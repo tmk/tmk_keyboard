@@ -25,14 +25,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PRODUCT_ID      0xBEE0
 #define MANUFACTURER    t.m.k.
 #define PRODUCT         Macway mod
-#define DESCRIPTION     t.m.k. keyboard firmware for Macway mod
+#define DESCRIPTION     t.m.k. keyboard firmware for Fourway mod
 
 
 /* matrix size */
-#define MATRIX_ROWS 9
-#define MATRIX_COLS 8
-/* define if matrix has ghost */
-#define MATRIX_HAS_GHOST
+#define MATRIX_ROWS 2
+#define MATRIX_COLS 2
 /* Set 0 if need no debouncing */
 #define DEBOUNCE    5
 
@@ -43,23 +41,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     keyboard_report->mods == (MOD_BIT(KB_LSHIFT) | MOD_BIT(KB_RSHIFT)) \
 )
 
-
-/* mouse keys */
-#ifdef MOUSEKEY_ENABLE
-#   define MOUSEKEY_DELAY_TIME 192
-#endif
-
-
-/* PS/2 mouse */
-#ifdef PS2_MOUSE_ENABLE
-#   define PS2_CLOCK_PORT  PORTF
-#   define PS2_CLOCK_PIN   PINF
-#   define PS2_CLOCK_DDR   DDRF
-#   define PS2_CLOCK_BIT   0
-#   define PS2_DATA_PORT   PORTF
-#   define PS2_DATA_PIN    PINF
-#   define PS2_DATA_DDR    DDRF
-#   define PS2_DATA_BIT    1
-#endif
 
 #endif

@@ -1,5 +1,5 @@
 # Target file name (without extension).
-TARGET = macway
+TARGET = fourway
 
 # Directory common source filess exist
 COMMON_DIR = ..
