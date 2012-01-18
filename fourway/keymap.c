@@ -28,16 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keymap.h"
 
 
-// Convert physical keyboard layout to matrix array.
-// This is a macro to define keymap easily in keyboard layout form.
-#define KEYMAP( \
-    R0C0, R0C1, \
-    R1C0, R1C1 \
-) { \
-    { R0C0, R0C1 }, \
-    { R1C0, R1C1 }\
-}
-
 #define KEYCODE(layer, row, col) (pgm_read_byte(&keymaps[(layer)][(row)][(col)]))
 
 
