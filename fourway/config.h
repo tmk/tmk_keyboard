@@ -21,6 +21,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* controller configuration */
 #include "controller_teensy.h"
 
+#define LAYERS \
+    /* Layer 0: Default Layer \
+     * ,-------. \
+     * | 1 | 2 | \
+     * |---+---| \
+     * | 3 | 4 | \
+     * `-------' \
+     */ \
+    KEYMAP(KB_1, KB_2, \
+           KB_3, KB_4)
+
+/* matrix size */
+#define MATRIX_ROWS 2
+#define MATRIX_COLS 2
+
+
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0xBEE0
 #define MANUFACTURER    t.m.k.
@@ -28,9 +44,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DESCRIPTION     t.m.k. keyboard firmware for Fourway mod
 
 
-/* matrix size */
-#define MATRIX_ROWS 2
-#define MATRIX_COLS 2
 /* Set 0 if need no debouncing */
 #define DEBOUNCE    5
 

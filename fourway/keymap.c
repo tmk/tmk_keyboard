@@ -53,15 +53,7 @@ static const uint8_t PROGMEM fn_keycode[] = {
 };
 
 static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    /* Layer 0: Default Layer
-     * ,-------.
-     * | 1 | 2 |
-     * |-------|
-     * | 3 | 4 |
-     * `-------'
-     */
-    KEYMAP(KB_1,  KB_2, \
-			KB_3, KB_4),
+	LAYERS
 };
 
 
