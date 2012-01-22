@@ -24,25 +24,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define LAYERS \
     /* Layer 0: Default Layer \
-     * ,-------. \
-     * | 1 | 2 | \
-     * |---+---| \
-     * | 3 | 4 | \
-     * `-------' \
+     *     ,---.     \
+     *     | W |     \
+     * ,---+---+---. \
+     * | A | S | D | \
+     * `-----------' \
      */ \
-    KEYMAP(KB_1, KB_2, \
-           KB_3, KB_4)
+    KEYMAP(      KB_W, \
+           KB_A, KB_S, KB_D)
 
-/* matrix size */
+/* logical matrix size */
 #define MATRIX_ROWS 2
 #define MATRIX_COLS 2
 
 // Convert physical keyboard layout to matrix array.
 // This is a macro to define keymap easily in keyboard layout form.
 #define KEYMAP( \
-      R0C0, R0C1, \
-      R1C0, R1C1 \
+    /* physical matrix */ \
+          R0C0, \
+    R0C1, R1C0, R1C1 \
 ) { \
+    /* logical matrix */ \
     { R0C0, R0C1 }, \
     { R1C0, R1C1 } \
 }
