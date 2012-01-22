@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
  * scan matrix
  */
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <avr/io.h>
@@ -30,12 +31,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // need to fix the row/col limit to support full C(22,2)
 #if (MATRIX_COLS > 16)
-#   error "MATRIX_COLS must not exceed 16"
+	#error "MATRIX_COLS must not exceed 16"
 #endif
 #if (MATRIX_ROWS > 8)
-#   error "MATRIX_ROWS must not exceed 8"
+	#error "MATRIX_ROWS must not exceed 8"
 #endif
-
+// need to generalize in order to have diodes work in other direction
+#if (DIODE_DIRECTION != ROWS)
+	#error "DIODE_DIRECTION only supports ROWS"
+#endif
 
 #ifndef DEBOUNCE
 #   define DEBOUNCE	0
@@ -61,6 +65,7 @@ static const bool matrix_has_diodes_in_row = DIODE_DIRECTION;
 /* C7-------D6 */
 /* Or in other words portmap is:
  * Index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21
+ * Hex:   00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15
  * Port:  B0 F0 B1 F1 B2 F4 B3 F5 B7 F6 D0 F7 D1 B6 D2 B5 D3 B4 C6 D7 C7 D6
  */
 static const uint8_t portmap[] = {
@@ -70,6 +75,17 @@ static const uint8_t portmap[] = {
 static const uint8_t pinmap[] = {
 	0, 0, 1, 1, 2, 4, 3, 5, 7, 6, 0, 7, 1, 6, 2, 5, 3, 4, 6, 7, 7, 6
 };
+
+static uint8_t num_inputs;
+static uint8_t num_outputs;
+
+#if (DIODE_DIRECTION == ROWS)
+static uint8_t inputpin[MATRIX_COLS];
+static uint8_t outputpin[MATRIX_ROWS];
+#else
+static uint8_t inputpin[MATRIX_ROWS];
+static uint8_t outputpin[MATRIX_COLS];
+#endif
 
 // matrix state buffer(1:on, 0:off)
 #if (MATRIX_COLS <= 8)
@@ -96,7 +112,7 @@ static uint8_t read_pin(uint8_t index);
 static void unselect(void);
 static void unselect_pin(uint8_t index);
 static void select(uint8_t index);
-
+static int compare_logical_order(const void* pin1, const void* pin2);
 
 inline
 uint8_t matrix_rows(void)
@@ -165,21 +181,55 @@ void pull_up(uint8_t index)
 			//DDRF CLEAR_PORT(index);
 			//PORTF SET_PORT(index);
 			break;
+		default:
+			print("failed to pull up ");
+			phex(index);
+			print("\n");
 	}
 }
 
+static int compare_logical_order(const void* pin1, const void* pin2) {
+	return portmap[* (uint8_t*) pin1] - portmap[*(uint8_t*) pin2];
+}
 
 void matrix_init(void)
 {
 	_delay_ms(1000);
 	print_enable = true;
-	print("init matrix\n");
-	// initialize row and col
-    unselect();
+
+	num_inputs = 0;
+	num_outputs = 0;
 	for (uint8_t i = 0; i < 22; i++) {
 		if (IS_INPUT(portmap[i])) {
-			pull_up(i);
+			inputpin[num_inputs] = i;
+			num_inputs++;
+		} else if (IS_OUTPUT(portmap[i])) {
+			outputpin[num_outputs] = i;
+			num_outputs++;
 		}
+	}
+	qsort(inputpin, num_inputs, sizeof inputpin[0], compare_logical_order);
+	qsort(outputpin, num_outputs, sizeof outputpin[0], compare_logical_order);
+
+	print("inputs: ");
+	for (uint8_t i = 0; i < num_inputs; i++) {
+		phex(inputpin[i]);
+		print(" ");
+	}
+	print("\n");
+
+	print("outputs: ");
+	for (uint8_t i = 0; i < num_outputs; i++) {
+		phex(outputpin[i]);
+		print(" ");
+	}
+	print("\n");
+
+	print("init matrix\n");
+	// initialize row and col
+	unselect();
+	for (uint8_t i = 0; i < num_inputs; i++) {
+		pull_up(inputpin[i]);
 	}
 
     // initialize matrix state: all keys off
@@ -198,25 +248,23 @@ uint8_t matrix_scan(void)
     }
 
 	uint8_t row = 0;
-	for (uint8_t i = 0; i < 22; i++) {
-		if (IS_OUTPUT(portmap[i])) {
-			select(i);
-			_delay_ms(300);  // without this wait read unstable value.
+	for (uint8_t i = 0; i < num_outputs; i++) {
+		select(outputpin[i]);
+		_delay_ms(300);  // without this wait read unstable value.
 #if (MATRIX_COLS <= 8)
-			uint8_t stripe = ~read();
+		uint8_t stripe = ~read();
 #else
-			uint16_t stripe = ~read();
+		uint16_t stripe = ~read();
 #endif
-			if (matrix[row] != stripe) {
-				matrix[row] = stripe;
-				row++;
-				if (debouncing) {
-					debug("bounce!: "); debug_hex(debouncing); print("\n");
-				}
-				debouncing = DEBOUNCE;
+		if (matrix[row] != stripe) {
+			matrix[row] = stripe;
+			row++;
+			if (debouncing) {
+				debug("bounce!: "); debug_hex(debouncing); print("\n");
 			}
-			unselect_pin(i);
+			debouncing = DEBOUNCE;
 		}
+		unselect_pin(outputpin[i]);
     }
 
     if (debouncing) {
@@ -325,14 +373,14 @@ uint8_t read_pin(uint8_t index)
 		case 13:
 		case 15:
 		case 17:
-			print("read port B pin ");
+			print("\tread port B pin ");
 			phex(pinmap[index]);
 			print("\n");
 			break;
 			//return PINB & (1 << pinmap[index]);
 		case 18:
 		case 20:
-			print("read port C pin ");
+			print("\tread port C pin ");
 			phex(pinmap[index]);
 			print("\n");
 			break;
@@ -343,7 +391,7 @@ uint8_t read_pin(uint8_t index)
 		case 16:
 		case 19:
 		case 21:
-			print("read port D pin ");
+			print("\tread port D pin ");
 			phex(pinmap[index]);
 			print("\n");
 			break;
@@ -354,11 +402,15 @@ uint8_t read_pin(uint8_t index)
 		case 7:
 		case 9:
 		case 11:
-			print("read port F pin ");
+			print("\tread port F pin ");
 			phex(pinmap[index]);
 			print("\n");
 			break;
 			//return PINF & (1 << pinmap[index]);
+		default:
+			print("failed to read port ");
+			phex(index);
+			print("\n");
 	}
 	return 0;
 }
@@ -376,11 +428,9 @@ static uint16_t read(void)
 	uint16_t row = 0xFFFF;
 #endif
 	uint8_t bit = 0;
-	for (uint8_t i = 0; i < 22; i++) {
-		if (IS_INPUT(portmap[i])) {
-			row |= ((read_pin(i) & 0x01) << bit);
-			bit++;
-		}
+	for (uint8_t i = 0; i < num_inputs; i++) {
+		row |= ((read_pin(inputpin[i]) & 0x01) << bit);
+		bit++;
 	}
 	return row;
 }
@@ -435,16 +485,18 @@ void unselect_pin(uint8_t index)
 			//DDRF CLEAR_PORT(index);
 			//PORTF CLEAR_PORT(index);
 			break;
+		default:
+			print("failed to unselect port ");
+			phex(index);
+			print("\n");
 	}
 }
 
 //inline
 static void unselect(void)
 {
-	for (uint8_t i = 0; i < 22; i++) {
-		if (IS_OUTPUT(portmap[i])) {
-			unselect_pin(i);
-		}
+	for (uint8_t i = 0; i < num_outputs; i++) {
+		unselect_pin(outputpin[i]);
 	}
 }
 
@@ -498,5 +550,9 @@ static void select(uint8_t index)
 			//DDRF SET_PORT(index);
 			//PORTF CLEAR_PORT(index);
 			break;
+		default:
+			print("failed to select port ");
+			phex(index);
+			print("\n");
 	}
 }
