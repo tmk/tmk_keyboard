@@ -72,13 +72,16 @@ static const uint8_t portmap[] = {
     PORTMAP
 };
 
+// the pin of the port for the corresponding element in portmap[]
 static const uint8_t pinmap[] = {
 	0, 0, 1, 1, 2, 4, 3, 5, 7, 6, 0, 7, 1, 6, 2, 5, 3, 4, 6, 7, 7, 6
 };
 
+// length of inputpin[] and outputpin[]
 static uint8_t num_inputs;
 static uint8_t num_outputs;
 
+// the index of portmap[] for inputs/outputs
 #if (DIODE_DIRECTION == ROWS)
 static uint8_t inputpin[MATRIX_COLS];
 static uint8_t outputpin[MATRIX_ROWS];
@@ -197,6 +200,7 @@ void matrix_init(void)
 	_delay_ms(1000);
 	print_enable = true;
 
+	// find all the input/output pins and sort them into logical order
 	num_inputs = 0;
 	num_outputs = 0;
 	for (uint8_t i = 0; i < 22; i++) {
@@ -214,14 +218,18 @@ void matrix_init(void)
 	print("inputs: ");
 	for (uint8_t i = 0; i < num_inputs; i++) {
 		phex(inputpin[i]);
-		print(" ");
+		print("(");
+		phex(portmap[inputpin[i]]);
+		print(") ");
 	}
 	print("\n");
 
 	print("outputs: ");
 	for (uint8_t i = 0; i < num_outputs; i++) {
 		phex(outputpin[i]);
-		print(" ");
+		print("(");
+		phex(portmap[outputpin[i]]);
+		print(") ");
 	}
 	print("\n");
 
