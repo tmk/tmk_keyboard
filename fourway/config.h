@@ -22,6 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "controller_teensy.h"
 #include "ports.h"
 
+//////////////////////////////////////////////
+// KEYBOARD LAYOUT
+//////////////////////////////////////////////
 #define LAYERS \
     /* Layer 0: Default Layer \
      *     ,---.     \
@@ -33,6 +36,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     KEYMAP(      KB_W, \
            KB_A, KB_S, KB_D)
 
+//////////////////////////////////////////////
+// MATRIX LAYOUT
+//////////////////////////////////////////////
 /* logical matrix size */
 #define MATRIX_ROWS 2
 #define MATRIX_COLS 2
@@ -49,6 +55,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     { R1C0, R1C1 } \
 }
 
+//////////////////////////////////////////////
+// CONTROLLER CONFIGURATION
+//////////////////////////////////////////////
 /* Set 0 if need no debouncing */
 #define DEBOUNCE    5
 
@@ -68,6 +77,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     NC, /* C6   0   D7 */ NC, \
     NC, /* C7-------D6 */ NC
 
+//////////////////////////////////////////////
+// USB CONFIGURATION
+//////////////////////////////////////////////
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0xBEE0
 #define MANUFACTURER    t.m.k.
