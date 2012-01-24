@@ -129,8 +129,8 @@ uint8_t matrix_cols(void)
     return MATRIX_COLS;
 }
 
-#define CLEAR_PORT(index) (|= (1 << pinmap[index]));
-#define SET_PORT(index) (&= ~(1 << pinmap[index]));
+#define CLEAR_PORT(index) &= ~(1 << pinmap[index]);
+#define SET_PORT(index) |= (1 << pinmap[index]);
 #define IS_INPUT(port) ((matrix_has_diodes_in_row && IS_COL(port)) || (!matrix_has_diodes_in_row && IS_ROW(port)))
 #define IS_OUTPUT(port) ((matrix_has_diodes_in_row && IS_ROW(port)) || (!matrix_has_diodes_in_row && IS_COL(port)))
 
@@ -149,16 +149,16 @@ void pull_up(uint8_t index)
 			print("pull up port B pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRB CLEAR_PORT(index);
-			//PORTB SET_PORT(index);
+			DDRB CLEAR_PORT(index);
+			PORTB SET_PORT(index);
 			break;
 		case 18:
 		case 20:
 			print("pull up port C pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRC CLEAR_PORT(index);
-			//PORTC SET_PORT(index);
+			DDRC CLEAR_PORT(index);
+			PORTC SET_PORT(index);
 			break;
 		case 10:
 		case 12:
@@ -169,8 +169,8 @@ void pull_up(uint8_t index)
 			print("pull up port D pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRD CLEAR_PORT(index);
-			//PORTD SET_PORT(index);
+			DDRD CLEAR_PORT(index);
+			PORTD SET_PORT(index);
 			break;
 		case 1:
 		case 3:
@@ -181,8 +181,8 @@ void pull_up(uint8_t index)
 			print("pull up port F pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRF CLEAR_PORT(index);
-			//PORTF SET_PORT(index);
+			DDRF CLEAR_PORT(index);
+			PORTF SET_PORT(index);
 			break;
 		default:
 			print("failed to pull up ");
@@ -197,8 +197,9 @@ static int compare_logical_order(const void* pin1, const void* pin2) {
 
 void matrix_init(void)
 {
-	_delay_ms(1000);
-	print_enable = true;
+	// uncomment next two lines for debug output
+	//_delay_ms(1000);
+	//print_enable = true;
 
 	// find all the input/output pins and sort them into logical order
 	num_inputs = 0;
@@ -255,18 +256,16 @@ uint8_t matrix_scan(void)
         matrix = tmp;
     }
 
-	uint8_t row = 0;
 	for (uint8_t i = 0; i < num_outputs; i++) {
 		select(outputpin[i]);
-		_delay_ms(300);  // without this wait read unstable value.
+		_delay_us(30);  // without this wait read unstable value.
 #if (MATRIX_COLS <= 8)
-		uint8_t stripe = ~read();
+		uint8_t stripe = read();
 #else
-		uint16_t stripe = ~read();
+		uint16_t stripe = read();
 #endif
-		if (matrix[row] != stripe) {
-			matrix[row] = stripe;
-			row++;
+		if (matrix[i] != stripe) {
+			matrix[i] = stripe;
 			if (debouncing) {
 				debug("bounce!: "); debug_hex(debouncing); print("\n");
 			}
@@ -370,6 +369,8 @@ static bool matrix_has_ghost_in_row(uint8_t row)
 }
 #endif
 
+// return 0x01 for open switch and 0x00 for closed switch
+// note its "backwards" due to pull up resistor on input
 uint8_t read_pin(uint8_t index)
 {
 	switch (index) {
@@ -384,15 +385,13 @@ uint8_t read_pin(uint8_t index)
 			print("\tread port B pin ");
 			phex(pinmap[index]);
 			print("\n");
-			break;
-			//return PINB & (1 << pinmap[index]);
+			return 1 & (PINB >> pinmap[index]);
 		case 18:
 		case 20:
 			print("\tread port C pin ");
 			phex(pinmap[index]);
 			print("\n");
-			break;
-			//return PINC & (1 << pinmap[index]);
+			return 1 & (PINC >> pinmap[index]);
 		case 10:
 		case 12:
 		case 14:
@@ -402,8 +401,7 @@ uint8_t read_pin(uint8_t index)
 			print("\tread port D pin ");
 			phex(pinmap[index]);
 			print("\n");
-			break;
-			//return PIND & (1 << pinmap[index]);
+			return 1 & (PIND >> pinmap[index]);
 		case 1:
 		case 3:
 		case 5:
@@ -413,14 +411,13 @@ uint8_t read_pin(uint8_t index)
 			print("\tread port F pin ");
 			phex(pinmap[index]);
 			print("\n");
-			break;
-			//return PINF & (1 << pinmap[index]);
+			return 1 & (PINF << pinmap[index]);
 		default:
 			print("failed to read port ");
 			phex(index);
 			print("\n");
+			return 0x01;
 	}
-	return 0;
 }
 
 //inline
@@ -431,13 +428,15 @@ static uint16_t read(void)
 #endif
 {
 #if (MATRIX_COLS <= 8)
-	uint8_t row = 0xFF;
+	uint8_t row = 0;
 #else
-	uint16_t row = 0xFFFF;
+	uint16_t row = 0;
 #endif
 	uint8_t bit = 0;
 	for (uint8_t i = 0; i < num_inputs; i++) {
-		row |= ((read_pin(inputpin[i]) & 0x01) << bit);
+		// its a pull up, so flip 0 to true
+		uint8_t r = 1 ^ read_pin(inputpin[i]);
+		row |= (r << bit);
 		bit++;
 	}
 	return row;
@@ -458,16 +457,16 @@ void unselect_pin(uint8_t index)
 			print("unselect port B pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRB CLEAR_PORT(index);
-			//PORTB CLEAR_PORT(index);
+			DDRB CLEAR_PORT(index);
+			PORTB CLEAR_PORT(index);
 			break;
 		case 18:
 		case 20:
 			print("unselect port C pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRC CLEAR_PORT(index);
-			//PORTC CLEAR_PORT(index);
+			DDRC CLEAR_PORT(index);
+			PORTC CLEAR_PORT(index);
 			break;
 		case 10:
 		case 12:
@@ -478,8 +477,8 @@ void unselect_pin(uint8_t index)
 			print("unselect port D pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRD CLEAR_PORT(index);
-			//PORTD CLEAR_PORT(index);
+			DDRD CLEAR_PORT(index);
+			PORTD CLEAR_PORT(index);
 			break;
 		case 1:
 		case 3:
@@ -490,8 +489,8 @@ void unselect_pin(uint8_t index)
 			print("unselect port F pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRF CLEAR_PORT(index);
-			//PORTF CLEAR_PORT(index);
+			DDRF CLEAR_PORT(index);
+			PORTF CLEAR_PORT(index);
 			break;
 		default:
 			print("failed to unselect port ");
@@ -523,16 +522,16 @@ static void select(uint8_t index)
 			print("select port B pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRB SET_PORT(index);
-			//PORTB CLEAR_PORT(index);
+			DDRB SET_PORT(index);
+			PORTB CLEAR_PORT(index);
 			break;
 		case 18:
 		case 20:
 			print("select port C pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRC SET_PORT(index);
-			//PORTC CLEAR_PORT(index);
+			DDRC SET_PORT(index);
+			PORTC CLEAR_PORT(index);
 			break;
 		case 10:
 		case 12:
@@ -543,8 +542,8 @@ static void select(uint8_t index)
 			print("select port D pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRD SET_PORT(index);
-			//PORTD CLEAR_PORT(index);
+			DDRD SET_PORT(index);
+			PORTD CLEAR_PORT(index);
 			break;
 		case 1:
 		case 3:
@@ -555,8 +554,8 @@ static void select(uint8_t index)
 			print("select port F pin ");
 			phex(pinmap[index]);
 			print("\n");
-			//DDRF SET_PORT(index);
-			//PORTF CLEAR_PORT(index);
+			DDRF SET_PORT(index);
+			PORTF CLEAR_PORT(index);
 			break;
 		default:
 			print("failed to select port ");
