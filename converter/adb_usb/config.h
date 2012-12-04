@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_COLS 8   // keycode bit: 6-4
 
 /* Locking Caps Lock support */
-#define MATRIX_HAS_LOCKING_CAPS
+//#define MATRIX_HAS_LOCKING_CAPS
 
 #define MATRIX_ROW(code)    ((code)>>3&0x0F)
 #define MATRIX_COL(code)    ((code)&0x07)
@@ -44,19 +44,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   define MOUSEKEY_DELAY_TIME 192
 #endif
 
+/* keyboard type */
+#define ADB_M0116
 
 /* ADB port setting */
-#define ADB_PORT        PORTF
-#define ADB_PIN         PINF
-#define ADB_DDR         DDRF
-#define ADB_DATA_BIT    0
+#define ADB_PORT        PORTC
+#define ADB_PIN         PINC
+#define ADB_DDR         DDRC
+#define ADB_DATA_BIT    7
 //#define ADB_PSW_BIT     1       // optional
 
 /* key combination for command */
 #include "adb.h"
 #include "matrix.h"
-#define IS_COMMAND() ( \
-    matrix_is_on(MATRIX_ROW(ADB_POWER), MATRIX_COL(ADB_POWER)) \
-)
+#define IS_COMMAND() false
+//#define IS_COMMAND() ( \
+//    matrix_is_on(MATRIX_ROW(ADB_POWER), MATRIX_COL(ADB_POWER)) \
+//)
 
 #endif

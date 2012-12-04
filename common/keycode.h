@@ -137,6 +137,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_MSTP KC_MEDIA_STOP
 #define KC_MPLY KC_MEDIA_PLAY_PAUSE
 #define KC_MSEL KC_MEDIA_SELECT
+#define KC_EJCT KC_MEDIA_EJECT
 #define KC_MAIL KC_MAIL
 #define KC_CALC KC_CALCULATOR
 #define KC_MYCM KC_MY_COMPUTER
@@ -410,7 +411,8 @@ enum internal_special_keycodes {
     KC_WWW_STOP,
     KC_WWW_REFRESH,     /* 0xC0 */
     KC_WWW_FAVORITES,   /* 0xC1 */
-                        /* 0xC2-DF vacant for future use */
+    KC_MEDIA_EJECT,
+                        /* 0xC3-DF vacant for future use */
 
     /* 0xE0-E7 for Modifiers. DO NOT USE. */
 

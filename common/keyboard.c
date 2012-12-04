@@ -204,6 +204,9 @@ static void register_code(uint8_t code)
             case KC_MEDIA_SELECT:
                 usage = AL_CC_CONFIG;
                 break;
+            case KC_MEDIA_EJECT:
+                usage = TRANSPORT_STOP_EJECT;
+                break;
             case KC_MAIL:
                 usage = AL_EMAIL;
                 break;

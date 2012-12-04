@@ -41,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TRANSPORT_NEXT_TRACK    0x00B5
 #define TRANSPORT_PREV_TRACK    0x00B6
 #define TRANSPORT_STOP          0x00B7
+#define TRANSPORT_STOP_EJECT    0x00CC
 #define TRANSPORT_PLAY_PAUSE    0x00CD
 #define AL_CC_CONFIG            0x0183
 #define AL_EMAIL                0x018A
