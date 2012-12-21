@@ -104,6 +104,7 @@ Note that ***comment out*** to disable them.
     PS2_MOUSE_ENABLE = yes	# PS/2 mouse(TrackPoint) support
     EXTRAKEY_ENABLE = yes	# Enhanced feature for Windows(Audio control and System control)
     NKRO_ENABLE = yes		# USB Nkey Rollover
+	FN_BITFIELD = yes		# FN key states are bits into layer index
 
 ### 3. Programmer
 Set proper command for your controller, bootloader and programmer.
