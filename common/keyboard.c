@@ -127,7 +127,11 @@ static void layer_switch_on(uint8_t code)
 {
     if (!IS_FN(code)) return;
     fn_state_bits |= FN_BIT(code);
+#ifdef FN_BITFIELD
+    uint8_t new_layer = keymap_fn_layer(fn_state_bits & 7);
+#else
     uint8_t new_layer = (fn_state_bits ? keymap_fn_layer(biton(fn_state_bits)) : default_layer);
+#endif
     if (current_layer != new_layer) {
         Kdebug("Layer Switch(on): "); Kdebug_hex(current_layer);
         Kdebug(" -> "); Kdebug_hex(new_layer); Kdebug("\n");
@@ -141,7 +145,11 @@ static bool layer_switch_off(uint8_t code)
 {
     if (!IS_FN(code)) return false;
     fn_state_bits &= ~FN_BIT(code);
+#ifdef FN_BITFIELD
+    uint8_t new_layer = keymap_fn_layer(fn_state_bits & 7);
+#else
     uint8_t new_layer = (fn_state_bits ? keymap_fn_layer(biton(fn_state_bits)) : default_layer);
+#endif
     if (current_layer != new_layer) {
         Kdebug("Layer Switch(off): "); Kdebug_hex(current_layer);
         Kdebug(" -> "); Kdebug_hex(new_layer); Kdebug("\n");

@@ -37,5 +37,9 @@ ifdef $(or MOUSEKEY_ENABLE, PS2_MOUSE_ENABLE)
     OPT_DEFS += -DMOUSE_ENABLE
 endif
 
+ifdef FN_BITFIELD
+	OPT_DEFS += -DFN_BITFIELD
+endif
+
 # Search Path
 VPATH += $(TOP_DIR)/common
