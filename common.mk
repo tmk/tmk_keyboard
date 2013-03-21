@@ -60,6 +60,9 @@ ifdef SLEEP_LED_ENABLE
     OPT_DEFS += -DSLEEP_LED_ENABLE
 endif
 
+ifdef WAKEUP_ENABLE
+    OPT_DEFS += -DNO_SUSPEND_POWER_DOWN
+endif
 
 # Search Path
 VPATH += $(TOP_DIR)/common
