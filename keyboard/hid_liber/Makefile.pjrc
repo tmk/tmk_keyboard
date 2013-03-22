@@ -92,3 +92,6 @@ VPATH += $(TOP_DIR)
 include $(TOP_DIR)/protocol/pjrc.mk
 include $(TOP_DIR)/common.mk
 include $(TOP_DIR)/rules.mk
+
+custom: OPT_DEFS += -DKEYMAP_CUSTOM
+custom: all
