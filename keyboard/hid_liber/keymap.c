@@ -63,7 +63,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* R */   { KC_NO   , KC_NO   , KC_NO   , KC_NO   , KC_##KR4, KC_NO   , KC_NO   , KC_NO    }  \
 }
 
-//eigens layout einfügen
+/*
+ * Add custom layouts. If no custom layout is defined the default layout is used.
+*/
 #if defined(KEYMAP_CUSTOM)
     #include "keymap_custom.h"
 #else
