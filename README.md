@@ -172,7 +172,8 @@ Note that ***comment out*** to disable them.
     EXTRAKEY_ENABLE = yes       # Audio control and System control(+450)
     CONSOLE_ENABLE = yes        # Console for debug(+400)
     COMMAND_ENABLE = yes        # Commands for debug and configuration
-    SLEEP_LED_ENABLE = yes      # Breathing sleep LED during USB suspend
+    WAKEUP_ENABLE = yes         # Enable wakeup from standby/hibernate - not yet supported in PJRC
+    SLEEP_LED_ENABLE = yes      # Breathing sleep LED during USB suspend - not yet supported in PJRC
     #NKRO_ENABLE = yes          # USB Nkey Rollover - not yet supported in LUFA
     #PS2_MOUSE_ENABLE = yes     # PS/2 mouse(TrackPoint) support
 
