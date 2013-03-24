@@ -166,7 +166,7 @@ static const uint8_t PROGMEM overlays[][MATRIX_ROWS][MATRIX_COLS] = {};
  * Fn action definition
  */
 static const uint16_t PROGMEM fn_actions[] = { 
-	[0] = ACTION_DEFAULT_LAYER_SET(0),
+    [0] = ACTION_DEFAULT_LAYER_SET(0),
     [1] = ACTION_DEFAULT_LAYER_SET(1),
     [2] = ACTION_DEFAULT_LAYER_SET(2),
     [3] = ACTION_DEFAULT_LAYER_SET(3),
