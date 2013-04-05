@@ -24,7 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keycode.h"
 #include "action.h"
 #include "action_macro.h"
-#include "layer_switch.h"
 #include "report.h"
 #include "host.h"
 #include "print.h"
@@ -160,52 +159,32 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
-static const uint8_t PROGMEM overlays[][MATRIX_ROWS][MATRIX_COLS] = {};
-
 /*
  * Fn action definition
  */
 static const uint16_t PROGMEM fn_actions[] = { 
-    [0] = ACTION_DEFAULT_LAYER_SET(0),
-    [1] = ACTION_DEFAULT_LAYER_SET(1),
-    [2] = ACTION_DEFAULT_LAYER_SET(2),
-    [3] = ACTION_DEFAULT_LAYER_SET(3),
-    [4] = ACTION_DEFAULT_LAYER_SET(4),
-    [5] = ACTION_DEFAULT_LAYER_SET(5),
-    [6] = ACTION_DEFAULT_LAYER_SET(6),
-    [7] = ACTION_DEFAULT_LAYER_SET(7),
-    [8] = ACTION_DEFAULT_LAYER_SET(8),
+    [0] = ACTION_LAYER_MOMENTARY(0),
+    [1] = ACTION_LAYER_MOMENTARY(1),
+    [2] = ACTION_LAYER_MOMENTARY(2),
+    [3] = ACTION_LAYER_MOMENTARY(3),
+    [4] = ACTION_LAYER_MOMENTARY(4),
+    [5] = ACTION_LAYER_MOMENTARY(5),
+    [6] = ACTION_LAYER_MOMENTARY(6),
+    [7] = ACTION_LAYER_MOMENTARY(7),
+    [8] = ACTION_LAYER_MOMENTARY(8),
 };
 #endif 
 
 #define KEYMAPS_SIZE    (sizeof(keymaps) / sizeof(keymaps[0]))
-#define OVERLAYS_SIZE   (sizeof(overlays) / sizeof(overlays[0]))
 #define FN_ACTIONS_SIZE (sizeof(fn_actions) / sizeof(fn_actions[0]))
 
 /* translates key to keycode */
 uint8_t keymap_key_to_keycode(uint8_t layer, key_t key)
 {
-    /* Overlay: 16-31(OVERLAY_BIT(0x10) | overlay_layer) */
-    if (layer & OVERLAY_BIT) {
-        layer &= OVERLAY_MASK;
-        if (layer < OVERLAYS_SIZE) {
-            return pgm_read_byte(&overlays[(layer)][(key.row)][(key.col)]);
-        } else {
-            // XXX: this may cuaes bootlaoder_jump incositent fail.
-            //debug("key_to_keycode: overlay "); debug_dec(layer); debug(" is invalid.\n");
-            return KC_TRANSPARENT;
-        }
-    } 
-    /* Keymap: 0-15 */
-    else {
-        if (layer < KEYMAPS_SIZE) {
-            return pgm_read_byte(&keymaps[(layer)][(key.row)][(key.col)]);
-        } else {
-            // XXX: this may cuaes bootlaoder_jump incositent fail.
-            //debug("key_to_keycode: base "); debug_dec(layer); debug(" is invalid.\n");
-            // fall back to layer 0
-            return pgm_read_byte(&keymaps[0][(key.row)][(key.col)]);
-        }
+    if (layer < KEYMAPS_SIZE) {
+        return pgm_read_byte(&keymaps[(layer)][(key.row)][(key.col)]);
+    } else {
+        return pgm_read_byte(&keymaps[0][(key.row)][(key.col)]);
     }
 }
 

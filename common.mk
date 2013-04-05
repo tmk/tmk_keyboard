@@ -2,9 +2,10 @@ COMMON_DIR = common
 SRC +=	$(COMMON_DIR)/host.c \
 	$(COMMON_DIR)/keyboard.c \
 	$(COMMON_DIR)/action.c \
+	$(COMMON_DIR)/action_tapping.c \
 	$(COMMON_DIR)/action_oneshot.c \
 	$(COMMON_DIR)/action_macro.c \
-	$(COMMON_DIR)/layer_switch.c \
+	$(COMMON_DIR)/action_layer.c \
 	$(COMMON_DIR)/keymap.c \
 	$(COMMON_DIR)/timer.c \
 	$(COMMON_DIR)/print.c \
