@@ -22,9 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <avr/pgmspace.h>
 #include "keycode.h"
+#include "action.h"
+#include "action_macro.h"
+#include "report.h"
+#include "host.h"
 #include "print.h"
 #include "debug.h"
-#include "util.h"
 #include "keymap.h"
 
 
@@ -35,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     KG7, KG5, KH5, KJ5, KI5, KI7, KK7, KK5, KL5, KA5, KC5, KC7, KL7, KD6, KQ7, KN7, KM7, \
     KG6, KG3, KH3, KJ3, KI3, KI6, KK6, KK3, KL3, KA3, KC3, KC6, KL6, KD4, KP7, KN5, KM5, \
     KH6, KG4, KH4, KJ4, KI4, KI1, KK1, KK4, KL4, KA4, KC4, KC1, KD0,                     \
-    KF6, KQ0, KG0, KH0, KJ0, KI0, KI2, KK2, KK0, KL0, KA0, KC2, KF4,           KN1,      \
+    KF6, KH1, KG0, KH0, KJ0, KI0, KI2, KK2, KK0, KL0, KA0, KC2, KF4,           KN1,      \
     KO7, KE6, KB1,           KP1,                     KB2, KR4, KA2, KO0, KN2, KP2, KQ2  \
 ) { \
 /*             0         1         2         3         4         5         6         7     */ \
@@ -45,8 +48,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* D */   { KC_##KD0, KC_##KD1, KC_##KD2, KC_NO   , KC_##KD4, KC_##KD5, KC_##KD6, KC_##KD7 }, \
 /* E */   { KC_NO   , KC_NO   , KC_NO   , KC_NO   , KC_NO   , KC_NO   , KC_##KE6, KC_NO    }, \
 /* F */   { KC_NO   , KC_NO   , KC_NO   , KC_NO   , KC_##KF4, KC_NO   , KC_##KF6, KC_NO    }, \
-/* G */   { KC_##KG0, KC_##KG1, KC_NO   , KC_##KG3, KC_##KG4, KC_##KG5, KC_##KG6, KC_##KG7  }, \
-/* H */   { KC_##KH0, KC_NO   , KC_NO   , KC_##KH3, KC_##KH4, KC_##KH5, KC_##KH6, KC_##KH7 }, \
+/* G */   { KC_##KG0, KC_##KG1, KC_NO   , KC_##KG3, KC_##KG4, KC_##KG5, KC_##KG6, KC_##KG7 }, \
+/* H */   { KC_##KH0, KC_##KH1, KC_NO   , KC_##KH3, KC_##KH4, KC_##KH5, KC_##KH6, KC_##KH7 }, \
 /* I */   { KC_##KI0, KC_##KI1, KC_##KI2, KC_##KI3, KC_##KI4, KC_##KI5, KC_##KI6, KC_##KI7 }, \
 /* J */   { KC_##KJ0, KC_##KJ1, KC_NO   , KC_##KJ3, KC_##KJ4, KC_##KJ5, KC_##KJ6, KC_##KJ7 }, \
 /* K */   { KC_##KK0, KC_##KK1, KC_##KK2, KC_##KK3, KC_##KK4, KC_##KK5, KC_##KK6, KC_##KK7 }, \
@@ -59,38 +62,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* R */   { KC_NO   , KC_NO   , KC_NO   , KC_NO   , KC_##KR4, KC_NO   , KC_NO   , KC_NO    }  \
 }
 
-#define KEYCODE(layer, row, col) (pgm_read_byte(&keymaps[(layer)][(row)][(col)]))
-
-
-// Assign Fn key(0-7) to a layer to which switch with the Fn key pressed.
-static const uint8_t PROGMEM fn_layer[] = {
-    0,              // Fn0
-    1,              // Fn1
-    2,              // Fn2
-    3,              // Fn3
-    4,              // Fn4
-    5,              // Fn5
-    6,              // Fn6
-    7               // Fn7
-};
-
-// Assign Fn key(0-7) to a keycode sent when release Fn key without use of the layer.
-// See layer.c for details.
-static const uint8_t PROGMEM fn_keycode[] = {
-    KC_NO,          // Fn0
-    KC_NO,          // Fn1
-    KC_NO,          // Fn2
-    KC_NO,          // Fn3
-    KC_NO,          // Fn4
-    KC_NO,          // Fn5
-    KC_NO,          // Fn6
-    KC_NO           // Fn7
-};
-
 /*
- * Tenkeyless keyboard default layout, ISO & ANSI (ISO is next to right shift,
- * not present on ANSI, other ISO switches move from ANSI layout but are same
- * switch
+ * Add custom layouts. If no custom layout is defined the default layout is used.
+*/
+#if defined(KEYMAP_CUSTOM)
+    #include "keymap_custom.h"
+#else
+/*
+ * Tenkeyless keyboard default layout, ISO & ANSI (ISO is between Left Shift
+ * and Z, and the ANSI \ key above Return/Enter is used for the additional ISO
+ * switch in the ASD row next to enter.  Use NUBS as keycode for the first and
+ * NUHS as the keycode for the second.
  *
  * ,---.   ,---------------. ,---------------. ,---------------. ,-----------.
  * |Esc|   |F1 |F2 |F3 |F4 | |F5 |F6 |F7 |F8 | |F9 |F10|F11|F12| |PrS|ScL|Pau|
@@ -124,7 +106,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |-----------------------------------------------------------| `-----------'
  * |FN1   |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|Return  |              
  * |-----------------------------------------------------------|     ,---.    
- * |Shft    |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|Shift     |     |Up |    
+ * |Shft|iso|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|Shift     |     |Up |    
  * |-----------------------------------------------------------| ,-----------.
  * |Ctl|Gui|Alt|          Space                |Alt|Gui|App|Ctl| |Lef|Dow|Rig|
  * `-----------------------------------------------------------' `-----------'
@@ -135,8 +117,18 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     GRV,   1,   2,   3,   4,   5,   6,   7,   8,   9,   0, MINS,  EQL, BSPC,  INS, HOME, PGUP, \
     TAB,   Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P, LBRC, RBRC, BSLS,  DEL,  END, PGDN, \
     FN1,   A,   S,   D,   F,   G,   H,   J,   K,   L, SCLN, QUOT,       ENT,                   \
-    LSFT, 0,  Z,   X,   C,   V,   B,   N,   M, COMM,  DOT, SLSH,      RSFT,         UP,       \
+    LSFT, NUBS, Z,   X,   C,   V,   B,   N,   M, COMM, DOT, SLSH,      RSFT,         UP,       \
     LCTL, LGUI, LALT,             SPC,                RALT, RGUI, APP, RCTL, LEFT, DOWN, RGHT),
+
+/*  EXAMPLE ISO keymap, see the NUBS and NUHS keycodes 
+ *  KEYMAP(\
+ *    ESC, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, PSCR, SLCK, BRK, \
+ *    GRV, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, MINS, EQL, BSPC, INS, HOME, PGUP, \
+ *    TAB, Q, W, E, R, T, Y, U, I, O, P, LBRC, RBRC, NUHS, DEL, END, PGDN, \
+ *    CAPS, A, S, D, F, G, H, J, K, L, SCLN, QUOT, ENT, \
+ *    LSFT, NUBS, Z, X, C, V, B, N, M, COMM, DOT, SLSH, RSFT, UP, \
+ *    LCTL, FN1, LALT, SPC, RALT, RGUI, APP, RCTL, LEFT, DOWN, RGHT),
+ */
 
 
 /*  
@@ -150,7 +142,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |-----------------------------------------------------------| `-----------'
  * |FN1   |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|Return  |              
  * |-----------------------------------------------------------|     ,---.    
- * |Shft    |  Z|  X|Clc|  V|  B|  N|  M|  ,|  .|  /|Caps      |     |Up |    
+ * |Shft|iso|  Z|  X|Clc|  V|  B|  N|  M|  ,|  .|  /|Caps      |     |Up |    
  * |-----------------------------------------------------------| ,-----------.
  * |Ctl|Gui|Alt|          Space                |Alt|Gui|App|Ctl| |Lef|Dow|Rig|
  * `-----------------------------------------------------------' `-----------'
@@ -161,24 +153,49 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     GRV,   1,   2,   3,   4,   5,   6,   7,   8,   9,MUTE, VOLD, VOLU, BSPC,  INS, HOME, PGUP, \
     TAB,   Q,   W,   E,   R,   T,   Y,   U,   I,MSTP,MPLY, MPRV, MNXT, MSEL,  DEL,  END, PGDN, \
     FN1,   A,   S,   D,   F,   G,   H,   J,   K,   L, SCLN, QUOT,       ENT,                   \
-    LSFT, NO,   Z,   X,CALC,   V,   B,   N,   M, COMM, DOT, SLSH,      CAPS,         UP,       \
+    LSFT, NUBS, Z,   X,CALC,   V,   B,   N,   M, COMM, DOT, SLSH,      CAPS,         UP,       \
     LCTL, LGUI, LALT,             SPC,                RALT, RGUI, APP, RCTL, LEFT, DOWN, RGHT),
 
 
 };
 
+/*
+ * Fn action definition
+ */
+static const uint16_t PROGMEM fn_actions[] = { 
+    [0] = ACTION_LAYER_MOMENTARY(0),
+    [1] = ACTION_LAYER_MOMENTARY(1),
+    [2] = ACTION_LAYER_MOMENTARY(2),
+    [3] = ACTION_LAYER_MOMENTARY(3),
+    [4] = ACTION_LAYER_MOMENTARY(4),
+    [5] = ACTION_LAYER_MOMENTARY(5),
+    [6] = ACTION_LAYER_MOMENTARY(6),
+    [7] = ACTION_LAYER_MOMENTARY(7),
+    [8] = ACTION_LAYER_MOMENTARY(8),
+};
+#endif 
 
-uint8_t keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t col)
+#define KEYMAPS_SIZE    (sizeof(keymaps) / sizeof(keymaps[0]))
+#define FN_ACTIONS_SIZE (sizeof(fn_actions) / sizeof(fn_actions[0]))
+
+/* translates key to keycode */
+uint8_t keymap_key_to_keycode(uint8_t layer, key_t key)
 {
-    return KEYCODE(layer, row, col);
+    if (layer < KEYMAPS_SIZE) {
+        return pgm_read_byte(&keymaps[(layer)][(key.row)][(key.col)]);
+    } else {
+        return pgm_read_byte(&keymaps[0][(key.row)][(key.col)]);
+    }
 }
 
-uint8_t keymap_fn_layer(uint8_t index)
+/* translates Fn keycode to action */
+action_t keymap_fn_to_action(uint8_t keycode)
 {
-    return pgm_read_byte(&fn_layer[index]);
-}
-
-uint8_t keymap_fn_keycode(uint8_t index)
-{
-    return pgm_read_byte(&fn_keycode[index]);
+    action_t action;
+    if (FN_INDEX(keycode) < FN_ACTIONS_SIZE) {
+        action.code = pgm_read_word(&fn_actions[FN_INDEX(keycode)]);
+    } else {
+        action.code = ACTION_NO;
+    }
+    return action;
 }

@@ -28,21 +28,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define IS_KEY(code)             (KC_A         <= (code) && (code) <= KC_EXSEL)
 #define IS_MOD(code)             (KC_LCTRL     <= (code) && (code) <= KC_RGUI)
 
-#define IS_FN(code)              (KC_FN0       <= (code) && (code) <= KC_FN7)
+
+#define IS_SPECIAL(code)         ((0xA5 <= (code) && (code) <= 0xDF) || (0xE8 <= (code) && (code) <= 0xFF))
+#define IS_SYSTEM(code)          (KC_POWER     <= (code) && (code) <= KC_WAKE)
+#define IS_CONSUMER(code)        (KC_MUTE      <= (code) && (code) <= KC_WFAV)
+#define IS_FN(code)              (KC_FN0       <= (code) && (code) <= KC_FN31)
 #define IS_MOUSEKEY(code)        (KC_MS_UP     <= (code) && (code) <= KC_MS_ACCEL2)
 #define IS_MOUSEKEY_MOVE(code)   (KC_MS_UP     <= (code) && (code) <= KC_MS_RIGHT)
 #define IS_MOUSEKEY_BUTTON(code) (KC_MS_BTN1   <= (code) && (code) <= KC_MS_BTN5)
 #define IS_MOUSEKEY_WHEEL(code)  (KC_MS_WH_UP  <= (code) && (code) <= KC_MS_WH_RIGHT)
 #define IS_MOUSEKEY_ACCEL(code)  (KC_MS_ACCEL0 <= (code) && (code) <= KC_MS_ACCEL2)
 
-#define IS_SPECIAL(code)         ((0xB0 <= (code) && (code) <= 0xDF) || (0xE8 <= (code) && (code) <= 0xFF))
-#define IS_CONSUMER(code)        (KC_MUTE      <= (code) && (code) <= KC_WFAV)
-#define IS_SYSTEM(code)          (KC_POWER     <= (code) && (code) <= KC_WAKE)
-
 #define MOD_BIT(code)   (1<<MOD_INDEX(code))
 #define MOD_INDEX(code) ((code) & 0x07)
 #define FN_BIT(code)    (1<<FN_INDEX(code))
 #define FN_INDEX(code)  ((code) - KC_FN0)
+#define FN_MIN          KC_FN0
+#define FN_MAX          KC_FN31
 
 
 /*
@@ -79,6 +81,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_APP  KC_APPLICATION
 #define KC_NUHS KC_NONUS_HASH
 #define KC_NUBS KC_NONUS_BSLASH
+#define KC_LCAP KC_LOCKING_CAPS
 #define KC_ERAS KC_ALT_ERASE,
 #define KC_CLR  KC_CLEAR
 /* Japanese specific */
@@ -148,6 +151,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_WSTP KC_WWW_STOP
 #define KC_WREF KC_WWW_REFRESH
 #define KC_WFAV KC_WWW_FAVORITES
+/* Transparent */
+#define KC_TRANSPARENT  1
+#define KC_TRNS KC_TRANSPARENT
+
 
 
 /* USB HID Keyboard/Keypad Usage(0x07) */
@@ -389,11 +396,10 @@ enum internal_special_keycodes {
     /* System Control */
     KC_SYSTEM_POWER     = 0xA5,
     KC_SYSTEM_SLEEP,
-    KC_SYSTEM_WAKE,     /* 0xA7 */
-                        /* 0xA8-AF */
+    KC_SYSTEM_WAKE,
 
-    /* Consumer Page */
-    KC_AUDIO_MUTE       = 0xB0,
+    /* Media Control */
+    KC_AUDIO_MUTE,
     KC_AUDIO_VOL_UP,
     KC_AUDIO_VOL_DOWN,
     KC_MEDIA_NEXT_TRACK,
@@ -416,15 +422,44 @@ enum internal_special_keycodes {
 
     /* 0xE0-E7 for Modifiers. DO NOT USE. */
 
-    /* Layer Switching */
-    KC_FN0              = 0xE8,
+    /* Fn key */
+    KC_FN0              = 0xC0,
     KC_FN1,
     KC_FN2,
     KC_FN3,
     KC_FN4,
     KC_FN5,
     KC_FN6,
-    KC_FN7,             /* 0xEF */
+    KC_FN7,
+    KC_FN8,
+    KC_FN9,
+    KC_FN10,
+    KC_FN11,
+    KC_FN12,
+    KC_FN13,
+    KC_FN14,
+    KC_FN15,
+
+    KC_FN16             = 0xD0,
+    KC_FN17,
+    KC_FN18,
+    KC_FN19,
+    KC_FN20,
+    KC_FN21,
+    KC_FN22,
+    KC_FN23,
+    KC_FN24,
+    KC_FN25,
+    KC_FN26,
+    KC_FN27,
+    KC_FN28,
+    KC_FN29,
+    KC_FN30,
+    KC_FN31,            /* 0xDF */
+
+    /**************************************/
+    /* 0xE0-E7 for Modifiers. DO NOT USE. */
+    /**************************************/
 
     /* Mousekey */
     KC_MS_UP            = 0xF0,

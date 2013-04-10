@@ -44,15 +44,11 @@ void matrix_init(void);
 /* scan all key states on matrix */
 uint8_t matrix_scan(void);
 /* whether modified from previous scan. used after matrix_scan. */
-bool matrix_is_modified(void);
-/* whether ghosting occur on matrix. */
-bool matrix_has_ghost(void);
+bool matrix_is_modified(void) __attribute__ ((deprecated));
 /* whether a swtich is on */
 bool matrix_is_on(uint8_t row, uint8_t col);
 /* matrix state on row */
 matrix_row_t  matrix_get_row(uint8_t row);
-/* count keys pressed */
-uint8_t matrix_key_count(void);
 /* print matrix for debug */
 void matrix_print(void);
 

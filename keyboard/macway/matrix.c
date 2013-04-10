@@ -28,36 +28,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "matrix.h"
 
 
-#if (MATRIX_COLS > 16)
-#   error "MATRIX_COLS must not exceed 16"
-#endif
-#if (MATRIX_ROWS > 255)
-#   error "MATRIX_ROWS must not exceed 255"
-#endif
-
-
 #ifndef DEBOUNCE
-#   define DEBOUNCE	0
+#   define DEBOUNCE	5
 #endif
 static uint8_t debouncing = DEBOUNCE;
 
-// matrix state buffer(1:on, 0:off)
-#if (MATRIX_COLS <= 8)
-static uint8_t *matrix;
-static uint8_t *matrix_prev;
-static uint8_t _matrix0[MATRIX_ROWS];
-static uint8_t _matrix1[MATRIX_ROWS];
-#else
-static uint16_t *matrix;
-static uint16_t *matrix_prev;
-static uint16_t _matrix0[MATRIX_ROWS];
-static uint16_t _matrix1[MATRIX_ROWS];
-#endif
+/* matrix state(1:on, 0:off) */
+static matrix_row_t matrix[MATRIX_ROWS];
+static matrix_row_t matrix_debouncing[MATRIX_ROWS];
 
 #ifdef MATRIX_HAS_GHOST
 static bool matrix_has_ghost_in_row(uint8_t row);
 #endif
-static uint8_t read_col(void);
+static matrix_row_t read_cols(void);
 static void unselect_rows(void);
 static void select_row(uint8_t row);
 
@@ -83,36 +66,37 @@ void matrix_init(void)
     PORTB = 0xFF;
 
     // initialize matrix state: all keys off
-    for (uint8_t i=0; i < MATRIX_ROWS; i++) _matrix0[i] = 0x00;
-    for (uint8_t i=0; i < MATRIX_ROWS; i++) _matrix1[i] = 0x00;
-    matrix = _matrix0;
-    matrix_prev = _matrix1;
+    for (uint8_t i=0; i < MATRIX_ROWS; i++) {
+        matrix[i] = 0;
+        matrix_debouncing[i] = 0;
+    }
 }
 
 uint8_t matrix_scan(void)
 {
-    if (!debouncing) {
-        uint8_t *tmp = matrix_prev;
-        matrix_prev = matrix;
-        matrix = tmp;
-    }
-
     for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        unselect_rows();
         select_row(i);
         _delay_us(30);  // without this wait read unstable value.
-        if (matrix[i] != (uint8_t)~read_col()) {
-            matrix[i] = (uint8_t)~read_col();
+        matrix_row_t cols = read_cols();
+        if (matrix_debouncing[i] != cols) {
+            matrix_debouncing[i] = cols;
             if (debouncing) {
-                debug("bounce!: "); debug_hex(debouncing); print("\n");
+                debug("bounce!: "); debug_hex(debouncing); debug("\n");
             }
             debouncing = DEBOUNCE;
         }
+        unselect_rows();
     }
-    unselect_rows();
 
     if (debouncing) {
-        debouncing--;
+        if (--debouncing) {
+            _delay_ms(1);
+        } else {
+            for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
+                matrix[i] = matrix_debouncing[i];
+            }
+        }
+
     }
 
     return 1;
@@ -121,38 +105,17 @@ uint8_t matrix_scan(void)
 bool matrix_is_modified(void)
 {
     if (debouncing) return false;
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        if (matrix[i] != matrix_prev[i]) {
-            return true;
-        }
-    }
-    return false;
-}
-
-inline
-bool matrix_has_ghost(void)
-{
-#ifdef MATRIX_HAS_GHOST
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        if (matrix_has_ghost_in_row(i))
-            return true;
-    }
-#endif
-    return false;
+    return true;
 }
 
 inline
 bool matrix_is_on(uint8_t row, uint8_t col)
 {
-    return (matrix[row] & (1<<col));
+    return (matrix[row] & ((matrix_row_t)1<<col));
 }
 
 inline
-#if (MATRIX_COLS <= 8)
-uint8_t matrix_get_row(uint8_t row)
-#else
-uint16_t matrix_get_row(uint8_t row)
-#endif
+matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
 }
@@ -162,11 +125,7 @@ void matrix_print(void)
     print("\nr/c 01234567\n");
     for (uint8_t row = 0; row < matrix_rows(); row++) {
         phex(row); print(": ");
-#if (MATRIX_COLS <= 8)
         pbin_reverse(matrix_get_row(row));
-#else
-        pbin_reverse16(matrix_get_row(row));
-#endif
 #ifdef MATRIX_HAS_GHOST
         if (matrix_has_ghost_in_row(row)) {
             print(" <ghost");
@@ -174,19 +133,6 @@ void matrix_print(void)
 #endif
         print("\n");
     }
-}
-
-uint8_t matrix_key_count(void)
-{
-    uint8_t count = 0;
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-#if (MATRIX_COLS <= 8)
-        count += bitpop(matrix[i]);
-#else
-        count += bitpop16(matrix[i]);
-#endif
-    }
-    return count;
 }
 
 #ifdef MATRIX_HAS_GHOST
@@ -199,7 +145,7 @@ static bool matrix_has_ghost_in_row(uint8_t row)
 
     // ghost exists in case same state as other row
     for (uint8_t i=0; i < MATRIX_ROWS; i++) {
-        if (i != row && (matrix[i] & matrix[row]) == matrix[row])
+        if (i != row && (matrix[i] & matrix[row]))
             return true;
     }
     return false;
@@ -207,9 +153,9 @@ static bool matrix_has_ghost_in_row(uint8_t row)
 #endif
 
 inline
-static uint8_t read_col(void)
+static matrix_row_t read_cols(void)
 {
-    return PINB;
+    return ~PINB;
 }
 
 inline

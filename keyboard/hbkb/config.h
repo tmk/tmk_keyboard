@@ -27,29 +27,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DEVICE_VER      0x0100
 #define PRODUCT         Happy Buckling Keyboard
 
-
 #define DESCRIPTION     mod version of IBM Model M keyboard
-
 
 /* matrix size */
 #define MATRIX_ROWS 12
 #define MATRIX_COLS 8
+
 /* define if matrix has ghost */
 #define MATRIX_HAS_GHOST
-/* Set 0 if need no debouncing */
-#define DEBOUNCE    10
 
+/* Set 0 if need no debouncing */
+#define DEBOUNCE    5
+
+/* legacy keymap support */
+#define USE_LEGACY_KEYMAP
 
 /* key combination for command */
 #define IS_COMMAND() ( \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_LCTRL) | MOD_BIT(KC_LALT) | MOD_BIT(KC_LGUI)) || \
     keyboard_report->mods == (MOD_BIT(KC_LALT) | MOD_BIT(KC_RALT)) \
 )
-
-
-/* mouse keys */
-#ifdef MOUSEKEY_ENABLE
-#   define MOUSEKEY_DELAY_TIME 128
-#endif
 
 #endif

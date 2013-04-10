@@ -26,10 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MANUFACTURER    t.m.k.
 #define PRODUCT         Phantom
 
-
 /* message strings */
 #define DESCRIPTION     t.m.k. keyboard firmware for Phantom
-
 
 /* matrix size */
 #define MATRIX_ROWS 6
@@ -41,6 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Set 0 if need no debouncing */
 #define DEBOUNCE    7
 
+/* legacy keymap support */
+#define USE_LEGACY_KEYMAP
 
 /* key combination for command */
 #define IS_COMMAND() ( \

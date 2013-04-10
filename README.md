@@ -1,34 +1,53 @@
-t.m.k. Keyboard Firmware Collection
-====================================
-This is a keyboard firmware with some features for Atmel AVR controller.
+TMK Keyboard Firmware Collection
+================================
+This is a keyboard firmware with some useful features for Atmel AVR controller.
 
 Source code is available here: <http://github.com/tmk/tmk_keyboard>
 
 
 Features
 --------
-* Mouse key             - Mouse control by keyboard.
-* System Control Key    - Power Down, Sleep, Wake Up and USB Remote Wake up.
-* Media Control Key     - Volume Down/Up, Mute, Next/Prev track, Play, Stop and etc. 
-* USB NKRO              - Can send 120 keys(+ 8 modifiers) simultaneously.
-* PS/2 mouse support    - integrate PS/2 mouse(TrackPoint) into keyboard as composite device.
-* keyboard protocols    - PS/2, ADB and old keyboard protocols.
+These features can be used in your keyboard.
+
+* Multi-layer Keymap  - Multiple keyboard layouts with layer switching
+* Mouse key           - Mouse control with keyboard
+* System Control Key  - Power Down, Sleep, Wake Up and USB Remote Wake up
+* Media Control Key   - Volume Down/Up, Mute, Next/Prev track, Play, Stop and etc
+* USB NKRO            - 120 keys(+ 8 modifiers) simultaneously
+* PS/2 mouse support  - PS/2 mouse(TrackPoint) as composite device
+* Keyboard protocols  - PS/2, ADB, M0110, Sun and other old keyboard protocols
+* User Function       - Customizable function of key with writing code
+* Macro               - Very primitive at this time
+* Keyboard Tricks     - Oneshot modifier and modifier with tapping feature
+* Debug Console       - Messages for debug and interaction with firmware
+* Virtual DIP Switch  - Configurations stored EEPROM(Boot Magic)
+* Locking CapsLock    - Mechanical switch support for CapsLock
+* Breathing Sleep LED - Sleep indicator with charm during USB suspend
 
 
 Projects
 --------
+You can find some keyboard specific projects under `converter` and `keyboard` directory.
+
 ### converter
-* ps2_usb       - [PS/2 keyboard to USB][GH_ps2]
-* adb_usb       - [ADB keyboard to USB][GH_adb]
-* m0110_usb     - [Machintosh 128K/512K/Plus keyboard to USB][GH_m0110]
-* terminal_usb  - [IBM Model M terminal keyboard(PS/2 scancode set3) to USB][GH_terminal]
-* news_usb      - [Sony NEWS keyboard to USB][GH_news]
-* x68k_usb      - [Sharp X68000 keyboard to USB][GH_x68k]
+* [ps2_usb](converter/ps2_usb/)             - [PS/2 keyboard to USB][GH_ps2]
+* [adb_usb](converter/adb_usb/)             - [ADB keyboard to USB][GH_adb]
+* [m0110_usb](converter/m0110_usb)          - [Machintosh 128K/512K/Plus keyboard to USB][GH_m0110]
+* [terminal_usb](converter/terminal_usb/)   - [IBM Model M terminal keyboard(PS/2 scancode set3) to USB][GH_terminal]
+* [news_usb](converter/news_usb/)           - [Sony NEWS keyboard to USB][GH_news]
+* [x68k_usb](converter/x68k_usb/)           - [Sharp X68000 keyboard to USB][GH_x68k]
+* [sun_usb](converter/sun_usb/)             - [Sun] to USB(type4, 5 and 3?)
+* [pc98_usb](converter/pc98_usb/)           - [PC98] to USB
+* [usb_usb](converter/usb_usb/)             - USB to USB(experimental)
 
 ### keyboard
-* hhkb      - [Happy Hacking Keyboard professional][GH_hhkb]
-* macway    - [Compact keyboard mod][GH_macway]
-* hbkb      - [Happy Buckling sprint keyboard(IBM Model M mod)][GH_hbkb]
+* [hhkb](keyboard/hhkb/)                    - [Happy Hacking Keyboard pro][GH_hhkb] **my main board**
+* [gh60](keyboard/gh60/)                    - [GH60] DIY 60% keyboard [prototype][GH60_proto] **my second board**
+* [hbkb](keyboard/hbkb/)                    - [Happy Buckling spring keyboard][GH_hbkb](IBM Model M 60% mod)
+* [hid_liber](keyboard/hid_liber/)          - [HID liberation][HID_liber] controller (by alaricljs)
+* [phantom](keyboard/phantom/)              - [Phantom] keyboard (by Tranquilite)
+* [IIgs_Standard](keyboard/IIgs/)           - Apple [IIGS] keyboard mod(by JeffreySung)
+* [macway](keyboard/macway/)                - [Compact keyboard mod][GH_macway] [retired]
 
 [GH_macway]:    http://geekhack.org/showwiki.php?title=Island:11930
 [GH_hhkb]:      http://geekhack.org/showwiki.php?title=Island:12047
@@ -40,10 +59,176 @@ Projects
 [GH_terminal]:  http://geekhack.org/showwiki.php?title=Island:27272
 [GH_x68k]:      http://geekhack.org/showwiki.php?title=Island:29060
 [GH_hbkb]:      http://geekhack.org/showwiki.php?title=Island:29483
+[HID_liber]:    http://deskthority.net/wiki/HID_Liberation_Device_-_DIY_Instructions
+[Phantom]:      http://geekhack.org/index.php?topic=26742
+[GH60]:         http://geekhack.org/index.php?topic=34959
+[GH60_proto]:   http://geekhack.org/index.php?topic=37570.0
+[PC98]:         http://en.wikipedia.org/wiki/NEC_PC-9801
+[Sun]:          http://en.wikipedia.org/wiki/Sun-3
+[IIGS]:         http://en.wikipedia.org/wiki/Apple_IIGS
 
 
 
-Files & Directories
+License
+-------
+**GPLv2** or later. Some protocol files are under **Modified BSD License**.
+LUFA, PJRC and V-USB stack have their own license respectively.
+
+
+
+Build Firmware and Program Controller
+-------------------------------------
+See [doc/build.md](doc/build.md).
+
+
+
+Change your keymap
+------------------
+See [doc/keymap.md](doc/keymap.md).
+
+
+
+Magic Comannds
+--------------
+To see help press `Magic` + `H`.
+
+ `Magic` key bind may be `LShift` + `RShift` in many project, but `Power` key on ADB converter. `Magic` keybind can be vary on each project, check `config.h` in project directory.
+
+Following commands can be also executed with `Magic` + key. In console mode `Magic` keybind is not needed.
+
+    ----- Command Help -----
+    c:      enter console mode
+    d:      toggle debug enable
+    x:      toggle matrix debug
+    k:      toggle keyboard debug
+    m:      toggle mouse debug
+    p:      toggle print enable
+    v:      print device version & info
+    t:      print timer count
+    s:      print status
+    e:	    print eeprom config
+    n:	    toggle NKRO
+    0/F10:  switch to Layer0
+    1/F1:   switch to Layer1
+    2/F2:   switch to Layer2
+    3/F3:   switch to Layer3
+    4/F4:   switch to Layer4
+    PScr:   power down/remote wake-up
+    Caps:   Lock Keyboard(Child Proof)
+    Paus:   jump to bootloader
+
+**TBD**
+
+### Boot Magic Configuration - Virtual DIP Switch
+Boot Magic are executed during boot up time. Press Magic key below then pulgin keyboard cable.
+Note that you must use keys of **Layer 0** as Magic keys. These settings are stored in EEPROM so that retain your configure over power cycles.
+
+#### EEPROM
+- Skip reading EEPROM(`ESC`)
+- Clear configuration stored in EEPROM(`Backspace`)
+
+#### Bootloader
+- Kick up Bootloader(`B`)
+
+#### Debug
+- Debug enable(`D`)
+- Debug matrix enable(`D`+`X`)
+- Debug keyboard enable(`D`+`K`)
+- Debug mouse enable(`D`+`M`)
+
+#### Keymap
+- Swap Control and CapsLock(`Left Control`)
+- Change CapsLock to Control(`Casp Lock`)
+- Swap LeftAlt and Gui(`Left Alt`)
+- Swap RightAlt and Gui(`Right Alt`)
+- Disable Gui(`Left Gui`)
+- Swap Grave and Escape(`Grave`)
+- Swap BackSlash and BackSpace(`Back Slash`)
+
+#### Default Layer
+- Set Default Layer to 0(`0`)
+- Set Default Layer to 0(`1`)
+- Set Default Layer to 0(`2`)
+- Set Default Layer to 0(`3`)
+
+**TBD**
+
+
+Mechanical Locking support for CapsLock
+---------------------------------------
+To enable this feature define these two macros in `config.h` and use `KC_LCAP` for locking CapsLock in keymap instead of normal `KC_CAPS`. Resync option tries to keep lock switch state consistent with keyboard LED state.
+ 
+    #define CAPSLOCK_LOCKING_ENABLE
+    #define CAPSLOCK_LOCKING_RESYNC_ENABLE
+
+
+Start Your Own Project
+-----------------------
+**TBD**
+### Config.h Options
+#### 1. USB vendor/product ID and device description
+    #define VENDOR_ID       0xFEED
+    #define PRODUCT_ID      0xBEEF
+    #define MANUFACTURER    t.m.k.
+    #define PRODUCT         Macway mod
+    #define DESCRIPTION     t.m.k. keyboard firmware for Macway mod
+
+#### 2. Keyboard matrix configuration
+    #define MATRIX_ROWS 8
+    #define MATRIX_COLS 8
+    #define MATRIX_HAS_GHOST
+
+
+
+Architecture
+------------
+    Architecture Diagram
+                               +---------------+---------------+-------------+
+                               |    Host       |   Keyboard    | Matrix, LED |
+       ___________             |-----------+-+ +-------------+ | +-----------|
+      /          /| Keys/Mouse | Protocol  |d| | Action      | | | Protocol  |
+     /__________/ |<-----------|  LUFA     |r| |  Layer, Tap | | |  Matrix   |
+     |.--------.| |   LED      |  V-USB    |i| |-------------| | |  PS/2,IBM |             __________________
+     ||        || |----------->|  PJRC     |v| | Keymap      | | |  ADB,M0110|  Keys      / /_/_/_/_/_/_/_/ /|
+     ||  Host  || |  Console   |  iWRAP(BT)|e| | Mousekey    | | |  SUN/NEWS |<----------/ /_/_/_/_/_/_/_/ / /
+     ||________||/.<-----------|  UART     |r| | Report      | | |  X68K/PC98| Control  / /_/_/_/_/_/_/_/ / /
+     `_========_'/|            |---------------------------------------------|-------->/___ /_______/ ___/ /
+     |_o______o_|/             | Sendchar, Print, Debug, Command, ...        |         |_________________|/
+                               +---------------------------------------------+              Keyboard
+
+
+
+Debuging
+--------
+Use PJRC's `hid_listen` to see debug messages. You can use the tool for debug even if firmware use LUFA stack.
+
+You will see output from firmware like this.
+
+    r/c 01234567
+    00: 00000000
+    01: 00000000
+    02: 00000000
+    03: 00000000
+    04: 00000000
+    05: 00000000
+    06: 00000000
+    07: 00000000
+
+    ---- action_exec: start -----
+    EVENT: 0307u(22511)
+    Tapping: Tap release(2)
+    ACTION: ACT_LAYER[5:2C]
+    LAYER_PRESSED: Tap: unregister_code
+    TAPPING_KEY=0307u(22511):2
+    processed: 0307u(22511):2
+
+    Tapping: End(Timeout after releasing last tap): FFFFu(22715)
+    TAPPING_KEY=0000u(0):0
+
+
+
+
+Files and Directories
 -------------------
 ### Top
 * common/       - common codes
@@ -55,7 +240,27 @@ Files & Directories
 * protoco.mk    - Makefile for protocol
 * rules.mk      - Makefile for build rules
 
+### Common
+* host.h
+* host_driver.h
+* keyboard.h
+* command.h
+* keymap.h
+* action.h
+* keycode.h
+* matrix.h
+* led.h
+* mousekey.h
+* report.h
+* debug.h
+* print.h
+* bootloader.h
+* sendchar.h
+* timer.h
+* util.h
+
 ### Keyboard Protocols
+* lufa/     - LUFA USB stack
 * pjrc/     - PJRC USB stack
 * vusb/     - Objective Development V-USB
 * iwrap/    - Bluetooth HID for Bluegiga iWRAP
@@ -64,123 +269,16 @@ Files & Directories
 * m0110.c   - Macintosh 128K/512K/Plus keyboard protocol
 * news.c    - Sony NEWS keyboard protocol
 * x68k.c    - Sharp X68000 keyboard protocol
-
-
-Build & Program
----------------
-### Build firmware
-To compile you need `AVR GCC`, `AVR Libc` and `GNU make`.
-You can use [WinAVR][winavr] on Windows and [CrossPack][crosspack] on Mac.
-
-    $ cd <project>
-    $ make
-
-The firmware will be compiled as a file `tmk_<project>.hex`.
-
-[winavr]:       http://winavr.sourceforge.net/
-[crosspack]:    http://www.obdev.at/products/crosspack/index.html
-
-### Program Controller
-If you have a proper program command in `Makefile` just type this.
-
-    $ make program
-
-As for `Teensy` you can use `PJRC's loader` to program hex file. <http://www.pjrc.com/teensy/loader.html>
+* serial_soft.c - Asynchronous Serial protocol implemented by software
 
 
 
-Makefile Options
-----------------
-### 1. MCU and Frequency.
-
-    MCU = atmega32u4       # Teensy 2.0
-    #MCU = at90usb1286      # Teensy++ 2.0
-    F_CPU = 16000000
-
-### 2. Features
-Note that ***comment out*** to disable them.
-
-    MOUSEKEY_ENABLE = yes	# Mouse keys
-    PS2_MOUSE_ENABLE = yes	# PS/2 mouse(TrackPoint) support
-    EXTRAKEY_ENABLE = yes	# Enhanced feature for Windows(Audio control and System control)
-    NKRO_ENABLE = yes		# USB Nkey Rollover
-
-### 3. Programmer
-Set proper command for your controller, bootloader and programmer.
-
-    # for PJRC Teensy
-    PROGRAM_CMD = teensy_loader_cli -mmcu=$(MCU) -w -v $(TARGET).hex
-
-    # for Atmel AT90USBKEY
-    PROGRAM_CMD = dfu-programmer $(MCU) flash $(TARGET).hex
-
-    # avrdude
-    PROGRAM_CMD = avrdude -p $(MCU) -c avrispmkII -P USB -U flash:w:$(TARGET).hex
-    PROGRAM_CMD = avrdude -p $(MCU) -c usbasp -U flash:w:$(TARGET).hex
-    PROGRAM_CMD = avrdude -p $(MCU) -c arduino -P COM1 -b 57600 -U flash:w:$(TARGET).hex
-
-config.h Options
-----------------
-### 1. USB vendor/product ID and device description
-    #define VENDOR_ID       0xFEED
-    #define PRODUCT_ID      0xBEEF
-    /* device description */
-    #define MANUFACTURER    t.m.k.
-    #define PRODUCT         Macway mod
-    #define DESCRIPTION     t.m.k. keyboard firmware for Macway mod
-
-### 2. Keyboard matrix configuration
-    #define MATRIX_ROWS 8
-    #define MATRIX_COLS 8
-    #define MATRIX_HAS_GHOST
-
-### 3. Mouse keys
-
-### 4. PS/2 mouse
-
-### 5. COMMAND key combination
-
-    #define IS_COMMAND() (keyboard_report->mods == (MOD_BIT(KB_LSHIFT) | MOD_BIT(KB_RSHIFT))) 
+Conding Style
+-------------
+- Doesn't use Tab to indent, use 4-spaces instead.
 
 
-Keymap
-------
 
-
-Build your own firmware
------------------------
-
-
-Debuging
---------
-Use PJRC's `hid_listen` to see debug messages and press `<COMMAND> + H` to debug menu. 
-See `config.h` for definition of `<COMMAND>` key combination.
-
-
-Other Keyboard Projects
------------------------
-### PJRC USB Keyboard/Mouse Example
-- <http://www.pjrc.com/teensy/usb_keyboard.html>
-- <http://www.pjrc.com/teensy/usb_mouse.html>
-
-### kbupgrade
-- <http://github.com/rhomann/kbupgrade>
-- <http://geekhack.org/showwiki.php?title=Island:8406>
-
-### c64key
-- <http://symlink.dk/projects/c64key/>
-
-### rump
-- <http://mg8.org/rump/>
-- <http://github.com/clee/rump>
-
-### dulcimer
-- <http://www.schatenseite.de/dulcimer.html>
-
-### humblehacker-keyboard
-- <http://github.com/humblehacker>
-- <http://www.humblehacker.com/keyboard/>
-- <http://geekhack.org/showwiki.php?title=Island:6292>
-
-### ps2avr
-- <http://sourceforge.net/projects/ps2avr/>
+Other Keyboard Firmware Projects
+------------------
+See [doc/other_projects.md](doc/other_projects.md).

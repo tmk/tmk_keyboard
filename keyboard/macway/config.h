@@ -29,37 +29,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MANUFACTURER    t.m.k.
 #define PRODUCT         Macway mod
 
-
 /* message strings */
 #define DESCRIPTION     t.m.k. keyboard firmware for Macway mod
-
 
 /* matrix size */
 #define MATRIX_ROWS 9
 #define MATRIX_COLS 8
+
 /* define if matrix has ghost */
 #define MATRIX_HAS_GHOST
+
 /* Set 0 if need no debouncing */
 #define DEBOUNCE    5
 
+/* legacy keymap support */
+#define USE_LEGACY_KEYMAP
 
 /* key combination for command */
 #define IS_COMMAND() ( \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_LCTRL) | MOD_BIT(KC_LALT) | MOD_BIT(KC_LGUI)) || \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)) \
 )
-
-
-/* layer switching */
-#define LAYER_SWITCH_DELAY 100
-#define LAYER_SEND_FN_TERM 300
-
-
-/* mouse keys */
-#ifdef MOUSEKEY_ENABLE
-#   define MOUSEKEY_DELAY_TIME 192
-#endif
-
 
 /* PS/2 mouse */
 #ifdef PS2_MOUSE_ENABLE

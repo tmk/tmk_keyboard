@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x0110
+#define DEVICE_VER      0x0100
 #define MANUFACTURER    t.m.k.
 #define PRODUCT         M0110 keyboard converter
 #define DESCRIPTION     convert M0110 keyboard to USB
@@ -36,9 +37,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Locking Caps Lock support */
 //#define MATRIX_HAS_LOCKING_CAPS
 
-/* key combination for command */
+/* magic key */
 #define IS_COMMAND() ( \
-    keyboard_report->mods == (MOD_BIT(KC_LALT) | MOD_BIT(KC_LGUI)) \
+    keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_LALT) | MOD_BIT(KC_LGUI)) || \
+    keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_LALT) | MOD_BIT(KC_LCTL)) \
 )
 
 

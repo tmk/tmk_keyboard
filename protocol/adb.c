@@ -57,7 +57,7 @@ static inline void place_bit1(void);
 static inline void send_byte(uint8_t data);
 static inline bool read_bit(void);
 static inline uint8_t read_byte(void);
-static inline uint8_t wait_data_lo(uint8_t us);
+static inline uint8_t wait_data_lo(uint16_t us);
 static inline uint8_t wait_data_hi(uint8_t us);
 
 
@@ -67,6 +67,12 @@ void adb_host_init(void)
 #ifdef ADB_PSW_BIT
     psw_hi();
 #endif
+
+    // Enable keyboard left/right modifier distinction
+    // Addr:Keyboard(0010), Cmd:Listen(10), Register3(11)
+    // upper byte: reserved bits 0000, device address 0010
+    // lower byte: device handler 00000011
+    adb_host_listen(0x2B,0x02,0x03);
 }
 
 #ifdef ADB_PSW_BIT
@@ -82,33 +88,46 @@ uint16_t adb_host_kbd_recv(void)
     attention();
     send_byte(0x2C);            // Addr:Keyboard(0010), Cmd:Talk(11), Register0(00)
     place_bit0();               // Stopbit(0)
-    if (!wait_data_lo(0xFF))    // Tlt/Stop to Start(140-260us)
+    if (!wait_data_lo(500)) {   // Tlt/Stop to Start(140-260us)
         return 0;               // No data to send
-    if (!read_bit())            // Startbit(1)
+    }
+    if (!read_bit()) {          // Startbit(1)
+        // Service Request
         return -2;
+    }
 
     // ad hoc fix: without block inerrupt read wrong bit occasionally and get keys stuck
     cli();
     data = read_byte();
     data = (data<<8) | read_byte();
+    uint8_t stop = read_bit();  // Stopbit(0)
     sei();
 
-    if (read_bit())             // Stopbit(0)
+    if (stop) {
         return -3;
+    }
     return data;
+}
+
+void adb_host_listen(uint8_t cmd, uint8_t data_h, uint8_t data_l)
+{
+    attention();
+    send_byte(cmd);
+    place_bit0();               // Stopbit(0)
+    _delay_us(200);             // Tlt/Stop to Start
+    place_bit1();               // Startbit(1)
+    send_byte(data_h); 
+    send_byte(data_l);
+    place_bit0();               // Stopbit(0);
 }
 
 // send state of LEDs
 void adb_host_kbd_led(uint8_t led)
 {
-    attention();
-    send_byte(0x2A);            // Addr:Keyboard(0010), Cmd:Listen(10), Register2(10)
-    place_bit0();               // Stopbit(0)
-    _delay_us(200);             // Tlt/Stop to Start
-    place_bit1();               // Startbit(1)
-    send_byte(0);               // send upper byte (not used)
-    send_byte(led&0x07);        // send lower byte (bit2: ScrollLock, bit1: CapsLock, bit0: NumLock)
-    place_bit0();               // Stopbit(0);
+    // Addr:Keyboard(0010), Cmd:Listen(10), Register2(10)
+    // send upper byte (not used)
+    // send lower byte (bit2: ScrollLock, bit1: CapsLock, bit0:
+    adb_host_listen(0x2A,0,led&0x07);
 }
 
 
@@ -185,24 +204,48 @@ static inline bool read_bit(void)
 {
     // ADB Bit Cells
     //
-    // bit0: ______~~~
-    //       65    :35us
-    //
-    // bit1: ___~~~~~~
-    //       35 :65us
-    //
-    // bit0 low time: 60-70% of bit cell(42-91us)
-    // bit1 low time: 30-40% of bit cell(21-52us)
     // bit cell time: 70-130us
-    // [from Apple IIgs Hardware Reference Second Edition]
+    // low part of bit0: 60-70% of bit cell
+    // low part of bit1: 30-40% of bit cell
     //
-    // After 55us if data line is low/high then bit is 0/1.
-    // Too simple to rely on?
+    //    bit cell time         70us        130us
+    //    --------------------------------------------
+    //    low  part of bit0     42-49       78-91
+    //    high part of bit0     21-28       39-52
+    //    low  part of bit1     21-28       39-52
+    //    high part of bit1     42-49       78-91
+    //
+    //
+    // bit0:
+    //    70us bit cell:
+    //      ____________~~~~~~
+    //      42-49        21-28  
+    //
+    //    130us bit cell:
+    //      ____________~~~~~~
+    //      78-91        39-52  
+    //
+    // bit1:
+    //    70us bit cell:
+    //      ______~~~~~~~~~~~~
+    //      21-28        42-49
+    //
+    //    130us bit cell:
+    //      ______~~~~~~~~~~~~
+    //      39-52        78-91
+    //
+    // read:
+    //      ________|~~~~~~~~~
+    //              55us
+    // Read data line after 55us. If data line is low/high then bit is 0/1.
+    // This method might not work at <90us bit cell time.
+    //
+    // [from Apple IIgs Hardware Reference Second Edition]
     bool bit;
-    wait_data_lo(75);   // wait the beginning of bit cell
+    wait_data_lo(75);   // wait the start of bit cell at least 130ms(55+0+75)
     _delay_us(55);
     bit = data_in();
-    wait_data_hi(36);   // wait high part of bit cell
+    wait_data_hi(36);   // wait high part of bit cell at least 91ms(55+36)
     return bit;
 }
 
@@ -217,7 +260,7 @@ static inline uint8_t read_byte(void)
     return data;
 }
 
-static inline uint8_t wait_data_lo(uint8_t us)
+static inline uint8_t wait_data_lo(uint16_t us)
 {
     while (data_in() && us) {
         _delay_us(1);
@@ -244,12 +287,16 @@ Resources
 ---------
 ADB - The Untold Story: Space Aliens Ate My Mouse
     http://developer.apple.com/legacy/mac/library/#technotes/hw/hw_01.html
-Apple IIgs Hardware Reference Second Edition [p80(Chapter6 p121)]
+ADB Manager
+    http://developer.apple.com/legacy/mac/library/documentation/mac/pdf/Devices/ADB_Manager.pdf
+    Service request(5-17)
+Apple IIgs Hardware Reference Second Edition [Chapter6 p121]
     ftp://ftp.apple.asimov.net/pub/apple_II/documentation/Apple%20IIgs%20Hardware%20Reference.pdf
 ADB Keycode
     http://72.0.193.250/Documentation/macppc/adbkeycodes/
     http://m0115.web.fc2.com/m0115.jpg
     [Inside Macintosh volume V, pages 191-192]
+    http://www.opensource.apple.com/source/IOHIDFamily/IOHIDFamily-421.18.3/IOHIDFamily/Cosmo_USB2ADB.c
 ADB Signaling
     http://kbdbabel.sourceforge.net/doc/kbd_signaling_pcxt_ps2_adb.pdf
 ADB Overview & History
@@ -361,9 +408,9 @@ Communication
     Global reset:
     Host asserts low in 2.8-5.2ms. All devices are forced to reset.
 
-    Send request from device(Srq):
+    Service request from device(Srq):
     Device can request to send at commad(Global only?) stop bit.
-    keep low for 300us to request.
+    Requesting device keeps low for 140-260us at stop bit of command.
 
 
 Keyboard Data(Register0)

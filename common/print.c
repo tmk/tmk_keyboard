@@ -27,12 +27,17 @@
 #include "print.h"
 
 
-#define sendchar(c)    do { if (print_enable && print_sendchar_func) (print_sendchar_func)(c); } while (0)
+#ifndef NO_PRINT
+
+#define sendchar(c)    do { if (print_sendchar_func) (print_sendchar_func)(c); } while (0)
 
 
-int8_t (*print_sendchar_func)(uint8_t) = 0;
-bool print_enable = true;
+static int8_t (*print_sendchar_func)(uint8_t) = 0;
 
+void print_set_sendchar(int8_t (*sendchar_func)(uint8_t))
+{
+    print_sendchar_func = sendchar_func;
+}
 
 /* print string stored in data memory(SRAM)
  *     print_P("hello world");
@@ -113,7 +118,6 @@ void print_decs(int16_t data)
 }
 
 
-static inline
 void print_hex4(uint8_t data)
 {
     sendchar(data + ((data < 10) ? '0' : 'A' - 10));
@@ -137,6 +141,12 @@ void print_hex32(uint32_t data)
     print_hex16(data);
 }
 
+void print_bin4(uint8_t data)
+{
+    for (int i = 4; i >= 0; i--) {
+        sendchar((data & (1<<i)) ? '1' : '0');
+    }
+}
 
 void print_bin8(uint8_t data)
 {
@@ -179,3 +189,5 @@ void print_bin_reverse32(uint32_t data)
     print_bin_reverse8(data>>16);
     print_bin_reverse8(data>>24);
 }
+
+#endif

@@ -1,5 +1,5 @@
 /*
-Copyright 2011 Jun Wako <wakojun@gmail.com>
+Copyright 2011,2012,2013 Jun Wako <wakojun@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,16 +21,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <stdbool.h>
 #include <avr/pgmspace.h>
-#include "host.h"
 #include "keycode.h"
-#include "print.h"
+#include "action.h"
+#include "action_macro.h"
+#include "report.h"
+#include "host.h"
 #include "debug.h"
-#include "util.h"
 #include "keymap.h"
 
 
-// Convert physical keyboard layout to matrix array.
-// This is a macro to define keymap easily in keyboard layout form.
 #define KEYMAP( \
     K31, K30, K00, K10, K11, K20, K21, K40, K41, K60, K61, K70, K71, K50, K51, \
     K32, K01, K02, K13, K12, K23, K22, K42, K43, K62, K63, K73, K72, K52, \
@@ -49,33 +48,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     { KC_##K70, KC_##K71, KC_##K72, KC_##K73, KC_##K74, KC_##K75, KC_##K76, KC_NO    } \
 }
 
-#define KEYCODE(layer, row, col) (pgm_read_byte(&keymaps[(layer)][(row)][(col)]))
-
-
-// Assign Fn key(0-7) to a layer to which switch with the Fn key pressed.
-static const uint8_t PROGMEM fn_layer[] = {
-    0,              // Fn0
-    1,              // Fn1
-    2,              // Fn2
-    3,              // Fn3
-    3,              // Fn4
-    5,              // Fn5
-    0,              // Fn6
-    0               // Fn7
-};
-
-// Assign Fn key(0-7) to a keycode sent when release Fn key without use of the layer.
-// See layer.c for details.
-static const uint8_t PROGMEM fn_keycode[] = {
-    KC_NO,          // Fn0
-    KC_NO,          // Fn1
-    KC_SLSH,        // Fn2
-    KC_SCLN,        // Fn3
-    KC_NO,          // Fn4
-    KC_SPC,         // Fn5
-    KC_NO,          // Fn6
-    KC_NO           // Fn7
-};
 
 static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Layer 0: Default Layer
@@ -84,18 +56,18 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |-----------------------------------------------------------|
      * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|Backs|
      * |-----------------------------------------------------------|
-     * |Contro|  A|  S|  D|  F|  G|  H|  J|  K|  L|Fn3|  '|Return  |
+     * |Contro|  A|  S|  D|  F|  G|  H|  J|  K|  L|Fn3|  '|Fn4     |
      * |-----------------------------------------------------------|
-     * |Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|Fn2|Shift |Fn1|
+     * |Fn5     |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|Fn2|Shift |Fn1|
      * `-----------------------------------------------------------'
-     *       |Gui|Alt  |Fn5                    |Alt  |Fn4|
+     *       |Gui|Alt  |         Fn6           |Alt  |Fn7|
      *       `-------------------------------------------'
      */
     KEYMAP(ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSLS,GRV, \
            TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,BSPC, \
-           LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   FN3, QUOT,ENT, \
-           LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, FN2, RSFT,FN1, \
-                LGUI,LALT,          FN5,                RALT,FN4),
+           LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   FN3, QUOT,FN4, \
+            FN5,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, FN2, RSFT,FN1, \
+                LGUI,LALT,          FN6,                RALT,FN7),
 
     /* Layer 1: HHKB mode (HHKB Fn)
      * ,-----------------------------------------------------------.
@@ -105,16 +77,16 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |-----------------------------------------------------------|
      * |Contro|VoD|VoU|Mut|   |   |  *|  /|Hom|PgU|Lef|Rig|Enter   |
      * |-----------------------------------------------------------|
-     * |Shift   |   |   |   |   |   |  +|  -|End|PgD|Dow|Shift |xxx|
+     * |Shift   |   |   |   |   |   |  +|  -|End|PgD|Dow|Shift |   |
      * `-----------------------------------------------------------'
-     *      |Gui |Alt  |Space                  |Alt  |xxx|
-     *      `--------------------------------------------'
+     *       |Gui|Alt  |         Space         |Alt  |Gui|
+     *       `-------------------------------------------'
      */ 
-    KEYMAP(PWR, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
-           CAPS,NO,  NO,  NO,  NO,  NO,  NO,  NO,  PSCR,SLCK,BRK, UP,  NO,  BSPC, \
+    KEYMAP(GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
+           CAPS,NO,  NO,  NO,  NO,  NO,  NO,  NO,  PSCR,SLCK,PAUS, UP,  NO,  BSPC, \
            LCTL,VOLD,VOLU,MUTE,NO,  NO,  PAST,PSLS,HOME,PGUP,LEFT,RGHT,ENT, \
-           LSFT,NO,  NO,  NO,  NO,  NO,  PPLS,PMNS,END, PGDN,DOWN,RSFT,FN1, \
-                LGUI,LALT,          SPC,                RALT,FN7),
+           LSFT,NO,  NO,  NO,  NO,  NO,  PPLS,PMNS,END, PGDN,DOWN,RSFT,TRNS, \
+                LGUI,LALT,          SPC,                RALT,RGUI),
 
     /* Layer 2: Vi mode (Slash)
      * ,-----------------------------------------------------------.
@@ -124,51 +96,38 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |-----------------------------------------------------------|
      * |Contro|   |Lef|Dow|Rig|   |Lef|Dow|Up |Rig|   |   |Return  |
      * |-----------------------------------------------------------|
-     * |Shift   |   |   |   |   |   |Hom|PgD|PgUlEnd|xxx|Shift |   |
+     * |Shift   |   |   |   |   |   |Hom|PgD|PgUlEnd|Fn0|Shift |   |
      * `-----------------------------------------------------------'
-     *       |Gui|Alt  |Space                  |Alt  |Gui|
+     *       |Gui|Alt  |          Space        |Alt  |Gui|
      *       `-------------------------------------------'
      */
-    KEYMAP(ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
+    KEYMAP(GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
            TAB, HOME,PGDN,UP,  PGUP,END, HOME,PGDN,PGUP,END, NO,  NO,  NO,  BSPC, \
            LCTL,NO,  LEFT,DOWN,RGHT,NO,  LEFT,DOWN,UP,  RGHT,NO,  NO,  ENT, \
-           LSFT,NO,  NO,  NO,  NO,  NO,  HOME,PGDN,PGUP,END, FN2, RSFT,NO, \
+           LSFT,NO,  NO,  NO,  NO,  NO,  HOME,PGDN,PGUP,END, TRNS,RSFT,NO, \
                 LGUI,LALT,          SPC,                RALT,RGUI),
 
     /* Layer 3: Mouse mode (Semicolon)
      * ,-----------------------------------------------------------.
      * |Esc| F1| F2| F3| F4| F5| F6| F7| F8| F9|F10|F11|F12|Ins|Del|
      * |-----------------------------------------------------------|
-     * |Tab  |MwL|MwU|McU|MwD|MwR|MwL|MwD|MwU|MwR|   |   |   |Backs|
+     * |Tab  |   |   |   |   |   |MwL|MwD|MwU|MwR|   |   |   |Backs|
      * |-----------------------------------------------------------|
-     * |Contro|   |McL|McD|McR|   |McL|McD|McU|McR|xxx|   |Return  |
+     * |Contro|   |   |   |   |   |McL|McD|McU|McR|Fn0|   |Return  |
      * |-----------------------------------------------------------|
-     * |Shift   |Mb4|Mb5|Mb1|Mb2|Mb3|Mb2|Mb1|Mb4|Mb5|   |Shift |   |
+     * |Shift   |   |   |   |   |Mb3|Mb2|Mb1|Mb4|Mb5|   |Shift |   |
      * `-----------------------------------------------------------'
-     *      |Gui |Alt  |Mb1                    |Alt  |Gui|
+     *      |Gui |Alt  |          Mb1          |Alt  |Fn0|
      *      `--------------------------------------------'
      * Mc: Mouse Cursor / Mb: Mouse Button / Mw: Mouse Wheel 
      */
-#ifdef HOST_IWRAP
-// iWRAP does not support mouse wheel, use these keycodes to remap as wheel
-#define KC_KPPL KC_KP_PLUS
-#define KC_KPMI KC_KP_MINUS
-#define KC_KPAS KC_KP_ASTERISK
-#define KC_KPSL KC_KP_SLASH
-    KEYMAP(ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
-           TAB, KPAS,KPPL,MS_U,KPMI,KPSL,KPAS,KPPL,KPMI,KPSL,NO,  NO,  NO,  BSPC, \
-           LCTL,NO,  MS_L,MS_D,MS_R,NO,  MS_L,MS_D,MS_U,MS_R,FN3, NO,  ENT, \
-           LSFT,BTN4,BTN5,BTN1,BTN2,BTN3,BTN2,BTN1,NO,  NO,  NO,  RSFT,NO, \
-                LGUI,LALT,          BTN1,               RALT,FN4),
-#else
-    KEYMAP(ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
+    KEYMAP(GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
            TAB, NO,  NO,  NO,  NO,  NO,  WH_L,WH_D,WH_U,WH_R,NO,  NO,  NO,  BSPC, \
-           LCTL,NO,  ACL0,ACL1,ACL2,NO,  MS_L,MS_D,MS_U,MS_R,FN3, NO,  ENT, \
-           LSFT,NO,  NO,  NO,  NO,  BTN3,BTN2,BTN1,BTN4,BTN5,NO,  RSFT,NO, \
-                LGUI,LALT,          BTN1,               RALT,FN4),
-#endif
+           LCTL,NO,  ACL0,ACL1,ACL2,NO,  MS_L,MS_D,MS_U,MS_R,TRNS,QUOT,ENT, \
+           LSFT,NO,  NO,  NO,  NO,  BTN3,BTN2,BTN1,BTN4,BTN5,SLSH,RSFT,NO, \
+                LGUI,LALT,          BTN1,               RALT,TRNS),
 
-    /* Layer 4: Matias half keyboard style (Space)
+    /* Layer 4: Matias half-qwerty keyboard style (Space)
      * ,-----------------------------------------------------------.
      * |  -|  0|  9|  8|  7|  6|  5|  4|  3|  2|  1|   |   |   |Esc|
      * |-----------------------------------------------------------|
@@ -178,43 +137,176 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |-----------------------------------------------------------|
      * |Shift   |  /|  .|  ,|  M|  N|  B|  V|  C|  X|  Z|Shift |   |
      * `-----------------------------------------------------------'
-     *      |Gui |Alt  |xxxxxxxxxxxxxxxxxxxxxxx|Alt  |Gui|
+     *      |Gui |Alt  |          Fn0          |Alt  |Gui|
      *      `--------------------------------------------'
      */
     KEYMAP(MINS,0,   9,   8,   7,   6,   5,   4,   3,   2,   1,   NO,  NO,  NO,  ESC, \
            BSPC,P,   O,   I,   U,   Y,   T,   R,   E,   W,   Q,   NO,  NO,  TAB, \
            LCTL,SCLN,L,   K,   J,   H,   G,   F,   D,   S,   A,   RCTL,RCTL, \
            LSFT,SLSH,DOT, COMM,M,   N,   B,   V,   C,   X,   Z,   RSFT,NO, \
-                LGUI,LALT,          FN5,                RALT,RGUI),
+                LGUI,LALT,          TRNS,               RALT,RGUI),
 
-    /* Layer5: another Mouse mode (Space) */
-#ifdef HOST_IWRAP
-    KEYMAP(ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
-           TAB, KPAS,KPPL,MS_U,KPMI,KPSL,KPAS,KPPL,KPMI,KPSL,NO,  NO,  NO,  BSPC, \
-           LCTL,NO,  MS_L,MS_D,MS_R,NO,  MS_L,MS_D,MS_U,MS_R,FN3, NO,  ENT, \
-           LSFT,BTN4,BTN5,BTN1,BTN2,BTN3,BTN2,BTN1,BTN4,BTN5,NO,  RSFT,NO, \
-                LGUI,LALT,          FN5,                RALT,RGUI),
-#else
+    /* Layer5: another Mouse mode (Space)
+     * ,-----------------------------------------------------------.
+     * |Esc| F1| F2| F3| F4| F5| F6| F7| F8| F9|F10|F11|F12|Ins|Del|
+     * |-----------------------------------------------------------|
+     * |Tab  |   |   |   |   |   |MwL|MwD|MwU|MwR|   |   |   |Backs|
+     * |-----------------------------------------------------------|
+     * |Contro|   |   |   |   |   |McL|McD|McU|McR|Fn0|   |Return  |
+     * |-----------------------------------------------------------|
+     * |Shift   |   |   |   |   |Mb3|Mb2|Mb1|Mb4|Mb5|   |Shift |   |
+     * `-----------------------------------------------------------'
+     *      |Gui |Alt  |          Fn0          |Alt  |Fn0|
+     *      `--------------------------------------------'
+     * Mc: Mouse Cursor / Mb: Mouse Button / Mw: Mouse Wheel 
+     */
     KEYMAP(ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
            TAB, NO,  NO,  NO,  NO,  NO,  WH_L,WH_D,WH_U,WH_R,NO,  NO,  NO,  BSPC, \
-           LCTL,NO,  ACL0,ACL1,ACL2,NO,  MS_L,MS_D,MS_U,MS_R,FN3, NO,  ENT, \
+           LCTL,NO,  ACL0,ACL1,ACL2,NO,  MS_L,MS_D,MS_U,MS_R,NO,  NO,  ENT, \
            LSFT,NO,  NO,  NO,  NO,  BTN3,BTN2,BTN1,BTN4,BTN5,NO,  RSFT,NO, \
-                LGUI,LALT,          FN5,                RALT,RGUI),
-#endif
+                LGUI,LALT,          TRNS,               RALT,RGUI),
 };
 
 
-uint8_t keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t col)
+
+/* id for user defined functions */
+enum function_id {
+    LSHIFT_LPAREN,
+    RSHIFT_RPAREN,
+};
+
+enum macro_id {
+    LSHIFT_PAREN,
+    RSHIFT_PAREN,
+    HELLO,
+};
+
+
+/*
+ * Fn action definition
+ */
+static const uint16_t PROGMEM fn_actions[] = {
+    [0] = ACTION_DEFAULT_LAYER_SET(0),                // Default layer(not used)
+    [1] = ACTION_LAYER_TAP_TOGGLE(1),                 // HHKB layer(toggle with 5 taps)
+    [2] = ACTION_LAYER_TAP_KEY(2, KC_SLASH),          // Cursor layer with Slash*
+    [3] = ACTION_LAYER_TAP_KEY(3, KC_SCLN),           // Mousekey layer with Semicolon*
+    [4] = ACTION_MODS_TAP_KEY(MOD_RCTL, KC_ENT),      // RControl with tap Enter*
+    [5] = ACTION_MODS_ONESHOT(MOD_LSFT),              // Oneshot Shift*
+    [6] = ACTION_LAYER_TAP_KEY(5, KC_SPC),            // Mousekey layer with Space
+    [7] = ACTION_LAYER_TOGGLE(3),                     // Mousekey layer(toggle)
+
+//  [8] = ACTION_LMOD_TAP_KEY(KC_LCTL, KC_BSPC),       // LControl with tap Backspace
+//  [9] = ACTION_LMOD_TAP_KEY(KC_LCTL, KC_ESC),        // LControl with tap Esc
+//  [11] = ACTION_FUNCTION_TAP(LSHIFT_LPAREN),         // Function: LShift with tap '('
+//  [12] = ACTION_FUNCTION_TAP(RSHIFT_RPAREN),         // Function: RShift with tap ')'
+//  [13] = ACTION_MACRO_TAP(LSHIFT_PAREN),             // Macro: LShift with tap '('
+//  [14] = ACTION_MACRO_TAP(RSHIFT_PAREN),             // Macro: RShift with tap ')'
+//  [15] = ACTION_MACRO(HELLO),                        // Macro: say hello
+};
+
+
+/*
+ * Macro definition
+ */
+const prog_macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
-    return KEYCODE(layer, row, col);
+    keyevent_t event = record->event;
+    tap_t tap = record->tap;
+
+    switch (id) {
+        case LSHIFT_PAREN:
+            if (tap.count > 0 && !tap.interrupted) {
+                return (event.pressed ?
+                        MACRO( MD(LSHIFT), D(9), U(9), MU(LSHIFT), END ) : MACRO_NONE);
+            } else {
+                return (event.pressed ?
+                        MACRO( MD(LSHIFT), END ) : MACRO( MU(LSHIFT), END ) );
+            }
+        case RSHIFT_PAREN:
+            if (tap.count > 0 && !tap.interrupted) {
+                return (event.pressed ?
+                        MACRO( MD(RSHIFT), D(0), U(0), MU(RSHIFT), END ) : MACRO_NONE);
+            } else {
+                return (event.pressed ?
+                        MACRO( MD(RSHIFT), END ) : MACRO( MU(RSHIFT), END ) );
+            }
+        case HELLO:
+            return (event.pressed ?
+                    MACRO( I(0), T(H), T(E), T(L), T(L), W(255), T(O), END ) :
+                    MACRO_NONE );
+    }
+    return MACRO_NONE;
 }
 
-uint8_t keymap_fn_layer(uint8_t index)
+
+
+/*
+ * user defined action function
+ */
+void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
-    return pgm_read_byte(&fn_layer[index]);
+    keyevent_t event = record->event;
+    tap_t tap = record->tap;
+
+    switch (id) {
+        case LSHIFT_LPAREN:
+            // LShft + tap '('
+            // NOTE: cant use register_code to avoid conflicting with magic key bind
+            if (event.pressed) {
+                if (tap.count == 0 || tap.interrupted) {
+                    add_mods(MOD_BIT(KC_LSHIFT));
+                } else {
+                    host_add_mods(MOD_BIT(KC_LSHIFT));
+                    host_add_key(KC_9);
+                    host_send_keyboard_report();
+                    host_del_mods(MOD_BIT(KC_LSHIFT));
+                    host_del_key(KC_9);
+                    host_send_keyboard_report();
+                }
+            } else {
+                if (tap.count == 0 || tap.interrupted) {
+                    del_mods(MOD_BIT(KC_LSHIFT));
+                }
+            }
+            break;
+        case RSHIFT_RPAREN:
+            // RShift + tap ')'
+            if (event.pressed) {
+                if (tap.count == 0 || tap.interrupted) {
+                    add_mods(MOD_BIT(KC_RSHIFT));
+                } else {
+                    host_add_mods(MOD_BIT(KC_RSHIFT));
+                    host_add_key(KC_0);
+                    host_send_keyboard_report();
+                    host_del_mods(MOD_BIT(KC_RSHIFT));
+                    host_del_key(KC_0);
+                    host_send_keyboard_report();
+                }
+            } else {
+                if (tap.count == 0 || tap.interrupted) {
+                    del_mods(MOD_BIT(KC_RSHIFT));
+                }
+            }
+            break;
+    }
 }
 
-uint8_t keymap_fn_keycode(uint8_t index)
+
+
+/* translates key to keycode */
+uint8_t keymap_key_to_keycode(uint8_t layer, key_t key)
 {
-    return pgm_read_byte(&fn_keycode[index]);
+    return pgm_read_byte(&keymaps[(layer)][(key.row)][(key.col)]);
+}
+
+/* translates Fn index to action */
+action_t keymap_fn_to_action(uint8_t keycode)
+{
+    action_t action;
+    if (FN_INDEX(keycode) < sizeof(fn_actions) / sizeof(fn_actions[0])) {
+        action.code = pgm_read_word(&fn_actions[FN_INDEX(keycode)]);
+    } else {
+        action.code = ACTION_NO;
+    }
+    return action;
 }

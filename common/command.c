@@ -19,25 +19,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <util/delay.h>
 #include "keycode.h"
 #include "host.h"
+#include "keymap.h"
 #include "print.h"
 #include "debug.h"
 #include "util.h"
 #include "timer.h"
 #include "keyboard.h"
 #include "bootloader.h"
+#include "action_layer.h"
+#include "eeconfig.h"
+#include "sleep_led.h"
+#include "led.h"
 #include "command.h"
+
 #ifdef MOUSEKEY_ENABLE
 #include "mousekey.h"
 #endif
 
-#ifdef HOST_PJRC
+#ifdef PROTOCOL_PJRC
 #   include "usb_keyboard.h"
 #   ifdef EXTRAKEY_ENABLE
 #       include "usb_extra.h"
 #   endif
 #endif
 
-#ifdef HOST_VUSB
+#ifdef PROTOCOL_VUSB
 #   include "usbdrv.h"
 #endif
 
@@ -52,8 +58,7 @@ static void mousekey_console_help(void);
 #endif
 
 static uint8_t numkey2num(uint8_t code);
-static void switch_layer(uint8_t layer);
-static void clear_keyboard(void);
+static void switch_default_layer(uint8_t layer);
 
 
 typedef enum { ONESHOT, CONSOLE, MOUSEKEY } cmdstate_t;
@@ -95,7 +100,6 @@ bool command_extra(uint8_t code)
  ***********************************************************/
 static void command_common_help(void)
 {
-    print_enable = true;
     print("\n\n----- Command Help -----\n");
     print("c:	enter console mode\n");
     print("d:	toggle debug enable\n");
@@ -106,6 +110,7 @@ static void command_common_help(void)
     print("v:	print device version & info\n");
     print("t:	print timer count\n");
     print("s:	print status\n");
+    print("e:	print eeprom config\n");
 #ifdef NKRO_ENABLE
     print("n:	toggle NKRO\n");
 #endif
@@ -119,10 +124,48 @@ static void command_common_help(void)
     print("Paus:	jump to bootloader\n");
 }
 
+#ifdef BOOTMAGIC_ENABLE
+static void print_eeconfig(void)
+{
+    print("default_layer: "); print_dec(eeconfig_read_defalt_layer()); print("\n");
+
+    debug_config_t dc;
+    dc.raw = eeconfig_read_debug();
+    print("debug_config.raw: "); print_hex8(dc.raw); print("\n");
+    print(".enable: "); print_dec(dc.enable); print("\n");
+    print(".matrix: "); print_dec(dc.matrix); print("\n");
+    print(".keyboard: "); print_dec(dc.keyboard); print("\n");
+    print(".mouse: "); print_dec(dc.mouse); print("\n");
+
+    keymap_config_t kc;
+    kc.raw = eeconfig_read_keymap();
+    print("keymap_config.raw: "); print_hex8(kc.raw); print("\n");
+    print(".swap_control_capslock: "); print_dec(kc.swap_control_capslock); print("\n");
+    print(".capslock_to_control: "); print_dec(kc.capslock_to_control); print("\n");
+    print(".swap_lalt_lgui: "); print_dec(kc.swap_lalt_lgui); print("\n");
+    print(".swap_ralt_rgui: "); print_dec(kc.swap_ralt_rgui); print("\n");
+    print(".no_gui: "); print_dec(kc.no_gui); print("\n");
+    print(".swap_grave_esc: "); print_dec(kc.swap_grave_esc); print("\n");
+    print(".swap_backslash_backspace: "); print_dec(kc.swap_backslash_backspace); print("\n");
+}
+#endif
+
 static bool command_common(uint8_t code)
 {
     static host_driver_t *host_driver = 0;
     switch (code) {
+        case KC_Z:
+            // test breathing sleep LED
+            print("Sleep LED test\n");
+            sleep_led_toggle();
+            led_set(host_keyboard_leds());
+            break;
+#ifdef BOOTMAGIC_ENABLE
+        case KC_E:
+            print("eeconfig:\n");
+            print_eeconfig();
+            break;
+#endif
         case KC_CAPSLOCK:
             if (host_get_driver()) {
                 host_driver = host_get_driver();
@@ -138,7 +181,6 @@ static bool command_common(uint8_t code)
             command_common_help();
             break;
         case KC_C:
-            print_enable = true;
             debug_matrix   = false;
             debug_keyboard = false;
             debug_mouse    = false;
@@ -204,19 +246,10 @@ static bool command_common(uint8_t code)
         case KC_T: // print timer
             print_val_hex32(timer_count);
             break;
-        case KC_P: // print toggle
-            if (print_enable) {
-                print("print disabled.\n");
-                print_enable = false;
-            } else {
-                print_enable = true;
-                print("print enabled.\n");
-            }
-            break;
         case KC_S:
             print("\n\n----- Status -----\n");
             print_val_hex8(host_keyboard_leds());
-#ifdef HOST_PJRC
+#ifdef PROTOCOL_PJRC
             print_val_hex8(UDCON);
             print_val_hex8(UDIEN);
             print_val_hex8(UDINT);
@@ -226,7 +259,7 @@ static bool command_common(uint8_t code)
             print_val_hex8(usb_keyboard_idle_count);
 #endif
 
-#ifdef HOST_VUSB
+#ifdef PROTOCOL_PJRC
 #   if USB_COUNT_SOF
             print_val_hex8(usbSofCount);
 #   endif
@@ -245,7 +278,7 @@ static bool command_common(uint8_t code)
 #ifdef EXTRAKEY_ENABLE
         case KC_PSCREEN:
             // TODO: Power key should take this feature? otherwise any key during suspend.
-#ifdef HOST_PJRC
+#ifdef PROTOCOL_PJRC
             if (suspend && remote_wakeup) {
                 usb_remote_wakeup();
             } else {
@@ -261,25 +294,16 @@ static bool command_common(uint8_t code)
 #endif
             break;
 #endif
+        case KC_ESC:
+        case KC_GRV:
         case KC_0:
-        case KC_F10:
-            switch_layer(0);
+            switch_default_layer(0);
             break;
-        case KC_1:
-        case KC_F1:
-            switch_layer(1);
+        case KC_1 ... KC_9:
+            switch_default_layer((code - KC_1) + 1);
             break;
-        case KC_2:
-        case KC_F2:
-            switch_layer(2);
-            break;
-        case KC_3:
-        case KC_F3:
-            switch_layer(3);
-            break;
-        case KC_4:
-        case KC_F4:
-            switch_layer(4);
+        case KC_F1 ... KC_F12:
+            switch_default_layer((code - KC_F1) + 1);
             break;
         default:
             print("?");
@@ -294,7 +318,6 @@ static bool command_common(uint8_t code)
  ***********************************************************/
 static void command_console_help(void)
 {
-    print_enable = true;
     print("\n\n----- Console Help -----\n");
     print("ESC/q:	quit\n");
 #ifdef MOUSEKEY_ENABLE
@@ -548,26 +571,10 @@ static uint8_t numkey2num(uint8_t code)
     return 0;
 }
 
-static void switch_layer(uint8_t layer)
+static void switch_default_layer(uint8_t layer)
 {
-    print_val_hex8(current_layer);
-    print_val_hex8(default_layer);
-    current_layer = layer;
-    default_layer = layer;
-    print("switch to "); print_val_hex8(layer);
-}
-
-static void clear_keyboard(void)
-{
-    host_clear_keys();
-    host_clear_mods();
-    host_send_keyboard_report();
-
-    host_system_send(0);
-    host_consumer_send(0);
-
-#ifdef MOUSEKEY_ENABLE
-    mousekey_clear();
-    mousekey_send();
-#endif
+    print("switch_default_layer: "); print_dec(biton32(default_layer_state));
+    print(" to "); print_dec(layer); print("\n");
+    default_layer_set(layer);
+    clear_keyboard();
 }
