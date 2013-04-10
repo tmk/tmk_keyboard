@@ -37,8 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KEYMAP( \
                            K7F,                                              \
    K35,K12,K13,K14,K15,K17,K16,K1A,K1C,K19,K1D,K1B,K18,K33, K47,K51,K4B,K43, \
-   K30,K0C,K0D,K0E,K0F,K11,K10,K20,K22,K1F,K23,K21,K1E,     K59,K5B,K5C,K4E, \
-   K36,K00,K01,K02,K03,K05,K04,K26,K28,K25,K29,K27,    K24, K56,K57,K58,K45, \
+   K30,K0C,K0D,K0E,K0F,K11,K10,K20,K22,K1F,K23,K21,K1E,     K59,K5B,K5C,K45, \
+   K36,K00,K01,K02,K03,K05,K04,K26,K28,K25,K29,K27,    K24, K56,K57,K58,K4E, \
    K38,K06,K07,K08,K09,K0B,K2D,K2E,K2B,K2F,K2C,        K7B, K53,K54,K55,     \
    K39,K3A,K37,K32,        K31,        K2A,K3B,K3C,K3D,K3E, K52,    K41,K4C  \
 ) { \
@@ -129,8 +129,8 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KEYMAP(
     EJCT,
     ESC, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10,F11,F12, NO,   NO, NO, NO, MUTE,
-    NO,   NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,       NO, NO, NO, VOLD,
-    NO,    NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,    NO,   NO, NO, NO, VOLU,
+    NO,   NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,       NO, NO, NO, VOLU,
+    NO,    NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,    NO,   NO, NO, NO, VOLD,
     CAPS,   NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,     CAPS,   NO, NO, NO,
     FN1,NO , NO, NO,         NO,      NO, HOME,END,PGDN,PGUP,   NO,     NO, NO
   ),
