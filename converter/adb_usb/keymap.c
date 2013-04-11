@@ -30,6 +30,116 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define KEYCODE(layer, row, col) (pgm_read_byte(&keymaps[(layer)][(row)][(col)]))
 
+#ifdef ADB_M0116
+
+// Keymap for ADB M0116 (compact mac) keyboard
+#define KEYMAP_ALL( \
+                           K7F,                                              \
+   K35,K12,K13,K14,K15,K17,K16,K1A,K1C,K19,K1D,K1B,K18,K33, K47,K51,K4B,K43, \
+   K30,K0C,K0D,K0E,K0F,K11,K10,K20,K22,K1F,K23,K21,K1E,     K59,K5B,K5C,K45, \
+   K36,K00,K01,K02,K03,K05,K04,K26,K28,K25,K29,K27,    K24, K56,K57,K58,K4E, \
+   K38,K06,K07,K08,K09,K0B,K2D,K2E,K2B,K2F,K2C,        K7B, K53,K54,K55,     \
+   K39,K3A,K37,K32,        K31,        K2A,K3B,K3C,K3D,K3E, K52,    K41,K4C  \
+) { \
+  { KC_##K00, KC_##K01, KC_##K02, KC_##K03, KC_##K04, KC_##K05, KC_##K06, KC_##K07 }, \
+  { KC_##K08, KC_##K09, KC_NO,    KC_##K0B, KC_##K0C, KC_##K0D, KC_##K0E, KC_##K0F }, \
+  { KC_##K10, KC_##K11, KC_##K12, KC_##K13, KC_##K14, KC_##K15, KC_##K16, KC_##K17 }, \
+  { KC_##K18, KC_##K19, KC_##K1A, KC_##K1B, KC_##K1C, KC_##K1D, KC_##K1E, KC_##K1F }, \
+  { KC_##K20, KC_##K21, KC_##K22, KC_##K23, KC_##K24, KC_##K25, KC_##K26, KC_##K27 }, \
+  { KC_##K28, KC_##K29, KC_##K2A, KC_##K2B, KC_##K2C, KC_##K2D, KC_##K2E, KC_##K2F }, \
+  { KC_##K30, KC_##K31, KC_##K32, KC_##K33, KC_NO,    KC_##K35, KC_##K36, KC_##K37 }, \
+  { KC_##K38, KC_##K39, KC_##K3A, KC_##K3B, KC_##K3C, KC_##K3D, KC_##K3E, KC_NO    }, \
+  { KC_NO,    KC_##K41, KC_NO,    KC_##K43, KC_NO,    KC_##K45, KC_NO,    KC_##K47 }, \
+  { KC_NO,    KC_NO,    KC_NO,    KC_##K4B, KC_##K4C, KC_NO,    KC_##K4E, KC_NO    }, \
+  { KC_NO,    KC_##K51, KC_##K52, KC_##K53, KC_##K54, KC_##K55, KC_##K56, KC_##K57 }, \
+  { KC_##K58, KC_##K59, KC_NO,    KC_##K5B, KC_##K5C, KC_NO,    KC_NO,    KC_NO    }, \
+  { KC_NO,    KC_NO,    KC_NO,    KC_NO   , KC_NO,    KC_NO,    KC_NO,    KC_NO    }, \
+  { KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO    }, \
+  { KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO    }, \
+  { KC_NO   , KC_NO,    KC_NO   , KC_##K7B, KC_NO,    KC_NO,    KC_NO,    KC_##K7F }  \
+}
+
+// Assign Fn key(0-7) to a layer to which switch with the Fn key pressed.
+static const uint8_t PROGMEM fn_layer[] = {
+    0,              // Fn0
+    1,              // Fn1
+    0,              // Fn2
+    0,              // Fn3
+    0,              // Fn4
+    0,              // Fn5
+    0,              // Fn6
+    0               // Fn7
+};
+
+// Assign Fn key(0-7) to a keycode sent when release Fn key without use of the layer.
+// See layer.c for details.
+static const uint8_t PROGMEM fn_keycode[] = {
+    KC_NO,          // Fn0
+    KC_NO,          // Fn1
+    KC_NO,          // Fn2
+    KC_NO,          // Fn3
+    KC_NO,          // Fn4
+    KC_NO,          // Fn5
+    KC_NO,          // Fn6
+    KC_NO           // Fn7
+};
+
+static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+  /* Default layer : plain keymap
+   *                     +-------+
+   *                     | power |
+   *                     +-------+
+   * +---+---+---+---+---+---+---+---+---+---+---+---+---+-----+ +---+---+---+---+
+   * |esc| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0 | - | = | bks | |clr| = | / | * |
+   * +---------------------------------------------------------+ +---+---+---+---+
+   * | tab | q | w | e | r | t | y | u | i | o | p | [ | ] |   | | 7 | 8 | 9 | + |
+   * +-----------------------------------------------------+   | +---+---+---+---+
+   * | ctrl | a | s | d | f | g | h | j | k | l | ; | ' |return| | 4 | 5 | 6 | - |
+   * +---------------------------------------------------------+ +---+---+---+---+
+   * | shift  | z | x | c | v | b | n | m | , | . | / |  shift | | 1 | 2 | 3 |   |
+   * +---------------------------------------------------------+ +-------+---|ent|
+   * |Fn1|opt|comnd| ` |                   | \ |lef|rig|dwn|up | |   0   | . |   |
+   * +---------------------------------------------------------+ +-------+---+---+
+   */
+  KEYMAP_ALL(
+    PWR,
+    ESC, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, MINS,EQL, BSPC,   DEL, EQL, PSLS,PAST,
+    TAB, Q, W, E, R, T, Y, U, I, O, P, LBRC, RBRC,       P7,  P8,  P9,  PPLS,
+    LCTL, A, S, D, F, G, H, J, K, L, SCLN, QUOT,   ENT,  P4,  P5,  P6,  PMNS,
+    LSFT,  Z, X, C, V, B, N, M, COMM,  DOT, SLSH, RSFT,  P1,  P2,  P3,
+    FN1,LALT,LGUI,GRV,   SPC,   BSLS,LEFT,RGHT,DOWN,UP,  P0,       PDOT,PENT
+  ),
+  /* Layer 1 : 
+   *                     +-------+
+   *                     | Eject |
+   *                     +-------+
+   * +---+---+---+---+---+---+---+---+---+---+---+---+---+-----+ +---+---+---+---+
+   * |Esc|F1 |F2 |F3 |F4 |F5 |F6 |F7 |F8 |F9 |F10|F11|F12|     | |   |   |   |Mut|
+   * +---------------------------------------------------------+ +---+---+---+---+
+   * |     |   |   |   |   |   |   |   |   |   |   |   |   |   | |   |   |   |VoU|
+   * +-----------------------------------------------------+   | +---+---+---+---+
+   * |      |   |   |   |   |   |   |   |   |   |   |   |      | |   |   |   |VoD|
+   * +---------------------------------------------------------+ +---+---+---+---+
+   * |Capslock|   |   |   |   |   |   |   |   |   |   |Capslock| |   |   |   |   |
+   * +---------------------------------------------------------+ +-------+---|   |
+   * |Fn1|   |     |   |                   |   |Hom|End|PgD|PgU| |       |   |   |
+   * +---------------------------------------------------------+ +-------+---+---+
+   */
+  KEYMAP_ALL(
+    EJCT,
+    ESC, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10,F11,F12, NO,   NO, NO, NO, MUTE,
+    NO,   NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,       NO, NO, NO, VOLU,
+    NO,    NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,    NO,   NO, NO, NO, VOLD,
+    CAPS,   NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,     CAPS,   NO, NO, NO,
+    FN1,NO , NO, NO,         NO,      NO, HOME,END,PGDN,PGUP,   NO,     NO, NO
+  ),
+};
+
+
+#else
+// Convert physical keyboard layout to matrix array.
+// This is a macro to define keymap easily in keyboard layout form.
+/* Apple Extended Keyboard */
 #define KEYMAP_ALL( \
     K35,  K7A,K78,K63,K76, K60,K61,K62,K64, K65,K6D,K67,K6F, K69,K6B,K71,              K7F, \
     K32,K12,K13,K14,K15,K17,K16,K1A,K1C,K19,K1D,K1B,K18,K33, K72,K73,K74,  K47,K51,K4B,K43, \
@@ -160,6 +270,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 
+#endif
 
 uint8_t keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t col)
 {
