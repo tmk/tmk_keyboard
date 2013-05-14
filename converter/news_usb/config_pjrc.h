@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CONFIG_H
 #define CONFIG_H
 
-/* controller configuration */
-#include "controller_teensy.h"
 
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x5021
@@ -31,6 +29,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* matrix size */
 #define MATRIX_ROWS 16  // keycode bit: 3-0
 #define MATRIX_COLS 8   // keycode bit: 6-4
+
+
+/* legacy keymap support */
+#define USE_LEGACY_KEYMAP
 
 
 /* key combination for command */

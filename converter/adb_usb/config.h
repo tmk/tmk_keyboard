@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CONFIG_H
 #define CONFIG_H
 
-/* controller configuration */
-#include "controller_teensy.h"
 
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x0ADB
@@ -36,8 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_COL(code)    ((code)&0x07)
 
 
-/* Locking Caps Lock support */
-//#define MATRIX_HAS_LOCKING_CAPS
 /* Mechanical locking CapsLock support. Use KC_LCAP instead of KC_CAPS in keymap */
 #define CAPSLOCK_LOCKING_ENABLE
 /* Locking CapsLock resynchronize hack */
