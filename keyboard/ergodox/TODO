@@ -1,0 +1,10 @@
+1. Flash led on ~Ln keypress (for now it works only on +Ln)
+2. Flash NumLock led only when "numpad" layer is active
+3. Command (in terms of IS_COMMAND) to switch to no-leds mode
+4. Increase count of ACTION keys
+5. Check how it works with ACTION/TAP keys (layerN+key or modifier+key)
+6. Fix command_state() onboard led:
+    it should flash only when kbd in some specific mode (CONSOLE || MOUSE)
+7. Fix Right TEENSY key (for now it locks kbd & system)
+8. Cleanup everything, add conditionals (ifdef/ifndef), push to github
+
