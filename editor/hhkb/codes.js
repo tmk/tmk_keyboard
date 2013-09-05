@@ -10,12 +10,12 @@ function flatten(obj)
 };
 */
 
-function to_2hexstr(b)
+function hexstr2(b)
 {
     return ('0'+ b.toString(16)).substr(-2).toUpperCase();
 };
 
-function hex_line(data, address, record_type)
+function hex_line(address, record_type, data)
 {
     var sum = 0;
     sum += data.length;
@@ -25,40 +25,42 @@ function hex_line(data, address, record_type)
 
     var line = '';
     line += ':';
-    line += to_2hexstr(data.length);
-    line += to_2hexstr(address >> 8);
-    line += to_2hexstr(address & 0xff);
-    line += to_2hexstr(record_type);
+    line += hexstr2(data.length);
+    line += hexstr2(address >> 8);
+    line += hexstr2(address & 0xff);
+    line += hexstr2(record_type);
     for (var i = 0; i < data.length; i++) {
         sum = (sum + data[i]);
-        line += to_2hexstr(data[i]);
+        line += hexstr2(data[i]);
     }
-    line += to_2hexstr((~sum + 1)&0xff);  // Checksum
+    line += hexstr2((~sum + 1)&0xff);  // Checksum
     line +="\r\n";
     return line;
 }
 
-function hex_output(keymaps) {
-    var output = '';
-    var bytes = [];
+function hex_eof()
+{
+    return ":00000001FF\r\n";
+}
 
-    // TODO: address
-    
-    // TODO: refine
-    // flatten keymaps into one dimension array
-    [].concat.apply([], [].concat.apply([], keymaps)).forEach(function(e) {
-        bytes.push(e);
-        if (bytes.length == 16) {
-            output += hex_line(bytes, 0x0123, 0x05);
-            console.log(bytes);
-            bytes.length = 0;
+function hex_output(address, data) {
+    var output = '';
+    var line = [];
+
+    // TODO: refine: flatten data into one dimension array
+    [].concat.apply([], [].concat.apply([], data)).forEach(function(e) {
+        line.push(e);
+        if (line.length == 16) {
+            output += hex_line(address, 0x00, line);
+            address += 16;
+            line.length = 0;   // clear array
         }
     });
-    if (bytes.length > 0) {
-        console.log(bytes);
+    if (line.length > 0) {
+        output += hex_line(address, 0x00, line);
     }
     return output;
-};
+}
 
 function source_output(keymaps) {
     var output = '';
@@ -75,7 +77,11 @@ function source_output(keymaps) {
     output += "#include \"action_macro.h\"\n";
     output += "#include \"keymap.h\"\n\n";
 
-    output += "static const uint16_t PROGMEM fn_actions[] = {\n";
+    output += "#ifdef KEYMAP_SECTION\n";
+    output += "const uint16_t fn_actions[] __attribute__ ((section (\".keymap.fn_actions\"))) = {\n";
+    output += "#else\n";
+    output += "static const uint16_t fn_actions[] PROGMEM = {\n";
+    output += "#endif\n";
     output += "    [0]  = ACTION_LAYER_MOMENTARY(0), \n";
     output += "    [1]  = ACTION_LAYER_MOMENTARY(1), \n";
     output += "    [2]  = ACTION_LAYER_MOMENTARY(2), \n";
@@ -91,11 +97,19 @@ function source_output(keymaps) {
     output += "};\n\n";
 
     // keymaps
-    output += 'static const uint8_t PROGMEM keymaps[][';
+    output += "#ifdef KEYMAP_SECTION\n";
+    output += "const uint8_t keymaps[][";
     output += keymaps[0].length;         // row
-    output += '][';
+    output += "][";
     output += keymaps[0][0].length;      // col
-    output += "] = {\n";
+    output += "] __attribute__ ((section (\".keymap.keymaps\"))) = {\n";
+    output += "#else\n";
+    output += "static const uint8_t keymaps[][";
+    output += keymaps[0].length;         // row
+    output += "][";
+    output += keymaps[0][0].length;      // col
+    output += "] PROGMEM = {\n";
+    output += "#endif\n";
     for (var i in keymaps) {
         output += "    {\n";
         for (var j in keymaps[i]) {
@@ -127,241 +141,6 @@ function source_output(keymaps) {
     output += "    return action;\n";
     output += "}\n";
     return output;
-};
-
-var id_code = {
-    'act-no': 0,
-    'act-roll-over': 1,
-    'act-post-fail': 2,
-    'act-undefined': 3,
-    'act-a': 4,
-    'act-b': 5,
-    'act-c': 6,
-    'act-d': 7,
-    'act-e': 8,
-    'act-f': 9,
-    'act-g': 10,
-    'act-h': 11,
-    'act-i': 12,
-    'act-j': 13,
-    'act-k': 14,
-    'act-l': 15,
-    'act-m': 16,
-    'act-n': 17,
-    'act-o': 18,
-    'act-p': 19,
-    'act-q': 20,
-    'act-r': 21,
-    'act-s': 22,
-    'act-t': 23,
-    'act-u': 24,
-    'act-v': 25,
-    'act-w': 26,
-    'act-x': 27,
-    'act-y': 28,
-    'act-z': 29,
-    'act-1': 30,
-    'act-2': 31,
-    'act-3': 32,
-    'act-4': 33,
-    'act-5': 34,
-    'act-6': 35,
-    'act-7': 36,
-    'act-8': 37,
-    'act-9': 38,
-    'act-0': 39,
-    'act-enter': 40,
-    'act-escape': 41,
-    'act-bspace': 42,
-    'act-tab': 43,
-    'act-space': 44,
-    'act-minus': 45,
-    'act-equal': 46,
-    'act-lbracket': 47,
-    'act-rbracket': 48,
-    'act-bslash': 49,
-    'act-nonus-hash': 50,
-    'act-scolon': 51,
-    'act-quote': 52,
-    'act-grave': 53,
-    'act-comma': 54,
-    'act-dot': 55,
-    'act-slash': 56,
-    'act-capslock': 57,
-    'act-f1': 58,
-    'act-f2': 59,
-    'act-f3': 60,
-    'act-f4': 61,
-    'act-f5': 62,
-    'act-f6': 63,
-    'act-f7': 64,
-    'act-f8': 65,
-    'act-f9': 66,
-    'act-f10': 67,
-    'act-f11': 68,
-    'act-f12': 69,
-    'act-pscreen': 70,
-    'act-scrolllock': 71,
-    'act-pause': 72,
-    'act-insert': 73,
-    'act-home': 74,
-    'act-pgup': 75,
-    'act-delete': 76,
-    'act-end': 77,
-    'act-pgdown': 78,
-    'act-right': 79,
-    'act-left': 80,
-    'act-down': 81,
-    'act-up': 82,
-    'act-numlock': 83,
-    'act-kp-slash': 84,
-    'act-kp-asterisk': 85,
-    'act-kp-minus': 86,
-    'act-kp-plus': 87,
-    'act-kp-enter': 88,
-    'act-kp-1': 89,
-    'act-kp-2': 90,
-    'act-kp-3': 91,
-    'act-kp-4': 92,
-    'act-kp-5': 93,
-    'act-kp-6': 94,
-    'act-kp-7': 95,
-    'act-kp-8': 96,
-    'act-kp-9': 97,
-    'act-kp-0': 98,
-    'act-kp-dot': 99,
-    'act-nonus-bslash': 100,
-    'act-application': 101,
-    'act-power': 102,
-    'act-kp-equal': 103,
-    'act-f13': 104,
-    'act-f14': 105,
-    'act-f15': 106,
-    'act-f16': 107,
-    'act-f17': 108,
-    'act-f18': 109,
-    'act-f19': 110,
-    'act-f20': 111,
-    'act-f21': 112,
-    'act-f22': 113,
-    'act-f23': 114,
-    'act-f24': 115,
-    'act-execute': 116,
-    'act-help': 117,
-    'act-menu': 118,
-    'act-select': 119,
-    'act-stop': 120,
-    'act-again': 121,
-    'act-undo': 122,
-    'act-cut': 123,
-    'act-copy': 124,
-    'act-paste': 125,
-    'act-find': 126,
-    'act--mute': 127,
-    'act--volup': 128,
-    'act--voldown': 129,
-    'act-locking-caps': 130,
-    'act-locking-num': 131,
-    'act-locking-scroll': 132,
-    'act-kp-comma': 133,
-    'act-kp-equal-as400': 134,
-    'act-int1': 135,
-    'act-int2': 136,
-    'act-int3': 137,
-    'act-int4': 138,
-    'act-int5': 139,
-    'act-int6': 140,
-    'act-int7': 141,
-    'act-int8': 142,
-    'act-int9': 143,
-    'act-lang1': 144,
-    'act-lang2': 145,
-    'act-lang3': 146,
-    'act-lang4': 147,
-    'act-lang5': 148,
-    'act-lang6': 149,
-    'act-lang7': 150,
-    'act-lang8': 151,
-    'act-lang9': 152,
-    'act-alt-erase': 153,
-    'act-sysreq': 154,
-    'act-cancel': 155,
-    'act-clear': 156,
-    'act-prior': 157,
-    'act-return': 158,
-    'act-separator': 159,
-    'act-out': 160,
-    'act-oper': 161,
-    'act-clear-again': 162,
-    'act-crsel': 163,
-    'act-exsel': 164,
-    'act-reserved-165': 165,
-    'act-reserved-166': 166,
-    'act-reserved-167': 167,
-    'act-reserved-168': 168,
-    'act-reserved-169': 169,
-    'act-reserved-170': 170,
-    'act-reserved-171': 171,
-    'act-reserved-172': 172,
-    'act-reserved-173': 173,
-    'act-reserved-174': 174,
-    'act-reserved-175': 175,
-    'act-kp-00': 176,
-    'act-kp-000': 177,
-    'act-thousands-separator': 178,
-    'act-decimal-separator': 179,
-    'act-currency-unit': 180,
-    'act-currency-sub-unit': 181,
-    'act-kp-lparen': 182,
-    'act-kp-rparen': 183,
-    'act-kp-lcbracket': 184,
-    'act-kp-rcbracket': 185,
-    'act-kp-tab': 186,
-    'act-kp-bspace': 187,
-    'act-kp-a': 188,
-    'act-kp-b': 189,
-    'act-kp-c': 190,
-    'act-kp-d': 191,
-    'act-kp-e': 192,
-    'act-kp-f': 193,
-    'act-kp-xor': 194,
-    'act-kp-hat': 195,
-    'act-kp-perc': 196,
-    'act-kp-lt': 197,
-    'act-kp-gt': 198,
-    'act-kp-and': 199,
-    'act-kp-lazyand': 200,
-    'act-kp-or': 201,
-    'act-kp-lazyor': 202,
-    'act-kp-colon': 203,
-    'act-kp-hash': 204,
-    'act-kp-space': 205,
-    'act-kp-atmark': 206,
-    'act-kp-exclamation': 207,
-    'act-kp-mem-store': 208,
-    'act-kp-mem-recall': 209,
-    'act-kp-mem-clear': 210,
-    'act-kp-mem-add': 211,
-    'act-kp-mem-sub': 212,
-    'act-kp-mem-mul': 213,
-    'act-kp-mem-div': 214,
-    'act-kp-plus-minus': 215,
-    'act-kp-clear': 216,
-    'act-kp-clear-entry': 217,
-    'act-kp-binary': 218,
-    'act-kp-octal': 219,
-    'act-kp-decimal': 220,
-    'act-kp-hexadecimal': 221,
-    'act-reserved-222': 222,
-    'act-reserved-223': 223,
-    'act-lctrl': 224,
-    'act-lshift': 225,
-    'act-lalt': 226,
-    'act-lgui': 227,
-    'act-rctrl': 228,
-    'act-rshift': 229,
-    'act-ralt': 230,
-    'act-rgui': 231,
 };
 
 /* keycode to display */

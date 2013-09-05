@@ -1,10 +1,11 @@
 <html>
 <head>
-    <title>Keymap Editor</title>
+    <title>TMK Keymap Editor</title>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="codes.js"></script>
+    <script src="firmware.js"></script>
     <link href='keyboard.css' rel='stylesheet' type='text/css'>
             
     <script>
@@ -93,13 +94,30 @@
             no_map(),
         ];
 
+        // TODO: define proper Fn actions: 32actions*2bytes
+        var fn_actions = [
+            0xF1,0xA0,0xF1,0xA1,0xF1,0xA2,0xF1,0xA3,0x01,0x8A,0x02,0x8A,0x04,0x8A,0x08,0x8A,
+            0xF0,0xA0,0xF0,0xA1,0xF0,0xA2,0xF0,0xA3,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        ];
+
         // key id under editing
         var editing_key;
         // layer under editing
         var editing_layer = 0;
 
         $(function() {
-            // TODO: alert when leave or close window
+            // Title
+            document.title = "TMK Keymap Editor for " + KEYBOARD_ID;
+            $("#page-title").text("TMK Keymap Editor for " + KEYBOARD_ID);
+
+            // lost keymap under edting when leave the page
+            /* TODO: Needed when released
+            $(window).bind('beforeunload', function(){
+                  return 'CAUTION: You will lost your change.';
+            });
+            */
 
             // load keymap on keyboard key buttons
             var load_keymap = function(layer, keymap) {
@@ -177,24 +195,47 @@
             /*
              * Output options
              */
-            //$("#keymap-source").resizable();  // resizable textarea
+            //$("#keymap-output").resizable();  // resizable textarea
 
-            // TODO: Hex output
+            // Hex Save
+            $("#keymap-download").click(function(ev, ui) {
+                var keymap_data = fn_actions.concat(keymaps);
+                var content = firmware_hex() +
+                              hex_output(KEYMAP_START_ADDRESS, keymap_data) +
+                              hex_eof();
+
+                // download hex file
+                var blob = new Blob([content], {type: "application/octet-stream"});
+                var hex_link = $("<a/>");
+                hex_link.attr('href', window.URL.createObjectURL(blob));
+                hex_link.attr('download', KEYBOARD_ID + "_firmware.hex");
+                // jQuery click() doesn't work straight for 'a' element
+                // http://stackoverflow.com/questions/1694595/
+                hex_link[0].click();
+            });
+
+            // Hex output
             $("#keymap-hex-generate").click(function(ev, ui) {
-                $("#keymap-source").text(hex_output(keymaps));
+                // TODO: flattened array
+                var keymap_data = fn_actions.concat(keymaps);
+                var content = firmware_hex() +
+                              hex_output(KEYMAP_START_ADDRESS, keymap_data) +
+                              hex_eof();
+                $("#keymap-output").text(content); 
             });
 
             // C source output
             $("#keymap-source-generate").click(function(ev, ui) {
-                $("#keymap-source").text(source_output(keymaps));
+                $("#keymap-output").text(source_output(keymaps));
             });
 
             // JSON output
+            //$("#keymap-json-generate").css('display', 'none');  // hide
             $("#keymap-json-generate").click(function(ev, ui) {
                 var keymap_output;
                 //keymap_output = JSON.stringify(keymaps, null, 4);
                 keymap_output = JSON.stringify({ keymaps: keymaps });
-                $("#keymap-source").text(keymap_output);
+                $("#keymap-output").text(keymap_output);
             });
 
         });
@@ -202,8 +243,17 @@
 </head>
 
 <body>
-<h1>TMK Keymap Editor</h1>
-See <a href="https://github.com/tmk/tmk_keyboard/blob/master/doc/keymap.md" target="_blank">this</a> for keymap description.
+<h1 id="page-title">TMK Keymap Editor</h1>
+
+<h3>Instruction</h3>
+How to edit keymap
+<ul>
+<li>Select layer
+<li>Select key to edit
+<li>Select keycode to assign to the key
+<li>Download firmware
+</ul>
+See <a href="https://github.com/tmk/tmk_keyboard/blob/master/doc/keymap.md" target="_blank">this</a> for detailed description of keymap.
 
 <h2>Keyboard</h2>
 <!-- 
@@ -302,9 +352,7 @@ Keyboard keys
 
 <!-- 
 Keycodes
-TODO: make display name and tooltip better
 TODO: better align of buttons
-TODO: get text and title from code table?
 -->
 <h2>Keycodes</h2>
 <div id="keycode_tabs">
@@ -627,16 +675,15 @@ TODO: get text and title from code table?
     </div>
 </div>
 
+<h3>Firmware Hex File Download:</h3>
+<button id="keymap-download" title="save file">Download</button>
+
 <h3>Keymap Output:</h3>
-<textarea id="keymap-source" rows="20" cols="80"></textarea>
+<textarea id="keymap-output" rows="20" cols="80"></textarea>
 <br/>
-<button id="keymap-source-generate" title="generate C source code">C source</button>
 <button id="keymap-json-generate" title="generate JSON">JSON</button>
+<button id="keymap-source-generate" title="generate C source code">C source</button>
 <button id="keymap-hex-generate" title="generate Hex">Hex</button>
-<!-- TODO: Hex/load JSON -->
-<!--
-<button id="keymap-json-load" title="generate JSON">Load JSON</button>
--->
 
 </body>
 </html>

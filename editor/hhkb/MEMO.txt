@@ -1,10 +1,11 @@
 TODO
-    test on remote site
+----
+    X test on remote site
         tmk.github.io/tmk_editor/hhkb/?
         github pages
         https://help.github.com/articles/user-organization-and-project-pages
 
-    save file button
+    X save file button
         https://developer.mozilla.org/en-US/docs/Web/API/Blob
         var typedArray = GetTheTypedArraySomehow();
         var blob = new Blob([typedArray], {type: "application/octet-binary"}); // pass a useful mime type here
@@ -23,38 +24,47 @@ TODO
         align of wrapped text
 
     edit action for FN key
-    load/save JSON
-    load/save hex(binary)
-        binary file format
-            meta info:
-                date/time
-                keyboard id
-                keymap/actionmap
+    action map support
+    Macro editor
+
+    Where it converts key postion into matrix position at?
+        Convert table? UI can use position of elemen placing.
+        UI uses matrix posiotn for ID of element.
+
+    P load/save JSON
+    X save hex(binary)
 
     firmware
-        load binary
-        Mass Storage or HID comm
-        fixed address for keymaps
+        P load binary
+        P Mass Storage or HID comm
+        X fixed address for keymaps
 
-    action map support
 
-Hex file format
-    http://en.wikipedia.org/wiki/Intel_HEX
-    1.Start code:     ':'
-    2.Byte Count:     2 hex(0-255)
-    3.Address:        4 hex(0-2^16)
-    4.Record Type:    2 hex(00-05)
-                        00: Data record. which contains 16bit address and data.
-                        01: End of File record. It must appear in the last line.(usually :00000001FF)
-                        02: Extended Segment Address Record.
-                        03: Start Segment Address Record.
-                        04: Extended Linear Address Record. Upper two bytes of 32 bit address.
-                        05: Start Linear Address Record.
-    5.Data:           byte_count * hex(a sequence of bytes)
-    6.Checksum:       2 hex LSB of 2's complement of the sum of fields: 'Byte Count', 'Address', 'Record Type' and 'Data'.
-                      checksum = ~(the sum of bytes)&0xff + 1 = (the sum)&0xff^0xff + 1 
+
+ld script/Firmware structure
+----------------------------
+    Flash Map of ATMega32U4(32KB)
+    +------------+ 0x0000
+    | .vectors   | 0xac (43vectors * 4bytes)
+    | .progmem   | PROGMEM variables and PSTR
+    | .init0-9   |
+    | .text      | code
+    | .fini9-0   |
+    |            | > text region
+    |------------| _etext
+    | .data      |
+    | .bss       |
+    | .noinit    |
+    |            | > data region
+    |------------| 0x6800
+    | .keymap    | > keymap region(2KB)
+    |------------| 0x7000
+    | bootloader | 4KB
+    +------------+ 0x7FFF
+    
 
 TMK keymapping mode
+-------------------
     keymap 8bit code
         Special 8bit code Fn0-32 can be assigned for action code.
         actions[]    -> ---------------
@@ -114,33 +124,23 @@ TMK keymapping mode
         8layers will be available for ATMega32U4 and 4layers for 16U4. This seems like enough in most case.
 
 
-HTML
-    Keyboard key element ID
-        a) ID indicates place of look. needs Converter Table.
-        b) ID indicates matrix position.
-      x c) ID indicates defalut key name like: q, w, ... lshift...
-            Not good. no consistency of name length.
-
-Javascript
-    Keymap Array
-        includes matrix postions of the key.
-        keymap[LAYER][8][8] = {
-            { { }, { } }
-
-    Keycode table
-        keyname => keycode(16bit)
-        keycode => keyname
-
-Keymap
-    16bit keymap at first
-    8bit keymap support depends on future request
-        Fn key configure
-    Macro editor
+Hex file format
+    http://en.wikipedia.org/wiki/Intel_HEX
+    1.Start code:     ':'
+    2.Byte Count:     2 hex(0-255)
+    3.Address:        4 hex(0-2^16)
+    4.Record Type:    2 hex(00-05)
+                        00: Data record. which contains 16bit address and data.
+                        01: End of File record. It must appear in the last line.(usually :00000001FF)
+                        02: Extended Segment Address Record.
+                        03: Start Segment Address Record.
+                        04: Extended Linear Address Record. Upper two bytes of 32 bit address.
+                        05: Start Linear Address Record.
+    5.Data:           byte_count * hex(a sequence of bytes)
+    6.Checksum:       2 hex LSB of 2's complement of the sum of fields: 'Byte Count', 'Address', 'Record Type' and 'Data'.
+                      checksum = ~(the sum of bytes)&0xff + 1 = (the sum)&0xff^0xff + 1 
 
 
-Where it converts key postion into matrix position at?
-    Convert table? UI can use position of elemen placing.
-    UI uses matrix posiotn for ID of element.
 
 
 
@@ -181,7 +181,7 @@ Key to matrix Table
 
 
 
-
+Keycodes
     KC_NO               = 0x00,
     KC_ROLL_OVER,
     KC_POST_FAIL,
