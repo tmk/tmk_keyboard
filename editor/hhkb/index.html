@@ -111,6 +111,7 @@
             // Title
             document.title = "TMK Keymap Editor for " + KEYBOARD_ID;
             $("#page-title").text("TMK Keymap Editor for " + KEYBOARD_ID);
+            $("#keyboard2").load("hhkb.html");
 
             // lost keymap under edting when leave the page
             /* TODO: Needed when released
@@ -216,12 +217,8 @@
 
             // Hex output
             $("#keymap-hex-generate").click(function(ev, ui) {
-                // TODO: flattened array
                 var keymap_data = fn_actions.concat(keymaps);
-                var content = firmware_hex() +
-                              hex_output(KEYMAP_START_ADDRESS, keymap_data) +
-                              hex_eof();
-                $("#keymap-output").text(content); 
+                $("#keymap-output").text(hex_output(KEYMAP_START_ADDRESS, keymap_data));
             });
 
             // C source output
@@ -256,6 +253,8 @@ How to edit keymap
 See <a href="https://github.com/tmk/tmk_keyboard/blob/master/doc/keymap.md" target="_blank">this</a> for detailed description of keymap.
 
 <h2>Keyboard</h2>
+<div id="keyboard2" class="keyboard"></div>
+<div id="keyboard" class="keyboard">
 <!-- 
 Layer selector
 -->
@@ -274,7 +273,6 @@ Layer selector
 <!-- 
 Keyboard keys
 -->
-<div class="keyboard">
     <div id="key-0301" class="key">Esc</div>
     <div id="key-0300" class="key">1</div>
     <div id="key-0000" class="key">2</div>
