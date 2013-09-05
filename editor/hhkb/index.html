@@ -111,7 +111,6 @@
             // Title
             document.title = "TMK Keymap Editor for " + KEYBOARD_ID;
             $("#page-title").text("TMK Keymap Editor for " + KEYBOARD_ID);
-            $("#keyboard2").load("hhkb.html");
 
             // lost keymap under edting when leave the page
             /* TODO: Needed when released
@@ -207,7 +206,7 @@
 
                 // download hex file
                 var blob = new Blob([content], {type: "application/octet-stream"});
-                var hex_link = $("<a/>");
+                var hex_link = $("#hex-download");
                 hex_link.attr('href', window.URL.createObjectURL(blob));
                 hex_link.attr('download', KEYBOARD_ID + "_firmware.hex");
                 // jQuery click() doesn't work straight for 'a' element
@@ -253,7 +252,6 @@ How to edit keymap
 See <a href="https://github.com/tmk/tmk_keyboard/blob/master/doc/keymap.md" target="_blank">this</a> for detailed description of keymap.
 
 <h2>Keyboard</h2>
-<div id="keyboard2" class="keyboard"></div>
 <div id="keyboard" class="keyboard">
 <!-- 
 Layer selector
@@ -353,7 +351,7 @@ Keycodes
 TODO: better align of buttons
 -->
 <h2>Keycodes</h2>
-<div id="keycode_tabs">
+<div id="keycode_tabs" class="keycode_tabs">
     <ul>
     <li><a href="#tabs-1">Main</a></li>
     <li><a href="#tabs-2">Function and Navigation</a></li>
@@ -675,6 +673,7 @@ TODO: better align of buttons
 
 <h3>Firmware Hex File Download:</h3>
 <button id="keymap-download" title="save file">Download</button>
+<a id="hex-download" style="display:none" ></a>
 
 <h3>Keymap Output:</h3>
 <textarea id="keymap-output" rows="20" cols="80"></textarea>

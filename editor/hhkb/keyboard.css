@@ -10,7 +10,7 @@
         display:block;
         float: left;
         color:#777777;
-        font-family:arial;
+        font-family:helvetica, arial, sans-serif;
         font-size:16px;
         font-weight:bold;
         text-decoration:none;
@@ -66,13 +66,22 @@
 
 .keyboard {
     width: 1000px;
-    overflow: auto;
+    overflow: nowrap;
+    font-size: 14px;
+    font-weight:bold;
 }
 
-#keycodes {
-    font-size:12px;
+.keycode_tabs {
+    width: 600px;
+    overflow: auto;
+    font-size:14px;
     font-weight:bold;
-    width: 200px;
+}
+
+.action {
+    font-size:16px;
+    font-weight:bold;
+    min-width: 30px;
 }
 
 /* http://www.w3schools.com/cssref/css3_pr_resize.asp */

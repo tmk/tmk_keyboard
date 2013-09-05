@@ -1,11 +1,32 @@
 KEYBOARD_ID = "hhkb";
+
+/* for ATMega32U4 with 32KB flash */
 KEYMAP_START_ADDRESS = 0x6800;
 
-/* HHKB firmware: v4.0-162-g52a7398 */
+/* hex file whthout keymap region and eof */
 function firmware_hex()
 {
+    /* HHKB firmware: v4.0-162-g52a7398 */
+    /*  Flash Map of ATMega32U4(32KB)
+     *  +------------+ 0x0000
+     *  | .vectors   | 0xac (43vectors * 4bytes)
+     *  | .progmem   | PROGMEM variables and PSTR
+     *  | .init0-9   |
+     *  | .text      | code
+     *  | .fini9-0   |
+     *  |            | > text region
+     *  |------------| _etext
+     *  | .data      |
+     *  | .bss       |
+     *  | .noinit    |
+     *  |            | > data region
+     *  |------------| 0x6800
+     *  | .keymap    | > keymap region(2KB)
+     *  |------------| 0x7000
+     *  | bootloader | 4KB
+     *  +------------+ 0x7FFF
+     */
     // TODO: read hex file directly from remote URL
-    // removed keymap region and eof
     return "\
 :100000000C942A070C9471070C9471070C947107D7\r\n\
 :100010000C9471070C9471070C9471070C94710780\r\n\
