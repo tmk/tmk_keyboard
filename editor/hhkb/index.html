@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    <script src="codes.js"></script>
+    <script src="keymap_editor.js"></script>
     <script src="firmware.js"></script>
     <link href='keyboard.css' rel='stylesheet' type='text/css'>
             
@@ -92,6 +92,13 @@
             ],
             no_map(),
             no_map(),
+
+            /*
+            no_map(),
+            no_map(),
+            no_map(),
+            no_map(),
+            */
         ];
 
         // TODO: define proper Fn actions: 32actions*2bytes
@@ -107,32 +114,32 @@
         // layer under editing
         var editing_layer = 0;
 
+        // load keymap on keyboard key buttons
+        var load_keymap_on_keyobard = function(layer, keymap) {
+            for (var row in keymap) {
+                for (var col in keymap[row]) {
+                    var code = keymap[row][col];
+                    var key = code_display[code];
+                    $("#key-0" + row + "0" + col).text(key.name);
+                    $("#key-0" + row + "0" + col).attr({ title: key.desc });
+                }
+            }
+        };
+
         $(function() {
             // Title
             document.title = "TMK Keymap Editor for " + KEYBOARD_ID;
             $("#page-title").text("TMK Keymap Editor for " + KEYBOARD_ID);
 
-            // lost keymap under edting when leave the page
-            /* TODO: Needed when released
-            $(window).bind('beforeunload', function(){
-                  return 'CAUTION: You will lost your change.';
-            });
-            */
+            /* 
+             * load keymap from URL hash
+             */
+            var decoded = decode_keymap(document.location.hash.substring(1));
+            if (decoded != null) {
+                keymaps = decoded['keymaps'];
+            }
 
-            // load keymap on keyboard key buttons
-            var load_keymap = function(layer, keymap) {
-                for (var row in keymap) {
-                    for (var col in keymap[row]) {
-                        var code = keymap[row][col];
-                        var key = code_display[code];
-                        $("#key-0" + row + "0" + col).text(key.name);
-                        $("#key-0" + row + "0" + col).attr({ title: key.desc });
-                    }
-                }
-            };
 
-            // load default keymap on startup
-            load_keymap(0, keymaps[0]);
 
             /*
              * Layer selector
@@ -143,12 +150,17 @@
             $(".layer").click(function(ev, ui) {
                 var layer = parseInt($(this).attr('id').match(/layer-(\d+)/)[1]);
                 editing_layer = layer;
-                load_keymap(layer, keymaps[layer]);
+                load_keymap_on_keyobard(layer, keymaps[layer]);
             });
 
+
+
             /*
-             * Keyboard display(key buttons)
+             * Keyboard(key buttons)
              */
+            // load default keymap on startup
+            load_keymap_on_keyobard(0, keymaps[0]);
+
             // Select key button to edit
             $(".key").click(function(ev, ui) {
                 editing_key = $(this).attr('id');
@@ -157,6 +169,8 @@
                 $(".key").removeClass("key-editing");
                 $(this).addClass("key-editing");
             });
+
+
 
             /*
              * Keycodes button tab
@@ -192,10 +206,24 @@
                 keymaps[editing_layer][row][col] = parseInt(code);
             });
 
+
             /*
-             * Output options
+             * Share URL
              */
-            //$("#keymap-output").resizable();  // resizable textarea
+            // Share URL
+            $("#keymap-share").click(function(ev, ui) {
+                var hash = encode_keymap({ keymaps: keymaps });
+                $("#share-url").text(document.location.origin + document.location.pathname + "#" + hash);
+            });
+
+            // Shorten URL
+            $("#shorten-url").click(function(ev, ui) {
+                var hash = encode_keymap({ keymaps: keymaps });
+                var editor_url = document.location.origin + document.location.pathname;
+                window.open("https://bitly.com/shorten/?url=" + encodeURIComponent(editor_url + "#" + hash));
+                //window.open("http://tinyurl.com/create.php?url=" + encodeURIComponent(editor_url + "#" + hash));
+            });
+
 
             // Hex Save
             $("#keymap-download").click(function(ev, ui) {
@@ -213,6 +241,13 @@
                 // http://stackoverflow.com/questions/1694595/
                 hex_link[0].click();
             });
+
+
+
+            /*
+             * Output options
+             */
+            //$("#keymap-output").resizable();  // resizable textarea
 
             // Hex output
             $("#keymap-hex-generate").click(function(ev, ui) {
@@ -234,6 +269,27 @@
                 $("#keymap-output").text(keymap_output);
             });
 
+            // encode keymap
+            $("#keymap-encode").click(function(ev, ui) {
+                var keymap_output = encode_keymap({ keymaps: keymaps });
+                $("#keymap-output").text(keymap_output);
+            });
+
+            // decode  keymap
+            $("#keymap-decode").click(function(ev, ui) {
+                var hash = $("#keymap-output").text();
+                var keymap_output = decode_keymap(hash);
+                $("#keymap-output").text(JSON.stringify(keymap_output));
+            });
+
+
+
+            // lost keymap under edting when leave the page
+            /* TODO: Needed when released
+            $(window).bind('beforeunload', function(){
+                  return 'CAUTION: You will lost your change.';
+            });
+            */
         });
     </script>
 </head>
@@ -243,34 +299,37 @@
 
 <h3>Instruction</h3>
 How to edit keymap
-<ul>
-<li>Select layer
-<li>Select key to edit
-<li>Select keycode to assign to the key
-<li>Download firmware
-</ul>
+<ol>
+    <li>Select layer</li>
+    <li>Select key to edit</li>
+    <li>Select keycode to assign to the key</li>
+    <li>Download firmware</li>
+</ol>
 See <a href="https://github.com/tmk/tmk_keyboard/blob/master/doc/keymap.md" target="_blank">this</a> for detailed description of keymap.
 
 <h2>Keyboard</h2>
-<div id="keyboard" class="keyboard">
-<!-- 
-Layer selector
--->
-<form>
-  <div id="layer_radio">
-    <input type="radio" name="radio" class="layer" id="layer-0"checked="checked" /><label for="layer-0">Layer 0</label>
-    <input type="radio" name="radio" class="layer" id="layer-1"/><label for="layer-1">Layer 1</label>
-    <input type="radio" name="radio" class="layer" id="layer-2"/><label for="layer-2">Layer 2</label>
-    <input type="radio" name="radio" class="layer" id="layer-3"/><label for="layer-3">Layer 3</label>
-  </div>
-</form> 
+<div id="keyboard-pane" class="keyboard-pane">
+    <form>
+        <div id="layer_radio">
+        <input type="radio" name="radio" class="layer" id="layer-0"checked="checked" /><label for="layer-0">Layer 0</label>
+        <input type="radio" name="radio" class="layer" id="layer-1"/><label for="layer-1">Layer 1</label>
+        <input type="radio" name="radio" class="layer" id="layer-2"/><label for="layer-2">Layer 2</label>
+        <input type="radio" name="radio" class="layer" id="layer-3"/><label for="layer-3">Layer 3</label>
+        <!--
+        <input type="radio" name="radio" class="layer" id="layer-4"/><label for="layer-4">Layer 4</label>
+        <input type="radio" name="radio" class="layer" id="layer-5"/><label for="layer-5">Layer 5</label>
+        <input type="radio" name="radio" class="layer" id="layer-6"/><label for="layer-6">Layer 6</label>
+        <input type="radio" name="radio" class="layer" id="layer-7"/><label for="layer-7">Layer 7</label>
+        -->
+        </div>
+    </form> 
 
-<!-- TODO: set all key to NO or TRANS -->
-<!-- TODO: copy layer -->
 
-<!-- 
-Keyboard keys
--->
+    <!-- 
+    Keyboard keys
+    -->
+    <div id="keyboard-outline" class="keyboard-outline">
+    <div class='keyboard-row'>
     <div id="key-0301" class="key">Esc</div>
     <div id="key-0300" class="key">1</div>
     <div id="key-0000" class="key">2</div>
@@ -286,8 +345,9 @@ Keyboard keys
     <div id="key-0701" class="key">=</div>
     <div id="key-0500" class="key">\</div>
     <div id="key-0501" class="key">`</div>
-    <br class="clear" />
+    </div>
 
+    <div class='keyboard-row'>
     <div id="key-0302" class="key btn150">Tab</div>
     <div id="key-0001" class="key">Q</div>
     <div id="key-0002" class="key">W</div>
@@ -302,8 +362,9 @@ Keyboard keys
     <div id="key-0703" class="key">[</div>
     <div id="key-0702" class="key">]</div>
     <div id="key-0502" class="key btn150">BSpc</div>
-    <br class="clear" />
+    </div>
 
+    <div class='keyboard-row'>
     <div id="key-0303" class="key btn175">Ctrl</div>
     <div id="key-0004" class="key">A</div>
     <div id="key-0003" class="key">S</div>
@@ -317,8 +378,9 @@ Keyboard keys
     <div id="key-0604" class="key">;</div>
     <div id="key-0704" class="key">'</div>
     <div id="key-0503" class="key btn225">Enter</div>
-    <br class="clear" />
+    </div>
 
+    <div class='keyboard-row'>
     <div id="key-0304" class="key btn225">Shift</div>
     <div id="key-0005" class="key">Z</div>
     <div id="key-0006" class="key">X</div>
@@ -332,8 +394,9 @@ Keyboard keys
     <div id="key-0705" class="key">/</div>
     <div id="key-0505" class="key btn175">Shift</div>
     <div id="key-0504" class="key">Fn</div>
-    <br class="clear" />
+    </div>
 
+    <div class='keyboard-row'>
     <div class="key spc150"></div>
     <div id="key-0305" class="key">Sup</div>
     <div id="key-0306" class="key btn150">Alt</div>
@@ -342,14 +405,13 @@ Keyboard keys
     <div id="key-0506" class="key">Sup</div>
     <div class="key spc150"></div>
     <div class="key spc100"></div>
-    <br class="clear" />
+    </div>
+    <div class="Thank"></div>
+
+    </div>
 </div>
 
 
-<!-- 
-Keycodes
-TODO: better align of buttons
--->
 <h2>Keycodes</h2>
 <div id="keycode_tabs" class="keycode_tabs">
     <ul>
@@ -675,12 +737,20 @@ TODO: better align of buttons
 <button id="keymap-download" title="save file">Download</button>
 <a id="hex-download" style="display:none" ></a>
 
+<h3>Share URL:</h3>
+<textarea id="share-url" rows="10" cols="80"></textarea>
+<br/>
+<button id="keymap-share" title="Share">Share</button>
+<button id="shorten-url" title="Shorten">Shorten</button>
+
 <h3>Keymap Output:</h3>
 <textarea id="keymap-output" rows="20" cols="80"></textarea>
 <br/>
 <button id="keymap-json-generate" title="generate JSON">JSON</button>
 <button id="keymap-source-generate" title="generate C source code">C source</button>
 <button id="keymap-hex-generate" title="generate Hex">Hex</button>
+<button id="keymap-encode" title="generate URL">encode URL</button>
+<button id="keymap-decode" title="decode URL">decode URL</button>
 
 </body>
 </html>

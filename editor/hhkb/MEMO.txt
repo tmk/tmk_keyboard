@@ -1,5 +1,18 @@
 TODO
 ----
+    Better source output
+        KEYMAP macro
+
+    layer operation
+        copy, swap, set all, clear...
+
+    X Share URL
+        X shoten service? 09/07
+
+    Bootloader jump doesn't work
+        
+    Keyobard external line graphic
+
     X test on remote site
         tmk.github.io/tmk_editor/hhkb/?
         github pages
@@ -20,8 +33,8 @@ TODO
         a.className = 'TE_link';
         a.click()
 
-    keyboard key text css
-        align of wrapped text
+    X keyboard key text css
+        X align of wrapped text
 
     edit action for FN key
     action map support
@@ -31,10 +44,9 @@ TODO
         Convert table? UI can use position of elemen placing.
         UI uses matrix posiotn for ID of element.
 
-    P load/save JSON
     X save hex(binary)
 
-    firmware
+    X firmware
         P load binary
         P Mass Storage or HID comm
         X fixed address for keymaps

@@ -1,19 +1,27 @@
 /*
-function flatten(obj)
+ * Share URL
+ */
+function encode_keymap(keymap)
 {
-    var a = [];
-    if (obj instanceof Array) {
-        return obj.map(function(e) {return flatten(e) ;});
-    } else {
-        return obj
-    }
-};
-*/
+    return window.btoa(JSON.stringify(keymap));
+}
 
+function decode_keymap(hash)
+{
+    try {
+        return JSON.parse(window.atob(hash));
+    } catch (err) {
+        return null;
+    }
+}
+
+/*
+ * Hex file
+ */
 function hexstr2(b)
 {
     return ('0'+ b.toString(16)).substr(-2).toUpperCase();
-};
+}
 
 function hex_line(address, record_type, data)
 {
@@ -43,6 +51,12 @@ function hex_eof()
     return ":00000001FF\r\n";
 }
 
+/*
+function flatten(array)
+{
+};
+*/
+
 function hex_output(address, data) {
     var output = '';
     var line = [];
@@ -62,6 +76,11 @@ function hex_output(address, data) {
     return output;
 }
 
+
+
+/*
+ * Source file
+ */
 function source_output(keymaps) {
     var output = '';
     // fn actions
@@ -143,7 +162,11 @@ function source_output(keymaps) {
     return output;
 };
 
-/* keycode to display */
+
+
+/* 
+ * keycodes
+ */
 var code_display = [
     // {id, name(text), description(tooltip)}
     {id: 'NO  ',                        name: 'NO',                          desc: 'No action'},
@@ -472,20 +495,20 @@ var code_display = [
     {id: 'RESERVED-238',                name: 'RESERVED-238',                desc: 'RESERVED-238'},
     {id: 'RESERVED-239',                name: 'RESERVED-239',                desc: 'RESERVED-239'},
     /* Mousekey */
-    {id: 'MS_U',                        name: 'MS_UP',                       desc: 'MS_UP'},
-    {id: 'MS_D',                        name: 'MS_DOWN',                     desc: 'MS_DOWN'},
-    {id: 'MS_L',                        name: 'MS_LEFT',                     desc: 'MS_LEFT'},
-    {id: 'MS_R',                        name: 'MS_RIGHT',                    desc: 'MS_RIGHT'},
-    {id: 'BTN1',                        name: 'MS_BTN1',                     desc: 'MS_BTN1'},
-    {id: 'BTN2',                        name: 'MS_BTN2',                     desc: 'MS_BTN2'},
-    {id: 'BTN3',                        name: 'MS_BTN3',                     desc: 'MS_BTN3'},
-    {id: 'BTN4',                        name: 'MS_BTN4',                     desc: 'MS_BTN4'},
-    {id: 'BTN5',                        name: 'MS_BTN5',                     desc: 'MS_BTN5'},
-    {id: 'WH_U',                        name: 'MS_WH_UP',                    desc: 'MS_WH_UP'},
-    {id: 'WH_D',                        name: 'MS_WH_DOWN',                  desc: 'MS_WH_DOWN'},
-    {id: 'WH_L',                        name: 'MS_WH_LEFT',                  desc: 'MS_WH_LEFT'},
-    {id: 'WH_R',                        name: 'MS_WH_RIGHT',                 desc: 'MS_WH_RIGHT'},
-    {id: 'ACL0',                        name: 'MS_ACCEL0',                   desc: 'MS_ACCEL0'},
-    {id: 'ACL1',                        name: 'MS_ACCEL1',                   desc: 'MS_ACCEL1'},
-    {id: 'ACL2',                        name: 'MS_ACCEL2',                   desc: 'MS_ACCEL2'},
+    {id: 'MS_U',                        name: 'Mouse Up',                    desc: 'Mouse UP'},
+    {id: 'MS_D',                        name: 'Mouse down',                  desc: 'Mouse Down'},
+    {id: 'MS_L',                        name: 'Mouse left',                  desc: 'Mouse Left'},
+    {id: 'MS_R',                        name: 'Mouse right',                 desc: 'Mouse Right'},
+    {id: 'BTN1',                        name: 'Mouse Button1',               desc: 'Mouse Button1'},
+    {id: 'BTN2',                        name: 'Mouse Button2',               desc: 'Mouse Button2'},
+    {id: 'BTN3',                        name: 'Mouse Button3',               desc: 'Mouse Button3'},
+    {id: 'BTN4',                        name: 'Mouse Button4',               desc: 'Mouse Button4'},
+    {id: 'BTN5',                        name: 'Mouse Button5',               desc: 'Mouse Button5'},
+    {id: 'WH_U',                        name: 'Wheel UP',                    desc: 'Wheel UP'},
+    {id: 'WH_D',                        name: 'Wheel DOWN',                  desc: 'Wheel DOWN'},
+    {id: 'WH_L',                        name: 'Wheel LEFT',                  desc: 'Wheel LEFT'},
+    {id: 'WH_R',                        name: 'Wheel RIGHT',                 desc: 'Wheel RIGHT'},
+    {id: 'ACL0',                        name: 'Mouse ACCEL0',                desc: 'Mouse ACCEL0'},
+    {id: 'ACL1',                        name: 'Mouse ACCEL1',                desc: 'Mouse ACCEL1'},
+    {id: 'ACL2',                        name: 'Mouse ACCEL2',                desc: 'Mouse ACCEL2'},
 ];
