@@ -68,6 +68,9 @@
                 // grey-out key to indicate being under editing
                 $(".key").removeClass("key-editing");
                 $(this).addClass("key-editing");
+            }).focus(function(ev, ui) {
+                // select editing_key with tab key focus
+                $(this).click();
             });
 
 
@@ -89,6 +92,7 @@
             });
 
             $(".action").click(function(ev,ui) {
+                console.log("action click");
                 if (!editing_key) return;
 
                 // get matrix position from key id: key-RRCC where RR is row and CC is column in dec
@@ -104,6 +108,9 @@
                 // get code from keycode button id: code-[0x]CC where CC is dec or hex number
                 var code = $(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1];
                 keymaps[editing_layer][row][col] = parseInt(code);
+
+                // give focus on editing_key for next tab key operation
+                $("#" + editing_key).focus();
             });
 
 
@@ -228,79 +235,79 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/doc/keymap.md" targ
     -->
     <div id="keyboard-outline" class="keyboard-outline">
     <div class='keyboard-row'>
-    <div id="key-0301" class="key">Esc</div>
-    <div id="key-0300" class="key">1</div>
-    <div id="key-0000" class="key">2</div>
-    <div id="key-0100" class="key">3</div>
-    <div id="key-0101" class="key">4</div>
-    <div id="key-0200" class="key">5</div>
-    <div id="key-0201" class="key">6</div>
-    <div id="key-0400" class="key">7</div>
-    <div id="key-0401" class="key">8</div>
-    <div id="key-0600" class="key">9</div>
-    <div id="key-0601" class="key">0</div>
-    <div id="key-0700" class="key">-</div>
-    <div id="key-0701" class="key">=</div>
-    <div id="key-0500" class="key">\</div>
-    <div id="key-0501" class="key">`</div>
+    <div id="key-0301" class="key" tabindex="1">Esc</div>
+    <div id="key-0300" class="key" tabindex="1">1</div>
+    <div id="key-0000" class="key" tabindex="1">2</div>
+    <div id="key-0100" class="key" tabindex="1">3</div>
+    <div id="key-0101" class="key" tabindex="1">4</div>
+    <div id="key-0200" class="key" tabindex="1">5</div>
+    <div id="key-0201" class="key" tabindex="1">6</div>
+    <div id="key-0400" class="key" tabindex="1">7</div>
+    <div id="key-0401" class="key" tabindex="1">8</div>
+    <div id="key-0600" class="key" tabindex="1">9</div>
+    <div id="key-0601" class="key" tabindex="1">0</div>
+    <div id="key-0700" class="key" tabindex="1">-</div>
+    <div id="key-0701" class="key" tabindex="1">=</div>
+    <div id="key-0500" class="key" tabindex="1">\</div>
+    <div id="key-0501" class="key" tabindex="1">`</div>
     </div>
 
     <div class='keyboard-row'>
-    <div id="key-0302" class="key btn150">Tab</div>
-    <div id="key-0001" class="key">Q</div>
-    <div id="key-0002" class="key">W</div>
-    <div id="key-0103" class="key">E</div>
-    <div id="key-0102" class="key">R</div>
-    <div id="key-0203" class="key">T</div>
-    <div id="key-0202" class="key">Y</div>
-    <div id="key-0402" class="key">U</div>
-    <div id="key-0403" class="key">I</div>
-    <div id="key-0602" class="key">O</div>
-    <div id="key-0603" class="key">P</div>
-    <div id="key-0703" class="key">[</div>
-    <div id="key-0702" class="key">]</div>
-    <div id="key-0502" class="key btn150">BSpc</div>
+    <div id="key-0302" class="key btn150" tabindex="2">Tab</div>
+    <div id="key-0001" class="key" tabindex="2">Q</div>
+    <div id="key-0002" class="key" tabindex="2">W</div>
+    <div id="key-0103" class="key" tabindex="2">E</div>
+    <div id="key-0102" class="key" tabindex="2">R</div>
+    <div id="key-0203" class="key" tabindex="2">T</div>
+    <div id="key-0202" class="key" tabindex="2">Y</div>
+    <div id="key-0402" class="key" tabindex="2">U</div>
+    <div id="key-0403" class="key" tabindex="2">I</div>
+    <div id="key-0602" class="key" tabindex="2">O</div>
+    <div id="key-0603" class="key" tabindex="2">P</div>
+    <div id="key-0703" class="key" tabindex="2">[</div>
+    <div id="key-0702" class="key" tabindex="2">]</div>
+    <div id="key-0502" class="key btn150" tabindex="2">BSpc</div>
     </div>
 
     <div class='keyboard-row'>
-    <div id="key-0303" class="key btn175">Ctrl</div>
-    <div id="key-0004" class="key">A</div>
-    <div id="key-0003" class="key">S</div>
-    <div id="key-0104" class="key">D</div>
-    <div id="key-0105" class="key">F</div>
-    <div id="key-0204" class="key">G</div>
-    <div id="key-0205" class="key">H</div>
-    <div id="key-0405" class="key">J</div>
-    <div id="key-0404" class="key">K</div>
-    <div id="key-0605" class="key">L</div>
-    <div id="key-0604" class="key">;</div>
-    <div id="key-0704" class="key">'</div>
-    <div id="key-0503" class="key btn225">Enter</div>
+    <div id="key-0303" class="key btn175" tabindex="3">Ctrl</div>
+    <div id="key-0004" class="key" tabindex="3">A</div>
+    <div id="key-0003" class="key" tabindex="3">S</div>
+    <div id="key-0104" class="key" tabindex="3">D</div>
+    <div id="key-0105" class="key" tabindex="3">F</div>
+    <div id="key-0204" class="key" tabindex="3">G</div>
+    <div id="key-0205" class="key" tabindex="3">H</div>
+    <div id="key-0405" class="key" tabindex="3">J</div>
+    <div id="key-0404" class="key" tabindex="3">K</div>
+    <div id="key-0605" class="key" tabindex="3">L</div>
+    <div id="key-0604" class="key" tabindex="3">;</div>
+    <div id="key-0704" class="key" tabindex="3">'</div>
+    <div id="key-0503" class="key btn225" tabindex="3">Enter</div>
     </div>
 
     <div class='keyboard-row'>
-    <div id="key-0304" class="key btn225">Shift</div>
-    <div id="key-0005" class="key">Z</div>
-    <div id="key-0006" class="key">X</div>
-    <div id="key-0007" class="key">C</div>
-    <div id="key-0106" class="key">V</div>
-    <div id="key-0107" class="key">B</div>
-    <div id="key-0206" class="key">N</div>
-    <div id="key-0406" class="key">M</div>
-    <div id="key-0606" class="key">,</div>
-    <div id="key-0706" class="key">.</div>
-    <div id="key-0705" class="key">/</div>
-    <div id="key-0505" class="key btn175">Shift</div>
-    <div id="key-0504" class="key">Fn</div>
+    <div id="key-0304" class="key btn225" tabindex="4">Shift</div>
+    <div id="key-0005" class="key" tabindex="4">Z</div>
+    <div id="key-0006" class="key" tabindex="4">X</div>
+    <div id="key-0007" class="key" tabindex="4">C</div>
+    <div id="key-0106" class="key" tabindex="4">V</div>
+    <div id="key-0107" class="key" tabindex="4">B</div>
+    <div id="key-0206" class="key" tabindex="4">N</div>
+    <div id="key-0406" class="key" tabindex="4">M</div>
+    <div id="key-0606" class="key" tabindex="4">,</div>
+    <div id="key-0706" class="key" tabindex="4">.</div>
+    <div id="key-0705" class="key" tabindex="4">/</div>
+    <div id="key-0505" class="key btn175" tabindex="4">Shift</div>
+    <div id="key-0504" class="key" tabindex="4">Fn</div>
     </div>
 
     <div class='keyboard-row'>
     <div class="key spc150"></div>
-    <div id="key-0305" class="key">Sup</div>
-    <div id="key-0306" class="key btn150">Alt</div>
-    <div id="key-0307" class="key btn600"></div>
-    <div id="key-0507" class="key btn150">Alt</div>
-    <div id="key-0506" class="key">Sup</div>
+    <div id="key-0305" class="key" tabindex="5">LGui</div>
+    <div id="key-0306" class="key btn150" tabindex="5">RAlt</div>
+    <div id="key-0307" class="key btn600" tabindex="5">Space</div>
+    <div id="key-0507" class="key btn150" tabindex="5">RAlt</div>
+    <div id="key-0506" class="key" tabindex="5">RGui</div>
     <div class="key spc150"></div>
     <div class="key spc100"></div>
     </div>
