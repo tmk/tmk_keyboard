@@ -81,11 +81,9 @@ $(function() {
         var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
         $(this).text(keycodes[code].name);
         $(this).attr({ title: keycodes[code].desc });
-        //console.log(index + ": " + code + " " + keycodes[code].desc);
     });
 
     $(".action").click(function(ev,ui) {
-        console.log("action click");
         if (!editing_key) return;
 
         // get matrix position from key id: key-RC where R is row and C is column in "0-v"(radix 32)
@@ -197,15 +195,24 @@ $(function() {
 /*
  * Share URL
  */
-function encode_keymap(keymap)
+function encode_keymap(obj)
 {
-    return window.btoa(JSON.stringify(keymap));
+    if (typeof LZString != "undefined" && typeof Base64 != "undefined") {
+        return Base64.encode(LZString.compress(JSON.stringify(obj)));
+    }
+    return window.btoa(JSON.stringify(obj));
 }
 
-function decode_keymap(hash)
+function decode_keymap(str)
 {
     try {
-        return JSON.parse(window.atob(hash));
+        /* lz-string-1.3.3.js: LZString.decompress() runs away if given short string. */
+        if (str == null || typeof str != "string" || str.length < 30) return null;
+
+        if (typeof LZString != "undefined" && typeof Base64 != "undefined") {
+            return JSON.parse(LZString.decompress(Base64.decode(str)));
+        }
+        return JSON.parse(window.atob(str));
     } catch (err) {
         return null;
     }
