@@ -1,13 +1,6 @@
 Keymap Editor for TMK firmware
 ==============================
 
-- [HHKB](hhkb/index.html)
-
-
-Instruction
------------
-
-
 Limitation
 ----------
 
@@ -16,13 +9,13 @@ TODO & MEMO
 ------------
 ### Edit action for FN key
 ### Better source output
-KEYMAP macro
+- KEYMAP macro
 ### Actionmap support
 ### Macro editor
 ### Layer operation
-copy, swap, set all, clear...
+- copy, swap, set all, clear...
 ### Compress share URL
-lz-string.js
+- lz-string.js(Done)
 
 ### Bootloader jump doesn't work
 ### Better Keyobard graphic
@@ -33,9 +26,9 @@ lz-string.js
 
 ldscript and Flash Memory
 -------------------------
-`ldscript_keymap_avr5.x` is ldscript and located at top directory. Using 
+[`ldscript_keymap_avr5.x`](https://github.com/tmk/tmk_keyboard/blob/master/ldscript_keymap_avr5.x) is custom ldscript to place keymap at fixed address(0x6800 in this case).
 
-Flash Memroy Map of ATMega32U4(32KB)
+Flash Memroy Map of ATMega32U4(32KB):
 
     +--------------------+ 0x0000
     | .vectors           | 0xac (43vectors * 4bytes)
@@ -59,8 +52,12 @@ Flash Memroy Map of ATMega32U4(32KB)
 
 Keymap(8bit code)
 -----------------
-`const uint16_t fn_actions[] __attribute__ ((section (".keymap.fn_actions")))`
-`const uint8_t keymaps[8][ROW][COL] __attribute__ ((section (".keymap.keymaps")))`
+This is a format of keymap used in TMK Keymap Editor. This is comprised of two arrays. `fn_actions` is a 64 byte fixed size array of 32 action codes(16bit). `keymaps` is a three dimensional array of key code(8bit) and contains 8 layers of keymap whose size(ROW x COL) is vary on each keyboard matrices.
+
+Signature of the arrays:
+
+- `const uint16_t fn_actions[] __attribute__ ((section (".keymap.fn_actions")))`
+- `const uint8_t keymaps[8][ROW][COL] __attribute__ ((section (".keymap.keymaps")))`
 
 These arrays are placed at fixed address in .keymap section:
 
@@ -82,9 +79,12 @@ These arrays are placed at fixed address in .keymap section:
 
 Actionmap(16bit code)
 ---------------------
-`const uint16_t actionmaps[] __attribute__ ((section (".keymap.actionmaps")))`
+`actionmaps` is a three dimensional array of actionmap which is matrix(ROW x COL) of action codes(16bit), but this is not actually used in firmware yet at this time. All key action can be represented in 16bit code. Flash Memory usage will be about doubled size compared to keymap(8bit code).
+ 
+Signature of the arrays:
 
-All key action can be defined in 16bit code. Memory usage will be about doubled size compared to keymap(8bit code).
+- `const uint16_t actionmaps[LAYER][ROW][COL] __attribute__ ((section (".keymap.actionmaps")))`
+
 
     actionmaps[] -> +-------------+
                     | actionmap 0 |
@@ -100,7 +100,7 @@ All key action can be defined in 16bit code. Memory usage will be about doubled 
 
 Flash usage cosidaration
 ------------------------
-For example of biggest ever map, PS/2 and ADB converter have 256 keys in a layer, so use 256 bytes each layer in keymap and 512 bytes in actionmap.
+As for example of biggest ever keymap, PS/2 and ADB converter have 256 keys in a layer, so use 256 bytes each layer in keymap and 512 bytes in actionmap.
 In most cases map size of keyboard will be far smaller than that.
 
 ### ATmega32U4
