@@ -35,15 +35,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* key combination for command */
 #define IS_COMMAND() (keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT))) 
 
-/* mouse keys */
-#ifdef MOUSEKEY_ENABLE
-#   define MOUSEKEY_DELAY_TIME 100
-#endif
-
-
-#define DEBUG_LED 1
-#define DEBUG_LED_CONFIG    (DDRD |= (1<<4))
-#define DEBUG_LED_OFF       (PORTD |= (1<<4))
-#define DEBUG_LED_ON        (PORTD &= ~(1<<4))
-
 #endif

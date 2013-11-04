@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CONFIG_H
 #define CONFIG_H
 
-/* controller configuration */
-#include "controller_teensy.h"
 
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x5021
@@ -33,17 +31,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_COLS 8   // keycode bit: 6-4
 
 
+/* legacy keymap support */
+#define USE_LEGACY_KEYMAP
+
+
 /* key combination for command */
 #define IS_COMMAND() ( \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)) || \
     keyboard_report->mods == (MOD_BIT(KC_LCTRL) | MOD_BIT(KC_RSHIFT)) \
 )
-
-
-/* mouse keys */
-#ifdef MOUSEKEY_ENABLE
-#   define MOUSEKEY_DELAY_TIME 255
-#endif
 
 
 /* Asynchronous USART

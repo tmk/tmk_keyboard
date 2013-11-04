@@ -18,13 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CONFIG_H
 #define CONFIG_H
 
-/* controller configuration */
-#include "controller_teensy.h"
-
 
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x0110
-#define DEVICE_VER      0x0100
+#define DEVICE_VER      0x0101
 #define MANUFACTURER    t.m.k.
 #define PRODUCT         M0110 keyboard converter
 #define DESCRIPTION     convert M0110 keyboard to USB
@@ -34,8 +31,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_ROWS 14
 #define MATRIX_COLS 8
 
-/* Locking Caps Lock support */
-//#define MATRIX_HAS_LOCKING_CAPS
+
+/* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
+#define LOCKING_SUPPORT_ENABLE
+/* Locking resynchronize hack */
+#define LOCKING_RESYNC_ENABLE
+
 
 /* magic key */
 #define IS_COMMAND() ( \
@@ -43,21 +44,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_LALT) | MOD_BIT(KC_LCTL)) \
 )
 
-
-/* mouse keys */
-#ifdef MOUSEKEY_ENABLE
-#   define MOUSEKEY_DELAY_TIME 192
-#endif
+/* boot magic key */
+#define BOOTMAGIC_KEY_SALT                      KC_FN0
+#define BOOTMAGIC_KEY_CAPSLOCK_TO_CONTROL       KC_LCAP
 
 
 /* ports */
-#define M0110_CLOCK_PORT        PORTF
-#define M0110_CLOCK_PIN         PINF
-#define M0110_CLOCK_DDR         DDRF
-#define M0110_CLOCK_BIT         0
-#define M0110_DATA_PORT         PORTF
-#define M0110_DATA_PIN          PINF
-#define M0110_DATA_DDR          DDRF
-#define M0110_DATA_BIT          1
+#define M0110_CLOCK_PORT        PORTD
+#define M0110_CLOCK_PIN         PIND
+#define M0110_CLOCK_DDR         DDRD
+#define M0110_CLOCK_BIT         1
+#define M0110_DATA_PORT         PORTD
+#define M0110_DATA_PIN          PIND
+#define M0110_DATA_DDR          DDRD
+#define M0110_DATA_BIT          0
 
 #endif

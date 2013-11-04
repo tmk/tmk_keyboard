@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define IS_SPECIAL(code)         ((0xA5 <= (code) && (code) <= 0xDF) || (0xE8 <= (code) && (code) <= 0xFF))
-#define IS_SYSTEM(code)          (KC_POWER     <= (code) && (code) <= KC_WAKE)
+#define IS_SYSTEM(code)          (KC_PWR       <= (code) && (code) <= KC_WAKE)
 #define IS_CONSUMER(code)        (KC_MUTE      <= (code) && (code) <= KC_WFAV)
 #define IS_FN(code)              (KC_FN0       <= (code) && (code) <= KC_FN31)
 #define IS_MOUSEKEY(code)        (KC_MS_UP     <= (code) && (code) <= KC_MS_ACCEL2)
@@ -60,10 +60,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_DEL  KC_DELETE
 #define KC_INS  KC_INSERT
 #define KC_CAPS KC_CAPSLOCK
+#define KC_CLCK KC_CAPSLOCK
 #define KC_RGHT KC_RIGHT
 #define KC_PGDN KC_PGDOWN
 #define KC_PSCR KC_PSCREEN
-#define KC_SLCK KC_SCKLOCK
+#define KC_SLCK KC_SCROLLLOCK
 #define KC_PAUS KC_PAUSE
 #define KC_BRK  KC_PAUSE
 #define KC_NLCK KC_NUMLOCK
@@ -82,6 +83,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_NUHS KC_NONUS_HASH
 #define KC_NUBS KC_NONUS_BSLASH
 #define KC_LCAP KC_LOCKING_CAPS
+#define KC_LNUM KC_LOCKING_NUM
+#define KC_LSCR KC_LOCKING_SCROLL
 #define KC_ERAS KC_ALT_ERASE,
 #define KC_CLR  KC_CLEAR
 /* Japanese specific */
@@ -230,7 +233,7 @@ enum hid_keyboard_keypad_usage {
     KC_F11,
     KC_F12,
     KC_PSCREEN,
-    KC_SCKLOCK,
+    KC_SCROLLLOCK,
     KC_PAUSE,
     KC_INSERT,
     KC_HOME,
@@ -407,6 +410,7 @@ enum internal_special_keycodes {
     KC_MEDIA_STOP,
     KC_MEDIA_PLAY_PAUSE,
     KC_MEDIA_SELECT,
+    KC_MEDIA_EJECT,
     KC_MAIL,
     KC_CALCULATOR,
     KC_MY_COMPUTER,
@@ -415,12 +419,8 @@ enum internal_special_keycodes {
     KC_WWW_BACK,
     KC_WWW_FORWARD,
     KC_WWW_STOP,
-    KC_WWW_REFRESH,     /* 0xC0 */
-    KC_WWW_FAVORITES,   /* 0xC1 */
-    KC_MEDIA_EJECT,
-                        /* 0xC3-DF vacant for future use */
-
-    /* 0xE0-E7 for Modifiers. DO NOT USE. */
+    KC_WWW_REFRESH,
+    KC_WWW_FAVORITES,   /* 0xBA */
 
     /* Fn key */
     KC_FN0              = 0xC0,

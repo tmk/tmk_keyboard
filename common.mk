@@ -3,14 +3,15 @@ SRC +=	$(COMMON_DIR)/host.c \
 	$(COMMON_DIR)/keyboard.c \
 	$(COMMON_DIR)/action.c \
 	$(COMMON_DIR)/action_tapping.c \
-	$(COMMON_DIR)/action_oneshot.c \
 	$(COMMON_DIR)/action_macro.c \
 	$(COMMON_DIR)/action_layer.c \
+	$(COMMON_DIR)/action_util.c \
 	$(COMMON_DIR)/keymap.c \
 	$(COMMON_DIR)/timer.c \
 	$(COMMON_DIR)/print.c \
 	$(COMMON_DIR)/bootloader.c \
 	$(COMMON_DIR)/suspend.c \
+	$(COMMON_DIR)/xprintf.S \
 	$(COMMON_DIR)/util.c
 
 
@@ -61,6 +62,19 @@ ifdef SLEEP_LED_ENABLE
     OPT_DEFS += -DSLEEP_LED_ENABLE
     OPT_DEFS += -DNO_SUSPEND_POWER_DOWN
 endif
+
+ifdef BACKLIGHT_ENABLE
+    SRC += $(COMMON_DIR)/backlight.c
+    OPT_DEFS += -DBACKLIGHT_ENABLE
+endif
+
+ifdef KEYMAP_SECTION_ENABLE
+    OPT_DEFS += -DKEYMAP_SECTION_ENABLE
+    EXTRALDFLAGS = -Wl,-L$(TOP_DIR),-Tldscript_keymap_avr5.x
+endif
+
+# Version string
+OPT_DEFS += -DVERSION=$(shell (git describe --always --dirty || echo 'unknown') 2> /dev/null)
 
 
 # Search Path

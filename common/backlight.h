@@ -1,5 +1,5 @@
 /*
-Copyright 2011 Jun Wako <wakojun@gmail.com>
+Copyright 2013 Mathias Andersson <wraul@dbox.se>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,13 +15,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TEENSY_H
-#define TEENSY_H 1
+#ifndef BACKLIGHT_H
+#define BACKLIGHT_H
 
-// for Teensy/Teensy++ 2.0
-#undef  DEBUG_LED
-#define DEBUG_LED_CONFIG
-#define DEBUG_LED_ON
-#define DEBUG_LED_OFF
+#include <stdint.h>
+#include <stdbool.h>
+
+typedef union {
+    uint8_t raw;
+    struct {
+        bool    enable:1;
+        uint8_t level:7;
+    };
+} backlight_config_t;
+
+void backlight_init(void);
+
+void backlight_increase(void);
+void backlight_decrease(void);
+void backlight_toggle(void);
+void backlight_step(void);
+
+void backlight_set(uint8_t level);
 
 #endif

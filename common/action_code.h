@@ -29,13 +29,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 000r|0000|0000 0001    Transparent code
  * 000r|0000| keycode     Key
  * 000r|mods|0000 0000    Modifiers
- * 000r|mods| keycode     Key and Modifiers
+ * 000r|mods| keycode     Modifiers+Key(Modified key)
  *   r: Left/Right flag(Left:0, Right:1)
  *
  * ACT_MODS_TAP(001r):
- * 0010|mods|0000 0000    Modifiers with OneShot
- * 0010|mods|0000 00xx    (reserved)
- * 0010|mods| keycode     Modifiers with Tap Key
+ * 001r|mods|0000 0000    Modifiers with OneShot
+ * 001r|mods|0000 00xx    (reserved)
+ * 001r|mods| keycode     Modifiers with Tap Key(Dual role)
  *
  *
  * Other Keys(01xx)
@@ -62,21 +62,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 1000|ooee|pppE BBBB   Layer Bitwise Operation
  *   oo:    operation(00:AND, 01:OR, 10:XOR, 11:SET)
  *   ppp:   4-bit chunk part(0-7)
- *   eBBBB: bits and extra bit
- *   ee:    on event(00:default layer, 01:press, 10:release, 11:both)
+ *   EBBBB: bits and extra bit
+ *   ee:    on event(01:press, 10:release, 11:both)
  *
  * 1001|xxxx|xxxx xxxx   (reserved)
  * 1001|oopp|BBBB BBBB   8-bit Bitwise Operation???
  *
  * ACT_LAYER_TAP(101x):
- * 101E|LLLL| keycode    Invert with tap key
+ * 101E|LLLL| keycode    On/Off with tap key
  * 101E|LLLL|1110 xxxx   Reserved(0xE0-EF)
  * 101E|LLLL|1111 0000   Invert with tap toggle(0xF0)
  * 101E|LLLL|1111 0001   On/Off
  * 101E|LLLL|1111 0010   Off/On
  * 101E|LLLL|1111 0011   Set/Clear
  * 101E|LLLL|1111 xxxx   Reserved(0xF4-FF)
- *   ELLLL: layer(0-31)
+ *   ELLLL: layer 0-31(E: extra bit for layer 16-31)
  *
  *
  * Extensions(11xx)
@@ -84,6 +84,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * ACT_MACRO(1100):
  * 1100|opt | id(8)      Macro play?
  * 1100|1111| id(8)      Macro record?
+ *
+ * ACT_BACKLIGHT(1101):
+ * 1101|xxxx| id(8)      Backlight commands
  *
  * ACT_COMMAND(1110):
  * 1110|opt | id(8)      Built-in Command exec
@@ -105,10 +108,11 @@ enum action_kind_id {
     ACT_MOUSEKEY        = 0b0101,
     /* Layer Actions */
     ACT_LAYER           = 0b1000,
-    ACT_LAYER_TAP       = 0b1010,
-    ACT_LAYER_TAP1      = 0b1011,
+    ACT_LAYER_TAP       = 0b1010, /* Layer  0-15 */
+    ACT_LAYER_TAP_EXT   = 0b1011, /* Layer 16-31 */
     /* Extensions */
     ACT_MACRO           = 0b1100,
+    ACT_BACKLIGHT       = 0b1101,
     ACT_COMMAND         = 0b1110,
     ACT_FUNCTION        = 0b1111
 };
@@ -157,6 +161,9 @@ typedef union {
         uint8_t  page   :2;
         uint8_t  kind   :4;
     } usage;
+    struct action_backlight {
+        uint8_t  id     :8;
+    } backlight;
     struct action_command {
         uint8_t  id     :8;
         uint8_t  opt    :4;
@@ -200,10 +207,10 @@ enum mods_codes {
     MODS_ONESHOT = 0x00,
 };
 #define ACTION_KEY(key)                 ACTION(ACT_MODS, (key))
-#define ACTION_MODS(mods)               ACTION(ACT_MODS, (mods)<<8 | 0)
-#define ACTION_MODS_KEY(mods, key)      ACTION(ACT_MODS, (mods)<<8 | (key))
-#define ACTION_MODS_TAP_KEY(mods, key)  ACTION(ACT_MODS_TAP, (mods)<<8 | (key))
-#define ACTION_MODS_ONESHOT(mods)       ACTION(ACT_MODS_TAP, (mods)<<8 | MODS_ONESHOT)
+#define ACTION_MODS(mods)               ACTION(ACT_MODS, (mods&0x1f)<<8 | 0)
+#define ACTION_MODS_KEY(mods, key)      ACTION(ACT_MODS, (mods&0x1f)<<8 | (key))
+#define ACTION_MODS_TAP_KEY(mods, key)  ACTION(ACT_MODS_TAP, (mods&0x1f)<<8 | (key))
+#define ACTION_MODS_ONESHOT(mods)       ACTION(ACT_MODS_TAP, (mods&0x1f)<<8 | MODS_ONESHOT)
 
 
 /*
@@ -272,10 +279,21 @@ enum layer_pram_tap_op {
 /*
  * Extensions
  */
+enum backlight_id {
+    BACKLIGHT_INCREASE = 0,
+    BACKLIGHT_DECREASE = 1,
+    BACKLIGHT_TOGGLE   = 2,
+    BACKLIGHT_STEP     = 3,
+};
 /* Macro */
 #define ACTION_MACRO(id)                ACTION(ACT_MACRO, (id))
 #define ACTION_MACRO_TAP(id)            ACTION(ACT_MACRO, FUNC_TAP<<8 | (id))
 #define ACTION_MACRO_OPT(id, opt)       ACTION(ACT_MACRO, (opt)<<8 | (id))
+/* Backlight */
+#define ACTION_BACKLIGHT_INCREASE()     ACTION(ACT_BACKLIGHT, BACKLIGHT_INCREASE)
+#define ACTION_BACKLIGHT_DECREASE()     ACTION(ACT_BACKLIGHT, BACKLIGHT_DECREASE)
+#define ACTION_BACKLIGHT_TOGGLE()       ACTION(ACT_BACKLIGHT, BACKLIGHT_TOGGLE)
+#define ACTION_BACKLIGHT_STEP()         ACTION(ACT_BACKLIGHT, BACKLIGHT_STEP)
 /* Command */
 #define ACTION_COMMAND(id, opt)         ACTION(ACT_COMMAND,  (opt)<<8 | (addr))
 /* Function */

@@ -18,9 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CONFIG_H
 #define CONFIG_H
 
-/* controller configuration */
-#include "controller_teensy.h"
-
 
 /* USB Device descriptor parameter */
 /* for Apple 
@@ -59,10 +56,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LAYER_SEND_FN_TERM 300
 
 
-/* mouse keys */
-#ifdef MOUSEKEY_ENABLE
-#   define MOUSEKEY_DELAY_TIME 192
-#endif
+/* legacy keymap support */
+#define USE_LEGACY_KEYMAP
 
 
 #endif

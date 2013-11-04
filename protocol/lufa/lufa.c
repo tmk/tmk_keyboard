@@ -220,6 +220,12 @@ void EVENT_USB_Device_ConfigurationChanged(void)
     ConfigSuccess &= ENDPOINT_CONFIG(CONSOLE_OUT_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_OUT,
                                      CONSOLE_EPSIZE, ENDPOINT_BANK_SINGLE);
 #endif
+
+#ifdef NKRO_ENABLE
+    /* Setup NKRO HID Report Endpoints */
+    ConfigSuccess &= ENDPOINT_CONFIG(NKRO_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
+                                     NKRO_EPSIZE, ENDPOINT_BANK_SINGLE);
+#endif
 }
 
 /*
@@ -347,15 +353,34 @@ static void send_keyboard(report_keyboard_t *report)
 {
     uint8_t timeout = 0;
 
-    // TODO: handle NKRO report
+    if (USB_DeviceState != DEVICE_STATE_Configured)
+        return;
+
     /* Select the Keyboard Report Endpoint */
-    Endpoint_SelectEndpoint(KEYBOARD_IN_EPNUM);
+#ifdef NKRO_ENABLE
+    if (keyboard_nkro) {
+        Endpoint_SelectEndpoint(NKRO_IN_EPNUM);
+    }
+    else
+#endif
+    {
+        Endpoint_SelectEndpoint(KEYBOARD_IN_EPNUM);
+    }
 
     /* Check if Keyboard Endpoint Ready for Read/Write */
     while (--timeout && !Endpoint_IsReadWriteAllowed()) ;
 
     /* Write Keyboard Report Data */
-    Endpoint_Write_Stream_LE(report, sizeof(report_keyboard_t), NULL);
+#ifdef NKRO_ENABLE
+    if (keyboard_nkro) {
+        Endpoint_Write_Stream_LE(report, NKRO_EPSIZE, NULL);
+    }
+    else
+#endif
+    {
+        /* boot mode */
+        Endpoint_Write_Stream_LE(report, KEYBOARD_EPSIZE, NULL);
+    }
 
     /* Finalize the stream transfer to send the last packet */
     Endpoint_ClearIN();
@@ -367,6 +392,9 @@ static void send_mouse(report_mouse_t *report)
 {
 #ifdef MOUSE_ENABLE
     uint8_t timeout = 0;
+
+    if (USB_DeviceState != DEVICE_STATE_Configured)
+        return;
 
     /* Select the Mouse Report Endpoint */
     Endpoint_SelectEndpoint(MOUSE_IN_EPNUM);
@@ -386,6 +414,9 @@ static void send_system(uint16_t data)
 {
     uint8_t timeout = 0;
 
+    if (USB_DeviceState != DEVICE_STATE_Configured)
+        return;
+
     report_extra_t r = {
         .report_id = REPORT_ID_SYSTEM,
         .usage = data
@@ -399,6 +430,9 @@ static void send_system(uint16_t data)
 static void send_consumer(uint16_t data)
 {
     uint8_t timeout = 0;
+
+    if (USB_DeviceState != DEVICE_STATE_Configured)
+        return;
 
     report_extra_t r = {
         .report_id = REPORT_ID_CONSUMER,
@@ -497,19 +531,26 @@ static void SetupHardware(void)
 
     // for Console_Task
     USB_Device_EnableSOFEvents();
+    print_set_sendchar(sendchar);
 }
 
 int main(void)  __attribute__ ((weak));
 int main(void)
 {
     SetupHardware();
+    sei();
+#if defined(INTERRUPT_CONTROL_ENDPOINT)
+    while (USB_DeviceState != DEVICE_STATE_Configured) ;
+#endif
+    print("USB configured.\n");
+
     keyboard_init();
     host_set_driver(&lufa_driver);
 #ifdef SLEEP_LED_ENABLE
     sleep_led_init();
 #endif
-    sei();
 
+    print("Keyboard start.\n");
     while (1) {
         while (USB_DeviceState == DEVICE_STATE_Suspended) {
             suspend_power_down();

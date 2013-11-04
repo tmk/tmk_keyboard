@@ -1,5 +1,5 @@
 # Target file name (without extension).
-TARGET = m0110
+TARGET = m0110_lufa
 
 # Directory common source filess exist
 TOP_DIR = ../..
@@ -8,10 +8,16 @@ TOP_DIR = ../..
 TARGET_DIR = .
 
 # keyboard dependent files
-SRC = 	keymap.c \
-	matrix.c \
+SRC =	matrix.c \
 	led.c \
 	m0110.c
+
+# To use own keymap file run make like: make keymap=hasu
+ifdef keymap
+    SRC += keymap_$(keymap).c
+else
+    SRC += keymap.c
+endif
 
 CONFIG_H = config.h
 
@@ -32,13 +38,47 @@ MCU = atmega32u4       # Teensy 2.0
 F_CPU = 16000000
 
 
+#
+# LUFA specific
+#
+# Target architecture (see library "Board Types" documentation).
+ARCH = AVR8
+
+# Input clock frequency.
+#     This will define a symbol, F_USB, in all source code files equal to the
+#     input clock frequency (before any prescaling is performed) in Hz. This value may
+#     differ from F_CPU if prescaling is used on the latter, and is required as the
+#     raw input clock is fed directly to the PLL sections of the AVR for high speed
+#     clock generation for the USB and other AVR subsections. Do NOT tack on a 'UL'
+#     at the end, this will be done automatically to create a 32-bit value in your
+#     source code.
+#
+#     If no clock division is performed on the input clock inside the AVR (via the
+#     CPU clock adjust registers or the clock division fuses), this will be equal to F_CPU.
+F_USB = $(F_CPU)
+
+# Interrupt driven control endpoint task
+OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
+
+
+# Boot Section Size in bytes
+#   Teensy halfKay   512
+#   Atmel DFU loader 4096
+#   LUFA bootloader  4096
+OPT_DEFS += -DBOOTLOADER_SIZE=4096
+
+
 # Build Options
 #   *Comment out* to disable the options.
 #
-#MOUSEKEY_ENABLE = yes	# Mouse keys
-#PS2_MOUSE_ENABLE = yes	# PS/2 mouse(TrackPoint) support
-#EXTRAKEY_ENABLE = yes	# Audio control and System control
-#NKRO_ENABLE = yes	# USB Nkey Rollover
+BOOTMAGIC_ENABLE = yes	# Virtual DIP switch configuration(+1000)
+MOUSEKEY_ENABLE = yes	# Mouse keys(+4700)
+EXTRAKEY_ENABLE = yes	# Audio control and System control(+450)
+CONSOLE_ENABLE = yes	# Console for debug(+400)
+COMMAND_ENABLE = yes    # Commands for debug and configuration
+#SLEEP_LED_ENABLE = yes  # Breathing sleep LED during USB suspend
+#NKRO_ENABLE = yes	# USB Nkey Rollover - not yet supported in LUFA
+KEYMAP_SECTION_ENABLE = yes	# fixed address keymap for keymap editor
 
 
 
@@ -51,7 +91,7 @@ VPATH += $(TARGET_DIR)
 VPATH += $(TOP_DIR)
 
 
-include $(TOP_DIR)/protocol/pjrc.mk
+include $(TOP_DIR)/protocol/lufa.mk
 include $(TOP_DIR)/protocol.mk
 include $(TOP_DIR)/common.mk
 include $(TOP_DIR)/rules.mk

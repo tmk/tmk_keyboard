@@ -1,10 +1,14 @@
 #include "suspend.h"
 #include "matrix.h"
 #include "action.h"
+#include "backlight.h"
 
 
 void suspend_power_down(void)
 {
+#ifdef BACKLIGHT_ENABLE
+    backlight_set(0);
+#endif
 #ifndef NO_SUSPEND_POWER_DOWN
     // Enable watchdog to wake from MCU sleep
     cli();
@@ -47,9 +51,11 @@ bool suspend_wakeup_condition(void)
 // run immediately after wakeup
 void suspend_wakeup_init(void)
 {
-    // clear matrix and keyboard state
-    matrix_init();
+    // clear keyboard state
     clear_keyboard();
+#ifdef BACKLIGHT_ENABLE
+    backlight_init();
+#endif
 }
 
 #ifndef NO_SUSPEND_POWER_DOWN

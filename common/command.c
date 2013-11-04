@@ -27,10 +27,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keyboard.h"
 #include "bootloader.h"
 #include "action_layer.h"
+#include "action_util.h"
 #include "eeconfig.h"
 #include "sleep_led.h"
 #include "led.h"
 #include "command.h"
+#include "backlight.h"
 
 #ifdef MOUSEKEY_ENABLE
 #include "mousekey.h"
@@ -106,7 +108,9 @@ static void command_common_help(void)
     print("x:	toggle matrix debug\n");
     print("k:	toggle keyboard debug\n");
     print("m:	toggle mouse debug\n");
-    print("p:	toggle print enable\n");
+#ifdef SLEEP_LED_ENABLE
+    print("z:	toggle sleep LED test\n");
+#endif
     print("v:	print device version & info\n");
     print("t:	print timer count\n");
     print("s:	print status\n");
@@ -127,7 +131,7 @@ static void command_common_help(void)
 #ifdef BOOTMAGIC_ENABLE
 static void print_eeconfig(void)
 {
-    print("default_layer: "); print_dec(eeconfig_read_defalt_layer()); print("\n");
+    print("default_layer: "); print_dec(eeconfig_read_default_layer()); print("\n");
 
     debug_config_t dc;
     dc.raw = eeconfig_read_debug();
@@ -147,6 +151,14 @@ static void print_eeconfig(void)
     print(".no_gui: "); print_dec(kc.no_gui); print("\n");
     print(".swap_grave_esc: "); print_dec(kc.swap_grave_esc); print("\n");
     print(".swap_backslash_backspace: "); print_dec(kc.swap_backslash_backspace); print("\n");
+
+#ifdef BACKLIGHT_ENABLE
+    backlight_config_t bc;
+    bc.raw = eeconfig_read_backlight();
+    print("backlight_config.raw: "); print_hex8(bc.raw); print("\n");
+    print(".enable: "); print_dec(bc.enable); print("\n");
+    print(".level: "); print_dec(bc.level); print("\n");
+#endif
 }
 #endif
 
@@ -154,12 +166,14 @@ static bool command_common(uint8_t code)
 {
     static host_driver_t *host_driver = 0;
     switch (code) {
+#ifdef SLEEP_LED_ENABLE
         case KC_Z:
             // test breathing sleep LED
             print("Sleep LED test\n");
             sleep_led_toggle();
             led_set(host_keyboard_leds());
             break;
+#endif
 #ifdef BOOTMAGIC_ENABLE
         case KC_E:
             print("eeconfig:\n");
@@ -238,10 +252,48 @@ static bool command_common(uint8_t code)
             break;
         case KC_V: // print version & information
             print("\n\n----- Version -----\n");
-            print(STR(DESCRIPTION) "\n");
-            print(STR(MANUFACTURER) "(" STR(VENDOR_ID) ")/");
-            print(STR(PRODUCT) "(" STR(PRODUCT_ID) ") ");
-            print("VERSION: " STR(DEVICE_VER) "\n");
+            print("DESC: " STR(DESCRIPTION) "\n");
+            print("VID: " STR(VENDOR_ID) "(" STR(MANUFACTURER) ") "
+                  "PID: " STR(PRODUCT_ID) "(" STR(PRODUCT) ") "
+                  "VER: " STR(DEVICE_VER) "\n");
+            print("BUILD: " STR(VERSION) " (" __TIME__ " " __DATE__ ")\n");
+            /* build options */
+            print("OPTIONS:"
+#ifdef PROTOCOL_PJRC
+            " PJRC"
+#endif
+#ifdef PROTOCOL_LUFA
+            " LUFA"
+#endif
+#ifdef PROTOCOL_VUSB
+            " VUSB"
+#endif
+#ifdef BOOTMAGIC_ENABLE
+            " BOOTMAGIC"
+#endif
+#ifdef MOUSEKEY_ENABLE
+            " MOUSEKEY"
+#endif
+#ifdef EXTRAKEY_ENABLE
+            " EXTRAKEY"
+#endif
+#ifdef CONSOLE_ENABLE
+            " CONSOLE"
+#endif
+#ifdef COMMAND_ENABLE
+            " COMMAND"
+#endif
+#ifdef NKRO_ENABLE
+            " NKRO"
+#endif
+#ifdef KEYMAP_SECTION_ENABLE
+            " KEYMAP_SECTION"
+#endif
+            " " STR(BOOTLOADER_SIZE) "\n");
+
+            print("GCC: " STR(__GNUC__) "." STR(__GNUC_MINOR__) "." STR(__GNUC_PATCHLEVEL__) 
+                  " AVR-LIBC: " __AVR_LIBC_VERSION_STRING__
+                  " AVR_ARCH: avr" STR(__AVR_ARCH__) "\n");
             break;
         case KC_T: // print timer
             print_val_hex32(timer_count);
@@ -575,6 +627,6 @@ static void switch_default_layer(uint8_t layer)
 {
     print("switch_default_layer: "); print_dec(biton32(default_layer_state));
     print(" to "); print_dec(layer); print("\n");
-    default_layer_set(layer);
+    default_layer_set(1UL<<layer);
     clear_keyboard();
 }

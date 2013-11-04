@@ -72,14 +72,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /* key report size(NKRO or boot mode) */
-#if defined(PROTOCOL_PJRC)
+#if defined(PROTOCOL_PJRC) && defined(NKRO_ENABLE)
 #   include "usb.h"
-#   if defined(KBD2_REPORT_KEYS) && KBD2_REPORT_KEYS > KBD_REPORT_KEYS
-#       define REPORT_KEYS KBD2_REPORT_KEYS
-#   else
-#       define REPORT_KEYS KBD_REPORT_KEYS
-#   endif
+#   define REPORT_SIZE KBD2_SIZE
+#   define REPORT_KEYS (KBD2_SIZE - 2)
+#   define REPORT_BITS (KBD2_SIZE - 1)
+
+#elif defined(PROTOCOL_LUFA) && defined(NKRO_ENABLE)
+#   include "protocol/lufa/descriptor.h"
+#   define REPORT_SIZE NKRO_EPSIZE
+#   define REPORT_KEYS (NKRO_EPSIZE - 2)
+#   define REPORT_BITS (NKRO_EPSIZE - 1)
+
 #else
+#   define REPORT_SIZE 8
 #   define REPORT_KEYS 6
 #endif
 
@@ -88,11 +94,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern "C" {
 #endif
 
+typedef union {
+    uint8_t raw[REPORT_SIZE];
+    struct {
+        uint8_t mods;
+        uint8_t reserved;
+        uint8_t keys[REPORT_KEYS];
+    };
+#ifdef NKRO_ENABLE
+    struct {
+        uint8_t mods;
+        uint8_t bits[REPORT_BITS];
+    } nkro;
+#endif
+} __attribute__ ((packed)) report_keyboard_t;
+/*
 typedef struct {
     uint8_t mods;
-    uint8_t rserved;
+    uint8_t reserved;
     uint8_t keys[REPORT_KEYS];
 } __attribute__ ((packed)) report_keyboard_t;
+*/
 
 typedef struct {
     uint8_t buttons;
@@ -117,6 +139,7 @@ typedef struct {
     (key == KC_MEDIA_NEXT_TRACK ?  TRANSPORT_NEXT_TRACK : \
     (key == KC_MEDIA_PREV_TRACK ?  TRANSPORT_PREV_TRACK : \
     (key == KC_MEDIA_STOP       ?  TRANSPORT_STOP : \
+    (key == KC_MEDIA_EJECT      ?  TRANSPORT_STOP_EJECT : \
     (key == KC_MEDIA_PLAY_PAUSE ?  TRANSPORT_PLAY_PAUSE : \
     (key == KC_MEDIA_SELECT     ?  AL_CC_CONFIG : \
     (key == KC_MAIL             ?  AL_EMAIL : \
@@ -128,7 +151,7 @@ typedef struct {
     (key == KC_WWW_FORWARD      ?  AC_FORWARD : \
     (key == KC_WWW_STOP         ?  AC_STOP : \
     (key == KC_WWW_REFRESH      ?  AC_REFRESH : \
-    (key == KC_WWW_FAVORITES    ?  AC_BOOKMARKS : 0))))))))))))))))))
+    (key == KC_WWW_FAVORITES    ?  AC_BOOKMARKS : 0)))))))))))))))))))
 
 #ifdef __cplusplus
 }

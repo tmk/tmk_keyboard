@@ -35,13 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   error "Timer resolution(>20us) is not enough for HHKB matrix scan tweak on V-USB."
 #endif
 
-#if (MATRIX_COLS > 16)
-#   error "MATRIX_COLS must not exceed 16"
-#endif
-#if (MATRIX_ROWS > 255)
-#   error "MATRIX_ROWS must not exceed 255"
-#endif
-
 
 // matrix state buffer(1:on, 0:off)
 static matrix_row_t *matrix;
@@ -70,7 +63,7 @@ static matrix_row_t _matrix1[MATRIX_ROWS];
     PORTE |= (1<<6);                    \
 } while (0)
 #define KEY_SELECT(ROW, COL)    (PORTB = (PORTB & 0xC0) |       \
-                                         (((COL) & 0x07)<<3) |    \
+                                         (((COL) & 0x07)<<3) |  \
                                          ((ROW) & 0x07))
 #define KEY_ENABLE()            (PORTB &= ~(1<<6))
 #define KEY_UNABLE()            (PORTB |=  (1<<6))
@@ -79,6 +72,50 @@ static matrix_row_t _matrix1[MATRIX_ROWS];
 #define KEY_PREV_OFF()          (PORTE &= ~(1<<7))
 #define KEY_POWER_ON()
 #define KEY_POWER_OFF()
+
+#elif defined(__AVR_ATmega32U4__)
+// Ports for my designed Alt Controller PCB
+// row:     PB0-2
+// col:     PB3-5,6
+// key:     PD7(pull-uped)
+// prev:    PB7
+// power:   PD4(L:off/H:on)
+#define KEY_INIT()              do {    \
+    DDRB  = 0xFF;                       \
+    PORTB = 0x00;                       \
+    DDRD  &= ~0x80;                     \
+    PORTD |= 0x80;                      \
+    /* keyswitch board power on */      \
+    DDRD  |=  (1<<4);                   \
+    PORTD |=  (1<<4);                   \
+    KEY_UNABLE();                       \
+    KEY_PREV_OFF();                     \
+} while (0)
+#define KEY_SELECT(ROW, COL)    (PORTB = (PORTB & 0xC0) |       \
+                                         (((COL) & 0x07)<<3) |  \
+                                         ((ROW) & 0x07))
+#define KEY_ENABLE()            (PORTB &= ~(1<<6))
+#define KEY_UNABLE()            (PORTB |=  (1<<6))
+#define KEY_STATE()             (PIND & (1<<7))
+#define KEY_PREV_ON()           (PORTB |=  (1<<7))
+#define KEY_PREV_OFF()          (PORTB &= ~(1<<7))
+#define KEY_POWER_ON()
+#define KEY_POWER_OFF()
+/*
+#define KEY_POWER_ON()          do {    \
+    KEY_INIT();                         \
+    PORTD |=  (1<<4);                   \
+    _delay_ms(1);                       \
+} while (0)
+#define KEY_POWER_OFF()         do {    \
+    PORTD &= ~(1<<4);                   \
+    DDRB  &= ~0xFF;                     \
+    PORTB &= ~0xFF;                     \
+    DDRB  &= ~0x80;                     \
+    PORTB &= ~0x80;                     \
+} while (0)
+*/
+
 
 #elif defined(__AVR_ATmega328P__)
 // Ports for V-USB
@@ -137,7 +174,6 @@ uint8_t matrix_cols(void)
 void matrix_init(void)
 {
 #ifdef DEBUG
-    print_enable = true;
     debug_enable = true;
     debug_keyboard = true;
 #endif
@@ -177,9 +213,21 @@ uint8_t matrix_scan(void)
             uint8_t last = TIMER_RAW;
 
             KEY_ENABLE();
+
             // Wait for KEY_STATE outputs its value.
             // 1us was ok on one HHKB, but not worked on another.
-            _delay_us(10);
+            // no   wait doesn't work on Teensy++ with pro(1us works)
+            // no   wait does    work on tmk PCB(8MHz) with pro2
+            // 1us  wait does    work on both of above
+            // 1us  wait doesn't work on tmk(16MHz)
+            // 5us  wait does    work on tmk(16MHz)
+            // 5us  wait does    work on tmk(16MHz/2)
+            // 5us  wait does    work on tmk(8MHz)
+            // 10us wait does    work on Teensy++ with pro
+            // 10us wait does    work on 328p+iwrap with pro
+            // 10us wait doesn't work on tmk PCB(8MHz) with pro2(very lagged scan)
+            _delay_us(5);
+
             if (KEY_STATE()) {
                 matrix[row] &= ~(1<<col);
             } else {
@@ -226,42 +274,15 @@ bool matrix_is_on(uint8_t row, uint8_t col)
 }
 
 inline
-#if (MATRIX_COLS <= 8)
-uint8_t matrix_get_row(uint8_t row)
-#else
-uint16_t matrix_get_row(uint8_t row)
-#endif
+matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
 }
 
 void matrix_print(void)
 {
-#if (MATRIX_COLS <= 8)
     print("\nr/c 01234567\n");
-#else
-    print("\nr/c 0123456789ABCDEF\n");
-#endif
     for (uint8_t row = 0; row < matrix_rows(); row++) {
-        phex(row); print(": ");
-#if (MATRIX_COLS <= 8)
-        pbin_reverse(matrix_get_row(row));
-#else
-        pbin_reverse16(matrix_get_row(row));
-#endif
-        print("\n");
+        xprintf("%02X: %08b\n", row, bitrev(matrix_get_row(row)));
     }
-}
-
-uint8_t matrix_key_count(void)
-{
-    uint8_t count = 0;
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-#if (MATRIX_COLS <= 8)
-        count += bitpop(matrix[i]);
-#else
-        count += bitpop16(matrix[i]);
-#endif
-    }
-    return count;
 }

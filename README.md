@@ -23,6 +23,7 @@ These features can be used in your keyboard.
 * Virtual DIP Switch  - Configurations stored EEPROM(Boot Magic)
 * Locking CapsLock    - Mechanical switch support for CapsLock
 * Breathing Sleep LED - Sleep indicator with charm during USB suspend
+* Backlight           - Control backlight levels
 
 
 Projects
@@ -48,6 +49,7 @@ You can find some keyboard specific projects under `converter` and `keyboard` di
 * [phantom](keyboard/phantom/)              - [Phantom] keyboard (by Tranquilite)
 * [IIgs_Standard](keyboard/IIgs/)           - Apple [IIGS] keyboard mod(by JeffreySung)
 * [macway](keyboard/macway/)                - [Compact keyboard mod][GH_macway] [retired]
+* [KMAC](keyboard/kmac/)                    - Korean custom keyboard
 
 [GH_macway]:    http://geekhack.org/showwiki.php?title=Island:11930
 [GH_hhkb]:      http://geekhack.org/showwiki.php?title=Island:12047
@@ -102,7 +104,6 @@ Following commands can be also executed with `Magic` + key. In console mode `Mag
     x:      toggle matrix debug
     k:      toggle keyboard debug
     m:      toggle mouse debug
-    p:      toggle print enable
     v:      print device version & info
     t:      print timer count
     s:      print status
@@ -123,9 +124,11 @@ Following commands can be also executed with `Magic` + key. In console mode `Mag
 Boot Magic are executed during boot up time. Press Magic key below then pulgin keyboard cable.
 Note that you must use keys of **Layer 0** as Magic keys. These settings are stored in EEPROM so that retain your configure over power cycles.
 
-#### EEPROM
-- Skip reading EEPROM(`ESC`)
-- Clear configuration stored in EEPROM(`Backspace`)
+To avoid configuring accidentally additive salt key `KC_SPACE` also needs to be pressed along with the following configuration keys. The salt key is configurable in `config.h`. See [common/bootmagic.h](common/bootmagic.h).
+
+#### General
+- Skip reading EEPROM to start with default configuration(`ESC`)
+- Clear configuration stored in EEPROM to reset configuration(`Backspace`)
 
 #### Bootloader
 - Kick up Bootloader(`B`)
@@ -147,19 +150,28 @@ Note that you must use keys of **Layer 0** as Magic keys. These settings are sto
 
 #### Default Layer
 - Set Default Layer to 0(`0`)
-- Set Default Layer to 0(`1`)
-- Set Default Layer to 0(`2`)
-- Set Default Layer to 0(`3`)
+- Set Default Layer to 1(`1`)
+- Set Default Layer to 2(`2`)
+- Set Default Layer to 3(`3`)
+- Set Default Layer to 4(`4`)
+- Set Default Layer to 5(`5`)
+- Set Default Layer to 6(`6`)
+- Set Default Layer to 7(`7`)
+
+#### Caution
+Unintentional use of this feature will cause user confusion.
+
+TODO: Magic key combination to avoid unintentional press during plug in
 
 **TBD**
 
 
-Mechanical Locking support for CapsLock
----------------------------------------
-To enable this feature define these two macros in `config.h` and use `KC_LCAP` for locking CapsLock in keymap instead of normal `KC_CAPS`. Resync option tries to keep lock switch state consistent with keyboard LED state.
+Mechanical Locking support
+--------------------------
+This feature makes it possible for you to use mechanical switch for `CapsLock`, `NumLock` or `ScrollLock`. To enable this feature define these macros in `config.h` and use `KC_LCAP`, `KC_LNUM` or `KC_LSCR` in keymap for locking key instead of normal `KC_CAPS`, `KC_NLCK` or `KC_SLCK`. Resync option tries to keep lock switch state consistent with keyboard LED state.
  
-    #define CAPSLOCK_LOCKING_ENABLE
-    #define CAPSLOCK_LOCKING_RESYNC_ENABLE
+    #define LOCKING_SUPPORT_ENABLE
+    #define LOCKING_RESYNC_ENABLE
 
 
 Start Your Own Project
@@ -202,29 +214,7 @@ Debuging
 --------
 Use PJRC's `hid_listen` to see debug messages. You can use the tool for debug even if firmware use LUFA stack.
 
-You will see output from firmware like this.
-
-    r/c 01234567
-    00: 00000000
-    01: 00000000
-    02: 00000000
-    03: 00000000
-    04: 00000000
-    05: 00000000
-    06: 00000000
-    07: 00000000
-
-    ---- action_exec: start -----
-    EVENT: 0307u(22511)
-    Tapping: Tap release(2)
-    ACTION: ACT_LAYER[5:2C]
-    LAYER_PRESSED: Tap: unregister_code
-    TAPPING_KEY=0307u(22511):2
-    processed: 0307u(22511):2
-
-    Tapping: End(Timeout after releasing last tap): FFFFu(22715)
-    TAPPING_KEY=0000u(0):0
-
+You can use xprintf() to display debug info on `hid_listen`, see `common/xprintf.h`.
 
 
 

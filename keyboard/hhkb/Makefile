@@ -57,8 +57,10 @@ CONFIG_H = config.h
 
 
 # MCU name
-MCU = at90usb1286
-#MCU = atmega32u4
+# PJRC Teensy++ 2.0
+#MCU = at90usb1286
+# TMK Alt Controller or PJRC Teensy 2.0
+MCU = atmega32u4
 
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the
@@ -97,15 +99,25 @@ F_USB = $(F_CPU)
 OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 
 
+# Boot Section Size in *bytes*
+#   Teensy halfKay   512
+#   Teensy++ halfKay 1024
+#   Atmel DFU loader 4096	(TMK Alt Controller)
+#   LUFA bootloader  4096
+#   USBaspLoader     2048
+OPT_DEFS += -DBOOTLOADER_SIZE=4096
+
+
 # Build Options
 #   comment out to disable the options.
 #
-BOOTMAGIC_ENABLE = yes	# Virtual DIP switch configuration
-MOUSEKEY_ENABLE = yes	# Mouse keys
-EXTRAKEY_ENABLE = yes	# Audio control and System control
-CONSOLE_ENABLE = yes	# Console for debug
-COMMAND_ENABLE = yes    # Commands for debug and configuration
-#NKRO_ENABLE = yes	# USB Nkey Rollover
+BOOTMAGIC_ENABLE = yes		# Virtual DIP switch configuration
+MOUSEKEY_ENABLE = yes		# Mouse keys
+EXTRAKEY_ENABLE = yes		# Audio control and System control
+CONSOLE_ENABLE = yes		# Console for debug
+COMMAND_ENABLE = yes    	# Commands for debug and configuration
+NKRO_ENABLE = yes		# USB Nkey Rollover
+KEYMAP_SECTION_ENABLE = yes	# fixed address keymap for keymap editor
 
 
 # Search Path
@@ -116,5 +128,8 @@ include $(TOP_DIR)/protocol/lufa.mk
 include $(TOP_DIR)/common.mk
 include $(TOP_DIR)/rules.mk
 
-debug-on: EXTRAFLAGS += -DDEBUG
+debug-on: EXTRAFLAGS += -DDEBUG -DDEBUG_ACTION
 debug-on: all
+
+debug-off: EXTRAFLAGS += -DNO_DEBUG -DNO_PRINT
+debug-off: all

@@ -227,7 +227,7 @@ You can define these actions on *'A'* key and *'left shift'* modifier with:
     ACTION_KEY(KC_A)
     ACTION_KEY(KC_LSFT)
 
-#### 2.1.2 Key with modifiers
+#### 2.1.2 Modified key
 This action is comprised of strokes of modifiers and a key. `Macro` action is needed if you want more complex key strokes.
 
 Say you want to assign a key to `Shift + 1` to get charactor *'!'* or `Alt + Tab` to switch application windows.
@@ -244,7 +244,7 @@ Registers multiple modifiers with pressing a key. To specify multiple modifiers 
 
     ACTION_MODS(MOD_ALT | MOD_LSFT)
 
-#### 2.1.3 Modifier with tap key
+#### 2.1.3 Modifier with Tap key([Dual role][dual_role])
 Works as a modifier key while holding, but registers a key on tap(press and release quickly).
 
 
@@ -363,21 +363,19 @@ Default Layer also has bitwise operations, they are executed when key is release
 
 `Macro` action indicates complex key strokes.
  
-    MACRO( MD(LSHIFT), D(D), END )
-    MACRO( U(D), MU(LSHIFT), END )
+    MACRO( D(LSHIFT), D(D), END )
+    MACRO( U(D), U(LSHIFT), END )
     MACRO( I(255), T(H), T(E), T(L), T(L), W(255), T(O), END )
 
-#### 2.3.1 Normal mode
+#### 2.3.1 Macro Commands
 - **I()**   change interavl of stroke.
 - **D()**   press key
 - **U()**   release key
 - **T()**   type key(press and release)
 - **W()**   wait
-- **MD()**  modifier down
-- **MU()**  modifier up
 - **END**   end mark
 
-#### 2.3.2 Extended mode
+#### 2.3.2 Examples
 
 ***TODO: sample impl***
 See `keyboard/hhkb/keymap.c` for sample.
@@ -430,6 +428,27 @@ See `keyboard/hhkb/keymap.c` for sample.
 
 
 
+### 2.5 Backlight Action
+These actions control the backlight.
+
+#### 2.5.1 Change backlight level
+Increase backlight level.
+
+    ACTION_BACKLIGHT_INCREASE()
+
+Decrease backlight level.
+
+    ACTION_BACKLIGHT_DECREASE()
+
+Step through backlight levels.
+
+    ACTION_BACKLIGHT_STEP()
+
+#### 2.5.2 Turn on / off backlight
+Turn the backlight on and off without changing level.
+
+    ACTION_BACKLIGHT_TOGGLE()
+
 
 
 ## 3. Layer switching Example
@@ -478,7 +497,7 @@ Number of taps can be configured with `TAPPING_TOGGLE` in `config.h`, `5` by def
 Tapping is to press and release a key quickly. Tapping speed is determined with setting of `TAPPING_TERM`, which can be defined in `config.h`, 200ms by default.
 
 ### 4.1 Tap Key
-This is a feature to assign normal key action and modifier including layer switching to just same one physical key. This is a kind of [Dual role modifier][dual_role]. It works as modifier when holding the key but registers normal key when tapping.
+This is a feature to assign normal key action and modifier including layer switching to just same one physical key. This is a kind of [Dual role key][dual_role]. It works as modifier when holding the key but registers normal key when tapping.
 
 Modifier with tap key:
 
@@ -488,7 +507,7 @@ Layer switching with tap key:
 
     ACTION_LAYER_TAP_KEY(2, KC_SCLN)
 
-[dual_role]: http://en.wikipedia.org/wiki/Modifier_key#Dual-role_modifier_keys
+[dual_role]: http://en.wikipedia.org/wiki/Modifier_key#Dual-role_keys
 
 
 ### 4.2 Tap Toggle
@@ -497,13 +516,14 @@ This is a feature to assign both toggle layer and momentary switch layer action 
     ACTION_LAYER_TAP_TOGGLE(1)
 
 
-### 4.3 One Shot Modifier
-This adds oneshot feature to modifier key. 'One Shot Modifier' is one time modifier which has effect only on following just one key.
-It works as normal modifier key when holding but oneshot modifier when tapping.
+### 4.3 Oneshot Modifier
+This runs onetime effect swhich modify only on just one following key. It works as normal modifier key when holding down while oneshot modifier when tapping.
 
     ACTION_MODS_ONESHOT(MOD_LSFT)
 
-Say you want to type 'The', you have to push and hold Shift before type 't' then release Shift before type 'h' and 'e' or you'll get 'THe'. With One Shot Modifier you can tap Shift then type 't', 'h' and 'e' normally, you don't need to holding Shift key properly here.
+Say you want to type 'The', you have to push and hold Shift key before type 't' then release it before type 'h' and 'e', otherwise you'll get 'THe' or 'the' unintentionally. With Oneshot Modifier you can tap Shift then type 't', 'h' and 'e' normally, you don't need to holding Shift key properly here. This mean you can realease Shift before 't' is pressed down.
+
+Oneshot effect is cancel unless following key is pressed down within `ONESHOT_TIMEOUT` of `config.h`. No timeout when it is `0` or not defined.
 
 
 
@@ -552,5 +572,5 @@ Top layer has higher precedence than lower layers.
 is to press and release a key quickly.
 ### Fn key
 is key which executes a special action like layer switching, mouse key, macro or etc.
-### dual role modifier
-<http://en.wikipedia.org/wiki/Modifier_key#Dual-role_modifier_keys>
+### dual role key
+<http://en.wikipedia.org/wiki/Modifier_key#Dual-role_keys>

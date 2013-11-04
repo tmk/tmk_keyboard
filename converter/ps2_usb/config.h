@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CONFIG_H
 
 #include <avr/interrupt.h>
-/* controller configuration */
-#include "controller_teensy.h"
 
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x6512
@@ -41,10 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 )
 
 
-/* mouse keys */
-#ifdef MOUSEKEY_ENABLE
-#   define MOUSEKEY_DELAY_TIME 255
-#endif
+/* legacy keymap support */
+#define USE_LEGACY_KEYMAP
 
 
 #ifdef PS2_USE_USART

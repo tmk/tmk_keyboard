@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CONFIG_H
 #define CONFIG_H
 
-/* controller configuration */
-#include "controller_teensy.h"
 
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x0ADB
@@ -36,12 +34,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_COL(code)    ((code)&0x07)
 
 
-/* Locking Caps Lock support */
-//#define MATRIX_HAS_LOCKING_CAPS
-/* Mechanical locking CapsLock support. Use KC_LCAP instead of KC_CAPS in keymap */
-#define CAPSLOCK_LOCKING_ENABLE
-/* Locking CapsLock resynchronize hack */
-#define CAPSLOCK_LOCKING_RESYNC_ENABLE
+/* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
+#define LOCKING_SUPPORT_ENABLE
+/* Locking resynchronize hack */
+#define LOCKING_RESYNC_ENABLE
 
 
 /* legacy keymap support */
@@ -64,6 +60,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define ADB_PSW_BIT     1       // optional
 
 /* key combination for command */
+#ifndef __ASSEMBLER__
 #include "adb.h"
 #include "matrix.h"
 #define IS_COMMAND() false

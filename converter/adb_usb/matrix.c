@@ -67,6 +67,13 @@ uint8_t matrix_cols(void)
 void matrix_init(void)
 {
     adb_host_init();
+    // wait for keyboard to boot up and receive command
+    _delay_ms(1000);
+    // Enable keyboard left/right modifier distinction
+    // Addr:Keyboard(0010), Cmd:Listen(10), Register3(11)
+    // upper byte: reserved bits 0000, device address 0010
+    // lower byte: device handler 00000011
+    adb_host_listen(0x2B,0x02,0x03);
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
@@ -85,6 +92,7 @@ uint8_t matrix_scan(void)
     uint8_t key0, key1;
 
     is_modified = false;
+    _delay_ms(12);  // delay for preventing overload of poor ADB keyboard controller
     codes = adb_host_kbd_recv();
     key0 = codes>>8;
     key1 = codes&0xFF;
@@ -100,9 +108,7 @@ uint8_t matrix_scan(void)
     } else if (codes == 0xFFFF) {   // power key release
         register_key(0xFF);
     } else if (key0 == 0xFF) {      // error
-        if (debug_matrix) print("adb_host_kbd_recv: ERROR(matrix cleared.)\n");
-        // clear matrix to unregister all keys
-        for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
+        xprintf("adb_host_kbd_recv: ERROR(%02X)\n", codes);
         return key1;
     } else {
         register_key(key0);

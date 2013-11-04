@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "bootmagic.h"
 #include "eeconfig.h"
 #include "mousekey.h"
+#include "backlight.h"
 
 
 #ifdef MATRIX_HAS_GHOST
@@ -53,9 +54,6 @@ static bool has_ghost_in_row(uint8_t row)
 
 void keyboard_init(void)
 {
-    // TODO: configuration of sendchar impl
-    print_set_sendchar(sendchar);
-
     timer_init();
     matrix_init();
 #ifdef PS2_MOUSE_ENABLE
@@ -64,6 +62,10 @@ void keyboard_init(void)
 
 #ifdef BOOTMAGIC_ENABLE
     bootmagic();
+#endif
+
+#ifdef BACKLIGHT_ENABLE
+    backlight_init();
 #endif
 }
 
