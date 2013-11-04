@@ -67,5 +67,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define IS_COMMAND() ( \
 //    matrix_is_on(MATRIX_ROW(ADB_POWER), MATRIX_COL(ADB_POWER)) \
 //)
+#endif
 
 #endif
