@@ -64,7 +64,8 @@ int main(void)
     // is not configured, choose the Bluefruit, otherwise use USB
     // Definitely would prefer to have this driven by an input pin and make
     // it switch dynamically - BCG
-    if (!usb_configured()) {
+    //if (!usb_configured()) {
+    if (true) {
     
         // Send power to Bluefruit... Adafruit says it takes 27 mA, I think
         // the pins should provide 40 mA, but just in case I switch the 
