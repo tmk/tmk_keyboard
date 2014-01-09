@@ -35,6 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #ifdef PS2_MOUSE_ENABLE
 #   include "ps2_mouse.h"
+static uint32_t ps2_mouse_poll_time = 0;
+static int ps2_mouse_poll_interval = 10; // milliseconds
 #endif
 #ifdef SERIAL_MOUSE_ENABLE
 #include "serial_mouse.h"
@@ -74,6 +76,7 @@ void keyboard_init(void)
     matrix_init();
 #ifdef PS2_MOUSE_ENABLE
     ps2_mouse_init();
+    ps2_mouse_poll_time = timer_read32();
 #endif
 #ifdef SERIAL_MOUSE_ENABLE
     serial_mouse_init();
@@ -152,7 +155,10 @@ MATRIX_LOOP_END:
 #endif
 
 #ifdef PS2_MOUSE_ENABLE
-    ps2_mouse_task();
+    if ( timer_elapsed32( ps2_mouse_poll_time ) >= ps2_mouse_poll_interval ) {
+       ps2_mouse_task();
+       ps2_mouse_poll_time = timer_read32();
+    }
 #endif
 
 #ifdef SERIAL_MOUSE_ENABLE
