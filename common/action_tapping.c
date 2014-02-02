@@ -316,7 +316,7 @@ void waiting_buffer_clear(void)
 
 bool waiting_buffer_typed(keyevent_t event)
 {
-    for (uint8_t i = waiting_buffer_tail; i != waiting_buffer_head; i = (i + 1) % WAITING_BUFFER_SIZE) {
+    uint8_t i = waiting_buffer_tail; for (; i != waiting_buffer_head; i = (i + 1) % WAITING_BUFFER_SIZE) {
         if (KEYEQ(event.key, waiting_buffer[i].event.key) && event.pressed !=  waiting_buffer[i].event.pressed) {
             return true;
         }
@@ -326,7 +326,7 @@ bool waiting_buffer_typed(keyevent_t event)
 
 bool waiting_buffer_has_anykey_pressed(void)
 {
-    for (uint8_t i = waiting_buffer_tail; i != waiting_buffer_head; i = (i + 1) % WAITING_BUFFER_SIZE) {
+    uint8_t i = waiting_buffer_tail; for (; i != waiting_buffer_head; i = (i + 1) % WAITING_BUFFER_SIZE) {
         if (waiting_buffer[i].event.pressed) return true;
     }
     return false;
@@ -340,7 +340,7 @@ void waiting_buffer_scan_tap(void)
     // invalid state: tapping_key released && tap.count == 0
     if (!tapping_key.event.pressed) return;
 
-    for (uint8_t i = waiting_buffer_tail; i != waiting_buffer_head; i = (i + 1) % WAITING_BUFFER_SIZE) {
+    uint8_t i = waiting_buffer_tail; for (; i != waiting_buffer_head; i = (i + 1) % WAITING_BUFFER_SIZE) {
         if (IS_TAPPING_KEY(waiting_buffer[i].event.key) &&
                 !waiting_buffer[i].event.pressed &&
                 WITHIN_TAPPING_TERM(waiting_buffer[i].event)) {
@@ -367,7 +367,7 @@ static void debug_tapping_key(void)
 static void debug_waiting_buffer(void)
 {
     debug("{ ");
-    for (uint8_t i = waiting_buffer_tail; i != waiting_buffer_head; i = (i + 1) % WAITING_BUFFER_SIZE) {
+    uint8_t i = waiting_buffer_tail; for (; i != waiting_buffer_head; i = (i + 1) % WAITING_BUFFER_SIZE) {
         debug("["); debug_dec(i); debug("]="); debug_record(waiting_buffer[i]); debug(" ");
     }
     debug("}\n");

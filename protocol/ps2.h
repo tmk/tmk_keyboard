@@ -35,8 +35,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef PS2_H
-#define PS2_H
+#ifndef TMK_PS2_H
+#define TMK_PS2_H
 
 #include <stdbool.h>
 #include <util/delay.h>

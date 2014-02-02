@@ -36,7 +36,11 @@ typedef union {
         uint8_t reserved:4;
     };
 } debug_config_t;
+#ifdef __cplusplus
+extern debug_config_t debug_config;
+#else
 debug_config_t debug_config;
+#endif
 
 /* for backward compatibility */
 #define debug_enable    (debug_config.enable)

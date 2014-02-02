@@ -89,7 +89,7 @@ void del_key(uint8_t key)
 void clear_keys(void)
 {
     // not clear mods
-    for (int8_t i = 1; i < REPORT_SIZE; i++) {
+    int8_t i = 1; for (; i < REPORT_SIZE; i++) {
         keyboard_report->raw[i] = 0;
     }
 }
@@ -136,7 +136,7 @@ void clear_oneshot_mods(void)
 uint8_t has_anykey(void)
 {
     uint8_t cnt = 0;
-    for (uint8_t i = 1; i < REPORT_SIZE; i++) {
+    uint8_t i = 1; for (; i < REPORT_SIZE; i++) {
         if (keyboard_report->raw[i])
             cnt++;
     }
@@ -185,7 +185,7 @@ static inline void add_key_byte(uint8_t code)
 
 static inline void del_key_byte(uint8_t code)
 {
-    for (uint8_t i = 0; i < REPORT_KEYS; i++) {
+    uint8_t i = 0; for (; i < REPORT_KEYS; i++) {
         if (keyboard_report->keys[i] == code) {
             keyboard_report->keys[i] = 0;
         }

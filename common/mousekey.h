@@ -21,6 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include "host.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* max value on report descriptor */
 #define MOUSEKEY_MOVE_MAX       127
@@ -51,19 +54,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MOUSEKEY_WHEEL_TIME_TO_MAX 40
 #endif
 
-
+#ifndef __cplusplus
 uint8_t mk_delay;
 uint8_t mk_interval;
 uint8_t mk_max_speed;
 uint8_t mk_time_to_max;
 uint8_t mk_wheel_max_speed;
 uint8_t mk_wheel_time_to_max;
-
+#endif
 
 void mousekey_task(void);
 void mousekey_on(uint8_t code);
 void mousekey_off(uint8_t code);
 void mousekey_clear(void);
 void mousekey_send(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

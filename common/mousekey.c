@@ -20,8 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keycode.h"
 #include "host.h"
 #include "timer.h"
-#include "print.h"
-#include "debug.h"
 #include "mousekey.h"
 
 
@@ -174,6 +172,9 @@ void mousekey_send(void)
     mousekey_debug();
     host_mouse_send(&mouse_report);
     last_timer = timer_read();
+    dprint("Exiting mousekey_send: ");
+    print_dec(last_timer);
+    dprintln();
 }
 
 void mousekey_clear(void)
@@ -186,12 +187,12 @@ void mousekey_clear(void)
 static void mousekey_debug(void)
 {
     if (!debug_mouse) return;
-    print("mousekey [btn|x y v h](rep/acl): [");
-    phex(mouse_report.buttons); print("|");
-    print_decs(mouse_report.x); print(" ");
-    print_decs(mouse_report.y); print(" ");
-    print_decs(mouse_report.v); print(" ");
-    print_decs(mouse_report.h); print("](");
-    print_dec(mousekey_repeat); print("/");
-    print_dec(mousekey_accel); print(")\n");
+    dprint("mousekey [btn|x y v h](rep/acl): [");
+    debug_hex16(mouse_report.buttons); dprint("|");
+    print_decs(mouse_report.x); dprint(" ");
+    print_decs(mouse_report.y); dprint(" ");
+    print_decs(mouse_report.v); dprint(" ");
+    print_decs(mouse_report.h); dprint("](");
+    print_dec(mousekey_repeat); dprint("/");
+    print_dec(mousekey_accel); dprint(")\n");
 }

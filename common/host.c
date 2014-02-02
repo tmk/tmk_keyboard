@@ -55,7 +55,7 @@ void host_keyboard_send(report_keyboard_t *report)
 
     if (debug_keyboard) {
         dprint("keyboard_report: ");
-        for (uint8_t i = 0; i < REPORT_SIZE; i++) {
+        uint8_t i = 0; for (; i < REPORT_SIZE; i++) {
             dprintf("%02X ", report->raw[i]);
         }
         dprint("\n");
