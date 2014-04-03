@@ -30,6 +30,7 @@ void bootmagic(void)
 
     /* eeconfig clear */
     if (bootmagic_scan_keycode(BOOTMAGIC_KEY_EEPROM_CLEAR)) {
+        eeconfig_disable();
         eeconfig_init();
     }
 

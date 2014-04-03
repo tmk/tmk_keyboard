@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <avr/eeprom.h>
 #include "eeconfig.h"
+#include "keymap_in_eeprom.h"
 
 void eeconfig_init(void)
 {
@@ -13,6 +14,9 @@ void eeconfig_init(void)
 #ifdef BACKLIGHT_ENABLE
     eeprom_write_byte(EECONFIG_BACKLIGHT,      0);
 #endif
+#ifdef KEYMAP_IN_EEPROM_ENABLE
+    keymap_in_eeprom_init();
+#endif
 }
 
 void eeconfig_enable(void)
@@ -23,6 +27,9 @@ void eeconfig_enable(void)
 void eeconfig_disable(void)
 {
     eeprom_write_word(EECONFIG_MAGIC, 0xFFFF);
+#ifdef KEYMAP_IN_EEPROM_ENABLE
+    keymap_in_eeprom_disable();
+#endif
 }
 
 bool eeconfig_is_enabled(void)
