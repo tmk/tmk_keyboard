@@ -31,6 +31,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_ROWS 5
 #define MATRIX_COLS 14
 
+/* keymap in eeprom */
+#define FN_ACTIONS_COUNT 32
+#define KEYMAPS_COUNT 8
+
 /* define if matrix has ghost */
 //#define MATRIX_HAS_GHOST
 

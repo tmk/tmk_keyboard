@@ -102,3 +102,13 @@ const uint16_t PROGMEM fn_actions[] = {
     [7] = ACTION_DEFAULT_LAYER_SET(2),  // set dvorak layout
     [8] = ACTION_DEFAULT_LAYER_SET(3),  // set workman layout
 };
+
+#ifdef KEYMAP_IN_EEPROM_ENABLE
+uint16_t keys_count(void) {
+    return sizeof(keymaps) / sizeof(keymaps[0]) * MATRIX_ROWS * MATRIX_COLS;
+}
+
+uint16_t fn_actions_count(void) {
+    return sizeof(fn_actions) / sizeof(fn_actions[0]);
+}
+#endif
