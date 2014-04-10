@@ -36,8 +36,10 @@ void keymap_in_eeprom_disable(void) {
 bool check_keymap_in_eeprom(void) {
     uint16_t checksum_in_eeprom = eeprom_read_word(EECONFIG_KEYMAP_CHECKSUM);
     uint16_t checksum = EECONFIG_MAGIC_NUMBER;
-    for (uint16_t i = 0; i < KEYMAP_WORD_SIZE; i++) {
-        checksum += eeprom_read_word(EECONFIG_KEYMAP_FN_ACTIONS + i);
+    for (uint16_t i = 0; i < KEYMAP_SIZE; i++) {
+        uint8_t byte = eeprom_read_byte((uint8_t *)EECONFIG_KEYMAP_FN_ACTIONS + i);
+        uint16_t word = (i & 1) ? byte << 8 : byte;
+        checksum += word;
     }
 #ifdef DEBUG
     eeprom_write_word(EECONFIG_KEYMAP_DEBUG, checksum);
