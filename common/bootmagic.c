@@ -7,6 +7,7 @@
 #include "keymap.h"
 #include "action_layer.h"
 #include "eeconfig.h"
+#include "keymap_in_eeprom.h"
 #include "bootmagic.h"
 
 
@@ -30,8 +31,10 @@ void bootmagic(void)
 
     /* eeconfig clear */
     if (bootmagic_scan_keycode(BOOTMAGIC_KEY_EEPROM_CLEAR)) {
-        eeconfig_disable();
         eeconfig_init();
+#ifdef KEYMAP_IN_EEPROM_ENABLE
+        write_keymap_to_eeprom();
+#endif
     }
 
     /* bootloader */
