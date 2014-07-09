@@ -29,6 +29,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "debug.h"
 #include "keymap.h"
 #include "ergodox.h"
+#include "passwords.h"
+
+/* id for user defined functions */
+enum function_id {
+    TEENSY_KEY,
+};
+
+void action_function(keyrecord_t *event, uint8_t id, uint8_t opt)
+{
+    if (id == TEENSY_KEY) {
+        clear_keyboard();
+        print("\n\nJump to bootloader... ");
+        _delay_ms(250);
+        bootloader_jump(); // should not return
+        print("not supported.\n");
+    }
+}
+
+/* id for user defined macros */
+enum macro_id {
+    PASSWORD0,
+};
+
+/*
+ * Macro definition
+ */
+const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
+{
+    keyevent_t event = record->event;
+
+    switch (id) {
+        case PASSWORD0:
+            return (event.pressed ?
+                    MACRO( I(0), M_PASSWORD0, END ) :
+                    MACRO_NONE );
+    }
+    return MACRO_NONE;
+}
 
 
 /* ErgoDox keymap definition macro */
@@ -170,11 +208,6 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
-/* id for user defined functions */
-enum function_id {
-    TEENSY_KEY,
-};
-
 /*
  * Fn action definition
  */
@@ -185,17 +218,6 @@ static const uint16_t PROGMEM fn_actions[] = {
     ACTION_LAYER_SET(3, ON_PRESS),                  // FN3 - push Layer3
     ACTION_LAYER_SET(0, ON_PRESS),                  // FN4 - push Layer0
 };
-
-void action_function(keyrecord_t *event, uint8_t id, uint8_t opt)
-{
-    if (id == TEENSY_KEY) {
-        clear_keyboard();
-        print("\n\nJump to bootloader... ");
-        _delay_ms(250);
-        bootloader_jump(); // should not return
-        print("not supported.\n");
-    }
-}
 
 #endif
 
