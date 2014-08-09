@@ -63,8 +63,9 @@ uint8_t matrix_cols(void)
 
 void matrix_init(void)
 {
-    print_enable = true;
-    debug_enable = true;
+    DDRD |= (1<<6);
+    PORTD |= (1<<6);
+    //debug_enable = true;
 
     serial_init();
 
@@ -85,14 +86,16 @@ uint8_t matrix_scan(void)
     debug_hex(code); debug(" ");
 
     switch (code) {
-        case 0x7E:  // reset fail
-        case 0xFE:  // layout
         case 0xFF:  // reset success
+        case 0xFE:  // layout
+        case 0x7E:  // reset fail
+            if (code == 0xFF) print("reset: 0xFF ");
+            if (code == 0x7E) print("reset fail: 0x7E ");
+            if (code == 0xFE) print("layout: 0xFE ");
+            // response byte
             _delay_ms(500);
-            // ignore response byte
-            debug("(response ignored:");
-            while ((code = serial_recv())) { debug(" "); debug_hex(code); }
-            debug(") ");
+            if (code = serial_recv()) print_hex8(code);
+            print("\n");
             // FALL THROUGH
         case 0x7F:
             // all keys up

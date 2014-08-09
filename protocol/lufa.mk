@@ -1,7 +1,12 @@
 LUFA_DIR = protocol/lufa
 
 # Path to the LUFA library
-LUFA_PATH ?= protocol/lufa/LUFA-120730
+ifeq (, $(wildcard $(TOP_DIR)/$(LUFA_DIR)/LUFA-git/LUFA/Version.h))
+    LUFA_PATH ?= $(LUFA_DIR)/LUFA-120730
+else
+    LUFA_PATH ?= $(LUFA_DIR)/LUFA-git
+endif
+
 
 # Create the LUFA source path variables by including the LUFA makefile
 ifneq (, $(wildcard $(TOP_DIR)/$(LUFA_PATH)/LUFA/Build/lufa_sources.mk))
@@ -30,9 +35,12 @@ VPATH += $(TOP_DIR)/$(LUFA_PATH)
 #endif
 
 # LUFA library compile-time options and predefined tokens
-LUFA_OPTS  = -D USB_DEVICE_ONLY
-LUFA_OPTS += -D USE_FLASH_DESCRIPTORS
-LUFA_OPTS += -D USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)"
+LUFA_OPTS  = -DUSB_DEVICE_ONLY
+LUFA_OPTS += -DUSE_FLASH_DESCRIPTORS
+LUFA_OPTS += -DUSE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)"
+#LUFA_OPTS += -DINTERRUPT_CONTROL_ENDPOINT
+LUFA_OPTS += -DFIXED_CONTROL_ENDPOINT_SIZE=8 
+LUFA_OPTS += -DFIXED_NUM_CONFIGURATIONS=1
 
 OPT_DEFS += -DF_USB=$(F_USB)UL
 OPT_DEFS += -DARCH=ARCH_$(ARCH)

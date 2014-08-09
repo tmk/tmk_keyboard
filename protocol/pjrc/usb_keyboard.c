@@ -34,12 +34,12 @@
 // protocol setting from the host.  We use exactly the same report
 // either way, so this variable only stores the setting since we
 // are required to be able to report which setting is in use.
-uint8_t usb_keyboard_protocol=1;
+uint8_t keyboard_protocol=1;
 
 // the idle configuration, how often we send the report to the
 // host (ms * 4) even when it hasn't changed
 // Windows and Linux set 0 while OS X sets 6(24ms) by SET_IDLE request.
-uint8_t usb_keyboard_idle_config=125;
+uint8_t keyobard_idle=125;
 
 // count until idle timeout
 uint8_t usb_keyboard_idle_count=0;
@@ -61,10 +61,7 @@ int8_t usb_keyboard_send_report(report_keyboard_t *report)
     else
 #endif
     {
-        if (usb_keyboard_protocol)
-            result = send_report(report, KBD_ENDPOINT, 0, KBD_SIZE);
-        else
-            result = send_report(report, KBD_ENDPOINT, 0, 6);
+        result = send_report(report, KBD_ENDPOINT, 0, KBD_SIZE);
     }
 
     if (result) return result;
