@@ -165,20 +165,19 @@ static matrix_row_t read_cols()
 /* Row pin configuration
  *
  * Teensy
- * TODO: rows 0 to 6
  * row: 0   1   2   3   4   5   6   7   8   9   10  11  12  13
- * pin:                             B0  B1  B2  B3  D2  D3  C6
+ * pin: B4  D7  D4  C7  D1  D0  B7  B0  B1  B2  B3  D2  D3  C6
  */
 static void unselect_rows()
 {
     // unselect on teensy
     // Hi-Z(DDR:0, PORT:0) to unselect
-    DDRB  &= ~(1<<0 | 1<<1 | 1<<2 | 1<<3);
-    PORTB &= ~(1<<0 | 1<<1 | 1<<2 | 1<<3);
-    DDRD  &= ~(1<<2 | 1<<3);
-    PORTD &= ~(1<<2 | 1<<3);
-    DDRC  &= ~(1<<6);
-    PORTC &= ~(1<<6);
+    DDRB  &= ~(1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<7);
+    PORTB &= ~(1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<7);
+    DDRD  &= ~(1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<7);
+    PORTD &= ~(1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<7);
+    DDRC  &= ~(1<<6 | 1<<7);
+    PORTC &= ~(1<<6 | 1<<7);
 }
 
 static void select_row(uint8_t row)
@@ -186,6 +185,35 @@ static void select_row(uint8_t row)
     // select on teensy
     // Output low(DDR:1, PORT:0) to select
     switch (row) {
+        case 0:
+            DDRB  |= (1<<4);
+            PORTB &= ~(1<<4);
+            break;
+        case 1:
+            DDRD  |= (1<<7);
+            PORTD &= ~(1<<7);
+            break;
+        case 2:
+            DDRD  |= (1<<4);
+            PORTD &= ~(1<<4);
+            break;
+        case 3:
+            DDRC  |= (1<<7);
+            PORTC &= ~(1<<7);
+            break;
+        case 4:
+            DDRD  |= (1<<1);
+            PORTD &= ~(1<<1);
+            break;
+        case 5:
+            DDRD  |= (1<<0);
+            PORTD &= ~(1<<0);
+            break;
+        case 6:
+            DDRB  |= (1<<7);
+            PORTB &= ~(1<<7);
+            break;
+
         case 7:
             DDRB  |= (1<<0);
             PORTB &= ~(1<<0);
@@ -204,7 +232,7 @@ static void select_row(uint8_t row)
             break;
         case 11:
             DDRD  |= (1<<2);
-            PORTD &= ~(1<<3);
+            PORTD &= ~(1<<2);
             break;
         case 12:
             DDRD  |= (1<<3);
