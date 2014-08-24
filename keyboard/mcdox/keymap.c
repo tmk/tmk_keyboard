@@ -129,7 +129,7 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 #if defined(KEYMAP_DVORAK)
 #include "keymap_dvorak.h"
 #elif defined(KEYMAP_COLEMAK)
-#error Colemak layout is not defined yet
+#include "keymap_colemak.h"
 #elif defined(KEYMAP_WORKMAN)
 #error Workman layout is not defined yet
 #else
