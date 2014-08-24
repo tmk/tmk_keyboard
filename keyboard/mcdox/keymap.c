@@ -23,7 +23,12 @@ This work is heavily based on initial firmware for Ergodox keyboard.
 Copyright (c) 2012, 2013 Ben Blazak <benblazak.dev@gmail.com>
 Released under The MIT License (see "doc/licenses/MIT.md")
 Project located at <https://github.com/benblazak/ergodox-firmware>
+
+Since this is so similar to the TMK port for the Ergodox, this file, and the
+included keymap_*.h files are completely compatible and may be used for either
+the Ergodox or the mcdox keyboards.
 */
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <avr/pgmspace.h>
