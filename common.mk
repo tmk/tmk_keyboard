@@ -72,6 +72,21 @@ endif
 # Version string
 OPT_DEFS += -DVERSION=$(shell (git describe --always --dirty || echo 'unknown') 2> /dev/null)
 
+# LEDs
+ifdef PHYSICAL_LEDS_ENABLE
+    OPT_DEFS += -DPHYSICAL_LEDS_ENABLE
+endif
+ifdef CAPS_LOCK_LED_ENABLE
+    OPT_DEFS += -DCAPS_LOCK_LED_ENABLE
+endif
+ifdef NUM_LOCK_LED_ENABLE
+    OPT_DEFS += -DNUM_LOCK_LED_ENABLE
+endif
+ifdef SCROLL_LOCK_LED_ENABLE
+    OPT_DEFS += -DSCROLL_LOCK_LED_ENABLE
+endif
+
+
 
 # Search Path
 VPATH += $(TOP_DIR)/common

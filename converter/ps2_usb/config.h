@@ -171,3 +171,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #endif
+
+
+/*
+ * PHYSICAL LEDs PINOUT
+ */
+#ifdef PHYSICAL_LEDS
+
+#define LED_INIT_LOOPS 2
+#define LED_INIT_DELAY 40
+
+#ifdef CAPS_LOCK_LED_ENABLE
+#define CAPS_LOCK_LED_PORT  PORTF
+#define CAPS_LOCK_LED_PIN   PINF
+#define CAPS_LOCK_LED_DDR   DDRF
+#define CAPS_LOCK_LED_BIT   6
+#endif
+
+#ifdef NUM_LOCK_LED_ENABLE
+#define NUM_LOCK_LED_PORT  PORTF
+#define NUM_LOCK_LED_PIN   PINF
+#define NUM_LOCK_LED_DDR   DDRF
+#define NUM_LOCK_LED_BIT   7
+#endif
+
+#ifdef SCROLL_LOCK_LED_ENABLE
+#define SCROLL_LOCK_LED_PORT  PORTF
+#define SCROLL_LOCK_LED_PIN   PINF
+#define SCROLL_LOCK_LED_DDR   DDRF
+#define SCROLL_LOCK_LED_BIT   5
+#endif
+
+#endif

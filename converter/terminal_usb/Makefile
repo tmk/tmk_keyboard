@@ -60,6 +60,12 @@ OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 #   LUFA bootloader  4096
 OPT_DEFS += -DBOOTLOADER_SIZE=4096
 
+# External LEDs Options
+#
+PHYSICAL_LEDS = yes          # Use to compile with external physical LEDs support
+CAPS_LOCK_LED_ENABLE = yes   # Adds the CAPS LOCK led
+NUM_LOCK_LED_ENABLE = yes    # Adds the NUM LOCK led
+SCROLL_LOCK_LED_ENABLE = yes # Adds the SCROLL LOCK led
 
 # Build Options
 #   comment out to disable the options.

@@ -79,6 +79,10 @@ void keyboard_init(void)
 #ifdef BACKLIGHT_ENABLE
     backlight_init();
 #endif
+
+#ifdef PHYSICAL_LEDS_ENABLE
+    physical_led_init();
+#endif
 }
 
 /*
