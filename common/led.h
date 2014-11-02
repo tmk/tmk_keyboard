@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define USB_LED_COMPOSE                 3
 #define USB_LED_KANA                    4
 
-#ifdef PHYSICAL_LEDS
+#ifdef PHYSICAL_LEDS_ENABLE
 
 /* CAPS_LOCK_LED_ENABLE */
 #ifdef CAPS_LOCK_LED_ENABLE

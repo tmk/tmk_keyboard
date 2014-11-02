@@ -176,7 +176,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
  * PHYSICAL LEDs PINOUT
  */
-#ifdef PHYSICAL_LEDS
+#ifdef PHYSICAL_LEDS_ENABLE
 
 #define LED_INIT_LOOPS 2
 #define LED_INIT_DELAY 40
