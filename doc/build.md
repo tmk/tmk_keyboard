@@ -5,23 +5,22 @@ Build Firmware and Program Controller
 Download and Install
 --------------------
 ### 1. Install Tools
-First, you need tools to build firmware and program your controller. I assume you are on Windows here.
 
-1. **Toolchain** Install [WinAVR][winavr]. This is old but works well for this purpose. `WinAVR` is a tool set to build firmware including C compiler(gcc) and make commands. You can use [CrossPack][crosspack] instead if you are on Mac.
+1. **Toolchain** On Windows install [MHV AVR Tools][mhv] for AVR GCC compiler and [Cygwin][cygwin](or [MinGW][mingw]) for shell terminal. On Mac you can use [CrossPack][crosspack]. On Linux you can install AVR GCC with your favorite package manager.
 
-2. **Programmer** Install [Atmel FLIP][flip]. `FLIP` is a tool to program(load) firmware into AVR controller via DFU bootloader. AVR USB chips including ATmega32U4 has DFU bootloader by factory default. You can also use [dfu-programmer][dfu-prog] instead if you are on Mac or Linux.
+2. **Programmer** On Windows install [Atmel FLIP][flip]. On Mac and Linux install [dfu-programmer][dfu-prog].
 
-3. **Driver** At first time you start DFU bootloader on Chip 'Found New Hardware Wizard' will come up on Windows. If you install device driver properly you can find chip name like 'ATmega32U4' under 'LibUSB-Win32 Devices' tree on 'Device Manager'. If not you shall need to update its driver on 'Device Manager'. You will find the driver in `FLIP` install directory like: C:\Program Files (x86)\Atmel\Flip 3.4.5\usb\. If you use `dfu-programmer` install its driver.
+3. **Driver** On Windows you start DFU bootloader on the chip first time you will see 'Found New Hardware Wizard' to install driver. If you install device driver properly you can find chip name like 'ATmega32U4' under 'LibUSB-Win32 Devices' tree on 'Device Manager'. If not you shall need to update its driver on 'Device Manager'. You will find the driver in `FLIP` install directory like: C:\Program Files (x86)\Atmel\Flip 3.4.5\usb\. In case of `dfu-programmer` use its driver.
 
 If you use PJRC Teensy you don't need step 2 and 3 above, just get [Teensy loader][teensy-loader].
 
 
 ### 2. Download source
-You can find firmware source at github: 
+You can find firmware source at github:
 
 - <https://github.com/tmk/tmk_keyboard>
 
-If you are familiar with `Git` tools you are recommended to use it but you can also download zip archive from: 
+If you are familiar with `Git` tools you are recommended to use it but you can also download zip archive from:
 
 - <https://github.com/tmk/tmk_keyboard/archive/master.zip>
 
@@ -29,7 +28,7 @@ If you are familiar with `Git` tools you are recommended to use it but you can a
 Build firmware
 --------------
 ### 1. Open terminal
-Open terminal window to get access to commands. You can use `cmd` in Windows or `Terminal.app` on Mac OSX. In Windows press `Windows` key and `R` then enter `cmd` in 'Run command' dialog showing up.
+Open terminal window to get access to commands. Use Cygwin(or MingGW) `shell terminal` in Windows or `Terminal.app` on Mac OSX. In Windows press `Windows` key and `R` then enter `cmd` in 'Run command' dialog showing up.
 
 ### 2. Change directory
 Move to project directory in the firmware source.
@@ -40,7 +39,7 @@ Move to project directory in the firmware source.
 Build firmware using GNU `make` command. You'll see `<project>_<variant>.hex` file in that directory unless something unexpected occurs in build process.
 
 
-    mkae -f Makefile.<variant> clean
+    make -f Makefile.<variant> clean
     make -f Makefile.<variant>
 
 
@@ -71,14 +70,14 @@ Or to program with `dfu-programmer` run:
 #### FLIP GUI tutorial
 1. On menu bar click Device -> Select, then. `ATmega32u4`.
 2. On menu bar click Settings -> Communication -> USB, then click 'Open' button on 'USB Port Connection' dialog.
-At this point you'll see greyouted widgets on the app get colored and ready.
+At this point you'll see grey-outed widgets on the app get colored and ready.
 
 3. On menu bar click File -> Load HEX File, then select your firmware hex file on File Selector dialog.
 4. On 'Operations Flow' panel click 'Run' button to load the firmware binary to the chip. Note that you should keep 'Erase', 'Blank Check', 'Program' and 'Verify' check boxes selected.
 5. Re-plug USB cord or click 'Start Application' button to restart your controller.
 Done.
 
-See also these instaructions if you need.
+See also these instructions if you need.
 
 - <http://code.google.com/p/micropendous/wiki/LoadingFirmwareWithFLIP>
 - <http://www.atmel.com/Images/doc7769.pdf>
@@ -95,11 +94,14 @@ Or use this command if you have command line version of Teensy Loader installed.
 
 
 ### 4. Program with Other programmer
-You may want to use other programmer like `avrdude` with AVRISPmkII, Aruduino or USBasp. In that case you can still use make target `program` for build with configuring `PROGRAM_CMD` in Makefile.
+You may want to use other programmer like `avrdude` with AVRISPmkII, Arduino or USBasp. In that case you can still use make target `program` for build with configuring `PROGRAM_CMD` in Makefile.
 
     $ make -f Makefile.<variant> program
 
 
+[cygwin]:       https://www.cygwin.com/
+[mingw]:        http://www.mingw.org/
+[mhv]:          https://infernoembedded.com/products/avr-tools
 [winavr]:       http://winavr.sourceforge.net/
 [crosspack]:    http://www.obdev.at/products/crosspack/index.html
 [flip]:         http://www.atmel.com/tools/FLIP.aspx
@@ -116,14 +118,18 @@ Makefile Options
     #MCU = at90usb1286      # Teensy++ 2.0
     F_CPU = 16000000
 
+Set your MCU and its clock in Hz.
+
     # Boot Section Size in *bytes*
     #   Teensy halfKay   512
     #   Atmel DFU loader 4096
     #   LUFA bootloader  4096
     OPT_DEFS += -DBOOTLOADER_SIZE=4096
 
+If you are using PJRC Teensy use `512` for `BOOTLOADER_SIZE`, otherwise use `4096` unless you are sure.
+
 ### 2. Features
-Optional. Note that ***comment out*** to disable them.
+Optional. Note that ***comment out*** with `#` to disable them.
 
     BOOTMAGIC_ENABLE = yes      # Virtual DIP switch configuration(+1000)
     MOUSEKEY_ENABLE = yes       # Mouse keys(+4700)
@@ -135,7 +141,7 @@ Optional. Note that ***comment out*** to disable them.
     #BACKLIGHT_ENABLE = yes     # Enable keyboard backlight functionality
 
 ### 3. Programmer
-Optional. Set proper command for your controller, bootloader and programmer. This command can be used with `make program`. Not needed if you use `FLIP`, `dfu-programmer` or `Teesy Loader`.
+Optional. Set proper command for your controller, bootloader and programmer. This command can be used with `make program`. Not needed if you use `FLIP`, `dfu-programmer` or `Teensy Loader`.
 
     # avrdude with AVRISPmkII
     PROGRAM_CMD = avrdude -p $(MCU) -c avrispmkII -P USB -U flash:w:$(TARGET).hex
@@ -152,13 +158,13 @@ Config.h Options
 ----------------
 ### 1. Magic command key combination
 
-    #define IS_COMMAND() (keyboard_report->mods == (MOD_BIT(KB_LSHIFT) | MOD_BIT(KB_RSHIFT))) 
+    #define IS_COMMAND() (keyboard_report->mods == (MOD_BIT(KB_LSHIFT) | MOD_BIT(KB_RSHIFT)))
 
 ### 2. Mechanical Locking Support for CapsLock
 
     /* Mechanical locking CapsLock support. Use KC_LCAP instead of KC_CAPS in keymap */
     #define CAPSLOCK_LOCKING_ENABLE
-    /* Locking CapsLock resynchronize hack */
+    /* Locking CapsLock re-synchronize hack */
     #define CAPSLOCK_LOCKING_RESYNC_ENABLE
 
 ### 3. Disable Debug and Print

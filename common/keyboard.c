@@ -30,8 +30,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "sendchar.h"
 #include "bootmagic.h"
 #include "eeconfig.h"
-#include "mousekey.h"
 #include "backlight.h"
+#ifdef MOUSEKEY_ENABLE
+#   include "mousekey.h"
+#endif
+#ifdef PS2_MOUSE_ENABLE
+#   include "ps2_mouse.h"
+#endif
+#ifdef SERIAL_MOUSE_ENABLE
+#include "serial_mouse.h"
+#endif
 
 
 #ifdef MATRIX_HAS_GHOST
@@ -59,6 +67,10 @@ void keyboard_init(void)
 #ifdef PS2_MOUSE_ENABLE
     ps2_mouse_init();
 #endif
+#ifdef SERIAL_MOUSE_ENABLE
+    serial_mouse_init();
+#endif
+
 
 #ifdef BOOTMAGIC_ENABLE
     bootmagic();
@@ -111,10 +123,20 @@ void keyboard_task(void)
     action_exec(TICK);
 
 MATRIX_LOOP_END:
+
 #ifdef MOUSEKEY_ENABLE
     // mousekey repeat & acceleration
     mousekey_task();
 #endif
+
+#ifdef PS2_MOUSE_ENABLE
+    ps2_mouse_task();
+#endif
+
+#ifdef SERIAL_MOUSE_ENABLE
+        serial_mouse_task();
+#endif
+
     // update LED
     if (led_status != host_keyboard_leds()) {
         led_status = host_keyboard_leds();

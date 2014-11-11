@@ -24,11 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #ifdef NKRO_ENABLE
-bool keyboard_nkro = false;
+bool keyboard_nkro = true;
 #endif
-
-report_mouse_t mouse_report = {};
-
 
 static host_driver_t *driver;
 static uint16_t last_system_report = 0;
@@ -87,11 +84,6 @@ void host_consumer_send(uint16_t report)
 
     if (!driver) return;
     (*driver->send_consumer)(report);
-}
-
-uint8_t host_mouse_in_use(void)
-{
-    return (mouse_report.buttons | mouse_report.x | mouse_report.y | mouse_report.v | mouse_report.h);
 }
 
 uint16_t host_last_sysytem_report(void)

@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * ACT_MODS_TAP(001r):
  * 001r|mods|0000 0000    Modifiers with OneShot
+ * 001r|mods|0000 0001    Modifiers with tap toggle
  * 001r|mods|0000 00xx    (reserved)
  * 001r|mods| keycode     Modifiers with Tap Key(Dual role)
  *
@@ -86,7 +87,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 1100|1111| id(8)      Macro record?
  *
  * ACT_BACKLIGHT(1101):
- * 1101|xxxx| id(8)      Backlight commands
+ * 1101|opt |level(8)    Backlight commands
  *
  * ACT_COMMAND(1110):
  * 1110|opt | id(8)      Built-in Command exec
@@ -162,7 +163,9 @@ typedef union {
         uint8_t  kind   :4;
     } usage;
     struct action_backlight {
-        uint8_t  id     :8;
+        uint8_t  level  :8;
+        uint8_t  opt    :4;
+        uint8_t  kind   :4;
     } backlight;
     struct action_command {
         uint8_t  id     :8;
@@ -205,12 +208,14 @@ enum mods_bit {
 };
 enum mods_codes {
     MODS_ONESHOT = 0x00,
+    MODS_TAP_TOGGLE = 0x01,
 };
 #define ACTION_KEY(key)                 ACTION(ACT_MODS, (key))
-#define ACTION_MODS(mods)               ACTION(ACT_MODS, (mods&0x1f)<<8 | 0)
-#define ACTION_MODS_KEY(mods, key)      ACTION(ACT_MODS, (mods&0x1f)<<8 | (key))
-#define ACTION_MODS_TAP_KEY(mods, key)  ACTION(ACT_MODS_TAP, (mods&0x1f)<<8 | (key))
-#define ACTION_MODS_ONESHOT(mods)       ACTION(ACT_MODS_TAP, (mods&0x1f)<<8 | MODS_ONESHOT)
+#define ACTION_MODS(mods)               ACTION(ACT_MODS, ((mods)&0x1f)<<8 | 0)
+#define ACTION_MODS_KEY(mods, key)      ACTION(ACT_MODS, ((mods)&0x1f)<<8 | (key))
+#define ACTION_MODS_TAP_KEY(mods, key)  ACTION(ACT_MODS_TAP, ((mods)&0x1f)<<8 | (key))
+#define ACTION_MODS_ONESHOT(mods)       ACTION(ACT_MODS_TAP, ((mods)&0x1f)<<8 | MODS_ONESHOT)
+#define ACTION_MODS_TAP_TOGGLE(mods)    ACTION(ACT_MODS_TAP, ((mods)&0x1f)<<8 | MODS_TAP_TOGGLE)
 
 
 /*
@@ -279,21 +284,23 @@ enum layer_pram_tap_op {
 /*
  * Extensions
  */
-enum backlight_id {
+enum backlight_opt {
     BACKLIGHT_INCREASE = 0,
     BACKLIGHT_DECREASE = 1,
     BACKLIGHT_TOGGLE   = 2,
     BACKLIGHT_STEP     = 3,
+    BACKLIGHT_LEVEL    = 4,
 };
 /* Macro */
 #define ACTION_MACRO(id)                ACTION(ACT_MACRO, (id))
 #define ACTION_MACRO_TAP(id)            ACTION(ACT_MACRO, FUNC_TAP<<8 | (id))
 #define ACTION_MACRO_OPT(id, opt)       ACTION(ACT_MACRO, (opt)<<8 | (id))
 /* Backlight */
-#define ACTION_BACKLIGHT_INCREASE()     ACTION(ACT_BACKLIGHT, BACKLIGHT_INCREASE)
-#define ACTION_BACKLIGHT_DECREASE()     ACTION(ACT_BACKLIGHT, BACKLIGHT_DECREASE)
-#define ACTION_BACKLIGHT_TOGGLE()       ACTION(ACT_BACKLIGHT, BACKLIGHT_TOGGLE)
-#define ACTION_BACKLIGHT_STEP()         ACTION(ACT_BACKLIGHT, BACKLIGHT_STEP)
+#define ACTION_BACKLIGHT_INCREASE()     ACTION(ACT_BACKLIGHT, BACKLIGHT_INCREASE << 8)
+#define ACTION_BACKLIGHT_DECREASE()     ACTION(ACT_BACKLIGHT, BACKLIGHT_DECREASE << 8)
+#define ACTION_BACKLIGHT_TOGGLE()       ACTION(ACT_BACKLIGHT, BACKLIGHT_TOGGLE << 8)
+#define ACTION_BACKLIGHT_STEP()         ACTION(ACT_BACKLIGHT, BACKLIGHT_STEP << 8)
+#define ACTION_BACKLIGHT_LEVEL(level)   ACTION(ACT_BACKLIGHT, BACKLIGHT_LEVEL << 8 | level)
 /* Command */
 #define ACTION_COMMAND(id, opt)         ACTION(ACT_COMMAND,  (opt)<<8 | (addr))
 /* Function */

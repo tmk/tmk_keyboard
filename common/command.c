@@ -151,6 +151,7 @@ static void print_eeconfig(void)
     print(".no_gui: "); print_dec(kc.no_gui); print("\n");
     print(".swap_grave_esc: "); print_dec(kc.swap_grave_esc); print("\n");
     print(".swap_backslash_backspace: "); print_dec(kc.swap_backslash_backspace); print("\n");
+    print(".nkro: "); print_dec(kc.nkro); print("\n");
 
 #ifdef BACKLIGHT_ENABLE
     backlight_config_t bc;
@@ -301,13 +302,13 @@ static bool command_common(uint8_t code)
         case KC_S:
             print("\n\n----- Status -----\n");
             print_val_hex8(host_keyboard_leds());
+            print_val_hex8(keyboard_protocol);
+            print_val_hex8(keyboard_idle);
 #ifdef PROTOCOL_PJRC
             print_val_hex8(UDCON);
             print_val_hex8(UDIEN);
             print_val_hex8(UDINT);
             print_val_hex8(usb_keyboard_leds);
-            print_val_hex8(usb_keyboard_protocol);
-            print_val_hex8(usb_keyboard_idle_config);
             print_val_hex8(usb_keyboard_idle_count);
 #endif
 

@@ -9,6 +9,7 @@ SRC +=	$(COMMON_DIR)/host.c \
 	$(COMMON_DIR)/keymap.c \
 	$(COMMON_DIR)/timer.c \
 	$(COMMON_DIR)/print.c \
+	$(COMMON_DIR)/debug.c \
 	$(COMMON_DIR)/bootloader.c \
 	$(COMMON_DIR)/suspend.c \
 	$(COMMON_DIR)/xprintf.S \
@@ -25,6 +26,7 @@ endif
 ifdef MOUSEKEY_ENABLE
     SRC += $(COMMON_DIR)/mousekey.c
     OPT_DEFS += -DMOUSEKEY_ENABLE
+    OPT_DEFS += -DMOUSE_ENABLE
 endif
 
 ifdef EXTRAKEY_ENABLE
@@ -47,14 +49,8 @@ ifdef NKRO_ENABLE
     OPT_DEFS += -DNKRO_ENABLE
 endif
 
-ifdef PS2_MOUSE_ENABLE
-    SRC += $(COMMON_DIR)/ps2.c \
-           $(COMMON_DIR)/ps2_mouse.c
-    OPT_DEFS += -DPS2_MOUSE_ENABLE
-endif
-
-ifdef $(or MOUSEKEY_ENABLE, PS2_MOUSE_ENABLE)
-    OPT_DEFS += -DMOUSE_ENABLE
+ifdef USB_6KRO_ENABLE
+    OPT_DEFS += -DUSB_6KRO_ENABLE
 endif
 
 ifdef SLEEP_LED_ENABLE

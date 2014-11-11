@@ -6,7 +6,7 @@ Hardware requirement
 Arduino Leonardo
     http://arduino.cc/en/Main/ArduinoBoardLeonardo 
 
-Circuit@Home USB Host Sheild 2.0
+Circuit@Home USB Host Shield 2.0
     http://www.circuitsathome.com/products-page/arduino-shields/usb-host-shield-2-0-for-arduino
 
 
@@ -14,12 +14,8 @@ Build firmware
 --------------
     $ git clone git://github.com/tmk/tmk_keyboard.git
     $ cd tmk_keyboard
-    $ git checkout usb_hid
     $ git submodule init
     $ git submodule update
-
-and download LUFA and unzip under protocol/lufa and edit LUFA_PATH in protocol/lufa.mk. Then,
-
     $ cd converter/usb_usb
     $ make
 
