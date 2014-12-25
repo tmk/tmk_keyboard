@@ -161,7 +161,6 @@ typedef struct {
     (key == KC_MEDIA_PREV_TRACK ?  TRANSPORT_PREV_TRACK : \
     (key == KC_MEDIA_FAST_FORWARD ?  TRANSPORT_FAST_FORWARD : \
     (key == KC_MEDIA_REWIND     ?  TRANSPORT_REWIND : \
-        
     (key == KC_MEDIA_STOP       ?  TRANSPORT_STOP : \
     (key == KC_MEDIA_EJECT      ?  TRANSPORT_STOP_EJECT : \
     (key == KC_MEDIA_PLAY_PAUSE ?  TRANSPORT_PLAY_PAUSE : \

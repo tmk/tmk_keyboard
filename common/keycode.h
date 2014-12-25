@@ -409,8 +409,6 @@ enum internal_special_keycodes {
     KC_AUDIO_VOL_DOWN,
     KC_MEDIA_NEXT_TRACK,
     KC_MEDIA_PREV_TRACK,
-    KC_MEDIA_FAST_FORWARD,
-    KC_MEDIA_REWIND,
     KC_MEDIA_STOP,
     KC_MEDIA_PLAY_PAUSE,
     KC_MEDIA_SELECT,
@@ -424,7 +422,9 @@ enum internal_special_keycodes {
     KC_WWW_FORWARD,
     KC_WWW_STOP,
     KC_WWW_REFRESH,
-    KC_WWW_FAVORITES,   /* 0xBC */
+    KC_WWW_FAVORITES,   
+    KC_MEDIA_FAST_FORWARD,
+    KC_MEDIA_REWIND,    /* 0xBC */
 
     /* Fn key */
     KC_FN0              = 0xC0,
