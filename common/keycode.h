@@ -140,6 +140,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_VOLD KC_AUDIO_VOL_DOWN
 #define KC_MNXT KC_MEDIA_NEXT_TRACK
 #define KC_MPRV KC_MEDIA_PREV_TRACK
+#define KC_MFFD KC_MEDIA_FAST_FORWARD
+#define KC_MRWD KC_MEDIA_REWIND
 #define KC_MSTP KC_MEDIA_STOP
 #define KC_MPLY KC_MEDIA_PLAY_PAUSE
 #define KC_MSEL KC_MEDIA_SELECT
@@ -407,6 +409,8 @@ enum internal_special_keycodes {
     KC_AUDIO_VOL_DOWN,
     KC_MEDIA_NEXT_TRACK,
     KC_MEDIA_PREV_TRACK,
+    KC_MEDIA_FAST_FORWARD,
+    KC_MEDIA_REWIND,
     KC_MEDIA_STOP,
     KC_MEDIA_PLAY_PAUSE,
     KC_MEDIA_SELECT,
@@ -420,7 +424,7 @@ enum internal_special_keycodes {
     KC_WWW_FORWARD,
     KC_WWW_STOP,
     KC_WWW_REFRESH,
-    KC_WWW_FAVORITES,   /* 0xBA */
+    KC_WWW_FAVORITES,   /* 0xBC */
 
     /* Fn key */
     KC_FN0              = 0xC0,
