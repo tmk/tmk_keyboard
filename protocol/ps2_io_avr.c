@@ -1,5 +1,4 @@
 #include <stdbool.h>
-#include <avr/io.h>
 #include <util/delay.h>
 
 /* Check port settings for clock and data line */

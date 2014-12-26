@@ -99,21 +99,15 @@ CONSOLE_ENABLE = yes	# Console for debug
 #   Teensy halfKay   512
 #   Atmel DFU loader 4096
 #   LUFA bootloader  4096
-OPT_DEFS += -DBOOTLOADER_SIZE=4096
+#OPT_DEFS += -DBOOTLOADER_SIZE=4096
 
 
 
 SRC =  \
-       keymap_common.c \
+       keymap.c \
        matrix.c \
        led.c \
        main.cpp
-
-ifdef KEYMAP
-    SRC := keymap_$(KEYMAP).c $(SRC)
-else
-    SRC := keymap.c $(SRC)
-endif
 
 CONFIG_H = config.h
 
@@ -126,7 +120,7 @@ VPATH += $(TOP_DIR)
 
 
 # program Leonardo
-PROGRAM_CMD = avrdude -p$(MCU) -cavr109 -b57600 -Uflash:w:$(TARGET).hex -P$(DEV)
+PROGRAM_CMD = avrdude -p$(MCU) -cavr109 -P$(DEV) -b57600 -Uflash:w:$(TARGET).hex
 
 
 
