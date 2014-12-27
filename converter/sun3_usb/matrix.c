@@ -65,7 +65,7 @@ void matrix_init(void)
 {
     DDRD |= (1<<6);
     PORTD |= (1<<6);
-    //debug_enable = true;
+    debug_enable = true;
 
     serial_init();
 
@@ -83,7 +83,7 @@ uint8_t matrix_scan(void)
     code = serial_recv();
     if (!code) return 0;
 
-    dprintf("%x ", code);
+    print_hex8(code);
 
     switch (code) {
         case 0xFF:  // reset success
