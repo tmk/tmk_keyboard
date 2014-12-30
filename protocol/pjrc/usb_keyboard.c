@@ -29,6 +29,7 @@
 #include "debug.h"
 #include "util.h"
 #include "host.h"
+#include "report.h"
 
 
 // protocol setting from the host.  We use exactly the same report
@@ -74,7 +75,7 @@ void usb_keyboard_print_report(report_keyboard_t *report)
 {
     if (!debug_keyboard) return;
     print("keys: ");
-    for (int i = 0; i < REPORT_KEYS; i++) { phex(report->keys[i]); print(" "); }
+    for (int i = 0; i < KEYBOARD_REPORT_KEYS; i++) { phex(report->keys[i]); print(" "); }
     print(" mods: "); phex(report->mods); print("\n");
 }
 
