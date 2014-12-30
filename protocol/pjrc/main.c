@@ -23,6 +23,7 @@
 
 #include <stdbool.h>
 #include <avr/io.h>
+#include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "keyboard.h"
@@ -42,7 +43,7 @@
 
 int main(void)
 {
-    // set for 16 MHz clock
+    // Set for 16 MHz clock
     CPU_PRESCALE(0);
 
     // Initialize the USB, and then wait for the host to set configuration.
@@ -51,21 +52,37 @@ int main(void)
     usb_init();
     while (!usb_configured()) /* wait */ ;
 
+    // TODO: This currently does nothing.
+    // TODO: To select output destinations: UART/USBSerial.
     print_set_sendchar(sendchar);
 
+    // Call all the initialisation routines fro setting up IO and such defined
+    // per keyboard.
     keyboard_init();
+
+    // Setup driver pointers defined per protocol.
     host_set_driver(pjrc_driver());
+
 #ifdef SLEEP_LED_ENABLE
     sleep_led_init();
 #endif
+
     while (1) {
+
+        // The suspend flag (extern bool defined in usb.c) is flipped by the ISR
+        // called within suspend_power_down().
+        // The remote_wakeup flag is used the same way.
         while (suspend) {
-            suspend_power_down();
+            // Use watchdog timer to sleep for a while.
+            suspend_power_down(WDTO_120MS);
+
             if (remote_wakeup && suspend_wakeup_condition()) {
                 usb_remote_wakeup();
             }
         }
 
+        // Main functionallity to scan matrix, update leds, etc.
+        // Simply called as fast as possible when suspend flag is false.
         keyboard_task(); 
     }
 }
