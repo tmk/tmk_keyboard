@@ -35,7 +35,7 @@ typedef union {
         bool no_gui:1;
         bool swap_grave_esc:1;
         bool swap_backslash_backspace:1;
-        bool reserved:1;
+        bool nkro:1;
     };
 } keymap_config_t;
 keymap_config_t keymap_config;
@@ -43,7 +43,7 @@ keymap_config_t keymap_config;
 
 
 /* translates key to keycode */
-uint8_t keymap_key_to_keycode(uint8_t layer, key_t key);
+uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key);
 
 /* translates Fn keycode to action */
 action_t keymap_fn_to_action(uint8_t keycode);

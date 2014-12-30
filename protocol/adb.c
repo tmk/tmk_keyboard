@@ -1,5 +1,6 @@
 /*
 Copyright 2011 Jun WAKO <wakojun@gmail.com>
+Copyright 2013 Shay Green <gblargg@gmail.com>
 
 This software is licensed with a Modified BSD License.
 All of this is supposed to be Free Software, Open Source, DFSG-free,
@@ -42,9 +43,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "adb.h"
 
 
-static inline void data_lo(void);
-static inline void data_hi(void);
-static inline bool data_in(void);
+// GCC doesn't inline functions normally
+#define data_lo() (ADB_DDR |=  (1<<ADB_DATA_BIT))
+#define data_hi() (ADB_DDR &= ~(1<<ADB_DATA_BIT))
+#define data_in() (ADB_PIN &   (1<<ADB_DATA_BIT))
+
 #ifdef ADB_PSW_BIT
 static inline void psw_lo(void);
 static inline void psw_hi(void);
@@ -55,24 +58,17 @@ static inline void attention(void);
 static inline void place_bit0(void);
 static inline void place_bit1(void);
 static inline void send_byte(uint8_t data);
-static inline bool read_bit(void);
-static inline uint8_t read_byte(void);
-static inline uint8_t wait_data_lo(uint16_t us);
-static inline uint8_t wait_data_hi(uint8_t us);
+static inline uint16_t wait_data_lo(uint16_t us);
+static inline uint16_t wait_data_hi(uint16_t us);
 
 
 void adb_host_init(void)
 {
+    ADB_PORT &= ~(1<<ADB_DATA_BIT);
     data_hi();
 #ifdef ADB_PSW_BIT
     psw_hi();
 #endif
-
-    // Enable keyboard left/right modifier distinction
-    // Addr:Keyboard(0010), Cmd:Listen(10), Register3(11)
-    // upper byte: reserved bits 0000, device address 0010
-    // lower byte: device handler 00000011
-    adb_host_listen(0x2B,0x02,0x03);
 }
 
 #ifdef ADB_PSW_BIT
@@ -82,35 +78,106 @@ bool adb_host_psw(void)
 }
 #endif
 
+/*
+ * Don't call this in a row without the delay, otherwise it makes some of poor controllers
+ * overloaded and misses strokes. Recommended interval is 12ms.
+ *
+ * Thanks a lot, blargg!
+ * <http://geekhack.org/index.php?topic=14290.msg1068919#msg1068919>
+ * <http://geekhack.org/index.php?topic=14290.msg1070139#msg1070139>
+ */
+
+// ADB Bit Cells
+//
+// bit cell time: 70-130us
+// low part of bit0: 60-70% of bit cell
+// low part of bit1: 30-40% of bit cell
+//
+//    bit cell time         70us        130us
+//    --------------------------------------------
+//    low  part of bit0     42-49       78-91
+//    high part of bit0     21-28       39-52
+//    low  part of bit1     21-28       39-52
+//    high part of bit1     42-49       78-91
+//
+//
+// bit0:
+//    70us bit cell:
+//      ____________~~~~~~
+//      42-49        21-28  
+//
+//    130us bit cell:
+//      ____________~~~~~~
+//      78-91        39-52  
+//
+// bit1:
+//    70us bit cell:
+//      ______~~~~~~~~~~~~
+//      21-28        42-49
+//
+//    130us bit cell:
+//      ______~~~~~~~~~~~~
+//      39-52        78-91
+//
+// [from Apple IIgs Hardware Reference Second Edition]
+
 uint16_t adb_host_kbd_recv(void)
 {
     uint16_t data = 0;
+    cli();
     attention();
     send_byte(0x2C);            // Addr:Keyboard(0010), Cmd:Talk(11), Register0(00)
     place_bit0();               // Stopbit(0)
+    if (!wait_data_hi(500)) {    // Service Request(310us Adjustable Keyboard): just ignored
+        sei();
+        return -30;             // something wrong
+    }
     if (!wait_data_lo(500)) {   // Tlt/Stop to Start(140-260us)
+        sei();
         return 0;               // No data to send
     }
-    if (!read_bit()) {          // Startbit(1)
-        // Service Request
-        return -2;
+    
+    uint8_t n = 17; // start bit + 16 data bits
+    do {
+        uint8_t lo = (uint8_t) wait_data_hi(130);
+        if (!lo)
+            goto error;
+        
+        uint8_t hi = (uint8_t) wait_data_lo(lo);
+        if (!hi)
+            goto error;
+        
+        hi = lo - hi;
+        lo = 130 - lo;
+        
+        data <<= 1;
+        if (lo < hi) {
+            data |= 1;
+        }
+        else if (n == 17) {
+            sei();
+            return -20;
+        }
     }
+    while ( --n );
 
-    // ad hoc fix: without block inerrupt read wrong bit occasionally and get keys stuck
-    cli();
-    data = read_byte();
-    data = (data<<8) | read_byte();
-    uint8_t stop = read_bit();  // Stopbit(0)
+    // Stop bit can't be checked normally since it could have service request lenghtening
+    // and its high state never goes low.
+    if (!wait_data_hi(351) || wait_data_lo(91)) {
+        sei();
+        return -21;
+    }
     sei();
-
-    if (stop) {
-        return -3;
-    }
     return data;
+
+error:
+    sei();
+    return -n;
 }
 
 void adb_host_listen(uint8_t cmd, uint8_t data_h, uint8_t data_l)
 {
+    cli();
     attention();
     send_byte(cmd);
     place_bit0();               // Stopbit(0)
@@ -119,6 +186,7 @@ void adb_host_listen(uint8_t cmd, uint8_t data_h, uint8_t data_l)
     send_byte(data_h); 
     send_byte(data_l);
     place_bit0();               // Stopbit(0);
+    sei();
 }
 
 // send state of LEDs
@@ -130,23 +198,6 @@ void adb_host_kbd_led(uint8_t led)
     adb_host_listen(0x2A,0,led&0x07);
 }
 
-
-static inline void data_lo()
-{
-    ADB_DDR  |=  (1<<ADB_DATA_BIT);
-    ADB_PORT &= ~(1<<ADB_DATA_BIT);
-}
-static inline void data_hi()
-{
-    ADB_PORT |=  (1<<ADB_DATA_BIT);
-    ADB_DDR  &= ~(1<<ADB_DATA_BIT);
-}
-static inline bool data_in()
-{
-    ADB_PORT |=  (1<<ADB_DATA_BIT);
-    ADB_DDR  &= ~(1<<ADB_DATA_BIT);
-    return ADB_PIN&(1<<ADB_DATA_BIT);
-}
 
 #ifdef ADB_PSW_BIT
 static inline void psw_lo()
@@ -170,7 +221,7 @@ static inline bool psw_in()
 static inline void attention(void)
 {
     data_lo();
-    _delay_us(700);
+    _delay_us(800-35); // bit1 holds lo for 35 more
     place_bit1();
 }
 
@@ -200,81 +251,27 @@ static inline void send_byte(uint8_t data)
     }
 }
 
-static inline bool read_bit(void)
+// These are carefully coded to take 6 cycles of overhead.
+// inline asm approach became too convoluted
+static inline uint16_t wait_data_lo(uint16_t us)
 {
-    // ADB Bit Cells
-    //
-    // bit cell time: 70-130us
-    // low part of bit0: 60-70% of bit cell
-    // low part of bit1: 30-40% of bit cell
-    //
-    //    bit cell time         70us        130us
-    //    --------------------------------------------
-    //    low  part of bit0     42-49       78-91
-    //    high part of bit0     21-28       39-52
-    //    low  part of bit1     21-28       39-52
-    //    high part of bit1     42-49       78-91
-    //
-    //
-    // bit0:
-    //    70us bit cell:
-    //      ____________~~~~~~
-    //      42-49        21-28  
-    //
-    //    130us bit cell:
-    //      ____________~~~~~~
-    //      78-91        39-52  
-    //
-    // bit1:
-    //    70us bit cell:
-    //      ______~~~~~~~~~~~~
-    //      21-28        42-49
-    //
-    //    130us bit cell:
-    //      ______~~~~~~~~~~~~
-    //      39-52        78-91
-    //
-    // read:
-    //      ________|~~~~~~~~~
-    //              55us
-    // Read data line after 55us. If data line is low/high then bit is 0/1.
-    // This method might not work at <90us bit cell time.
-    //
-    // [from Apple IIgs Hardware Reference Second Edition]
-    bool bit;
-    wait_data_lo(75);   // wait the start of bit cell at least 130ms(55+0+75)
-    _delay_us(55);
-    bit = data_in();
-    wait_data_hi(36);   // wait high part of bit cell at least 91ms(55+36)
-    return bit;
-}
-
-static inline uint8_t read_byte(void)
-{
-    uint8_t data = 0;
-    for (int i = 0; i < 8; i++) {
-        data <<= 1;
-        if (read_bit())
-            data = data | 1;
+    do {
+        if ( !data_in() )
+            break;
+        _delay_us(1 - (6 * 1000000.0 / F_CPU));
     }
-    return data;
-}
-
-static inline uint8_t wait_data_lo(uint16_t us)
-{
-    while (data_in() && us) {
-        _delay_us(1);
-        us--;
-    }
+    while ( --us );
     return us;
 }
 
-static inline uint8_t wait_data_hi(uint8_t us)
+static inline uint16_t wait_data_hi(uint16_t us)
 {
-    while (!data_in() && us) {
-        _delay_us(1);
-        us--;
+    do {
+        if ( data_in() )
+            break;
+        _delay_us(1 - (6 * 1000000.0 / F_CPU));
     }
+    while ( --us );
     return us;
 }
 

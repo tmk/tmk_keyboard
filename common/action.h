@@ -25,6 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "action_macro.h"
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* tapping count and state */
 typedef struct {
     bool    interrupted :1;
@@ -42,12 +46,11 @@ typedef struct {
 #endif
 } keyrecord_t;
 
-
 /* Execute action per keyevent */
 void action_exec(keyevent_t event);
 
 /* action for key */
-action_t action_for_key(uint8_t layer, key_t key);
+action_t action_for_key(uint8_t layer, keypos_t key);
 
 /* macro */
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt);
@@ -59,18 +62,21 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt);
 void process_action(keyrecord_t *record);
 void register_code(uint8_t code);
 void unregister_code(uint8_t code);
-void add_mods(uint8_t mods);
-void del_mods(uint8_t mods);
-void set_mods(uint8_t mods);
+void register_mods(uint8_t mods);
+void unregister_mods(uint8_t mods);
+//void set_mods(uint8_t mods);
 void clear_keyboard(void);
 void clear_keyboard_but_mods(void);
-bool sending_anykey(void);
 void layer_switch(uint8_t new_layer);
-bool is_tap_key(key_t key);
+bool is_tap_key(keypos_t key);
 
 /* debug */
 void debug_event(keyevent_t event);
 void debug_record(keyrecord_t record);
 void debug_action(action_t action);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* ACTION_H */

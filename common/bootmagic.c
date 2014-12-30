@@ -5,6 +5,7 @@
 #include "bootloader.h"
 #include "debug.h"
 #include "keymap.h"
+#include "host.h"
 #include "action_layer.h"
 #include "eeconfig.h"
 #include "bootmagic.h"
@@ -18,8 +19,10 @@ void bootmagic(void)
     }
 
     /* do scans in case of bounce */
+    print("boogmagic scan: ... ");
     uint8_t scan = 100;
     while (scan--) { matrix_scan(); _delay_ms(10); }
+    print("done.\n");
 
     /* bootmagic skip */
     if (bootmagic_scan_keycode(BOOTMAGIC_KEY_SKIP)) {
@@ -53,7 +56,7 @@ void bootmagic(void)
 
     /* keymap config */
     keymap_config.raw = eeconfig_read_keymap();
-    if (bootmagic_scan_keycode(BOOTMAGIC_KEY_SWAP_CONTROL_CPASLOCK)) {
+    if (bootmagic_scan_keycode(BOOTMAGIC_KEY_SWAP_CONTROL_CAPSLOCK)) {
         keymap_config.swap_control_capslock = !keymap_config.swap_control_capslock;
     }
     if (bootmagic_scan_keycode(BOOTMAGIC_KEY_CAPSLOCK_TO_CONTROL)) {
@@ -74,7 +77,14 @@ void bootmagic(void)
     if (bootmagic_scan_keycode(BOOTMAGIC_KEY_SWAP_BACKSLASH_BACKSPACE)) {
         keymap_config.swap_backslash_backspace = !keymap_config.swap_backslash_backspace;
     }
+    if (bootmagic_scan_keycode(BOOTMAGIC_HOST_NKRO)) {
+        keymap_config.nkro = !keymap_config.nkro;
+    }
     eeconfig_write_keymap(keymap_config.raw);
+
+#ifdef NKRO_ENABLE
+    keyboard_nkro = keymap_config.nkro;
+#endif
 
     /* default layer */
     uint8_t default_layer = 0;
@@ -101,7 +111,7 @@ static bool scan_keycode(uint8_t keycode)
         matrix_row_t matrix_row = matrix_get_row(r);
         for (uint8_t c = 0; c < MATRIX_COLS; c++) {
             if (matrix_row & ((matrix_row_t)1<<c)) {
-                if (keycode == keymap_key_to_keycode(0, (key_t){ .row = r, .col = c })) {
+                if (keycode == keymap_key_to_keycode(0, (keypos_t){ .row = r, .col = c })) {
                     return true;
                 }
             }

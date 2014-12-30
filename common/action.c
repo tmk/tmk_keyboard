@@ -23,8 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "backlight.h"
 #include "action_layer.h"
 #include "action_tapping.h"
-#include "action_oneshot.h"
 #include "action_macro.h"
+#include "action_util.h"
 #include "action.h"
 
 #ifdef DEBUG_ACTION
@@ -79,15 +79,15 @@ void process_action(keyrecord_t *record)
                                                                 action.key.mods<<4;
                 if (event.pressed) {
                     if (mods) {
-                        host_add_mods(mods);
-                        host_send_keyboard_report();
+                        add_weak_mods(mods);
+                        send_keyboard_report();
                     }
                     register_code(action.key.code);
                 } else {
                     unregister_code(action.key.code);
                     if (mods) {
-                        host_del_mods(mods);
-                        host_send_keyboard_report();
+                        del_weak_mods(mods);
+                        send_keyboard_report();
                     }
                 }
             }
@@ -100,47 +100,45 @@ void process_action(keyrecord_t *record)
                                                                     action.key.mods<<4;
                 switch (action.layer_tap.code) {
     #ifndef NO_ACTION_ONESHOT
-                    case 0x00:
+                    case MODS_ONESHOT:
                         // Oneshot modifier
                         if (event.pressed) {
                             if (tap_count == 0) {
-                                dprint("MODS_TAP: Oneshot: add_mods\n");
-                                add_mods(mods);
+                                register_mods(mods);
                             }
                             else if (tap_count == 1) {
                                 dprint("MODS_TAP: Oneshot: start\n");
-                                oneshot_start(mods);
-                            }
-                            else if (tap_count == TAPPING_TOGGLE) {
-                                dprint("MODS_TAP: Oneshot: toggle\n");
-                                oneshot_toggle();
+                                set_oneshot_mods(mods);
                             }
                             else {
-                                dprint("MODS_TAP: Oneshot: cancel&add_mods\n");
-                                // double tap cancels oneshot and works as normal modifier.
-                                oneshot_cancel();
-                                add_mods(mods);
+                                register_mods(mods);
                             }
                         } else {
                             if (tap_count == 0) {
-                                dprint("MODS_TAP: Oneshot: cancel/del_mods\n");
-                                // cancel oneshot on hold
-                                oneshot_cancel();
-                                del_mods(mods);
+                                clear_oneshot_mods();
+                                unregister_mods(mods);
                             }
                             else if (tap_count == 1) {
-                                dprint("MODS_TAP: Oneshot: del_mods\n");
-                                // retain Oneshot
-                                del_mods(mods);
+                                // Retain Oneshot mods
                             }
                             else {
-                                dprint("MODS_TAP: Oneshot: del_mods\n");
-                                // cancel Mods
-                                del_mods(mods);
+                                clear_oneshot_mods();
+                                unregister_mods(mods);
                             }
                         }
                         break;
     #endif
+                    case MODS_TAP_TOGGLE:
+                        if (event.pressed) {
+                            if (tap_count <= TAPPING_TOGGLE) {
+                                register_mods(mods);
+                            }
+                        } else {
+                            if (tap_count < TAPPING_TOGGLE) {
+                                unregister_mods(mods);
+                            }
+                        }
+                        break;
                     default:
                         if (event.pressed) {
                             if (tap_count > 0) {
@@ -148,14 +146,14 @@ void process_action(keyrecord_t *record)
                                     dprint("MODS_TAP: Tap: Cancel: add_mods\n");
                                     // ad hoc: set 0 to cancel tap
                                     record->tap.count = 0;
-                                    add_mods(mods);
+                                    register_mods(mods);
                                 } else {
                                     dprint("MODS_TAP: Tap: register_code\n");
                                     register_code(action.key.code);
                                 }
                             } else {
                                 dprint("MODS_TAP: No tap: add_mods\n");
-                                add_mods(mods);
+                                register_mods(mods);
                             }
                         } else {
                             if (tap_count > 0) {
@@ -163,7 +161,7 @@ void process_action(keyrecord_t *record)
                                 unregister_code(action.key.code);
                             } else {
                                 dprint("MODS_TAP: No tap: add_mods\n");
-                                del_mods(mods);
+                                unregister_mods(mods);
                             }
                         }
                         break;
@@ -239,6 +237,16 @@ void process_action(keyrecord_t *record)
         case ACT_LAYER_TAP:
         case ACT_LAYER_TAP_EXT:
             switch (action.layer_tap.code) {
+                case 0xe0 ... 0xef:
+                    /* layer On/Off with modifiers(left only) */
+                    if (event.pressed) {
+                        layer_on(action.layer_tap.val);
+                        register_mods(action.layer_tap.code & 0x0f);
+                    } else {
+                        layer_off(action.layer_tap.val);
+                        unregister_mods(action.layer_tap.code & 0x0f);
+                    }
+                    break;
                 case OP_TAP_TOGGLE:
                     /* tap toggle */
                     if (event.pressed) {
@@ -296,7 +304,7 @@ void process_action(keyrecord_t *record)
 #ifdef BACKLIGHT_ENABLE
         case ACT_BACKLIGHT:
             if (!event.pressed) {
-                switch (action.backlight.id) {
+                switch (action.backlight.opt) {
                     case BACKLIGHT_INCREASE:
                         backlight_increase();
                         break;
@@ -308,6 +316,9 @@ void process_action(keyrecord_t *record)
                         break;
                     case BACKLIGHT_STEP:
                         backlight_step();
+                        break;
+                    case BACKLIGHT_LEVEL:
+                        backlight_level(action.backlight.level);
                         break;
                 }
             }
@@ -343,30 +354,30 @@ void register_code(uint8_t code)
         // Resync: ignore if caps lock already is on
         if (host_keyboard_leds() & (1<<USB_LED_CAPS_LOCK)) return;
 #endif
-        host_add_key(KC_CAPSLOCK);
-        host_send_keyboard_report();
-        host_del_key(KC_CAPSLOCK);
-        host_send_keyboard_report();
+        add_key(KC_CAPSLOCK);
+        send_keyboard_report();
+        del_key(KC_CAPSLOCK);
+        send_keyboard_report();
     }
 
     else if (KC_LOCKING_NUM == code) {
 #ifdef LOCKING_RESYNC_ENABLE
         if (host_keyboard_leds() & (1<<USB_LED_NUM_LOCK)) return;
 #endif
-        host_add_key(KC_NUMLOCK);
-        host_send_keyboard_report();
-        host_del_key(KC_NUMLOCK);
-        host_send_keyboard_report();
+        add_key(KC_NUMLOCK);
+        send_keyboard_report();
+        del_key(KC_NUMLOCK);
+        send_keyboard_report();
     }
 
     else if (KC_LOCKING_SCROLL == code) {
 #ifdef LOCKING_RESYNC_ENABLE
         if (host_keyboard_leds() & (1<<USB_LED_SCROLL_LOCK)) return;
 #endif
-        host_add_key(KC_SCROLLLOCK);
-        host_send_keyboard_report();
-        host_del_key(KC_SCROLLLOCK);
-        host_send_keyboard_report();
+        add_key(KC_SCROLLLOCK);
+        send_keyboard_report();
+        del_key(KC_SCROLLLOCK);
+        send_keyboard_report();
     }
 #endif
 
@@ -375,25 +386,28 @@ void register_code(uint8_t code)
         if (command_proc(code)) return;
 
 #ifndef NO_ACTION_ONESHOT
+/* TODO: remove
         if (oneshot_state.mods && !oneshot_state.disabled) {
-            uint8_t tmp_mods = host_get_mods();
-            host_add_mods(oneshot_state.mods);
+            uint8_t tmp_mods = get_mods();
+            add_mods(oneshot_state.mods);
 
-            host_add_key(code);
-            host_send_keyboard_report();
+            add_key(code);
+            send_keyboard_report();
 
-            host_set_mods(tmp_mods);
+            set_mods(tmp_mods);
+            send_keyboard_report();
             oneshot_cancel();
         } else 
+*/
 #endif
         {
-            host_add_key(code);
-            host_send_keyboard_report();
+            add_key(code);
+            send_keyboard_report();
         }
     }
     else if IS_MOD(code) {
-        host_add_mods(MOD_BIT(code));
-        host_send_keyboard_report();
+        add_mods(MOD_BIT(code));
+        send_keyboard_report();
     }
     else if IS_SYSTEM(code) {
         host_system_send(KEYCODE2SYSTEM(code));
@@ -415,40 +429,40 @@ void unregister_code(uint8_t code)
         // Resync: ignore if caps lock already is off
         if (!(host_keyboard_leds() & (1<<USB_LED_CAPS_LOCK))) return;
 #endif
-        host_add_key(KC_CAPSLOCK);
-        host_send_keyboard_report();
-        host_del_key(KC_CAPSLOCK);
-        host_send_keyboard_report();
+        add_key(KC_CAPSLOCK);
+        send_keyboard_report();
+        del_key(KC_CAPSLOCK);
+        send_keyboard_report();
     }
 
     else if (KC_LOCKING_NUM == code) {
 #ifdef LOCKING_RESYNC_ENABLE
         if (!(host_keyboard_leds() & (1<<USB_LED_NUM_LOCK))) return;
 #endif
-        host_add_key(KC_NUMLOCK);
-        host_send_keyboard_report();
-        host_del_key(KC_NUMLOCK);
-        host_send_keyboard_report();
+        add_key(KC_NUMLOCK);
+        send_keyboard_report();
+        del_key(KC_NUMLOCK);
+        send_keyboard_report();
     }
 
     else if (KC_LOCKING_SCROLL == code) {
 #ifdef LOCKING_RESYNC_ENABLE
         if (!(host_keyboard_leds() & (1<<USB_LED_SCROLL_LOCK))) return;
 #endif
-        host_add_key(KC_SCROLLLOCK);
-        host_send_keyboard_report();
-        host_del_key(KC_SCROLLLOCK);
-        host_send_keyboard_report();
+        add_key(KC_SCROLLLOCK);
+        send_keyboard_report();
+        del_key(KC_SCROLLLOCK);
+        send_keyboard_report();
     }
 #endif
 
     else if IS_KEY(code) {
-        host_del_key(code);
-        host_send_keyboard_report();
+        del_key(code);
+        send_keyboard_report();
     }
     else if IS_MOD(code) {
-        host_del_mods(MOD_BIT(code));
-        host_send_keyboard_report();
+        del_mods(MOD_BIT(code));
+        send_keyboard_report();
     }
     else if IS_SYSTEM(code) {
         host_system_send(0);
@@ -458,38 +472,33 @@ void unregister_code(uint8_t code)
     }
 }
 
-void add_mods(uint8_t mods)
+void register_mods(uint8_t mods)
 {
     if (mods) {
-        host_add_mods(mods);
-        host_send_keyboard_report();
+        add_mods(mods);
+        send_keyboard_report();
     }
 }
 
-void del_mods(uint8_t mods)
+void unregister_mods(uint8_t mods)
 {
     if (mods) {
-        host_del_mods(mods);
-        host_send_keyboard_report();
+        del_mods(mods);
+        send_keyboard_report();
     }
-}
-
-void set_mods(uint8_t mods)
-{
-    host_set_mods(mods);
-    host_send_keyboard_report();
 }
 
 void clear_keyboard(void)
 {
-    host_clear_mods();
+    clear_mods();
     clear_keyboard_but_mods();
 }
 
 void clear_keyboard_but_mods(void)
 {
-    host_clear_keys();
-    host_send_keyboard_report();
+    clear_weak_mods();
+    clear_keys();
+    send_keyboard_report();
 #ifdef MOUSEKEY_ENABLE
     mousekey_clear();
     mousekey_send();
@@ -500,13 +509,7 @@ void clear_keyboard_but_mods(void)
 #endif
 }
 
-bool sending_anykey(void)
-{
-    return (host_has_anykey() || host_mouse_in_use() ||
-            host_last_sysytem_report() || host_last_consumer_report());
-}
-
-bool is_tap_key(key_t key)
+bool is_tap_key(keypos_t key)
 {
     action_t action = layer_switch_get_action(key);
 

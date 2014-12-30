@@ -10,13 +10,14 @@ TARGET_DIR = .
 # keyboard dependent files
 SRC =	matrix.c \
 	led.c \
+	keymap_common.c \
 	m0110.c
 
 # To use own keymap file run make like: make keymap=hasu
-ifdef keymap
-    SRC += keymap_$(keymap).c
+ifdef KEYMAP
+    SRC += keymap_$(KEYMAP).c
 else
-    SRC += keymap.c
+    SRC += keymap_plain.c
 endif
 
 CONFIG_H = config.h
@@ -78,6 +79,7 @@ CONSOLE_ENABLE = yes	# Console for debug(+400)
 COMMAND_ENABLE = yes    # Commands for debug and configuration
 #SLEEP_LED_ENABLE = yes  # Breathing sleep LED during USB suspend
 #NKRO_ENABLE = yes	# USB Nkey Rollover - not yet supported in LUFA
+#KEYMAP_SECTION_ENABLE = yes	# fixed address keymap for keymap editor
 
 
 

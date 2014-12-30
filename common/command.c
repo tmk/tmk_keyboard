@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keyboard.h"
 #include "bootloader.h"
 #include "action_layer.h"
+#include "action_util.h"
 #include "eeconfig.h"
 #include "sleep_led.h"
 #include "led.h"
@@ -62,19 +63,22 @@ static uint8_t numkey2num(uint8_t code);
 static void switch_default_layer(uint8_t layer);
 
 
-typedef enum { ONESHOT, CONSOLE, MOUSEKEY } cmdstate_t;
-static cmdstate_t state = ONESHOT;
+command_state_t command_state = ONESHOT;
 
 
 bool command_proc(uint8_t code)
 {
-    switch (state) {
+    switch (command_state) {
         case ONESHOT:
             if (!IS_COMMAND())
                 return false;
             return (command_extra(code) || command_common(code));
+            break;
         case CONSOLE:
-            command_console(code);
+            if (IS_COMMAND())
+                return (command_extra(code) || command_common(code));
+            else
+                return (command_console_extra(code) || command_console(code));
             break;
 #ifdef MOUSEKEY_ENABLE
         case MOUSEKEY:
@@ -82,15 +86,22 @@ bool command_proc(uint8_t code)
             break;
 #endif
         default:
-            state = ONESHOT;
+            command_state = ONESHOT;
             return false;
     }
     return true;
 }
 
+/* TODO: Refactoring is needed. */
 /* This allows to define extra commands. return false when not processed. */
 bool command_extra(uint8_t code) __attribute__ ((weak));
 bool command_extra(uint8_t code)
+{
+    return false;
+}
+
+bool command_console_extra(uint8_t code) __attribute__ ((weak));
+bool command_console_extra(uint8_t code)
 {
     return false;
 }
@@ -150,6 +161,7 @@ static void print_eeconfig(void)
     print(".no_gui: "); print_dec(kc.no_gui); print("\n");
     print(".swap_grave_esc: "); print_dec(kc.swap_grave_esc); print("\n");
     print(".swap_backslash_backspace: "); print_dec(kc.swap_backslash_backspace); print("\n");
+    print(".nkro: "); print_dec(kc.nkro); print("\n");
 
 #ifdef BACKLIGHT_ENABLE
     backlight_config_t bc;
@@ -201,7 +213,7 @@ static bool command_common(uint8_t code)
             command_console_help();
             print("\nEnter Console Mode\n");
             print("C> ");
-            state = CONSOLE;
+            command_state = CONSOLE;
             break;
         case KC_PAUSE:
             clear_keyboard();
@@ -251,10 +263,48 @@ static bool command_common(uint8_t code)
             break;
         case KC_V: // print version & information
             print("\n\n----- Version -----\n");
-            print(STR(DESCRIPTION) "\n");
-            print(STR(MANUFACTURER) "(" STR(VENDOR_ID) ")/");
-            print(STR(PRODUCT) "(" STR(PRODUCT_ID) ") ");
-            print("VERSION: " STR(DEVICE_VER) "\n");
+            print("DESC: " STR(DESCRIPTION) "\n");
+            print("VID: " STR(VENDOR_ID) "(" STR(MANUFACTURER) ") "
+                  "PID: " STR(PRODUCT_ID) "(" STR(PRODUCT) ") "
+                  "VER: " STR(DEVICE_VER) "\n");
+            print("BUILD: " STR(VERSION) " (" __TIME__ " " __DATE__ ")\n");
+            /* build options */
+            print("OPTIONS:"
+#ifdef PROTOCOL_PJRC
+            " PJRC"
+#endif
+#ifdef PROTOCOL_LUFA
+            " LUFA"
+#endif
+#ifdef PROTOCOL_VUSB
+            " VUSB"
+#endif
+#ifdef BOOTMAGIC_ENABLE
+            " BOOTMAGIC"
+#endif
+#ifdef MOUSEKEY_ENABLE
+            " MOUSEKEY"
+#endif
+#ifdef EXTRAKEY_ENABLE
+            " EXTRAKEY"
+#endif
+#ifdef CONSOLE_ENABLE
+            " CONSOLE"
+#endif
+#ifdef COMMAND_ENABLE
+            " COMMAND"
+#endif
+#ifdef NKRO_ENABLE
+            " NKRO"
+#endif
+#ifdef KEYMAP_SECTION_ENABLE
+            " KEYMAP_SECTION"
+#endif
+            " " STR(BOOTLOADER_SIZE) "\n");
+
+            print("GCC: " STR(__GNUC__) "." STR(__GNUC_MINOR__) "." STR(__GNUC_PATCHLEVEL__) 
+                  " AVR-LIBC: " __AVR_LIBC_VERSION_STRING__
+                  " AVR_ARCH: avr" STR(__AVR_ARCH__) "\n");
             break;
         case KC_T: // print timer
             print_val_hex32(timer_count);
@@ -262,13 +312,13 @@ static bool command_common(uint8_t code)
         case KC_S:
             print("\n\n----- Status -----\n");
             print_val_hex8(host_keyboard_leds());
+            print_val_hex8(keyboard_protocol);
+            print_val_hex8(keyboard_idle);
 #ifdef PROTOCOL_PJRC
             print_val_hex8(UDCON);
             print_val_hex8(UDIEN);
             print_val_hex8(UDINT);
             print_val_hex8(usb_keyboard_leds);
-            print_val_hex8(usb_keyboard_protocol);
-            print_val_hex8(usb_keyboard_idle_config);
             print_val_hex8(usb_keyboard_idle_count);
 #endif
 
@@ -348,14 +398,14 @@ static bool command_console(uint8_t code)
         case KC_Q:
         case KC_ESC:
             print("\nQuit Console Mode\n");
-            state = ONESHOT;
+            command_state = ONESHOT;
             return false;
 #ifdef MOUSEKEY_ENABLE
         case KC_M:
             mousekey_console_help();
             print("\nEnter Mousekey Console\n");
             print("M0>");
-            state = MOUSEKEY;
+            command_state = MOUSEKEY;
             return true;
 #endif
         default:
@@ -515,7 +565,7 @@ static bool mousekey_console(uint8_t code)
             mousekey_param = 0;
             print("\nQuit Mousekey Console\n");
             print("C> ");
-            state = CONSOLE;
+            command_state = CONSOLE;
             return false;
         case KC_P:
             mousekey_param_print();

@@ -49,7 +49,7 @@ TARGET_DIR = .
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC +=	keymap.c \
+SRC +=	keymap_common.c \
 	matrix.c \
 	led.c
 
@@ -96,7 +96,7 @@ ARCH = AVR8
 F_USB = $(F_CPU)
 
 # Interrupt driven control endpoint task
-OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
+#OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 
 
 # Boot Section Size in *bytes*
@@ -111,12 +111,33 @@ OPT_DEFS += -DBOOTLOADER_SIZE=4096
 # Build Options
 #   comment out to disable the options.
 #
-BOOTMAGIC_ENABLE = yes	# Virtual DIP switch configuration
-MOUSEKEY_ENABLE = yes	# Mouse keys
-EXTRAKEY_ENABLE = yes	# Audio control and System control
-CONSOLE_ENABLE = yes	# Console for debug
-COMMAND_ENABLE = yes    # Commands for debug and configuration
-NKRO_ENABLE = yes	# USB Nkey Rollover
+BOOTMAGIC_ENABLE = yes		# Virtual DIP switch configuration
+MOUSEKEY_ENABLE = yes		# Mouse keys
+EXTRAKEY_ENABLE = yes		# Audio control and System control
+CONSOLE_ENABLE = yes		# Console for debug
+COMMAND_ENABLE = yes    	# Commands for debug and configuration
+NKRO_ENABLE = yes		# USB Nkey Rollover
+#KEYMAP_SECTION_ENABLE = yes	# fixed address keymap for keymap editor
+#HHKB_JP = yes			# HHKB JP support
+
+
+ifdef HHKB_JP
+    OPT_DEFS += -DHHKB_JP
+endif
+
+
+#
+# Keymap file
+#
+ifdef KEYMAP
+    SRC := keymap_$(KEYMAP).c $(SRC)
+else
+    ifdef HHKB_JP
+    	SRC := keymap_jp.c $(SRC)
+    else 
+    	SRC := keymap_hhkb.c $(SRC)
+    endif
+endif
 
 
 # Search Path
@@ -127,5 +148,9 @@ include $(TOP_DIR)/protocol/lufa.mk
 include $(TOP_DIR)/common.mk
 include $(TOP_DIR)/rules.mk
 
-debug-on: EXTRAFLAGS += -DDEBUG
+debug-on: EXTRAFLAGS += -DDEBUG -DDEBUG_ACTION
 debug-on: all
+
+debug-off: EXTRAFLAGS += -DNO_DEBUG -DNO_PRINT
+debug-off: OPT_DEFS := $(filter-out -DCONSOLE_ENABLE,$(OPT_DEFS))
+debug-off: all

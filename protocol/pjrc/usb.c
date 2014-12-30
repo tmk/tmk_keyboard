@@ -38,6 +38,8 @@
 #include "sleep_led.h"
 #endif
 #include "suspend.h"
+#include "action.h"
+#include "action_util.h"
 
 
 /**************************************************************************
@@ -627,6 +629,7 @@ uint8_t usb_configured(void)
 void usb_remote_wakeup(void)
 {
     UDCON |= (1<<RMWKUP);
+    while (UDCON & (1<<RMWKUP));
 }
 
 
@@ -661,8 +664,9 @@ ISR(USB_GEN_vect)
             suspend_wakeup_init();
 #ifdef SLEEP_LED_ENABLE
             sleep_led_disable();
-#endif
+            // NOTE: converters may not accept this
             led_set(host_keyboard_leds());
+#endif
 
             UDIEN |= (1<<SUSPE);
             UDIEN &= ~(1<<WAKEUPE);
@@ -690,20 +694,20 @@ ISR(USB_GEN_vect)
 		}
                 /* TODO: should keep IDLE rate on each keyboard interface */
 #ifdef NKRO_ENABLE
-		if (!keyboard_nkro && usb_keyboard_idle_config && (++div4 & 3) == 0) {
+		if (!keyboard_nkro && keyboard_idle && (++div4 & 3) == 0) {
 #else
-		if (usb_keyboard_idle_config && (++div4 & 3) == 0) {
+		if (keyboard_idle && (++div4 & 3) == 0) {
 #endif
 			UENUM = KBD_ENDPOINT;
 			if (UEINTX & (1<<RWAL)) {
 				usb_keyboard_idle_count++;
-				if (usb_keyboard_idle_count == usb_keyboard_idle_config) {
+				if (usb_keyboard_idle_count == keyboard_idle) {
 					usb_keyboard_idle_count = 0;
                                         /* TODO: fix keyboard_report inconsistency */
 /* To avoid Mac SET_IDLE behaviour.
 					UEDATX = keyboard_report_prev->mods;
 					UEDATX = 0;
-                                        uint8_t keys = usb_keyboard_protocol ? KBD_REPORT_KEYS : 6;
+                                        uint8_t keys = keyboard_protocol ? KBD_REPORT_KEYS : 6;
 					for (uint8_t i=0; i<keys; i++) {
 						UEDATX = keyboard_report_prev->keys[i];
 					}
@@ -899,13 +903,13 @@ ISR(USB_COM_vect)
 				}
 				if (bRequest == HID_GET_IDLE) {
 					usb_wait_in_ready();
-					UEDATX = usb_keyboard_idle_config;
+					UEDATX = keyboard_idle;
 					usb_send_in();
 					return;
 				}
 				if (bRequest == HID_GET_PROTOCOL) {
 					usb_wait_in_ready();
-					UEDATX = usb_keyboard_protocol;
+					UEDATX = keyboard_protocol;
 					usb_send_in();
 					return;
 				}
@@ -919,14 +923,18 @@ ISR(USB_COM_vect)
 					return;
 				}
 				if (bRequest == HID_SET_IDLE) {
-					usb_keyboard_idle_config = (wValue >> 8);
+					keyboard_idle = (wValue >> 8);
 					usb_keyboard_idle_count = 0;
 					//usb_wait_in_ready();
 					usb_send_in();
 					return;
 				}
 				if (bRequest == HID_SET_PROTOCOL) {
-					usb_keyboard_protocol = wValue;
+					keyboard_protocol = wValue;
+#ifdef NKRO_ENABLE
+                                        keyboard_nkro = !!keyboard_protocol;
+#endif
+                                        clear_keyboard();
 					//usb_wait_in_ready();
 					usb_send_in();
 					return;

@@ -33,13 +33,15 @@ You can find some keyboard specific projects under `converter` and `keyboard` di
 ### converter
 * [ps2_usb](converter/ps2_usb/)             - [PS/2 keyboard to USB][GH_ps2]
 * [adb_usb](converter/adb_usb/)             - [ADB keyboard to USB][GH_adb]
-* [m0110_usb](converter/m0110_usb)          - [Machintosh 128K/512K/Plus keyboard to USB][GH_m0110]
+* [m0110_usb](converter/m0110_usb)          - [Macintosh 128K/512K/Plus keyboard to USB][GH_m0110]
 * [terminal_usb](converter/terminal_usb/)   - [IBM Model M terminal keyboard(PS/2 scancode set3) to USB][GH_terminal]
 * [news_usb](converter/news_usb/)           - [Sony NEWS keyboard to USB][GH_news]
 * [x68k_usb](converter/x68k_usb/)           - [Sharp X68000 keyboard to USB][GH_x68k]
 * [sun_usb](converter/sun_usb/)             - [Sun] to USB(type4, 5 and 3?)
 * [pc98_usb](converter/pc98_usb/)           - [PC98] to USB
 * [usb_usb](converter/usb_usb/)             - USB to USB(experimental)
+* [ascii_usb](converter/ascii_usb/)         - ASCII(Serial console terminal) to USB
+* [ibm4704_usb](converter/ibm4704_usb)      - [IBM 4704 keyboard Converter][GH_ibm4704]
 
 ### keyboard
 * [hhkb](keyboard/hhkb/)                    - [Happy Hacking Keyboard pro][GH_hhkb] **my main board**
@@ -50,6 +52,7 @@ You can find some keyboard specific projects under `converter` and `keyboard` di
 * [IIgs_Standard](keyboard/IIgs/)           - Apple [IIGS] keyboard mod(by JeffreySung)
 * [macway](keyboard/macway/)                - [Compact keyboard mod][GH_macway] [retired]
 * [KMAC](keyboard/kmac/)                    - Korean custom keyboard
+* [Lightsaber](keyboard/lightsaber/)        - Korean custom keyboard
 
 [GH_macway]:    http://geekhack.org/showwiki.php?title=Island:11930
 [GH_hhkb]:      http://geekhack.org/showwiki.php?title=Island:12047
@@ -61,6 +64,7 @@ You can find some keyboard specific projects under `converter` and `keyboard` di
 [GH_terminal]:  http://geekhack.org/showwiki.php?title=Island:27272
 [GH_x68k]:      http://geekhack.org/showwiki.php?title=Island:29060
 [GH_hbkb]:      http://geekhack.org/showwiki.php?title=Island:29483
+[GH_ibm4704]:   http://geekhack.org/index.php?topic=54706.0
 [HID_liber]:    http://deskthority.net/wiki/HID_Liberation_Device_-_DIY_Instructions
 [Phantom]:      http://geekhack.org/index.php?topic=26742
 [GH60]:         http://geekhack.org/index.php?topic=34959
@@ -90,7 +94,7 @@ See [doc/keymap.md](doc/keymap.md).
 
 
 
-Magic Comannds
+Magic Commands
 --------------
 To see help press `Magic` + `H`.
 
@@ -121,7 +125,7 @@ Following commands can be also executed with `Magic` + key. In console mode `Mag
 **TBD**
 
 ### Boot Magic Configuration - Virtual DIP Switch
-Boot Magic are executed during boot up time. Press Magic key below then pulgin keyboard cable.
+Boot Magic are executed during boot up time. Press Magic key below then plug in keyboard cable.
 Note that you must use keys of **Layer 0** as Magic keys. These settings are stored in EEPROM so that retain your configure over power cycles.
 
 To avoid configuring accidentally additive salt key `KC_SPACE` also needs to be pressed along with the following configuration keys. The salt key is configurable in `config.h`. See [common/bootmagic.h](common/bootmagic.h).
@@ -141,12 +145,13 @@ To avoid configuring accidentally additive salt key `KC_SPACE` also needs to be 
 
 #### Keymap
 - Swap Control and CapsLock(`Left Control`)
-- Change CapsLock to Control(`Casp Lock`)
+- Change CapsLock to Control(`Caps Lock`)
 - Swap LeftAlt and Gui(`Left Alt`)
 - Swap RightAlt and Gui(`Right Alt`)
 - Disable Gui(`Left Gui`)
 - Swap Grave and Escape(`Grave`)
 - Swap BackSlash and BackSpace(`Back Slash`)
+- Enable NKRO on boot(`N`)
 
 #### Default Layer
 - Set Default Layer to 0(`0`)
@@ -210,7 +215,7 @@ Architecture
 
 
 
-Debuging
+Debugging
 --------
 Use PJRC's `hid_listen` to see debug messages. You can use the tool for debug even if firmware use LUFA stack.
 
@@ -227,7 +232,7 @@ Files and Directories
 * converter/    - protocol converter projects
 * doc/          - documents
 * common.mk     - Makefile for common
-* protoco.mk    - Makefile for protocol
+* protocol.mk    - Makefile for protocol
 * rules.mk      - Makefile for build rules
 
 ### Common
@@ -263,7 +268,7 @@ Files and Directories
 
 
 
-Conding Style
+Coding Style
 -------------
 - Doesn't use Tab to indent, use 4-spaces instead.
 
