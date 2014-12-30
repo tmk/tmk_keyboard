@@ -47,8 +47,8 @@ TOP_DIR = ../..
 # Directory keyboard dependent files exist
 TARGET_DIR = .
 
-# keyboard dependent files
-SRC =	keymap.c \
+# List C source files here. (C dependencies are automatically generated.)
+SRC = keymap.c \
 	matrix.c \
 	led.c
 
@@ -64,10 +64,14 @@ MCU = atmega32u4       # Teensy 2.0
 
 
 # Processor frequency.
+#   This will define a symbol, F_CPU, in all source code files equal to the
+#   processor frequency in Hz.
 #   Normally the first thing your program should do is set the clock prescaler,
-#   so your program will run at the correct speed.  You should also set this
-#   variable to same clock speed.  The _delay_ms() macro uses this, and many
-#   examples use this variable to calculate timings.  Do not add a "UL" here.
+#   so your program will run at the correct speed.
+#   The _delay_ms() macro uses this, and many examples use this variable to
+#   calculate timings.
+#   Do NOT tack on a 'UL' at the end, this will be done automatically to create
+#   a 32-bit value in your source code.
 F_CPU = 16000000
 
 
@@ -77,7 +81,7 @@ F_CPU = 16000000
 BOOTMAGIC_ENABLE = yes	# Virtual DIP switch configuration(+1000)
 #MOUSEKEY_ENABLE = yes	# Mouse keys(+5000)
 EXTRAKEY_ENABLE = yes	# Audio control and System control(+600)
-CONSOLE_ENABLE = yes    # Console for debug
+CONSOLE_ENABLE = yes    # Console for debug(+400)
 COMMAND_ENABLE = yes    # Commands for debug and configuration
 #SLEEP_LED_ENABLE = yes  # Breathing sleep LED during USB suspend
 #NKRO_ENABLE = yes	# USB Nkey Rollover(+500)
