@@ -82,7 +82,7 @@ void keyboard_init(void)
 
 /*
  * Do keyboard routine jobs: scan mantrix, light LEDs, ...
- * This is repeatedly called as fast as possible.
+ * This is repeatedly called as fast as possible from main.c:main().
  */
 void keyboard_task(void)
 {
