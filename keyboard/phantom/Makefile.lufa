@@ -103,7 +103,18 @@ EXTRAKEY_ENABLE = yes	# Audio control and System control(+450)
 CONSOLE_ENABLE = yes	# Console for debug(+400)
 COMMAND_ENABLE = yes    # Commands for debug and configuration
 #SLEEP_LED_ENABLE = yes  # Breathing sleep LED during USB suspend
-#NKRO_ENABLE = yes	# USB Nkey Rollover - not yet supported in LUFA
+
+#
+# keyconf bit defaults
+#
+#SWAP_CONTROL_CAPSLOCK = yes
+#CAPSLOCK_TO_CONTROL = yes
+#SWAP_LALT_LGUI = yes
+#SWAP_RALT_RGUI = yes
+#NO_GUI = yes
+#SWAP_GRAVE_ESC = yes
+#SWAP_BACKSLASH_BACKSPACE = yes
+NKRO_ENABLE = yes		# USB NKRO - ONLY supported in LUFA
 
 
 # Boot Section Size in bytes
