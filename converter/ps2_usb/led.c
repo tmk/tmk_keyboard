@@ -23,11 +23,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void led_set(uint8_t usb_led)
 {
     uint8_t ps2_led = 0;
-    if (usb_led &  (1<<USB_LED_SCROLL_LOCK))
+    if (usb_led &  (1<<USB_LED_SCROLL_LOCK)) {
         ps2_led |= (1<<PS2_LED_SCROLL_LOCK);
-    if (usb_led &  (1<<USB_LED_NUM_LOCK))
+	SCROLL_LOCK_LED_ON; }
+    else SCROLL_LOCK_LED_OFF;
+    if (usb_led &  (1<<USB_LED_NUM_LOCK)) {
         ps2_led |= (1<<PS2_LED_NUM_LOCK);
-    if (usb_led &  (1<<USB_LED_CAPS_LOCK))
+	NUM_LOCK_LED_ON; }
+    else NUM_LOCK_LED_OFF;
+    if (usb_led &  (1<<USB_LED_CAPS_LOCK)) {
         ps2_led |= (1<<PS2_LED_CAPS_LOCK);
+	CAPS_LOCK_LED_ON; }
+    else CAPS_LOCK_LED_OFF;
     ps2_host_set_led(ps2_led);
 }
+
+
+#ifdef PHYSICAL_LEDS_ENABLE
+
+void physical_led_init()
+{
+
+    uint8_t counter;
+
+    for (counter=0; counter<LED_INIT_LOOPS; counter++) {
+#ifdef NUM_LOCK_LED_ENABLE
+    NUM_LOCK_LED_INIT;
+    NUM_LOCK_LED_ON;
+    _delay_ms(LED_INIT_DELAY);
+    NUM_LOCK_LED_OFF;
+#endif
+
+#ifdef CAPS_LOCK_LED_ENABLE
+    CAPS_LOCK_LED_INIT;
+    CAPS_LOCK_LED_ON;
+    _delay_ms(LED_INIT_DELAY);
+    CAPS_LOCK_LED_OFF;
+#endif
+
+#ifdef SCROLL_LOCK_LED_ENABLE
+    SCROLL_LOCK_LED_INIT;
+    SCROLL_LOCK_LED_ON;
+    _delay_ms(LED_INIT_DELAY);
+    SCROLL_LOCK_LED_OFF;
+#endif 
+    }
+
+}
+
+#endif
+    

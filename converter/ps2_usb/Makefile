@@ -91,6 +91,13 @@ PS2_USE_USART = yes	# uses hardware USART engine for PS/2 signal receive(recomen
 #PS2_USE_INT = yes	# uses external interrupt for falling edge of PS/2 clock pin
 #PS2_USE_BUSYWAIT = yes	# uses primitive reference code
 
+# External LEDs Options
+#
+PHYSICAL_LEDS_ENABLE = yes          # Use to compile with external physical LEDs support
+CAPS_LOCK_LED_ENABLE = yes   # Adds the CAPS LOCK led
+NUM_LOCK_LED_ENABLE = yes    # Adds the NUM LOCK led
+SCROLL_LOCK_LED_ENABLE = yes # Adds the SCROLL LOCK led
+
 
 # Optimize size but this may cause error "relocation truncated to fit"
 #EXTRALDFLAGS = -Wl,--relax
