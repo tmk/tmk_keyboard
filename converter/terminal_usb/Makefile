@@ -62,7 +62,7 @@ OPT_DEFS += -DBOOTLOADER_SIZE=4096
 
 # External LEDs Options
 #
-PHYSICAL_LEDS = yes          # Use to compile with external physical LEDs support
+PHYSICAL_LEDS_ENABLE = yes          # Use to compile with external physical LEDs support
 CAPS_LOCK_LED_ENABLE = yes   # Adds the CAPS LOCK led
 NUM_LOCK_LED_ENABLE = yes    # Adds the NUM LOCK led
 SCROLL_LOCK_LED_ENABLE = yes # Adds the SCROLL LOCK led
@@ -102,7 +102,6 @@ ifdef PS2_USE_BUSYWAIT
     SRC += protocol/ps2.c
     OPT_DEFS += -DPS2_USE_BUSYWAIT
 endif
-
 
 #---------------- Programming Options --------------------------
 PROGRAM_CMD = teensy_loader_cli -mmcu=$(MCU) -w -v $(TARGET).hex

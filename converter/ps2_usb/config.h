@@ -179,7 +179,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef PHYSICAL_LEDS_ENABLE
 
 #define LED_INIT_LOOPS 2
-#define LED_INIT_DELAY 40
+#define LED_INIT_DELAY 60
 
 #ifdef CAPS_LOCK_LED_ENABLE
 #define CAPS_LOCK_LED_PORT  PORTF
