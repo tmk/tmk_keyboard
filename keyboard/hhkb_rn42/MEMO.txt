@@ -172,7 +172,7 @@ TROUBLE SHOOT
 07/16   After fix of voltage dividor on GPIO6, had a trouble that it could not send a char to BT module, though could receive.
         Found R8 had wrong 1K resistor and changed to 10K, after that it can send to the module again. Not sure how it had sent with the wrong 1K before.
 
-07/18   On Linux, had an USB related trouble; keyobard or console didn't work for some reason. Changing PID cured this problem. Very annoying, took very long time before resolved it.
+07/18   On Linux, had an USB related trouble; keyboard or console didn't work for some reason. Changing PID cured this problem. Very annoying, took very long time before resolved it.
 
 
 
