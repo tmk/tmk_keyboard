@@ -191,7 +191,11 @@ static bool command_common(uint8_t code)
             print_eeconfig();
             break;
 #endif
+#ifdef BOOTMAGIC_KEY_LOCK
+        case BOOTMAGIC_KEY_LOCK:
+#else
         case KC_CAPSLOCK:
+#endif
             if (host_get_driver()) {
                 host_driver = host_get_driver();
                 clear_keyboard();
@@ -216,7 +220,11 @@ static bool command_common(uint8_t code)
             print("C> ");
             command_state = CONSOLE;
             break;
+#ifdef BOOTMAGIC_KEY_BOOTLOADER
+        case BOOTMAGIC_KEY_BOOTLOADER:
+#else
         case KC_PAUSE:
+#endif
             clear_keyboard();
             print("\n\nJump to bootloader... ");
             _delay_ms(1000);
@@ -340,7 +348,11 @@ static bool command_common(uint8_t code)
             break;
 #endif
 #ifdef EXTRAKEY_ENABLE
+#ifdef BOOTMAGIC_KEY_WAKE
+        case BOOTMAGIC_KEY_WAKE:
+#else
         case KC_PSCREEN:
+#endif
             // TODO: Power key should take this feature? otherwise any key during suspend.
 #ifdef PROTOCOL_PJRC
             if (suspend && remote_wakeup) {
