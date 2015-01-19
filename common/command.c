@@ -124,7 +124,10 @@ static void command_common_help(void)
     print("v:	print device version & info\n");
     print("t:	print timer count\n");
     print("s:	print status\n");
+#ifdef BOOTMAGIC_ENABLE
     print("e:	print eeprom config\n");
+#endif
+    print("w:	write default eeprom config\n");
 #ifdef NKRO_ENABLE
     print("n:	toggle NKRO\n");
 #endif
@@ -191,6 +194,10 @@ static bool command_common(uint8_t code)
             print_eeconfig();
             break;
 #endif
+        case KC_W:
+            eeconfig_init();
+			print("eeprom written\n");
+            break;
         case KC_CAPSLOCK:
             if (host_get_driver()) {
                 host_driver = host_get_driver();
