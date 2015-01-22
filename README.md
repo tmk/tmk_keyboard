@@ -1,5 +1,8 @@
 TMK Keyboard Firmware Collection
 ================================
+
+[![Build Status](https://travis-ci.org/cj1324/tmk_keyboard.svg)](https://travis-ci.org/cj1324/tmk_keyboard)
+
 This is a keyboard firmware with some useful features for Atmel AVR controller.
 
 Source code is available here: <http://github.com/tmk/tmk_keyboard>
