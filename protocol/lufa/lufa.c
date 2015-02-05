@@ -239,6 +239,8 @@ void EVENT_USB_Device_ConfigurationChanged(void)
     /* Setup NKRO HID Report Endpoints */
     ConfigSuccess &= ENDPOINT_CONFIG(NKRO_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
                                      NKRO_EPSIZE, ENDPOINT_BANK_SINGLE);
+
+    keyboard_nkro = true;
 #endif
 }
 
