@@ -233,20 +233,19 @@ static inline void add_key_byte(uint8_t code)
     cb_count++;
 #else
     int8_t i = 0;
-    int8_t empty = -1;
     for (; i < KEYBOARD_REPORT_KEYS; i++) {
         if (keyboard_report->keys[i] == code) {
-            break;
+            return;
         }
-        if (empty == -1 && keyboard_report->keys[i] == 0) {
-            empty = i;
+        if (keyboard_report->keys[i] == 0) {
+	    break;
         }
     }
     if (i == KEYBOARD_REPORT_KEYS) {
-        if (empty != -1) {
-            keyboard_report->keys[empty] = code;
-        }
+        for (i = 0; i < KEYBOARD_REPORT_KEYS - 1; i++)
+            keyboard_report->keys[i] = keyboard_report->keys[i + 1];
     }
+    keyboard_report->keys[i] = code;
 #endif
 }
 
@@ -280,7 +279,11 @@ static inline void del_key_byte(uint8_t code)
 #else
     for (uint8_t i = 0; i < KEYBOARD_REPORT_KEYS; i++) {
         if (keyboard_report->keys[i] == code) {
-            keyboard_report->keys[i] = 0;
+	    uint8_t j = i;
+            for (; j < KEYBOARD_REPORT_KEYS - 1 && keyboard_report->keys[j + 1]; j++)
+                keyboard_report->keys[j] = keyboard_report->keys[j + 1];
+
+            keyboard_report->keys[j] = 0;
         }
     }
 #endif

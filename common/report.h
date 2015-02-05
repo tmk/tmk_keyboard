@@ -82,7 +82,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #elif defined(PROTOCOL_LUFA) && defined(NKRO_ENABLE)
 #   include "protocol/lufa/descriptor.h"
 #   define KEYBOARD_REPORT_SIZE NKRO_EPSIZE
-#   define KEYBOARD_REPORT_KEYS (NKRO_EPSIZE - 2)
+#   define KEYBOARD_REPORT_KEYS 6
 #   define KEYBOARD_REPORT_BITS (NKRO_EPSIZE - 1)
 
 #else
