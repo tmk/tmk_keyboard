@@ -40,6 +40,7 @@ void suspend_idle(uint8_t time)
     sleep_disable();
 }
 
+#ifndef NO_SUSPEND_POWER_DOWN
 /* Power down MCU with watchdog timer
  * wdto: watchdog timer timeout defined in <avr/wdt.h>
  *          WDTO_15MS
@@ -80,10 +81,29 @@ static void power_down(uint8_t wdto)
     wdt_disable();
 }
 
+/* watchdog timeout */
+ISR(WDT_vect)
+{
+    // compensate timer for sleep
+    switch (wdt_timeout) {
+        case WDTO_15MS:
+            timer_count += 15 + 2;  // WDTO_15MS + 2(from observation)
+            break;
+        default:
+            ;
+    }
+}
+
 void suspend_power_down(void)
 {
     power_down(WDTO_15MS);
 }
+#else
+void suspend_power_down(void)
+{
+    suspend_idle(16);
+}
+#endif
 
 bool suspend_wakeup_condition(void)
 {
@@ -105,18 +125,3 @@ void suspend_wakeup_init(void)
     backlight_init();
 #endif
 }
-
-#ifndef NO_SUSPEND_POWER_DOWN
-/* watchdog timeout */
-ISR(WDT_vect)
-{
-    // compensate timer for sleep
-    switch (wdt_timeout) {
-        case WDTO_15MS:
-            timer_count += 15 + 2;  // WDTO_15MS + 2(from observation)
-            break;
-        default:
-            ;
-    }
-}
-#endif
