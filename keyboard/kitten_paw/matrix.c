@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <stdbool.h>
 #include <avr/io.h>
+#include <avr/pgmspace.h>
 #include <util/delay.h>
 #include "print.h"
 #include "debug.h"
@@ -175,65 +176,16 @@ static uint8_t read_rows(void)
 static void unselect_cols(void)
 {
     DDRD |= 0b01110111;
-    PORTD &= ~0b01110111;
+    PORTD |= 0b01110111;
 }
+
+static const uint8_t matrix_col_table[18] PROGMEM = {
+0xEC, 0xDC, 0xCC, 0x9F, 0x8F, 0xFB, 0xEB, 0xDB, 0xCB,
+0xBB, 0xAB, 0x9B, 0x8B, 0xDE, 0xCE, 0xFD, 0xCD, 0xFC };
 
 static void select_col(uint8_t col)
 {
-    switch (col) {
-        case 0:
-            PORTD |= (1<<5) | (1<<6) | (1<<2);
-            break;
-        case 1:
-            PORTD |= (1<<4) | (1<<6) | (1<<2);
-            break;
-        case 2:
-            PORTD |= (1<<6) | (1<<2);
-            break;
-        case 3:
-            PORTD |= (1<<4) | (1<<2) | (1<<0) | (1<<1);
-            break;
-        case 4:
-            PORTD |= (1<<2) | (1<<0) | (1<<1);
-            break;
-        case 5:
-            PORTD |= (1<<4) | (1<<5) | (1<<6) | (1<<0) | (1<<1);
-            break;
-        case 6:
-            PORTD |= (1<<5) | (1<<6) | (1<<0) | (1<<1);
-            break;
-        case 7:
-            PORTD |= (1<<4) | (1<<6) | (1<<0) | (1<<1);
-            break;
-        case 8:
-            PORTD |= (1<<6) | (1<<0) | (1<<1);
-            break;
-        case 9:
-            PORTD |= (1<<4) | (1<<5) | (1<<0) | (1<<1);
-            break;
-        case 10:
-            PORTD |= (1<<5) | (1<<0) | (1<<1);
-            break;
-        case 11:
-            PORTD |= (1<<4) | (1<<0) | (1<<1);
-            break;
-        case 12:
-            PORTD |= (1<<0) | (1<<1);
-            break;
-        case 13:
-            PORTD |= (1<<4) | (1<<1) | (1<<6) | (1<<2);
-            break;
-        case 14:
-            PORTD |= (1<<1) | (1<<6) | (1<<2);
-            break;
-        case 15:
-            PORTD |= (1<<4) | (1<<5) | (1<<0) | (1<<6) | (1<<2);
-            break;
-        case 16:
-            PORTD |= (1<<0) | (1<<6) | (1<<2);
-            break;
-        case 17:
-            PORTD |= (1<<4) | (1<<5) | (1<<6) | (1<<2);
-            break;
-    }
+    PORTD |= 0b01110111;
+    if (col < sizeof(matrix_col_table))
+        PORTD &= pgm_read_byte(&matrix_col_table[col]);
 }

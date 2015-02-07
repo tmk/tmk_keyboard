@@ -558,6 +558,13 @@ static void SetupHardware(void)
     // Leonardo needs. Without this USB device is not recognized.
     USB_Disable();
 
+    // Disable SPI
+    PRR0 = _BV(PRSPI);
+    // Disable USART
+    PRR1 = _BV(PRUSART1);
+    // Disable analog comparator
+    ACSR = _BV(ACD);
+
     USB_Init();
 
     // for Console_Task
