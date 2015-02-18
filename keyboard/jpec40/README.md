@@ -19,4 +19,5 @@ To build firmware binary hex file with a certain keymap just do `make` with `KEY
 
 ## Load firmware
 Move to this directory then just run the teensy-loader-cli tool like this:
-    teensy-loader-cli -mmcu=atmega32u4 jpec40.hex
+
+    # teensy-loader-cli -mmcu=atmega32u4 jpec40.hex
