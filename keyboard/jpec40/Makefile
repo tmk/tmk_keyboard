@@ -39,7 +39,11 @@
 #----------------------------------------------------------------------------
 
 # Target file name (without extension).
-TARGET = jpec40
+ifdef KEYMAP
+    TARGET = jpec40_$(KEYMAP)
+else
+    TARGET = jpec40
+endif
 
 # Directory common source filess exist
 TOP_DIR = ../..
