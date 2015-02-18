@@ -2,6 +2,7 @@ JPEC40 keyboard firmware
 ========================
 DIY compact keyboard designed by Julien Pecqueur using Teensy controller.
 
+![jpec40](jpec40.png)
 
 ## Build
 Move to this directory then just run `make` like:
