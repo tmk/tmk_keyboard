@@ -4,6 +4,10 @@ DIY compact keyboard designed by Julien Pecqueur using Teensy controller.
 
 ![jpec40](jpec40.png)
 
+The defaut keymap (jpec40) uses the Fn1 key to toggle the alternate layout and the Fn2 key to toggle the function layout.
+
+The space fn keymap (spacefn) uses the Fn1 key to set/unset the alternate layout, the Fn2 key to toggle the alternate layout and the space key to toggle the function layout.
+
 ## Build
 Move to this directory then just run `make` like:
 
