@@ -36,8 +36,8 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         RBRC,Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC, \
         LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT, \
         LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,BSLS, \
-        TAB, GRV, LGUI,LALT,FN1,      FN0, FN2, RALT,BSPC,EQL, ENT ),
-    /* Keymap 1: Alternate Layer
+        TAB, GRV, LGUI,LALT,FN0,      SPC, FN1, RALT,BSPC,EQL, ENT ),
+    /* Keymap 1: Alternate Layer (Fn1)
      * ,-----------------------------------------------.
      * |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|
      * |-----------------------------------------------|
@@ -52,8 +52,8 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         GRV, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS, \
         TRNS,F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,F12, \
-        TRNS,TRNS,TRNS,TRNS,FN1,      FN0, FN1, TRNS,DEL ,TRNS,PENT),
-    /* Keymap 2: Space Function Layer 
+        TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS,TRNS, TRNS,DEL ,TRNS,PENT),
+    /* Keymap 2: Function Layer (Fn2)
      * ,-----------------------------------------------.
      * |Esc|   | UP|   | <-|Hom|Pup|   | UP|   |Prt|Slk|
      * |-----------------------------------------------|
@@ -75,8 +75,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Fn action definition
  */
 const uint16_t PROGMEM fn_actions[] = {
-    [0] = ACTION_LAYER_TAP_KEY(2, KC_SPACE),
-    [1] = ACTION_LAYER_TOGGLE(1),
-    [2] = ACTION_LAYER_MOMENTARY(1),
-    [3] = ACTION_LAYER_TOGGLE(0)
+    [0] = ACTION_LAYER_MOMENTARY(1),
+    [1] = ACTION_LAYER_MOMENTARY(2),
+
 };
