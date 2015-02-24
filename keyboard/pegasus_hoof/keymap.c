@@ -54,7 +54,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* R */ KC_##KR0, KC_NO,    KC_##KR2, KC_##KR3, KC_##KR4, KC_##KR5, KC_##KR6, KC_##KR7  \
 }
 
-#include "keymap.h"
+#if defined(LAYOUT_CUSTOM)
+    #include "keymap_custom.h"
+#else
+    #include "keymap.h"
+#endif
 
 #define KEYMAPS_SIZE    (sizeof(keymaps) / sizeof(keymaps[0]))
 #define FN_ACTIONS_SIZE (sizeof(fn_actions) / sizeof(fn_actions[0]))
