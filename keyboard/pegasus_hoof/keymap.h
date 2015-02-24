@@ -22,7 +22,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_COLS][MATRIX_ROWS] = {
          TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,  TRNS,TRNS,TRNS,  \
          TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS,                   \
          TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS,        TRNS,      \
-         TRNS,TRNS,TRNS,               TRNS,               TRNS,TRNS,TRNS,TRNS,  TRNS,TRNS,TRNS), \
+         TRNS,TRNS,TRNS,               TRNS,               TRNS,TRNS, FN0, FN1,  TRNS,TRNS,TRNS), \
 };
 
 static const uint16_t PROGMEM fn_actions[] = {
