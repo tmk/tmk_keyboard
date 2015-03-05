@@ -58,6 +58,7 @@ You can find some keyboard specific projects under `converter` and `keyboard` di
 * [KittenPaw](keyboard/kitten_paw)          - Custom Majestouch controller
 * [Lightpad](keyboard/lightpad)             - Korean custom keypad
 * [ghost_squid](keyboard/ghost_squid/)      - [The Ghost Squid][ghost_squid] controller for [Cooler Master QuickFire XT][cmxt]
+* [JPEC40](keyboard/jpec40)                 - JPEC40 40% orthogonal keyboard
 
 ### Extenal projects using tmk_keyboard
 * [ErgoDox_cub-uanic][cub-uanic]            - Split Ergonomic Keyboard [ErgoDox][ergodox_org]
