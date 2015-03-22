@@ -29,5 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 void led_set(uint8_t usb_led);
+void led_layer_set(uint32_t state);
 
 #endif
