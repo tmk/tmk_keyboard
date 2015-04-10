@@ -440,7 +440,7 @@ flip-ee: $(TARGET).hex $(TARGET).eep
 	$(REMOVE) $(TARGET)eep.hex
 
 dfu-ee: $(TARGET).hex $(TARGET).eep
-	dfu-programmer $(MCU) eeprom-flash $(TARGET).eep
+	dfu-programmer $(MCU) flash-eeprom $(TARGET).eep
 	dfu-programmer $(MCU) reset
 
 

@@ -5,6 +5,78 @@
 #include "led.h"
 #include "sleep_led.h"
 
+#ifdef HARDWARE_PWM
+void sleep_led_init(void)
+{
+    /* Timer1 setup */
+    /* PWM mode */
+    TCCR1A = _BV(WGM10);
+    /* PWM mode */
+    TCCR1B = _BV(WGM12);
+    /* Set initial compare value */
+    OCR1AL = 0;
+    /* Enable Overflow Interrupt */
+    TIMSK1 |= _BV(TOIE1);
+}
+
+void sleep_led_enable(void)
+{
+    led_set(0);
+    /* Clock select: clk/1024 */
+    TCCR1B |= _BV(CS12) | _BV(CS10);
+}
+
+void sleep_led_disable(void)
+{
+    /* Clock select: disable */
+    TCCR1B &= ~(_BV(CS12) | _BV(CS10));
+    /* Disable output */
+    TCCR1A &= ~(_BV(COM1A0) | _BV(COM1A1));
+}
+
+void sleep_led_toggle(void)
+{
+    /* Clock select: toggle */
+    TCCR1B ^= _BV(CS12) | _BV(CS10);
+    /* Disable output */
+    TCCR1A &= ~(_BV(COM1A0) | _BV(COM1A1));
+}
+
+/* Breathing Sleep LED brighness(PWM On period) table */
+#define M 128
+
+static const uint8_t breathing_table[256] PROGMEM = {
+M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M,
+M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, 0, 0, 0,
+0, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 6, 7, 8, 9, 10, 12, 13, 15, 16, 18,
+20, 22, 24, 26, 29, 31, 34, 37, 40, 43, 46, 50, 53, 57, 61, 65, 69,
+73, 78, 83, 87, 92, 97, 102, 107, 113, 118, 123, 129, 134, 140, 145,
+151, 157, 162, 168, 173, 179, 184, 189, 194, 199, 204, 209, 213, 218,
+222, 226, 230, 233, 236, 239, 242, 245, 247, 249, 251, 252, 253, 254,
+254, 255, 254, 254, 253, 252, 251, 249, 247, 245, 242, 239, 236, 233,
+230, 226, 222, 218, 213, 209, 204, 199, 194, 189, 184, 179, 173, 168,
+162, 157, 151, 145, 140, 134, 129, 123, 118, 113, 107, 102, 97, 92,
+87, 83, 78, 73, 69, 65, 61, 57, 53, 50, 46, 43, 40, 37, 34, 31, 29,
+26, 24, 22, 20, 18, 16, 15, 13, 12, 10, 9, 8, 7, 6, 5, 4, 4, 3, 3, 2,
+2, 1, 1, 1, 0, 0, 0, 0, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, 
+M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M, M,
+M, M, M, M };
+
+ISR(TIMER1_OVF_vect)
+{
+    static uint8_t index = 0;
+    uint8_t pwm = pgm_read_byte(&breathing_table[index++]);
+
+    if (pwm != M) {
+        OCR1AL = pwm;
+        /* Enable output */
+        TCCR1A |= _BV(COM1A0) | _BV(COM1A1);
+    } else {
+        /* Disable output */
+        TCCR1A &= ~(_BV(COM1A0) | _BV(COM1A1));
+    }
+}
+#else
 /* Software PWM
  *  ______           ______           __
  * |  ON  |___OFF___|  ON  |___OFF___|   ....
@@ -93,3 +165,4 @@ ISR(TIMER1_COMPA_vect)
         led_set(0);
     }
 }
+#endif

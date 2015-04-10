@@ -239,6 +239,8 @@ void EVENT_USB_Device_ConfigurationChanged(void)
     /* Setup NKRO HID Report Endpoints */
     ConfigSuccess &= ENDPOINT_CONFIG(NKRO_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
                                      NKRO_EPSIZE, ENDPOINT_BANK_SINGLE);
+
+    keyboard_nkro = true;
 #endif
 }
 
@@ -555,6 +557,13 @@ static void SetupHardware(void)
 
     // Leonardo needs. Without this USB device is not recognized.
     USB_Disable();
+
+    // Disable SPI
+    PRR0 = _BV(PRSPI);
+    // Disable USART
+    PRR1 = _BV(PRUSART1);
+    // Disable analog comparator
+    ACSR = _BV(ACD);
 
     USB_Init();
 
