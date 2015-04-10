@@ -1,7 +1,7 @@
-  Sun to USB keyboard protocol converter
+  Sun3 to USB keyboard protocol converter
 ======================================
 Target MCU is ATMega32u4 but other USB capable AVR will also work.
-Supported keyboards: Sun Type 5 Keyboard, CTCSP SHORT TYPE KEYBOARD(CKUB)
+Supported keyboards: Sun Type 3 Keyboard
 
 CTCSP SHORT TYPE KEYBOARD: http://imgur.com/a/QIv6p
 
@@ -53,10 +53,6 @@ Commands From System To Keyboard
     0x03 Bell Off
     0x0A Click On
     0x0B Click Off
-    0x0E LED
-            followed by LED status byte:
-            bit: 3       2       1       0
-            LED: CapsLk  ScrLk   Compose NumLk
     0x0F Layout
             Keyboard responds with 'Layout Response' 0xFE 0xXX
 

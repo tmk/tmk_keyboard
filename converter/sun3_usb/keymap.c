@@ -50,10 +50,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ) { \
     { KC_NO,    KC_##K01, KC_NO,    KC_##K03, KC_NO,    KC_##K05, KC_##K06, KC_NO    }, \
     { KC_##K08, KC_NO,    KC_##K0A, KC_NO,    KC_##K0C, KC_NO,    KC_##K0E, KC_NO    }, \
-    { KC_##K10, KC_##K11, KC_##K12, KC_##K13, KC_NO,    KC_NO,    KC_##K16, KC_NO    }, \
+    { KC_##K10, KC_##K11, KC_##K12, KC_##K13, KC_NO,    KC_##K15, KC_##K16, KC_##K17 }, \
     { KC_NO,    KC_##K19, KC_##K1A, KC_NO,    KC_NO,    KC_##K1D, KC_##K1E, KC_##K1F }, \
     { KC_##K20, KC_##K21, KC_##K22, KC_##K23, KC_##K24, KC_##K25, KC_##K26, KC_##K27 }, \
-    { KC_##K28, KC_##K29, KC_##K2A, KC_##K2B, KC_NO,    KC_NO,    KC_##K2E, KC_##K2F }, \
+    { KC_##K28, KC_##K29, KC_##K2A, KC_##K2B, KC_NO,    KC_##K2D, KC_##K2E, KC_##K2F }, \
     { KC_NO,    KC_##K31, KC_NO,    KC_##K33, KC_NO,    KC_##K35, KC_##K36, KC_##K37 }, \
     { KC_##K38, KC_##K39, KC_##K3A, KC_##K3B, KC_##K3C, KC_##K3D, KC_##K3E, KC_##K3F }, \
     { KC_##K40, KC_##K41, KC_##K42, KC_NO,    KC_##K44, KC_##K45, KC_##K46, KC_NO    }, \
@@ -61,7 +61,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     { KC_##K50, KC_##K51, KC_##K52, KC_##K53, KC_##K54, KC_##K55, KC_##K56, KC_##K57 }, \
     { KC_##K58, KC_##K59, KC_NO,    KC_##K5B, KC_##K5C, KC_##K5D, KC_NO,    KC_##K5F }, \
     { KC_NO,    KC_##K61, KC_NO,    KC_##K63, KC_##K64, KC_##K65, KC_##K66, KC_##K67 }, \
-    { KC_##K68, KC_##K69, KC_##K6A, KC_##K6B, KC_##K6C, KC_##K6D, KC_##K6E, KC_NO    }, \
+    { KC_##K68, KC_##K69, KC_##K6A, KC_##K6B, KC_##K6C, KC_##K6D, KC_##K6E, KC_##K6F }, \
     { KC_##K70, KC_##K71, KC_##K72, KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_##K77 }, \
     { KC_##K78, KC_##K79, KC_##K7A, KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO    }  \
 }
@@ -95,12 +95,12 @@ static const uint8_t PROGMEM fn_keycode[] = {
 static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     KEYMAP(
-    F10, F11,   F1, F2,     F3,     F4,     F5,     F6,      F7,  F8, F9,  BSPC,   P7,   P8,     P9,
-    F12, F13,   ESC, 1,  2,  3,  4,  5,  6,  7,  8,  9,  0,MINS, EQL, BSLS, GRV,   P4,   P5,     P6,
+    F10, F11,   F1, F2,     F3,     F4,     F5,     F6,      F7,  F8, F9,  BSPC,   VOLD, MUTE,   VOLU,
+    F12, F13,   ESC, 1,  2,  3,  4,  5,  6,  7,  8,  9,  0,MINS, EQL, BSLS, GRV,   MPRV, MPLY,   MNXT,
     F14, F15,   TAB, Q,  W,  E,  R,  T,  Y,  U,  I,  O,  P,   LBRC,RBRC,    DEL,   HOME, UP,     PGUP,
     F16, F17,   LCTL, A,  S,  D,  F,  G,  H,  J,  K,  L,  SCLN,QUOT,        ENT,   LEFT, INSERT, RIGHT, 
     F18, F19,   LSFT,  Z,  X,  C,  V,  B,  N,  M,  COMM,DOT,SLSH,     RSFT,RCTL,   END,  DOWN,   PGDOWN,
-                LALT, LGUI,                 SPC,                      RGUI,RALT
+                LGUI, LALT,                 SPC,                      RALT,RGUI
     ),
     /*
     // 0: default

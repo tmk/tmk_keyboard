@@ -15,8 +15,6 @@ bool command_extra(uint8_t code)
             print("Down:	Bell Off\n");
             print("Left:	Click On\n");
             print("Right:	Click Off\n");
-            print("PgUp:	LED all On\n");
-            print("PgDown:	LED all On\n");
             print("Insert:	Layout\n");
             print("Delete:	Reset\n");
             return false;
@@ -39,16 +37,6 @@ bool command_extra(uint8_t code)
         case KC_RIGHT:
             print("Click Off\n");
             serial_send(0x0B);
-            break;
-        case KC_PGUP:
-            print("LED all on\n");
-            serial_send(0x0E);
-            serial_send(0xFF);
-            break;
-        case KC_PGDOWN:
-            print("LED all off\n");
-            serial_send(0x0E);
-            serial_send(0x00);
             break;
         case KC_INSERT:
             print("layout\n");
