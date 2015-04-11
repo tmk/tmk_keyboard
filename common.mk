@@ -69,6 +69,11 @@ ifdef KEYMAP_SECTION_ENABLE
     EXTRALDFLAGS = -Wl,-L$(TOP_DIR),-Tldscript_keymap_avr5.x
 endif
 
+ifdef KEYMAP_IN_EEPROM_ENABLE
+    SRC += $(COMMON_DIR)/keymap_in_eeprom.c
+    OPT_DEFS += -DKEYMAP_IN_EEPROM_ENABLE
+endif
+
 # Version string
 OPT_DEFS += -DVERSION=$(shell (git describe --always --dirty || echo 'unknown') 2> /dev/null)
 

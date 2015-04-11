@@ -139,6 +139,7 @@ Optional. Note that ***comment out*** with `#` to disable them.
     SLEEP_LED_ENABLE = yes      # Breathing sleep LED during USB suspend
     #NKRO_ENABLE = yes          # USB Nkey Rollover - not yet supported in LUFA
     #BACKLIGHT_ENABLE = yes     # Enable keyboard backlight functionality
+    #KEYMAP_IN_EEPROM_ENABLE = yes # Read keymap from eeprom
 
 ### 3. Programmer
 Optional. Set proper command for your controller, bootloader and programmer. This command can be used with `make program`. Not needed if you use `FLIP`, `dfu-programmer` or `Teensy Loader`.
