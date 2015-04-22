@@ -221,6 +221,8 @@ Use PJRC's `hid_listen` to see debug messages. You can use the tool for debug ev
 
 You can use xprintf() to display debug info on `hid_listen`, see `tmk_core/common/xprintf.h`.
 
+One source for `hid_listen` is https://www.pjrc.com/teensy/hid_listen.html
+
 
 
 Files and Directories
