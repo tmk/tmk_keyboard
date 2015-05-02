@@ -30,6 +30,7 @@ bool keyboard_nkro = true;
 static host_driver_t *driver;
 static uint16_t last_system_report = 0;
 static uint16_t last_consumer_report = 0;
+static report_mouse_t oldmousereports[2] = {{0},{0}};
 
 
 void host_set_driver(host_driver_t *d)
@@ -65,6 +66,12 @@ void host_keyboard_send(report_keyboard_t *report)
 void host_mouse_send(report_mouse_t *report)
 {
     if (!driver) return;
+#ifdef ADB_MOUSE_ENABLE
+#ifdef MOUSEKEY_ENABLE
+    oldmousereports[report->source] = *report;
+    report->buttons = oldmousereports[0].buttons | oldmousereports[1].buttons;
+#endif
+#endif
     (*driver->send_mouse)(report);
 }
 

@@ -40,7 +40,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 static bool is_modified = false;
-static report_mouse_t mouse_report = {};
 
 // matrix state buffer(1:on, 0:off)
 #if (MATRIX_COLS <= 8)
@@ -101,6 +100,8 @@ void adb_mouse_task(void)
     uint16_t codes;
     int16_t x, y;
     static int8_t mouseacc; 
+    report_mouse_t mouse_report = {};
+
     _delay_ms(12);  // delay for preventing overload of poor ADB keyboard controller
     codes = adb_host_mouse_recv();
     // If nothing received reset mouse acceleration, and quit. 
@@ -111,8 +112,9 @@ void adb_mouse_task(void)
     // Bit sixteen is button.
     if (~codes & (1 << 15))
         mouse_report.buttons |= MOUSE_BTN1;
-    if (codes & (1 << 15))
-        mouse_report.buttons &= ~MOUSE_BTN1;
+#ifdef MOUSEKEY_ENABLE
+    mouse_report.source = 1;
+#endif
     // lower seven bits are movement, as signed int_7. 
     // low byte is X-axis, high byte is Y. 
     y = (codes>>8 & 0x3F);

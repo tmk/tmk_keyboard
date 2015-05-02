@@ -143,6 +143,11 @@ typedef struct {
     int8_t y;
     int8_t v;
     int8_t h;
+#ifdef ADB_MOUSE_ENABLE
+#ifdef MOUSEKEY_ENABLE
+    uint8_t source;
+#endif
+#endif
 } __attribute__ ((packed)) report_mouse_t;
 
 
