@@ -118,6 +118,47 @@ extern const uint16_t fn_actions[];
 }
 
 
+/* M0118 Apple Standard Keyboard ISO
+*                     +-------+
+*                     | power |
+*                     +-------+
+* +---+---+---+---+---+---+---+---+---+---+---+---+---+-----+ +---+---+---+---+
+* | ` | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0 | - | = | bks | |clr| = | / | * |
+* +---------------------------------------------------------+ +---+---+---+---+
+* | tab | q | w | e | r | t | y | u | i | o | p | [ | ] |ret| | 7 | 8 | 9 | + |
+* +-----------------------------------------------------++  | +---+---+---+---+
+* | esc  | a | s | d | f | g | h | j | k | l | ; | ' | \ |  | | 4 | 5 | 6 | - |
+* +---------------------------------------------------------+ +---+---+---+---+
+* | shi| < | z | x | c | v | b | n | m | , | . | / |    |up | | 1 | 2 | 3 |   |
+* +---------------------------------------------------------+ +-------+---|   |
+* | cap| opt | comnd|                   |       |lef|rig|dwn| |   0   | . |ent|
+* +---------------------------------------------------------+ +-------+---+---+
+*/
+#define KEYMAP_M0118_ISO( \
+                           K7F,                                                   \
+   K35,    K12,K13,K14,K15,K17,K16,K1A,K1C,K19,K1D,K1B,K18,K33,  K47,K51,K4B,K43, \
+   K30,    K0C,K0D,K0E,K0F,K11,K10,K20,K22,K1F,K23,K21,K1E,K24,  K59,K5B,K5C,K45, \
+   K39,    K00,K01,K02,K03,K05,K04,K26,K28,K25,K29,K27,K2A,      K56,K57,K58,K4E, \
+   K38,K32,K06,K07,K08,K09,K0B,K2D,K2E,K2B,K2F,K2C,        K3E,  K53,K54,K55,     \
+   K36,K3A,K37,        K31,                        K3B,K3C,K3D,  K52,    K41,K4C  \
+) { \
+  { KC_##K00, KC_##K01, KC_##K02, KC_##K03, KC_##K04, KC_##K05, KC_##K06, KC_##K07 }, \
+  { KC_##K08, KC_##K09, KC_NO,    KC_##K0B, KC_##K0C, KC_##K0D, KC_##K0E, KC_##K0F }, \
+  { KC_##K10, KC_##K11, KC_##K12, KC_##K13, KC_##K14, KC_##K15, KC_##K16, KC_##K17 }, \
+  { KC_##K18, KC_##K19, KC_##K1A, KC_##K1B, KC_##K1C, KC_##K1D, KC_##K1E, KC_##K1F }, \
+  { KC_##K20, KC_##K21, KC_##K22, KC_##K23, KC_##K24, KC_##K25, KC_##K26, KC_##K27 }, \
+  { KC_##K28, KC_##K29, KC_##K2A, KC_##K2B, KC_##K2C, KC_##K2D, KC_##K2E, KC_##K2F }, \
+  { KC_##K30, KC_##K31, KC_##K32, KC_##K33, KC_NO,    KC_##K35, KC_##K36, KC_##K37 }, \
+  { KC_##K38, KC_##K39, KC_##K3A, KC_##K3B, KC_##K3C, KC_##K3D, KC_##K3E, KC_NO    }, \
+  { KC_NO,    KC_##K41, KC_NO,    KC_##K43, KC_NO,    KC_##K45, KC_NO,    KC_##K47 }, \
+  { KC_NO,    KC_NO,    KC_NO,    KC_##K4B, KC_##K4C, KC_NO,    KC_##K4E, KC_NO    }, \
+  { KC_NO,    KC_##K51, KC_##K52, KC_##K53, KC_##K54, KC_##K55, KC_##K56, KC_##K57 }, \
+  { KC_##K58, KC_##K59, KC_NO,    KC_##K5B, KC_##K5C, KC_NO,    KC_NO,    KC_NO    }, \
+  { KC_NO,    KC_NO,    KC_NO,    KC_NO   , KC_NO,    KC_NO,    KC_NO,    KC_NO    }, \
+  { KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO    }, \
+  { KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO    }, \
+  { KC_NO   , KC_NO,    KC_NO   , KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_##K7F }  \
+}
 
 
 /* M0116 Apple Standard Keyboard ANSI
