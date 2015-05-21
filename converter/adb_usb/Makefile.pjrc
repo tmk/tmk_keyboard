@@ -62,7 +62,6 @@ ADB_MOUSE_ENABLE = yes
 # ADB Mice need acceleration for todays much bigger screens. 
 OPT_DEFS += -DADB_MOUSE_MAXACC=8
 
-
 # Search Path
 VPATH += $(TARGET_DIR)
 VPATH += $(TMK_DIR)
