@@ -2,7 +2,7 @@
 TARGET = m0110_lufa
 
 # Directory common source filess exist
-TOP_DIR = ../..
+TMK_DIR = ../../tmk_core
 
 # Directory keyboard dependent files exist
 TARGET_DIR = .
@@ -17,7 +17,7 @@ SRC =	matrix.c \
 ifdef KEYMAP
     SRC += keymap_$(KEYMAP).c
 else
-    SRC += keymap_plain.c
+    SRC += keymap_default.c
 endif
 
 CONFIG_H = config.h
@@ -25,10 +25,8 @@ CONFIG_H = config.h
 
 # MCU name, you MUST set this to match the board you are using
 # type "make clean" after changing this, so all files will be rebuilt
-#MCU = at90usb162       # Teensy 1.0
-MCU = atmega32u4       # Teensy 2.0
-#MCU = at90usb646       # Teensy++ 1.0
-#MCU = at90usb1286      # Teensy++ 2.0
+MCU = atmega32u2       # TMK converter rev2
+#MCU = atmega32u4       # TMK converter rev1
 
 
 # Processor frequency.
@@ -89,10 +87,10 @@ PROGRAM_CMD = teensy_loader_cli -mmcu=$(MCU) -w -v $(TARGET).hex
 
 # Search Path
 VPATH += $(TARGET_DIR)
-VPATH += $(TOP_DIR)
+VPATH += $(TMK_DIR)
 
 
-include $(TOP_DIR)/protocol/lufa.mk
-include $(TOP_DIR)/protocol.mk
-include $(TOP_DIR)/common.mk
-include $(TOP_DIR)/rules.mk
+include $(TMK_DIR)/protocol/lufa.mk
+include $(TMK_DIR)/protocol.mk
+include $(TMK_DIR)/common.mk
+include $(TMK_DIR)/rules.mk
