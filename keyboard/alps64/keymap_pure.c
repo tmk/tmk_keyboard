@@ -16,8 +16,8 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [1] = KEYMAP_AEK( \
         GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, DEL, \
         TRNS ,TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  INS,UP,PSCR,VOLD,  VOLU,  MUTE, \
-        TRNS ,TRNS,TRNS,TRNS,TRNS,  TRNS,  TRNS,PGUP,LEFT,DOWN,RGHT,TRNS, TRNS, \
-        TRNS,TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,PGDN,HOME, END,PAUS,TRNS, \
+        TRNS ,TRNS,TRNS,TRNS,TRNS,  TRNS,  TRNS,PGUP,LEFT,DOWN,RGHT,SLCK, TRNS, \
+        FN1,TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,PGDN,HOME, END,PAUS,TRNS, \
         TRNS,TRNS,TRNS,          TRNS,                         TRNS,TRNS,TRNS)
 };
 
@@ -28,7 +28,7 @@ enum function_id {
 };
 
 enum macro_id {
-    ALT_TAB,
+    CTRLALTDEL,
 };
 
 
@@ -37,6 +37,7 @@ enum macro_id {
  */
 const uint16_t PROGMEM fn_actions[] = {
     [0] = ACTION_LAYER_MOMENTARY(1),                  // Pure Layer
+    [1] = ACTION_MACRO(CTRLALTDEL)
 };
 
 
@@ -46,9 +47,9 @@ const uint16_t PROGMEM fn_actions[] = {
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
     switch (id) {
-        case ALT_TAB:
+        case CTRLALTDEL:
             return (record->event.pressed ?
-                    MACRO( D(LALT), D(TAB), END ) :
+                    MACRO( D(LALT), D(LCTL), D(DEL), END ) :
                     MACRO( U(TAB), END ));
     }
     return MACRO_NONE;
