@@ -7,7 +7,7 @@ var editing_key;
 var editing_layer = 0;
 
 // load keymap on keyboard key buttons
-var load_keymap_on_keyobard = function(layer, keymap) {
+var load_keymap_on_keyboard = function(layer, keymap) {
     for (var row in keymap) {
         for (var col in keymap[row]) {
             var code = keymap[row][col];
@@ -43,7 +43,7 @@ $(function() {
     $(".layer").click(function(ev, ui) {
         var layer = parseInt($(this).attr('id').match(/layer-(\d+)/)[1]);
         editing_layer = layer;
-        load_keymap_on_keyobard(layer, keymaps[layer]);
+        load_keymap_on_keyboard(layer, keymaps[layer] || no_map());
     });
 
 
@@ -52,7 +52,7 @@ $(function() {
      * Keyboard(key buttons)
      */
     // load default keymap on startup
-    load_keymap_on_keyobard(0, keymaps[0]);
+    load_keymap_on_keyboard(0, keymaps[0]);
 
     // Select key button to edit
     $(".key").click(function(ev, ui) {

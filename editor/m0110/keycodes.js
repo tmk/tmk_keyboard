@@ -213,8 +213,8 @@ keycodes = [
     {id: 'FN11',                        name: 'L2t',                         desc: 'Change to Layer 2(Momentary with Tap Toggle) '},
     {id: 'FN12',                        name: 'L3t',                         desc: 'Change to Layer 3(Momentary with Tap Toggle) '},
     /* Layer swith with Tap key */
-    {id: 'FN13',                        name: 'F (L1)',                      desc: 'F with with L1(Tap key)'},
-    {id: 'FN14',                        name: 'J (L2)',                      desc: 'J with with L2(Tap key)'},
+    {id: 'FN13',                        name: '\\ (L1)',                     desc: '\\ with with L1(Tap key)'},
+    {id: 'FN14',                        name: 'Tab (L2)',                    desc: 'Tab with with L2(Tap key)'},
     {id: 'FN15',                        name: 'Enter (L3)',                  desc: 'Enter with with L3(Tap key)'},
     {id: 'FN16',                        name: 'Space (L4)',                  desc: 'Space with L4(Tap key)'},
     {id: 'FN17',                        name: '; (L5)',                      desc: 'Semicolon with L5(Tap key)'},
