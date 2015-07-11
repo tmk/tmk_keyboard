@@ -43,7 +43,7 @@ $(function() {
     $(".layer").click(function(ev, ui) {
         var layer = parseInt($(this).attr('id').match(/layer-(\d+)/)[1]);
         editing_layer = layer;
-        load_keymap_on_keyboard(layer, keymaps[layer] || no_map());
+        load_keymap_on_keyboard(layer, keymaps[layer]);
     });
 
 
