@@ -421,17 +421,17 @@ flip: $(TARGET).hex
 
 dfu: $(TARGET).hex
 ifneq (, $(findstring 0.7, $(shell dfu-programmer --version 2>&1)))
-	dfu-programmer $(MCU) erase --force
+	sudo dfu-programmer $(MCU) erase --force
 else
-	dfu-programmer $(MCU) erase
+	sudo dfu-programmer $(MCU) erase
 endif
-	dfu-programmer $(MCU) erase
-	dfu-programmer $(MCU) flash $(TARGET).hex
-	dfu-programmer $(MCU) reset
+	sudo dfu-programmer $(MCU) erase
+	sudo dfu-programmer $(MCU) flash $(TARGET).hex
+	sudo dfu-programmer $(MCU) reset
 	
 dfu-start:
-	dfu-programmer $(MCU) reset
-	dfu-programmer $(MCU) start
+	sudo dfu-programmer $(MCU) reset
+	sudo dfu-programmer $(MCU) start
 
 flip-ee: $(TARGET).hex $(TARGET).eep
 	$(COPY) $(TARGET).eep $(TARGET)eep.hex
@@ -441,12 +441,12 @@ flip-ee: $(TARGET).hex $(TARGET).eep
 	$(REMOVE) $(TARGET)eep.hex
 
 dfu-ee: $(TARGET).hex $(TARGET).eep
-ifneq (, $(findstring 0.7, $(shell dfu-programmer --version 2>&1)))
-	dfu-programmer $(MCU) flash --eeprom $(TARGET).eep
+ifneq (, $(findstring 0.7, $(shell sudo dfu-programmer --version 2>&1)))
+	sudo dfu-programmer $(MCU) flash --eeprom $(TARGET).eep
 else
-	dfu-programmer $(MCU) flash-eeprom $(TARGET).eep
+	sudo dfu-programmer $(MCU) flash-eeprom $(TARGET).eep
 endif
-	dfu-programmer $(MCU) reset
+	sudo dfu-programmer $(MCU) reset
 
 
 # Generate avr-gdb config/init file which does the following:
