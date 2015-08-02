@@ -99,3 +99,6 @@ winkey: all
 
 winkeyless: OPT_DEFS += -DLAYOUT_WINKEYLESS
 winkeyless: all
+
+happy: OPT_DEFS += -DLAYOUT_HAPPY
+happy: all
