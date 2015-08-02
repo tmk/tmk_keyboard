@@ -34,7 +34,7 @@ static uint8_t debouncing = DEBOUNCE;
 static matrix_row_t matrix[MATRIX_ROWS];
 static matrix_row_t matrix_debouncing[MATRIX_ROWS];
 
-static uint8_t read_rows();
+static uint8_t read_rows(void);
 static uint8_t read_caps(void);
 static void init_rows(void);
 static void unselect_cols(void);
@@ -66,7 +66,6 @@ void matrix_init(void)
 uint8_t matrix_scan(void)
 {
     for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-
         select_col(col);    
         _delay_us(3); // TODO: Determine the correct value needed here.
         uint8_t rows = read_rows();
@@ -148,7 +147,7 @@ static void init_rows(void)
     PORTD &= ~0b00101111;
     if(!LAYOUT_HAPPY){
         DDRB  &= ~(1<<7);
-        PORTB &= ~(1<<7);      
+        PORTB &= ~(1<<7);
     }
     // Input with pull-up, for CAPS lock
     DDRE &= ~(1<<2);
@@ -185,7 +184,7 @@ static uint8_t read_caps(void)
 }
 
 /* Columns 0 - 15 TKL SIZE
- * These columns uses two 74HC237D 3 to 8 bit demultiplexers
+ * These columns uses two 74HC238D 3 to 8 bit demultiplexers.
  * col / pin:    PC6  PB6  PF0  PF1  PC7
  * 0:             1    0    0    0    0
  * 1:             1    0    1    0    0
@@ -226,9 +225,9 @@ static uint8_t read_caps(void)
  * 12:            0    0    0    0    0    0    0    0    1    0    0
  * 13:            0    0    0    0    0    0    0    0    0    1    0
  * 14:            0    0    0    0    0    0    0    0    0    0    1
- * 
  *
- * 
+ *
+ *
  */
 static void unselect_cols(void)
 {
@@ -252,7 +251,7 @@ static void unselect_cols(void)
     PORTC &= ~((1<<6) | (1<<7));
 
     DDRF |= (1<<0) | (1<<1);
-    PORTF &= ~((1<<0) | (1<<1)); 
+    PORTF &= ~((1<<0) | (1<<1));
 }
 
 static void select_col(uint8_t col)
