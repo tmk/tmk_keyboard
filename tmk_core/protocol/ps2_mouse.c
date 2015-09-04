@@ -33,6 +33,12 @@ static report_mouse_t mouse_report = {};
 static void print_usb_data(void);
 
 
+#if PS2_MOUSE_SCROLL_BTN_MASK
+static uint16_t scroll_events_time = 0;
+static uint8_t scroll_delay = 100;
+#endif
+
+
 /* supports only 3 button mouse at this time */
 uint8_t ps2_mouse_init(void) {
     uint8_t rcv;
@@ -59,6 +65,96 @@ uint8_t ps2_mouse_init(void) {
     // send Set Remote mode
     rcv = ps2_host_send(0xF0);
     print("ps2_mouse_init: send 0xF0: ");
+    phex(rcv); phex(ps2_error); print("\n");
+
+    // set TrackPoint sensitivity
+    print("ps2_mouse_init: send 0xE2: ");
+    rcv = ps2_host_send(0xE2);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x81: ");
+    rcv = ps2_host_send(0x81);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x4A: ");
+    rcv = ps2_host_send(0x4A);
+    phex(rcv); phex(ps2_error); print("\n");
+    // default sensitivity value is 0x80
+    print("ps2_mouse_init: send 0x60: ");
+    rcv = ps2_host_send(0x60);
+    phex(rcv); phex(ps2_error); print("\n");
+
+    // set TrackPoint speed
+    // (transfer function upper plateau speed)
+    print("ps2_mouse_init: send 0xE2: ");
+    rcv = ps2_host_send(0xE2);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x81: ");
+    rcv = ps2_host_send(0x81);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x60: ");
+    rcv = ps2_host_send(0x60);
+    phex(rcv); phex(ps2_error); print("\n");
+    // default plateau speed is 0x61
+    print("ps2_mouse_init: send 0x90: ");
+    rcv = ps2_host_send(0x90);
+    phex(rcv); phex(ps2_error); print("\n");
+
+    // set TrackPoint Negative Inertia factor
+    print("ps2_mouse_init: send 0xE2: ");
+    rcv = ps2_host_send(0xE2);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x81: ");
+    rcv = ps2_host_send(0x81);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x4D: ");
+    rcv = ps2_host_send(0x4D);
+    phex(rcv); phex(ps2_error); print("\n");
+    // default negative inertia factor is 0x06
+    print("ps2_mouse_init: send 0x03: ");
+    rcv = ps2_host_send(0x03);
+    phex(rcv); phex(ps2_error); print("\n");
+
+    // enable TrackPoint Press to Select (PtS)
+    print("ps2_mouse_init: send 0xE2: ");
+    rcv = ps2_host_send(0xE2);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x47: ");
+    rcv = ps2_host_send(0x47);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x2C: ");
+    rcv = ps2_host_send(0x2C);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x01: ");
+    rcv = ps2_host_send(0x01);
+    phex(rcv); phex(ps2_error); print("\n");
+
+    // set TrackPoint Press to Select threshold
+    print("ps2_mouse_init: send 0xE2: ");
+    rcv = ps2_host_send(0xE2);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x81: ");
+    rcv = ps2_host_send(0x81);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x5C: ");
+    rcv = ps2_host_send(0x5C);
+    phex(rcv); phex(ps2_error); print("\n");
+    // default PtS threshold is 0x08
+    print("ps2_mouse_init: send 0x04: ");
+    rcv = ps2_host_send(0x04);
+    phex(rcv); phex(ps2_error); print("\n");
+
+    // set TrackPoint Minimum Drag (mindrag)
+    print("ps2_mouse_init: send 0xE2: ");
+    rcv = ps2_host_send(0xE2);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x81: ");
+    rcv = ps2_host_send(0x81);
+    phex(rcv); phex(ps2_error); print("\n");
+    print("ps2_mouse_init: send 0x59: ");
+    rcv = ps2_host_send(0x59);
+    phex(rcv); phex(ps2_error); print("\n");
+    // default PtS mindrag is 0x14
+    print("ps2_mouse_init: send 0x14: ");
+    rcv = ps2_host_send(0x14);
     phex(rcv); phex(ps2_error); print("\n");
 
     return 0;
@@ -122,6 +218,8 @@ void ps2_mouse_task(void)
 
 #if PS2_MOUSE_SCROLL_BTN_MASK
         static uint16_t scroll_button_time = 0;
+        static uint8_t abs_x = 0;
+        static uint8_t abs_y = 0;
         if ((mouse_report.buttons & (PS2_MOUSE_SCROLL_BTN_MASK)) == (PS2_MOUSE_SCROLL_BTN_MASK)) {
             if (scroll_state == SCROLL_NONE) {
                 scroll_button_time = timer_read();
@@ -134,8 +232,22 @@ void ps2_mouse_task(void)
             if (mouse_report.x || mouse_report.y) {
                 scroll_state = SCROLL_SENT;
 
-                mouse_report.v = -mouse_report.y/(PS2_MOUSE_SCROLL_DIVISOR_V);
-                mouse_report.h =  mouse_report.x/(PS2_MOUSE_SCROLL_DIVISOR_H);
+                if (mouse_report.y) {
+                    abs_y = abs(mouse_report.y);
+                    mouse_report.v = -mouse_report.y/(PS2_MOUSE_SCROLL_DIVISOR_V);
+                    // make sure to send at least the minimum amount of scroll
+                    if (!mouse_report.v) { mouse_report.v = -mouse_report.y/abs_y; }
+                }
+                if (mouse_report.x) {
+                    abs_x = abs(mouse_report.x);
+                    mouse_report.h =  mouse_report.x/(PS2_MOUSE_SCROLL_DIVISOR_H);
+                    // make sure to send at least the minimum amount of scroll
+                    if (!mouse_report.h) { mouse_report.h = mouse_report.x/abs_x; }
+                }
+
+                scroll_delay = 100 - (abs_x + abs_y);
+                if (scroll_delay < 0) { scroll_delay = 0; }
+
                 mouse_report.x = 0;
                 mouse_report.y = 0;
                 //host_mouse_send(&mouse_report);
@@ -143,12 +255,16 @@ void ps2_mouse_task(void)
         }
         else if ((mouse_report.buttons & (PS2_MOUSE_SCROLL_BTN_MASK)) == 0) {
 #if PS2_MOUSE_SCROLL_BTN_SEND
-            if (scroll_state == SCROLL_BTN &&
+            // if the Scroll button was pressed and released fast enough
+            if (scroll_state != SCROLL_NONE &&
                     TIMER_DIFF_16(timer_read(), scroll_button_time) < PS2_MOUSE_SCROLL_BTN_SEND) {
-                // send Scroll Button(down and up at once) when not scrolled
+                // clear scrolling events
+                mouse_report.v = 0;
+                mouse_report.h = 0;
+                // send Scroll Button press (down and up at once) instead of scroll event
                 mouse_report.buttons |= (PS2_MOUSE_SCROLL_BTN_MASK);
                 host_mouse_send(&mouse_report);
-                _delay_ms(100);
+                _delay_ms(75);
                 mouse_report.buttons &= ~(PS2_MOUSE_SCROLL_BTN_MASK);
             }
 #endif
@@ -156,11 +272,22 @@ void ps2_mouse_task(void)
         }
         // doesn't send Scroll Button
         mouse_report.buttons &= ~(PS2_MOUSE_SCROLL_BTN_MASK);
+
+        // wait a little between sending scroll events
+        if (scroll_state == SCROLL_SENT) {
+            if (TIMER_DIFF_16(timer_read(), scroll_events_time) > scroll_delay) {
+                host_mouse_send(&mouse_report);
+                print_usb_data();
+                scroll_events_time = timer_read();
+            }
+        } else {
+            scroll_events_time = timer_read();
 #endif
-
-
-        host_mouse_send(&mouse_report);
-        print_usb_data();
+            host_mouse_send(&mouse_report);
+            print_usb_data();
+#if PS2_MOUSE_SCROLL_BTN_MASK
+        }
+#endif
     }
     // clear report
     mouse_report.x = 0;

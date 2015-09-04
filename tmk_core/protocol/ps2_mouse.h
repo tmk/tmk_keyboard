@@ -49,14 +49,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 /* send button event when button is released within this value(ms); set 0 to disable  */
 #ifndef PS2_MOUSE_SCROLL_BTN_SEND
-#define PS2_MOUSE_SCROLL_BTN_SEND       300
+#define PS2_MOUSE_SCROLL_BTN_SEND       250
 #endif
 /* divide vertical and horizontal mouse move by this to convert to scroll move */
 #ifndef PS2_MOUSE_SCROLL_DIVISOR_V
-#define PS2_MOUSE_SCROLL_DIVISOR_V      2
+#define PS2_MOUSE_SCROLL_DIVISOR_V      4
 #endif
 #ifndef PS2_MOUSE_SCROLL_DIVISOR_H
-#define PS2_MOUSE_SCROLL_DIVISOR_H      2
+#define PS2_MOUSE_SCROLL_DIVISOR_H      4
 #endif
 
 
