@@ -125,16 +125,6 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 const uint16_t PROGMEM fn_actions[] = {
 //  [0] = ACTION_LAYER_MOMENTARY(3),  // Hold for Function layer
     [0] = ACTION_LAYER_TAP_TOGGLE(3), // Hold for Function layer, tap 5 times to toggle
-    [1] = ACTION_LAYER_TOGGLE(1),     // Toggle Numpad layer
+    [1] = ACTION_LAYER_TOGGLE(1)      // Toggle Numpad layer
 //  [3] = ACTION_MACRO(FOUR_SPACES)   // Send 4 spaces
-/*
-    [1] = MACRO( T(NUMLOCK), ACTION_LAYER_TOGGLE(2), END ) // Toggle Numpad layer and Numlock LED
-    [1] = ACTION_LAYER_TOGGLE(4),     // toggle arrow overlay
-    [2] = ACTION_LAYER_TOGGLE(5),     // toggle Esc overlay
-    [3] = ACTION_MODS_KEY(MOD_RCTL|MOD_RSFT, KC_ESC), // Task(RControl,RShift+Esc)
-    [4] = ACTION_LAYER_MOMENTARY(7),  // to Layout selector
-    [5] = ACTION_DEFAULT_LAYER_SET(0),  // set qwerty layout
-    [6] = ACTION_DEFAULT_LAYER_SET(x),  // set standard layout
-    [6] = ACTION_DEFAULT_LAYER_SET(y)  // set reverse spanish layout
-*/
 };
