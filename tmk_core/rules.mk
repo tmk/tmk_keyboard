@@ -249,7 +249,7 @@ EXTMEMOPTS =
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
 #
-# Comennt out "--relax" option to avoid a error such:
+# Comment out "--relax" option to avoid a error such:
 # 	(.vectors+0x30): relocation truncated to fit: R_AVR_13_PCREL against symbol `__vector_12'
 #
 LDFLAGS = -Wl,-Map=$(TARGET).map,--cref

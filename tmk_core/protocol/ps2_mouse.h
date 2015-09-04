@@ -51,7 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef PS2_MOUSE_SCROLL_BTN_SEND
 #define PS2_MOUSE_SCROLL_BTN_SEND       300
 #endif
-/* divide virtical and horizontal mouse move by this to convert to scroll move */
+/* divide vertical and horizontal mouse move by this to convert to scroll move */
 #ifndef PS2_MOUSE_SCROLL_DIVISOR_V
 #define PS2_MOUSE_SCROLL_DIVISOR_V      2
 #endif
