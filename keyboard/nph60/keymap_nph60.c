@@ -9,17 +9,18 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |------------------------------------------------------.    |
      * |CapsLk| a | s | d | f | g | h | j | k | l | ñ | ' | ç |    |
      * |--------------------------O--------------------------------|
-     * |Shft| < | z | x | c | v | b | n | m | , | . | - |  Shift   |
+     * |Shft|Fn1| z | x | c | v | b | n | m | , | . | - |  Shift   |
      * |-----------------------------------------------------------|
      * |LCtl|LGui|LAlt|m1 |Space|m3 | Fn0 | m2 |RAlt|RGui|Menu|RCtl|
      * `--------------'   '-----'   '-----'    '-------------------'
      * Fn0: hold for Function layer
+     * Fn1: tap for '<', hold for RAlt
      */
     KEYMAP(
         ESC ,1   ,2   ,3   ,4   ,5   ,6   ,7   ,8   ,9   ,0   ,MINS,EQL ,BSPC, \
         TAB ,Q   ,W   ,E   ,R   ,T   ,Y   ,U   ,I   ,O   ,P   ,LBRC,RBRC,ENT , \
         CAPS,A   ,S   ,D   ,F   ,G   ,H   ,J   ,K   ,L   ,SCLN,QUOT,NUHS,      \
-        LSFT,NUBS,Z   ,X   ,C   ,V   ,B   ,N   ,M   ,COMM,DOT ,SLSH,RSFT,      \
+        LSFT,FN1 ,Z   ,X   ,C   ,V   ,B   ,N   ,M   ,COMM,DOT ,SLSH,RSFT,      \
         LCTL,LGUI,LALT,SPC ,FN0 ,RALT,RGUI,APP ,RCTL                           ),
 
     /* 1: Numpad layer
@@ -70,17 +71,17 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |------------------------------------------------------.    |
      * |Backsp|Prv|Nxt|Stp|Ply|   |Hom|Lft|Dwn|Rgt|End|   |Pau|    |
      * |--------------------------O--------------------------------|
-     * |    |   |   |   |   |   |   |Fn1|PDn|   |   |Del|          |
+     * |    |   |   |   |   |   |   |Fn2|PDn|   |   |Del|          |
      * |-----------------------------------------------------------|
      * |    |    |    |   |     |   |     |    |    |    |    |    |
      * `--------------'   '-----'   '-----'    '-------------------'
-     * Fn1: toggle Numpad layer
+     * Fn2: toggle Numpad layer
      */
     KEYMAP(
         GRV ,F1  ,F2  ,F3  ,F4  ,F5  ,F6  ,F7  ,F8  ,F9  ,F10 ,F11 ,F12 ,TRNS, \
         TRNS,MUTE,VOLD,VOLU,TRNS,TRNS,TRNS,PGUP,UP  ,TRNS,PSCR,SLCK,INS ,TRNS, \
         BSPC,MPRV,MNXT,MSTP,MPLY,TRNS,HOME,LEFT,DOWN,RGHT,END ,TRNS,PAUS,      \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,FN1 ,PGDN,TRNS,TRNS,DEL ,TRNS,      \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,FN2 ,PGDN,TRNS,TRNS,DEL ,TRNS,      \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS                           )
 };
 
@@ -123,8 +124,10 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
  * Function key actions
  */
 const uint16_t PROGMEM fn_actions[] = {
-//  [0] = ACTION_LAYER_MOMENTARY(3),  // Hold for Function layer
-    [0] = ACTION_LAYER_TAP_TOGGLE(3), // Hold for Function layer, tap 5 times to toggle
-    [1] = ACTION_LAYER_TOGGLE(1)      // Toggle Numpad layer
-//  [3] = ACTION_MACRO(FOUR_SPACES)   // Send 4 spaces
+//  [0] = ACTION_LAYER_MOMENTARY(3),             // Hold for Function layer
+    [0] = ACTION_LAYER_TAP_TOGGLE(3),            // Hold for Function layer, tap 5 times to toggle
+    [1] = ACTION_MODS_TAP_MOD(MOD_RALT,KC_NUBS), // Tap for '<', hold for RAlt
+    [2] = ACTION_LAYER_TOGGLE(1)                 // Toggle Numpad layer
+//  [3] = ACTION_MACRO(FOUR_SPACES)              // Send 4 spaces
 };
+
