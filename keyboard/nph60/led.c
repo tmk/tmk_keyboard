@@ -78,7 +78,7 @@ void led_nKey(bool enable)
 void led_set(uint8_t usb_led)
 {
     // Teensy built-in LED, used as Scroll Lock indicator
-    led_builtIn(usb_led & (1<<USB_LED_SCROLL_LOCK));
+    //led_builtIn(usb_led & (1<<USB_LED_SCROLL_LOCK));
 
     // Esc key LED, used as Function layer indicator
     led_escKey(layer_state & (1<<3));    // turn LED on if layer 3 is active
