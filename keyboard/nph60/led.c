@@ -80,12 +80,12 @@ void led_set(uint8_t usb_led)
     // Teensy built-in LED, used as Scroll Lock indicator
     //led_builtIn(usb_led & (1<<USB_LED_SCROLL_LOCK));
 
-    // Esc key LED, used as Function layer indicator
-    led_escKey(layer_state & (1<<3));    // turn LED on if layer 3 is active
-    //led_escKey(biton32(layer_state) == 3); // turn LED on if layer 3 is the highest active layer
+    // N key LED, used as Function layer indicator
+    led_nKey(layer_state & (1<<3));    // turn LED on if layer 3 is active
+    //led_nKey(biton32(layer_state) == 3); // turn LED on if layer 3 is the highest active layer
 
-    // N key LED, used as Numpad layer indicator
-    led_nKey(layer_state & (1<<1));
+    // Esc key LED, used as Numpad layer indicator
+    led_escKey(layer_state & (1<<1));
 
     // Caps Lock key LED
     if (layer_state & (1<<1)) {
