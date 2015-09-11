@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 )
 
 /* period of tapping(ms) for Fn keys */
-#define TAPPING_TERM    150
+#define TAPPING_TERM    200
 /* tap count needed for toggling a feature */
 #define TAPPING_TOGGLE  5
 
