@@ -126,7 +126,7 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 const uint16_t PROGMEM fn_actions[] = {
 //  [0] = ACTION_LAYER_MOMENTARY(3),             // Hold for Function layer
     [0] = ACTION_LAYER_TAP_TOGGLE(3),            // Hold for Function layer, tap 5 times to toggle
-    [1] = ACTION_MODS_TAP_MOD(MOD_RALT,KC_NUBS), // Tap for '<', hold for RAlt
+    [1] = ACTION_MODS_TAP_KEY(MOD_RALT,KC_NUBS), // Tap for '<', hold for RAlt
     [2] = ACTION_LAYER_TOGGLE(1)                 // Toggle Numpad layer
 //  [3] = ACTION_MACRO(FOUR_SPACES)              // Send 4 spaces
 };

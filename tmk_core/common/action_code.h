@@ -214,7 +214,6 @@ enum mods_codes {
 #define ACTION_MODS(mods)               ACTION(ACT_MODS, ((mods)&0x1f)<<8 | 0)
 #define ACTION_MODS_KEY(mods, key)      ACTION(ACT_MODS, ((mods)&0x1f)<<8 | (key))
 #define ACTION_MODS_TAP_KEY(mods, key)  ACTION(ACT_MODS_TAP, ((mods)&0x1f)<<8 | (key))
-#define ACTION_MODS_TAP_MOD(mods, key)  ACTION(ACT_MODS_TAP, (key) | ((mods)&0x1f)<<8)
 #define ACTION_MODS_ONESHOT(mods)       ACTION(ACT_MODS_TAP, ((mods)&0x1f)<<8 | MODS_ONESHOT)
 #define ACTION_MODS_TAP_TOGGLE(mods)    ACTION(ACT_MODS_TAP, ((mods)&0x1f)<<8 | MODS_TAP_TOGGLE)
 
