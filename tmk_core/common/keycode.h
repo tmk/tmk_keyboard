@@ -144,8 +144,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_MRWD KC_MEDIA_REWIND
 #define KC_MSTP KC_MEDIA_STOP
 #define KC_MPLY KC_MEDIA_PLAY_PAUSE
-#define KC_MSEL KC_MEDIA_SELECT
 #define KC_EJCT KC_MEDIA_EJECT
+#define KC_MSEL KC_MEDIA_SELECT
 #define KC_MAIL KC_MAIL
 #define KC_CALC KC_CALCULATOR
 #define KC_MYCM KC_MY_COMPUTER
@@ -411,10 +411,12 @@ enum internal_special_keycodes {
     KC_AUDIO_VOL_DOWN,
     KC_MEDIA_NEXT_TRACK,
     KC_MEDIA_PREV_TRACK,
+    KC_MEDIA_FAST_FORWARD,
+    KC_MEDIA_REWIND,
     KC_MEDIA_STOP,
     KC_MEDIA_PLAY_PAUSE,
-    KC_MEDIA_SELECT,
     KC_MEDIA_EJECT,
+    KC_MEDIA_SELECT,
     KC_MAIL,
     KC_CALCULATOR,
     KC_MY_COMPUTER,
@@ -424,9 +426,7 @@ enum internal_special_keycodes {
     KC_WWW_FORWARD,
     KC_WWW_STOP,
     KC_WWW_REFRESH,
-    KC_WWW_FAVORITES,
-    KC_MEDIA_FAST_FORWARD,
-    KC_MEDIA_REWIND,    /* 0xBC */
+    KC_WWW_FAVORITES,    /* 0xBC */
 
     /* Jump to bootloader */
     KC_BOOTLOADER       = 0xBF,
