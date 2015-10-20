@@ -1,0 +1,3 @@
+https://geekhack.org/index.php?topic=57008.0
+https://www.pjrc.com/teensy/pinout2a.png
+http://deskthority.net/workshop-f7/how-to-build-your-very-own-keyboard-firmware-t7177.html
