@@ -64,8 +64,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     K0A, K0B, K0C,                K0G,                K0L, K0M, NO,  K0N,      K0O, K0P, K0Q  \
 )
 
+#define KEYMAP_HAPPY( \
+    R13, R18, R23, R28, R32, R41, R46, R50, R54, R58, R67, R72, R75, R79, R84, \
+    R14, R19, R24, R29, R33, R42, R47, R51, R55, R59, R68, R73, R76,    R80,   \
+    R36, R20, R25, R30, R34, R43, R48, R52, R56, R60, R69, R74,        R81,    \
+    R15, R21, R26, R31, R35, R44, R49, R53, R57, R61, R70,        R77,     R82,\
+    R16, R22, R27,           R45,                                R71, R78, R83 \
+) { \
+/* 4 */   { KC_##R13, KC_##R18, KC_##R23, KC_##R28, KC_##R32, KC_##R41, KC_##R46, KC_##R50, KC_##R54, KC_##R58, KC_##R67, KC_##R72, KC_##R75, KC_##R79,KC_##R84 }, \
+/* 3 */   { KC_##R14, KC_##R19, KC_##R24, KC_##R29, KC_##R33, KC_##R42, KC_##R47, KC_##R51, KC_##R55, KC_##R59, KC_##R68, KC_##R73, KC_##R76, KC_##R80,KC_NO }, \
+/* 2 */   { KC_##R36, KC_##R20, KC_##R25, KC_##R30, KC_##R34, KC_##R43, KC_##R48, KC_##R52, KC_##R56, KC_##R60, KC_##R69, KC_##R74, KC_NO,    KC_##R81,KC_NO }, \
+/* 1 */   { KC_##R15, KC_##R21, KC_##R26, KC_##R31, KC_##R35, KC_##R44, KC_##R49, KC_##R53, KC_##R57, KC_##R61, KC_##R70, KC_NO,    KC_##R77, KC_##R82,KC_NO }, \
+/* 0 */   { KC_##R16, KC_##R22, KC_##R27, KC_NO,    KC_##R36, KC_##R45, KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_##R71, KC_NO,    KC_##R78, KC_##R83,KC_NO } \
+}
+
 #if defined(LAYOUT_WINKEYLESS)
     #include "keymap_winkeyless.h"
+#elif defined(LAYOUT_HAPPY)
+    #include "keymap_happy.h"
 #else
     #include "keymap_winkey.h"
 #endif
