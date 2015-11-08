@@ -55,13 +55,13 @@ keymaps = [
         [ 0x2C, 0x06, 0x19, 0x0A, 0x1C, 0x18, 0x23, 0x24, ],
         [ 0x65, 0x05, 0x11, 0x0B, 0x0D, 0x0C, 0x25, 0x26, ],
     ],
-    no_map(),
-    no_map(),
-    no_map(),
-    no_map(),
-    no_map(),
-    no_map(),
-    no_map(),
+    transparent_map(),
+    transparent_map(),
+    transparent_map(),
+    transparent_map(),
+    transparent_map(),
+    transparent_map(),
+    transparent_map(),
 ];
 
 fn_actions = [
