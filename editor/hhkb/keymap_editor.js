@@ -135,8 +135,8 @@ function source_output(keymaps) {
     output += "    [27] = ACTION_MODS_TAP_KEY(MOD_LSFT, KC_ESC),\n";
     output += "    [28] = ACTION_MODS_TAP_KEY(MOD_LSFT, KC_BSPACE),\n";
     output += "    [29] = ACTION_MODS_ONESHOT(MOD_LSFT),\n";
-    output += "    [30] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_ESC),\n";
-    output += "    [31] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_BSPACE),\n";
+    output += "    [30] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_GRAVE),\n";
+    output += "    [31] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_BSLASH),\n";
     output += "};\n\n";
 
     // keymaps
