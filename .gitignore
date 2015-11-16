@@ -11,3 +11,7 @@ tags
 *~
 build/
 *.bak
+GPATH
+GRTAGS
+GTAGS
+GTAGSROOT
