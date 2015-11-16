@@ -155,7 +155,7 @@ You can find other keymap definitions in file `keymap.c` located on project dire
 
 
 ## 1. Keycode
-See [`common/keycode.h`](../common/keycode.h) or keycode table below for the detail. Keycode is internal **8bit code** to indicate action performed on key in keymap. Keycode has `KC_` prefixed symbol respectively. Most of keycodes like `KC_A` have simple action registers key to host on press and unregister on release, while some of other keycodes has some special actions like `Fn` keys, Media control keys, System control keys and Mousekeys.
+See [`common/keycode.h`](../tmk_core/common/keycode.h) or keycode table below for the detail. Keycode is internal **8bit code** to indicate action performed on key in keymap. Keycode has `KC_` prefixed symbol respectively. Most of keycodes like `KC_A` have simple action registers key to host on press and unregister on release, while some of other keycodes has some special actions like `Fn` keys, Media control keys, System control keys and Mousekeys.
 
  ***In `KEYMAP()` macro you should omit prefix part `KC_` of keycode to keep keymap compact.*** For example, just use `A` instead you place `KC_A` in `KEYMAP()`. Some keycodes has 4-letter **short name** in addition to descriptive name, you'll prefer short one in `KEYMAP()`.
 
@@ -203,7 +203,7 @@ There are 8 modifiers which has discrimination between left and right.
 
 
 ## 2. Action
-See [`common/action_code.h`](../common/action_code.h). Action is a **16bit code** and defines function to perform on events of a key like press, release, holding and tapping.
+See [`common/action_code.h`](../tmk_core/common/action_code.h). Action is a **16bit code** and defines function to perform on events of a key like press, release, holding and tapping.
 
 Most of keys just register 8bit scancode to host, but to support other complex features needs 16bit extended action codes internally. However, using 16bit action codes in keymap results in double size in memory compared to using just keycodes. To avoid this waste 8bit keycodes are used in `KEYMAP()` instead of action codes.
 
