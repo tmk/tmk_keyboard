@@ -4,62 +4,158 @@
 // Fn + Esc = `
 // Fn + {left, down, up, right}  = {home, pgdown, pgup, end}
 const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    /* 0: qwerty */
+    /* 0: qwerty
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+│GRAVE│  1  │  2  │  3  │  4  │  5  │  6  │  7  │  8  │  9  │  0  │  -  │  =  │▒▒▒▒▒│BKSPC│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│ TAB │  Q  │  W  │  E  │  R  │  T  │  Y  │  U  │  I  │  O  │  P  │  [  │  ]  │  \  │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│LCTRL│  A  │  S  │  D  │  F  │  G  │  H  │  J  │  K  │  L  │  ;  │  '  │▒▒▒▒▒│ENTER│█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│LSHFT│▒▒▒▒▒│  Z  │  X  │  C  │  V  │  B  │  N  │  M  │  ,  │  .  │  /  │▒▒▒▒▒│RSHFT│▒▒▒▒▒│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│LCTRL│L_WIN│L_ALT│█████│█████│█████│ SPC │█████│█████│█████│ Fn0 │R_WIN│ APP │RCTRL│█████│
+└─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+    */
     KEYMAP_ANSI(
-        GRV, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSPC, \
-        TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,BSLS, \
-        LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     ENT,  \
-        LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,          RSFT, \
-        LCTL,LGUI,LALT,          SPC,                     FN0, RGUI,APP, RCTL),
-    /* 1: Poker with Arrow */
+         GRV,    1,    2,   3,   4,   5,   6,   7,   8,    9,    0, MINS,  EQL,   NO, BSPC, \
+         TAB,    Q,    W,   E,   R,   T,   Y,   U,   I,    O,    P, LBRC, RBRC, BSLS,       \
+        LCTL,    A,    S,   D,   F,   G,   H,   J,   K,    L, SCLN, QUOT,   NO,  ENT,       \
+        LSFT,   NO,    Z,   X,   C,   V,   B,   N,   M, COMM,  DOT, SLSH,   NO, RSFT,   NO, \
+        LCTL, LGUI, LALT,                SPC,                  FN0, RGUI,  APP, RCTL),
+    /* 1: Poker with Arrow
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+│     │     │     │     │     │     │     │     │     │     │     │     │     │▒▒▒▒▒│     │
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │     │     │     │     │     │     │     │     │     │     │     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │     │     │     │     │     │     │     │     │     │▒▒▒▒▒│     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │▒▒▒▒▒│     │     │     │     │     │     │     │     │     │     │▒▒▒▒▒│ Up  │▒▒▒▒▒│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │█████│█████│█████│     │█████│█████│█████│ Fn1 │Left │Down │Right│█████│
+└─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+    */
     KEYMAP_ANSI(
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,          UP,   \
-        TRNS,TRNS,TRNS,          TRNS,                    FN1, LEFT,DOWN,RGHT),
-    /* 2: Poker with Esc */
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, \
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,       \
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,       \
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,   UP, TRNS, \
+        TRNS, TRNS, TRNS,                   TRNS,                    FN1, LEFT, DOWN, RGHT),
+    /* 2: Poker with Esc
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+│ ESC │     │     │     │     │     │     │     │     │     │     │     │     │▒▒▒▒▒│     │
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │     │     │     │     │     │     │     │     │     │     │     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │     │     │     │     │     │     │     │     │     │▒▒▒▒▒│     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │▒▒▒▒▒│     │     │     │     │     │     │     │     │     │     │▒▒▒▒▒│     │▒▒▒▒▒│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │█████│█████│█████│     │█████│█████│█████│ Fn2 │     │     │     │█████│
+└─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+    */
     KEYMAP_ANSI(
-        ESC, TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,          TRNS, \
-        TRNS,TRNS,TRNS,          TRNS,                    FN2, TRNS,TRNS,TRNS),
-    /* 3: Poker with Arrow and Esc */
+         ESC, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, \
+	TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,       \
+	TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,       \
+	TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, \
+	TRNS, TRNS, TRNS,                   TRNS,                    FN2, TRNS, TRNS, TRNS),
+    /* 3: Poker with Arrow and Esc
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+│ Esc │     │     │     │     │     │     │     │     │     │     │     │     │▒▒▒▒▒│     │
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │     │     │     │     │     │     │     │     │     │     │     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │     │     │     │     │     │     │     │     │     │▒▒▒▒▒│     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │▒▒▒▒▒│     │     │     │     │     │     │     │     │     │     │▒▒▒▒▒│ Up  │▒▒▒▒▒│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │█████│█████│█████│     │█████│█████│█████│ Fn3 │Left │Down │Right│█████│
+└─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+    */
     KEYMAP_ANSI(
-        ESC, TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,          UP,   \
-        TRNS,TRNS,TRNS,          TRNS,                    FN3, LEFT,DOWN,RGHT),
-    /* 4: Poker Fn'd */
+         ESC, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, \
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,       \
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,       \
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,   UP, TRNS, \
+        TRNS, TRNS, TRNS,                   TRNS,                    FN3, LEFT, DOWN, RGHT),
+    /* 4: Poker Fn'd
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+│ Esc │ F1  │ F2  │ F3  │ F4  │ F5  │ F6  │ F7  │ F8  │ F9  │ F10 │ F11 │ F12 │▒▒▒▒▒│     │
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │ Fn6 │ Up  │     │     │     │     │     │     │ Cal │     │Home │ Ins │     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │Left │Down │Right│     │     │ Psc │ Slk │Pause│     │ Fn8 │ End │▒▒▒▒▒│     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │▒▒▒▒▒│ Del │     │ Web │Mute │ VoU │ VoD │     │PgUp │PgDwn│ Del │▒▒▒▒▒│     │▒▒▒▒▒│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │█████│█████│█████│ Fn5 │█████│█████│█████│ Fn4 │     │     │     │█████│
+└─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+    */
     KEYMAP_ANSI(
-        ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, TRNS, \
-        TRNS,FN6, UP,  TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,CALC,TRNS,HOME,INS, TRNS, \
-        TRNS,LEFT,DOWN,RGHT,TRNS,TRNS,PSCR,SLCK,PAUS,TRNS,FN8, END,      TRNS, \
-        TRNS,DEL, TRNS,WHOM,MUTE,VOLU,VOLD,TRNS,PGUP,PGDN,DEL,           TRNS, \
-        TRNS,TRNS,TRNS,          FN5,                     FN4, TRNS,TRNS,TRNS),
-    /* 5: Poker Fn'd arrow */
+         ESC,   F1,   F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,  F10,  F11,  F12, TRNS, TRNS, \
+        TRNS,  FN6,   UP, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, CALC, TRNS, HOME,  INS, TRNS,       \
+        TRNS, LEFT, DOWN, RGHT, TRNS, TRNS, PSCR, SLCK, PAUS, TRNS,  FN8,  END, TRNS, TRNS,       \
+        TRNS, TRNS,  DEL, TRNS, WHOM, MUTE, VOLU, VOLD, TRNS, PGUP, PGDN,  DEL, TRNS, TRNS, TRNS, \
+        TRNS, TRNS, TRNS,                    FN5,                    FN4, TRNS, TRNS, TRNS),
+    /* 5: Poker Fn'd arrow
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+│ Esc │ F1  │ F2  │ F3  │ F4  │ F5  │ F6  │ F7  │ F8  │ F9  │ F10 │ F11 │ F12 │▒▒▒▒▒│     │
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │ Fn7 │ Up  │     │     │     │     │     │     │ Cal │     │Home │ Ins │     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │Left │Down │Right│     │     │ Psc │ Slk │Pause│     │ Fn8 │ End │▒▒▒▒▒│     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │▒▒▒▒▒│ Del │     │ Web │Mute │ VoU │ VoD │     │PgUp │PgDwn│ Del │▒▒▒▒▒│PgUp │▒▒▒▒▒│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │█████│█████│█████│ Fn4 │█████│█████│█████│ Fn5 │Home │PgDwn│ End │█████│
+└─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+    */
     KEYMAP_ANSI(
-        ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, TRNS, \
-        TRNS,FN7, UP,  TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,CALC,TRNS,HOME,INS, TRNS, \
-        TRNS,LEFT,DOWN,RGHT,TRNS,TRNS,PSCR,SLCK,PAUS,TRNS,FN8, END,      TRNS, \
-        TRNS,DEL, TRNS,WHOM,MUTE,VOLU,VOLD,TRNS,PGUP,PGDN,DEL,           PGUP, \
-        TRNS,TRNS,TRNS,          FN4,                     FN5, HOME,PGDN,END),
-    /* 6: Poker Fn'd Esc */
+         ESC,   F1,   F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,  F10,  F11,  F12, TRNS, TRNS, \
+        TRNS,  FN7,   UP, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, CALC, TRNS, HOME,  INS, TRNS,       \
+        TRNS, LEFT, DOWN, RGHT, TRNS, TRNS, PSCR, SLCK, PAUS, TRNS,  FN8,  END, TRNS, TRNS,       \
+        TRNS, TRNS,  DEL, TRNS, WHOM, MUTE, VOLU, VOLD, TRNS, PGUP, PGDN,  DEL, TRNS, PGUP, TRNS, \
+        TRNS, TRNS, TRNS,                    FN4,                    FN5, HOME, PGDN,  END),
+    /* 6: Poker Fn'd Esc
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+│Grave│ F1  │ F2  │ F3  │ F4  │ F5  │ F6  │ F7  │ F8  │ F9  │ F10 │ F11 │ F12 │▒▒▒▒▒│     │
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │ Fn4 │ Up  │     │     │     │     │     │     │ Cal │     │Home │ Ins │     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │Left │Down │Right│     │     │ Psc │ Slk │Pause│     │ Fn8 │ End │▒▒▒▒▒│     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │▒▒▒▒▒│ Del │     │ Web │Mute │ VoU │ VoD │     │PgUp │PgDwn│ Del │▒▒▒▒▒│     │▒▒▒▒▒│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │█████│█████│█████│ Fn7 │█████│█████│█████│ Fn6 │     │     │     │█████│
+└─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+    */
     KEYMAP_ANSI(
-        GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, TRNS, \
-        TRNS,FN4, UP,  TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,CALC,TRNS,HOME,INS, TRNS, \
-        TRNS,LEFT,DOWN,RGHT,TRNS,TRNS,PSCR,SLCK,PAUS,TRNS,FN8, END,      TRNS, \
-        TRNS,DEL, TRNS,WHOM,MUTE,VOLU,VOLD,TRNS,PGUP,PGDN,DEL,           TRNS, \
-        TRNS,TRNS,TRNS,          FN7,                     FN6, TRNS,TRNS,TRNS),
-    /* 7: Poker Fn'd Arrow + Esc */
+         GRV,   F1,   F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,  F10,  F11,  F12, TRNS, TRNS, \
+        TRNS,  FN4,   UP, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, CALC, TRNS, HOME,  INS, TRNS,       \
+        TRNS, LEFT, DOWN, RGHT, TRNS, TRNS, PSCR, SLCK, PAUS, TRNS,  FN8,  END, TRNS, TRNS,       \
+        TRNS, TRNS,  DEL, TRNS, WHOM, MUTE, VOLU, VOLD, TRNS, PGUP, PGDN,  DEL, TRNS, TRNS, TRNS, \
+        TRNS, TRNS, TRNS,                    FN7,                    FN6, TRNS, TRNS, TRNS),
+    /* 7: Poker Fn'd Arrow + Esc
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+│Grave│ F1  │ F2  │ F3  │ F4  │ F5  │ F6  │ F7  │ F8  │ F9  │ F10 │ F11 │ F12 │▒▒▒▒▒│     │
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │ Fn5 │ Up  │     │     │     │     │     │     │ Cal │     │Home │ Ins │     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │Left │Down │Right│     │     │ Psc │ Slk │Pause│     │ Fn8 │ End │▒▒▒▒▒│     │█████│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │▒▒▒▒▒│ Del │     │ Web │Mute │ VoU │ VoD │     │PgUp │PgDwn│ Del │▒▒▒▒▒│PgUp │▒▒▒▒▒│
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │█████│█████│█████│ Fn6 │█████│█████│█████│ Fn7 │Home │PgDwn│ End │█████│
+└─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+    */
     KEYMAP_ANSI(
-        GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, TRNS, \
-        TRNS,FN5, UP,  TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,CALC,TRNS,HOME,INS, TRNS, \
-        TRNS,LEFT,DOWN,RGHT,TRNS,TRNS,PSCR,SLCK,PAUS,TRNS,FN8, END,      TRNS, \
-        TRNS,DEL, TRNS,WHOM,MUTE,VOLU,VOLD,TRNS,PGUP,PGDN,DEL,           PGUP, \
-        TRNS,TRNS,TRNS,          FN6,                     FN7, HOME,PGDN,END),
+         GRV,   F1,   F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,  F10,  F11,  F12, TRNS, TRNS, \
+        TRNS,  FN5,   UP, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, CALC, TRNS, HOME,  INS, TRNS,       \
+        TRNS, LEFT, DOWN, RGHT, TRNS, TRNS, PSCR, SLCK, PAUS, TRNS,  FN8,  END, TRNS, TRNS,       \
+        TRNS, TRNS,  DEL, TRNS, WHOM, MUTE, VOLU, VOLD, TRNS, PGUP, PGDN,  DEL, TRNS, PGUP, TRNS, \
+        TRNS, TRNS, TRNS,                    FN6,                    FN7, HOME, PGDN,  END),
 };
 
 /*
