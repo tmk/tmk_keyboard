@@ -82,7 +82,7 @@ while both [keymap_poker_bit.c](keymap_poker_bit.c) and [keymap_poker_set.c](key
 Without any Fn layer this will be useful if you want to use key remapping tool like AHK on host.
 See [keymap_plain.c](keymap_plain.c) for detail.
 
-#### 1.0 Plain Default layer
+#### 3.0 Plain Default layer
     ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
     │ Esc │  1  │  2  │  3  │  4  │  5  │  6  │  7  │  8  │  9  │  0  │  -  │  =  │▒▒▒▒▒│BkSpc│
     ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
