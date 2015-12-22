@@ -50,7 +50,8 @@ TARGET_DIR = .
 # project specific files
 SRC =	keymap_numpad.c \
 	keymap_common.c \
-	matrix.c
+	matrix.c \
+	led.c
 
 CONFIG_H = config.h
 
