@@ -33,7 +33,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 └─────────┴────┴────┘
 
 */
-    KEYMAP_ANSI(
+    KEYMAP(
         NUMLOCK, KP_SLASH, KP_ASTERISK, KP_MINUS, \
         KP_7,    KP_8,     KP_9,                  \
         KP_4,    KP_5,     KP_6,        KP_PLUS,  \
