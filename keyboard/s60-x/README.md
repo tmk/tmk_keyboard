@@ -11,13 +11,13 @@ Use `make -f Makefile.pjrc` if you want to use PJRC stack but I find no reason t
 
 
 ## Keymap
-Several version of keymap are available in advance but you are recommended to define your favorite layout yourself. To define your own keymap create file named `keymap_<name>.c` and see keymap document(you can find in top README.md) and existent keymap files.
+Several versions of keymaps are available in advance but you are recommended to define your favorite layout yourself. To define your own keymap create file named `keymap_<name>.c` and see keymap document(you can find in top README.md) and existent keymap files.
 
 To build firmware binary hex file with a certain keymap just do `make` with `KEYMAP` option like:
 
     $ make KEYMAP=[custom|poker|poker_set|poker_bit|plain|hasu|spacefn|hhkb|<name>]
 
-File [S60-X_pre-built_firmwares.zip](S60-X_pre-built_firmwares.zip) contains all keymaps available. The only tested firmware is custom, as it is a testing firmware to confirm that all possible switch positions are working on the PCB. It has the layout shown on [keymap_custom.c](keymap_custom.c).
+File [S60-X_pre-built_firmwares.zip](S60-X_pre-built_firmwares.zip) contains pre-compiled firmwares for all keymaps available. The only tested firmware is 'custom', as it is a testing firmware to confirm that all possible switch positions are working on the PCB. It has the layout shown on [keymap_custom.c](keymap_custom.c).
 
 
 ### 0  Initial explanations
