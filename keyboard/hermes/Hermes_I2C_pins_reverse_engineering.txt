@@ -1,0 +1,6 @@
+Hermes:
+
+ SDA: F4
+ SCL: F5
+ SDB: F0
+INTB: F1
