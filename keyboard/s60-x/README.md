@@ -41,10 +41,9 @@ Programming the firmware (Linux)
 
 1. Download and install/compile/unpack dfu-programmer from http://dfu-programmer.sourceforge.net/.
 2. Issue the following commands in the command prompt after connecting the device and pressing the programming button (S1). You may need root permissions or udev rules to do that.
-
-    sudo dfu-programmer atmega32u4 erase
-    sudo dfu-programmer atmega32u4 flash <firmware>.hex
-    sudo dfu-programmer atmega32u4 start
+    `sudo dfu-programmer atmega32u4 erase`
+    `sudo dfu-programmer atmega32u4 flash <firmware>.hex`
+    `sudo dfu-programmer atmega32u4 start`
 
 3. The keyboard should start working. If it doesn't, reconnect the cable.
 
