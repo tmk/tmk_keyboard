@@ -1,6 +1,6 @@
 S60-X keyboard firmware
 =======================
-DIY compact keyboard designed by VinnyCordeiro for Sentraq. Based on GH60 code.
+DIY compact keyboard designed by VinnyCordeiro for Sentraq. Most of the keymaps are based on GH60 code.
 
 ## Build
 Move to this directory then just run `make` like:
