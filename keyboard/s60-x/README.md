@@ -24,6 +24,7 @@ File [S60-X_pre-compiled_firmwares.zip](S60-X_pre-compiled_firmwares.zip) contai
 The recommended program for flashing your keyboard is [Atmel FLIP](http://www.atmel.com/tools/FLIP.aspx) on Windows or [dfu-programmer](http://dfu-programmer.sourceforge.net/) on Linux (there is also a Windows version).
 
 Programming the firmware (Windows)
+
 1. download and install FLIP (http://www.atmel.com/tools/FLIP.aspx)
 2. connect the keyboard, press the program button (S1) and wait until it enumerates
 3. go to device manager, find the atmega32u4 chip and click "update driver"
@@ -37,6 +38,7 @@ Programming the firmware (Windows)
 
 
 Programming the firmware (Linux)
+
 1. Download and install/compile/unpack dfu-programmer from http://dfu-programmer.sourceforge.net/.
 2. Issue the following commands in the command prompt after connecting the device and pressing the programming button (S1). You may need root permissions or udev rules to do that.
     sudo dfu-programmer atmega32u4 erase
