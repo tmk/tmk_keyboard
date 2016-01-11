@@ -75,7 +75,6 @@ fn_actions = [
     0x2A,0x22,0x00,0x22,0x35,0x32,0x31,0x32,
 ];
 
-
 /* Fn actions source */
 fn_actions_source = "\
     [0]  = ACTION_LAYER_MOMENTARY(1),\n\
@@ -111,6 +110,7 @@ fn_actions_source = "\
     [30] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_GRAVE),\n\
     [31] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_BSLASH),\n\
 ";
+
 
 /* hex file whthout keymap region and eof */
 function firmware_hex()
