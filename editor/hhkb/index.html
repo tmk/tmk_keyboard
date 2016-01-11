@@ -2,203 +2,14 @@
 <head>
     <title>TMK Keymap Editor</title>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <link href='keyboard.css' rel='stylesheet' type='text/css'>
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    <script src="keymap_editor.js"></script>
+    <!-- lz-string-1.3.3.js: LZString.decompress() runs away if given short string. -->
+    <script src="../common/lz-string-1.0.2.js"></script>
+    <script src="../common/base64.js"></script>
+    <script src="../common/keymap_editor.js"></script>
     <script src="firmware.js"></script>
-    <link href='keyboard.css' rel='stylesheet' type='text/css'>
-            
-    <script>
-        // key id under editing
-        var editing_key;
-        // layer under editing
-        var editing_layer = 0;
-
-        // load keymap on keyboard key buttons
-        var load_keymap_on_keyobard = function(layer, keymap) {
-            for (var row in keymap) {
-                for (var col in keymap[row]) {
-                    var code = keymap[row][col];
-                    var key = code_display[code];
-                    $("#key-0" + row + "0" + col).text(key.name);
-                    $("#key-0" + row + "0" + col).attr({ title: key.desc });
-                }
-            }
-        };
-
-        $(function() {
-            // Title
-            document.title = "TMK Keymap Editor for " + KEYBOARD_DESC;
-            $("#page-title").text("TMK Keymap Editor for " + KEYBOARD_DESC);
-
-            /* 
-             * load keymap from URL hash
-             */
-            var decoded = decode_keymap(document.location.hash.substring(1));
-            if (decoded != null) {
-                keymaps = decoded['keymaps'];
-            }
-
-
-
-            /*
-             * Layer selector
-             */
-            $("#layer_radio").buttonset();
-
-            // layer change
-            $(".layer").click(function(ev, ui) {
-                var layer = parseInt($(this).attr('id').match(/layer-(\d+)/)[1]);
-                editing_layer = layer;
-                load_keymap_on_keyobard(layer, keymaps[layer]);
-            });
-
-
-
-            /*
-             * Keyboard(key buttons)
-             */
-            // load default keymap on startup
-            load_keymap_on_keyobard(0, keymaps[0]);
-
-            // Select key button to edit
-            $(".key").click(function(ev, ui) {
-                editing_key = $(this).attr('id');
-
-                // grey-out key to indicate being under editing
-                $(".key").removeClass("key-editing");
-                $(this).addClass("key-editing");
-            }).focus(function(ev, ui) {
-                // select editing_key with tab key focus
-                $(this).click();
-            });
-
-
-
-            /*
-             * Keycodes button tab
-             */
-            $("#keycode_tabs").tabs({
-                heightStyle: "auto",
-            });
-
-            // Keycodes: read name and description from code table
-            $(".action").each(function(index) {
-                // get code from code button id: code-[0x]CCCC where CCCC is dec or hex number
-                var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
-                $(this).text(code_display[code].name);
-                $(this).attr({ title: code_display[code].desc });
-                //console.log(index + ": " + code + " " + code_display[code].desc);
-            });
-
-            $(".action").click(function(ev,ui) {
-                console.log("action click");
-                if (!editing_key) return;
-
-                // get matrix position from key id: key-RRCC where RR is row and CC is column in dec
-                var pos = editing_key.match(/key-(\d\d)(\d\d)/i);
-                if (!pos) return;
-                var row = parseInt(pos[1]), col = parseInt(pos[2]);
-
-                // set text and tooltip to key button under editing
-                $("#" + editing_key).text($(this).text());
-                $("#" + editing_key).attr({ title: $(this).attr('title'), });
-
-                // change keymap array
-                // get code from keycode button id: code-[0x]CC where CC is dec or hex number
-                var code = $(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1];
-                keymaps[editing_layer][row][col] = parseInt(code);
-
-                // give focus on editing_key for next tab key operation
-                $("#" + editing_key).focus();
-            });
-
-
-            /*
-             * Share URL
-             */
-            // Share URL
-            $("#keymap-share").click(function(ev, ui) {
-                var hash = encode_keymap({ keymaps: keymaps });
-                $("#share-url").text(document.location.origin + document.location.pathname + "#" + hash);
-            });
-
-            // Shorten URL
-            $("#shorten-url").click(function(ev, ui) {
-                var hash = encode_keymap({ keymaps: keymaps });
-                var editor_url = document.location.origin + document.location.pathname;
-                window.open("https://bitly.com/shorten/?url=" + encodeURIComponent(editor_url + "#" + hash));
-                //window.open("http://tinyurl.com/create.php?url=" + encodeURIComponent(editor_url + "#" + hash));
-            });
-
-
-            // Hex Save
-            $("#keymap-download").click(function(ev, ui) {
-                var keymap_data = fn_actions.concat(keymaps);
-                var content = firmware_hex() +
-                              hex_output(KEYMAP_START_ADDRESS, keymap_data) +
-                              hex_eof();
-
-                // download hex file
-                var blob = new Blob([content], {type: "application/octet-stream"});
-                var hex_link = $("#hex-download");
-                hex_link.attr('href', window.URL.createObjectURL(blob));
-                hex_link.attr('download', KEYBOARD_ID + "_firmware.hex");
-                // jQuery click() doesn't work straight for 'a' element
-                // http://stackoverflow.com/questions/1694595/
-                hex_link[0].click();
-            });
-
-
-
-            /*
-             * Output options
-             */
-            //$("#keymap-output").resizable();  // resizable textarea
-
-            // Hex output
-            $("#keymap-hex-generate").click(function(ev, ui) {
-                var keymap_data = fn_actions.concat(keymaps);
-                $("#keymap-output").text(hex_output(KEYMAP_START_ADDRESS, keymap_data));
-            });
-
-            // C source output
-            $("#keymap-source-generate").click(function(ev, ui) {
-                $("#keymap-output").text(source_output(keymaps));
-            });
-
-            // JSON output
-            //$("#keymap-json-generate").css('display', 'none');  // hide
-            $("#keymap-json-generate").click(function(ev, ui) {
-                var keymap_output;
-                //keymap_output = JSON.stringify(keymaps, null, 4);
-                keymap_output = JSON.stringify({ keymaps: keymaps });
-                $("#keymap-output").text(keymap_output);
-            });
-
-            // encode keymap
-            $("#keymap-encode").click(function(ev, ui) {
-                var keymap_output = encode_keymap({ keymaps: keymaps });
-                $("#keymap-output").text(keymap_output);
-            });
-
-            // decode  keymap
-            $("#keymap-decode").click(function(ev, ui) {
-                var hash = $("#keymap-output").text();
-                var keymap_output = decode_keymap(hash);
-                $("#keymap-output").text(JSON.stringify(keymap_output));
-            });
-
-
-
-            // lost keymap under edting when leave the page
-            /* TODO: Needed when released
-            $(window).bind('beforeunload', function(){
-                  return 'CAUTION: You will lost your change.';
-            });
-            */
-        });
-    </script>
 </head>
 
 <body>
@@ -212,7 +23,6 @@ How to edit keymap
     <li>Select keycode to assign to the key</li>
     <li>Download firmware</li>
 </ol>
-See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md" target="_blank">this</a> for detailed description of keymap.
 
 <h2>Keyboard</h2>
 <div id="keyboard-pane" class="keyboard-pane">
@@ -227,91 +37,90 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <input type="radio" name="radio" class="layer" id="layer-6"/><label for="layer-6">Layer 6</label>
         <input type="radio" name="radio" class="layer" id="layer-7"/><label for="layer-7">Layer 7</label>
         </div>
-    </form> 
+    </form>
 
 
-    <!-- 
+    <!--
     Keyboard keys
     -->
     <div id="keyboard-outline" class="keyboard-outline">
     <div class='keyboard-row'>
-    <div id="key-0301" class="key" tabindex="1">Esc</div>
-    <div id="key-0300" class="key" tabindex="1">1</div>
-    <div id="key-0000" class="key" tabindex="1">2</div>
-    <div id="key-0100" class="key" tabindex="1">3</div>
-    <div id="key-0101" class="key" tabindex="1">4</div>
-    <div id="key-0200" class="key" tabindex="1">5</div>
-    <div id="key-0201" class="key" tabindex="1">6</div>
-    <div id="key-0400" class="key" tabindex="1">7</div>
-    <div id="key-0401" class="key" tabindex="1">8</div>
-    <div id="key-0600" class="key" tabindex="1">9</div>
-    <div id="key-0601" class="key" tabindex="1">0</div>
-    <div id="key-0700" class="key" tabindex="1">-</div>
-    <div id="key-0701" class="key" tabindex="1">=</div>
-    <div id="key-0500" class="key" tabindex="1">\</div>
-    <div id="key-0501" class="key" tabindex="1">`</div>
+    <div id="key-31" class="key" tabindex="1">Esc</div>
+    <div id="key-30" class="key" tabindex="1">1</div>
+    <div id="key-00" class="key" tabindex="1">2</div>
+    <div id="key-10" class="key" tabindex="1">3</div>
+    <div id="key-11" class="key" tabindex="1">4</div>
+    <div id="key-20" class="key" tabindex="1">5</div>
+    <div id="key-21" class="key" tabindex="1">6</div>
+    <div id="key-40" class="key" tabindex="1">7</div>
+    <div id="key-41" class="key" tabindex="1">8</div>
+    <div id="key-60" class="key" tabindex="1">9</div>
+    <div id="key-61" class="key" tabindex="1">0</div>
+    <div id="key-70" class="key" tabindex="1">-</div>
+    <div id="key-71" class="key" tabindex="1">=</div>
+    <div id="key-50" class="key" tabindex="1">\</div>
+    <div id="key-51" class="key" tabindex="1">`</div>
     </div>
 
     <div class='keyboard-row'>
-    <div id="key-0302" class="key btn150" tabindex="2">Tab</div>
-    <div id="key-0001" class="key" tabindex="2">Q</div>
-    <div id="key-0002" class="key" tabindex="2">W</div>
-    <div id="key-0103" class="key" tabindex="2">E</div>
-    <div id="key-0102" class="key" tabindex="2">R</div>
-    <div id="key-0203" class="key" tabindex="2">T</div>
-    <div id="key-0202" class="key" tabindex="2">Y</div>
-    <div id="key-0402" class="key" tabindex="2">U</div>
-    <div id="key-0403" class="key" tabindex="2">I</div>
-    <div id="key-0602" class="key" tabindex="2">O</div>
-    <div id="key-0603" class="key" tabindex="2">P</div>
-    <div id="key-0703" class="key" tabindex="2">[</div>
-    <div id="key-0702" class="key" tabindex="2">]</div>
-    <div id="key-0502" class="key btn150" tabindex="2">BSpc</div>
+    <div id="key-32" class="key btn150" tabindex="2">Tab</div>
+    <div id="key-01" class="key" tabindex="2">Q</div>
+    <div id="key-02" class="key" tabindex="2">W</div>
+    <div id="key-13" class="key" tabindex="2">E</div>
+    <div id="key-12" class="key" tabindex="2">R</div>
+    <div id="key-23" class="key" tabindex="2">T</div>
+    <div id="key-22" class="key" tabindex="2">Y</div>
+    <div id="key-42" class="key" tabindex="2">U</div>
+    <div id="key-43" class="key" tabindex="2">I</div>
+    <div id="key-62" class="key" tabindex="2">O</div>
+    <div id="key-63" class="key" tabindex="2">P</div>
+    <div id="key-73" class="key" tabindex="2">[</div>
+    <div id="key-72" class="key" tabindex="2">]</div>
+    <div id="key-52" class="key btn150" tabindex="2">BSpc</div>
     </div>
 
     <div class='keyboard-row'>
-    <div id="key-0303" class="key btn175" tabindex="3">Ctrl</div>
-    <div id="key-0004" class="key" tabindex="3">A</div>
-    <div id="key-0003" class="key" tabindex="3">S</div>
-    <div id="key-0104" class="key" tabindex="3">D</div>
-    <div id="key-0105" class="key" tabindex="3">F</div>
-    <div id="key-0204" class="key" tabindex="3">G</div>
-    <div id="key-0205" class="key" tabindex="3">H</div>
-    <div id="key-0405" class="key" tabindex="3">J</div>
-    <div id="key-0404" class="key" tabindex="3">K</div>
-    <div id="key-0605" class="key" tabindex="3">L</div>
-    <div id="key-0604" class="key" tabindex="3">;</div>
-    <div id="key-0704" class="key" tabindex="3">'</div>
-    <div id="key-0503" class="key btn225" tabindex="3">Enter</div>
+    <div id="key-33" class="key btn175" tabindex="3">Ctrl</div>
+    <div id="key-04" class="key" tabindex="3">A</div>
+    <div id="key-03" class="key" tabindex="3">S</div>
+    <div id="key-14" class="key" tabindex="3">D</div>
+    <div id="key-15" class="key" tabindex="3">F</div>
+    <div id="key-24" class="key" tabindex="3">G</div>
+    <div id="key-25" class="key" tabindex="3">H</div>
+    <div id="key-45" class="key" tabindex="3">J</div>
+    <div id="key-44" class="key" tabindex="3">K</div>
+    <div id="key-65" class="key" tabindex="3">L</div>
+    <div id="key-64" class="key" tabindex="3">;</div>
+    <div id="key-74" class="key" tabindex="3">'</div>
+    <div id="key-53" class="key btn225" tabindex="3">Enter</div>
     </div>
 
     <div class='keyboard-row'>
-    <div id="key-0304" class="key btn225" tabindex="4">Shift</div>
-    <div id="key-0005" class="key" tabindex="4">Z</div>
-    <div id="key-0006" class="key" tabindex="4">X</div>
-    <div id="key-0007" class="key" tabindex="4">C</div>
-    <div id="key-0106" class="key" tabindex="4">V</div>
-    <div id="key-0107" class="key" tabindex="4">B</div>
-    <div id="key-0206" class="key" tabindex="4">N</div>
-    <div id="key-0406" class="key" tabindex="4">M</div>
-    <div id="key-0606" class="key" tabindex="4">,</div>
-    <div id="key-0706" class="key" tabindex="4">.</div>
-    <div id="key-0705" class="key" tabindex="4">/</div>
-    <div id="key-0505" class="key btn175" tabindex="4">Shift</div>
-    <div id="key-0504" class="key" tabindex="4">Fn</div>
+    <div id="key-34" class="key btn225" tabindex="4">Shift</div>
+    <div id="key-05" class="key" tabindex="4">Z</div>
+    <div id="key-06" class="key" tabindex="4">X</div>
+    <div id="key-07" class="key" tabindex="4">C</div>
+    <div id="key-16" class="key" tabindex="4">V</div>
+    <div id="key-17" class="key" tabindex="4">B</div>
+    <div id="key-26" class="key" tabindex="4">N</div>
+    <div id="key-46" class="key" tabindex="4">M</div>
+    <div id="key-66" class="key" tabindex="4">,</div>
+    <div id="key-76" class="key" tabindex="4">.</div>
+    <div id="key-75" class="key" tabindex="4">/</div>
+    <div id="key-55" class="key btn175" tabindex="4">Shift</div>
+    <div id="key-54" class="key" tabindex="4">Fn</div>
     </div>
 
     <div class='keyboard-row'>
     <div class="key spc150"></div>
-    <div id="key-0305" class="key" tabindex="5">LGui</div>
-    <div id="key-0306" class="key btn150" tabindex="5">RAlt</div>
-    <div id="key-0307" class="key btn600" tabindex="5">Space</div>
-    <div id="key-0507" class="key btn150" tabindex="5">RAlt</div>
-    <div id="key-0506" class="key" tabindex="5">RGui</div>
+    <div id="key-35" class="key" tabindex="5">LGui</div>
+    <div id="key-36" class="key btn150" tabindex="5">RAlt</div>
+    <div id="key-37" class="key btn600" tabindex="5">Space</div>
+    <div id="key-57" class="key btn150" tabindex="5">RAlt</div>
+    <div id="key-56" class="key" tabindex="5">RGui</div>
     <div class="key spc150"></div>
     <div class="key spc100"></div>
     </div>
-    <div class="Thank"></div>
 
     </div>
 </div>
@@ -407,6 +216,10 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <button class="action" id="code-230" title="RALT">RALT</button>
         <button class="action" id="code-231" title="RGUI">RGUI</button>
         <br/>
+        <p>
+        See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md" target="_blank">this</a> for detailed description of keymap.<br>
+        See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#02-layer-precedence-and-transparency" target="_blank">this</a> for TRNS.<br>
+        </p>
     </div>
 
     <!-- Function and Navigation -->
@@ -579,6 +392,8 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <button class="action" id="code-174"></button>
         <button class="action" id="code-175"></button>
         <button class="action" id="code-176"></button>
+        <button class="action" id="code-187"></button>
+        <button class="action" id="code-188"></button>
         <br>
 
         Application:<br>
@@ -598,8 +413,6 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <br>
 
         <!--
-        <button class="action" id="code-187"></button>
-        <button class="action" id="code-188"></button>
         <button class="action" id="code-189"></button>
         <button class="action" id="code-190"></button>
         <button class="action" id="code-191"></button>
@@ -689,23 +502,29 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <p>
         See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#3-layer-switching-example" target="_blank">this</a> for detail of Layer Switching.<br>
         See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#41-tap-key" target="_blank">this</a> for Tap key(Dual-role Modifier).<br>
-        See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#43-oneshot-modifier" target="_blank">this</a> for OneShot Modifier.</p>
-        <br>
+        See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#43-oneshot-modifier" target="_blank">this</a> for OneShot Modifier.<br>
+        </p>
     </div>
 </div>
 
 <h3>Firmware Hex File Download:</h3>
+<div align="left">Select(USB or BT):
+    <select id=variant>
+        <option value="usb" selected>USB</option>
+        <option value="bt">Bluetooth</option>
+    </select>
 <button id="keymap-download" title="save file">Download</button>
 <a id="hex-download" style="display:none" ></a>
+</div>
 
 <h3>Share URL:</h3>
-<textarea id="share-url" rows="10" cols="80"></textarea>
+<textarea id="share-url" rows="10" cols="80" readonly></textarea>
 <br/>
 <button id="keymap-share" title="Share">Share</button>
 <button id="shorten-url" title="Shorten">Shorten</button>
 
 <h3>Keymap Output(for debug):</h3>
-<textarea id="keymap-output" rows="20" cols="80"></textarea>
+<textarea id="keymap-output" rows="20" cols="80" readonly></textarea>
 <br/>
 <button id="keymap-json-generate" title="generate JSON">JSON</button>
 <button id="keymap-source-generate" title="generate C source code">C source</button>
