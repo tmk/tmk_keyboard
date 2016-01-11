@@ -14,12 +14,6 @@
 
 <body>
 <h1 id="page-title">TMK Keymap Editor</h1>
-<div align="right">Converter Revision(See <a href="https://geekhack.org/index.php?topic=24965.msg470309#msg470309" target="_blank">this</a>):
-    <select id=revision>
-        <option value="rev1">Rev.1</option>
-        <option value="rev2" selected>Rev.2</option>
-    </select>
-</div>
 
 <h2>Apple Macintosh M0110 + M0120</h2>
 <div id="keyboard-pane" class="keyboard-pane">
@@ -535,8 +529,14 @@
 </div>
 
 <h3>Firmware Hex File Download:</h3>
+<div align="left">Select revision(See <a href="https://geekhack.org/index.php?topic=24965.msg470309#msg470309" target="_blank">this</a>):
+    <select id=revision>
+        <option value="rev1">Rev.1</option>
+        <option value="rev2" selected>Rev.2</option>
+    </select>
 <button id="keymap-download" title="save file">Download</button>
 <a id="hex-download" style="display:none" ></a>
+</div>
 
 <h3>Share URL:</h3>
 <textarea id="share-url" rows="10" cols="80" readonly></textarea>
