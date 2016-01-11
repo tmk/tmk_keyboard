@@ -2,13 +2,14 @@
 <head>
     <title>TMK Keymap Editor</title>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <link href='keyboard.css' rel='stylesheet' type='text/css'>
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <!-- lz-string-1.3.3.js: LZString.decompress() runs away if given short string. -->
     <script src="../common/lz-string-1.0.2.js"></script>
     <script src="../common/base64.js"></script>
-    <script src="keymap_editor.js"></script>
+    <script src="../common/keymap_editor.js"></script>
     <script src="firmware.js"></script>
-    <link href='keyboard.css' rel='stylesheet' type='text/css'>
 </head>
 
 <body>
@@ -37,10 +38,10 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <input type="radio" name="radio" class="layer" id="layer-6"/><label for="layer-6">Layer 6</label>
         <input type="radio" name="radio" class="layer" id="layer-7"/><label for="layer-7">Layer 7</label>
         </div>
-    </form> 
+    </form>
 
 
-    <!-- 
+    <!--
     Keyboard keys
     -->
     <div id="keyboard-outline" class="keyboard-outline">
@@ -122,7 +123,6 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
     <div id="key-10" class="key btn125" tabindex="5">RGui</div>
     <div id="key-20" class="key btn125" tabindex="5">RCtl</div>
     </div>
-    <div class="Thank"></div>
 
     </div>
 </div>
@@ -218,6 +218,10 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <button class="action" id="code-230" title="RALT">RALT</button>
         <button class="action" id="code-231" title="RGUI">RGUI</button>
         <br/>
+        <p>
+        See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md" target="_blank">this</a> for detailed description of keymap.<br>
+        See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#02-layer-precedence-and-transparency" target="_blank">this</a> for TRNS.<br>
+        </p>
     </div>
 
     <!-- Function and Navigation -->
@@ -390,6 +394,8 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <button class="action" id="code-174"></button>
         <button class="action" id="code-175"></button>
         <button class="action" id="code-176"></button>
+        <button class="action" id="code-187"></button>
+        <button class="action" id="code-188"></button>
         <br>
 
         Application:<br>
@@ -409,8 +415,6 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <br>
 
         <!--
-        <button class="action" id="code-187"></button>
-        <button class="action" id="code-188"></button>
         <button class="action" id="code-189"></button>
         <button class="action" id="code-190"></button>
         <button class="action" id="code-191"></button>
@@ -500,8 +504,8 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <p>
         See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#3-layer-switching-example" target="_blank">this</a> for detail of Layer Switching.<br>
         See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#41-tap-key" target="_blank">this</a> for Tap key(Dual-role Modifier).<br>
-        See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#43-oneshot-modifier" target="_blank">this</a> for OneShot Modifier.</p>
-        <br>
+        See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#43-oneshot-modifier" target="_blank">this</a> for OneShot Modifier.<br>
+        </p>
     </div>
 </div>
 
@@ -510,13 +514,13 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
 <a id="hex-download" style="display:none" ></a>
 
 <h3>Share URL:</h3>
-<textarea id="share-url" rows="10" cols="80"></textarea>
+<textarea id="share-url" rows="10" cols="80" readonly></textarea>
 <br/>
 <button id="keymap-share" title="Share">Share</button>
 <button id="shorten-url" title="Shorten">Shorten</button>
 
 <h3>Keymap Output(for debug):</h3>
-<textarea id="keymap-output" rows="20" cols="80"></textarea>
+<textarea id="keymap-output" rows="20" cols="80" readonly></textarea>
 <br/>
 <button id="keymap-json-generate" title="generate JSON">JSON</button>
 <button id="keymap-source-generate" title="generate C source code">C source</button>
