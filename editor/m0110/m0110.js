@@ -2,6 +2,7 @@
  * M0110 keymap
  */
 KEYBOARD_ID = "m0110";
+KEYBOARD_DESC = "TMK Converter for M0110"
 
 /* for ATMega32U4 with 32KB flash */
 KEYMAP_START_ADDRESS = 0x6800;
@@ -111,7 +112,7 @@ function transparent_map()
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1],
-    ]; 
+    ];
 }
 
 /* default keymaps(8 layers) */
