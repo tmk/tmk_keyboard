@@ -8,7 +8,6 @@ html * {
     border-radius:6px;
     border:2px solid #dcdcdc;
     display:inline-block;
-    float: left;
     color:#777777;
     font-family:helvetica, arial, sans-serif;
     font-size:16px;
@@ -86,14 +85,15 @@ html * {
 
 .keyboard-row {
     width: auto;
-    display: inline-block;
+    white-space: nowrap;
 }
 
 .keyboard-outline {
+    /* stop displaying whitespace between keys */
+    font-size: 0;
 }
 
 .keyboard-pane {
-    width: 750px;
     font-size: 14px;
     font-weight:bold;
 }
