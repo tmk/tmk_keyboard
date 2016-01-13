@@ -76,11 +76,13 @@ html * {
 .btn700 { width:325px; }    /* 350      - 25 */
 .btn750 { width:350px; }    /* 375      - 25 */
 
+.spc050 { width:0px; visibility:hidden; }
+.spc075 { width:12.5px; visibility:hidden; }
 .spc100 { width:25px; visibility:hidden; }
 .spc125 { width:37.5px; visibility:hidden; }
 .spc150 { width:50px; visibility:hidden; }
 .spc175 { width:62.5px; visibility:hidden; }
-.spc200 { width 75px; visibility:hidden; }
+.spc200 { width:75px; visibility:hidden; }
 
 .keyboard-row {
     width: auto;
