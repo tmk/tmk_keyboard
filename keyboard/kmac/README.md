@@ -6,14 +6,14 @@ Korean custom keyboard designed by Byungho Kim and KBDMania community.
 
 Supported models
 ----------------
-At the moment only the TKL models is supported.
+TKL models and happy.
 
 
 Build
 -----
 Move to this directory then just run `make` like:
 
-    $ make -f Makefile.[pjrc|lufa] [winkey|winkeyless]
+    $ make -f Makefile.[pjrc|lufa] [winkey|winkeyless|happy]
 
 Use `Makefile.pjrc` if you want to use PJRC stack or use `Makefile.lufa` for LUFA stack.
 
