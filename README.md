@@ -70,6 +70,7 @@ You can find some keyboard specific projects under `converter` and `keyboard` di
 * [KittenPaw](keyboard/kitten_paw)          - Custom Majestouch controller
 * [Lightpad](keyboard/lightpad)             - Korean custom keypad
 * [ghost_squid](keyboard/ghost_squid/)      - [The Ghost Squid][ghost_squid] controller for [Cooler Master QuickFire XT][cmxt]
+* [pegasus_hoof](keyboard/pegasus_hoof/)    - [The Pegasus Hoof][pegasus_hoof] controller for [Filco Majestouch-2 TKL][filco_mt2tkl]
 
 ### Extenal projects using tmk_keyboard
 * [ErgoDox_cub-uanic][cub-uanic]            - Split Ergonomic Keyboard [ErgoDox][ergodox_org]
@@ -101,6 +102,8 @@ You can find some keyboard specific projects under `converter` and `keyboard` di
 [cub-uanic]:    https://github.com/cub-uanic/tmk_keyboard/tree/master/keyboard/ergodox
 [mcdox]:        https://github.com/DavidMcEwan/mcdox
 [mcdox_tmk]:    https://github.com/DavidMcEwan/tmk_keyboard/tree/master/keyboard/mcdox
+[pegasus_hoof]: http://deskthority.net/wiki/Costar_replacement_controllers#The_Pegasus_Hoof
+[filco_mt2tkl]: http://www.keyboardco.com/keyboard/uk-filco-majestouch-2-tenkeyless-nkr-tactile-action-keyboard.asp
 
 
 
