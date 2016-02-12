@@ -47,6 +47,8 @@ uint8_t matrix_cols(void);
 void matrix_setup(void);
 /* intialize matrix for scaning. */
 void matrix_init(void);
+/* called at early stage of startup after matrix_init when host driver is set.(optional) */
+void matrix_startup(void);
 /* scan all key states on matrix */
 uint8_t matrix_scan(void);
 /* whether modified from previous scan. used after matrix_scan. */

@@ -61,6 +61,7 @@ int main(void)
 #ifdef SLEEP_LED_ENABLE
     sleep_led_init();
 #endif
+    keyboard_startup();
     while (1) {
         while (suspend) {
             suspend_power_down();

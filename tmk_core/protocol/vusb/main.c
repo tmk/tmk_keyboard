@@ -58,6 +58,7 @@ int main(void)
 
     debug("initForUsbConnectivity()\n");
     initForUsbConnectivity();
+    keyboard_startup();
 
     debug("main loop\n");
     while (1) {
