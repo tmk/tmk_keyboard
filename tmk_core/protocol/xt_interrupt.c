@@ -43,132 +43,43 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "pbuff.h"
-#include "ps2.h"
-#include "ps2_io.h"
+#include "xt.h"
+#include "xt_io.h"
+#include "wait.h"
 #include "print.h"
 
-
-#define WAIT(stat, us, err) do { \
-    if (!wait_##stat(us)) { \
-        ps2_error = err; \
-        goto ERROR; \
-    } \
-} while (0)
-
-
-uint8_t ps2_error = PS2_ERR_NONE;
-
-void ps2_host_init(void)
+void xt_host_init(void)
 {
-    idle();
-    PS2_INT_INIT();
-    PS2_INT_ON();
-    // POR(150-2000ms) plus BAT(300-500ms) may take 2.5sec([3]p.20)
-    //_delay_ms(2500);
-}
-
-uint8_t ps2_host_send(uint8_t data)
-{
-    bool parity = true;
-    ps2_error = PS2_ERR_NONE;
-
-    PS2_INT_OFF();
-
-    /* terminate a transmission if we have */
-    inhibit();
-    _delay_us(100); // 100us [4]p.13, [5]p.50
-
-    /* 'Request to Send' and Start bit */
-    data_lo();
-    clock_hi();
-    WAIT(clock_lo, 10000, 10);   // 10ms [5]p.50
-
-    /* Data bit[2-9] */
-    for (uint8_t i = 0; i < 8; i++) {
-        _delay_us(15);
-        if (data&(1<<i)) {
-            parity = !parity;
-            data_hi();
-        } else {
-            data_lo();
-        }
-        WAIT(clock_hi, 50, 2);
-        WAIT(clock_lo, 50, 3);
-    }
-
-    /* Parity bit */
-    _delay_us(15);
-    if (parity) { data_hi(); } else { data_lo(); }
-    WAIT(clock_hi, 50, 4);
-    WAIT(clock_lo, 50, 5);
-
-    /* Stop bit */
-    _delay_us(15);
-    data_hi();
-
-    /* Ack */
-    WAIT(data_lo, 50, 6);
-    WAIT(clock_lo, 50, 7);
-
-    /* wait for idle state */
-    WAIT(clock_hi, 50, 8);
-    WAIT(data_hi, 50, 9);
-
-    idle();
-    PS2_INT_ON();
-    return ps2_host_recv_response();
-ERROR:
-    idle();
-    PS2_INT_ON();
-    return 0;
-}
-
-uint8_t ps2_host_recv_response(void)
-{
-    // Command may take 25ms/20ms at most([5]p.46, [3]p.21)
-    uint8_t retry = 25;
-    while (retry-- && !pbuf_has_data()) {
-        _delay_ms(1);
-    }
-    return pbuf_dequeue();
+    XT_INT_INIT();
+    XT_INT_ON();
 }
 
 /* get data received by interrupt */
-uint8_t ps2_host_recv(void)
+uint8_t xt_host_recv(void)
 {
     if (pbuf_has_data()) {
-        ps2_error = PS2_ERR_NONE;
         return pbuf_dequeue();
     } else {
-        ps2_error = PS2_ERR_NODATA;
         return 0;
     }
 }
 
-ISR(PS2_INT_VECT)
+ISR(XT_INT_VECT)
 {
     static enum {
         INIT,
-        START,
         BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7,
-        PARITY,
         STOP,
     } state = INIT;
     static uint8_t data = 0;
-    static uint8_t parity = 1;
+    // wait for clock falling edge
+    if(state != INIT)
+        wait_clock_lo(70);
 
-    // TODO: abort if elapse 100us from previous interrupt
-
-    // return unless falling edge
-    if (clock_in()) {
-        goto RETURN;
-    }
-
-    state++;
     switch (state) {
-        case START:
+        case INIT:
             if (data_in())
-                goto ERROR;
+                state++;
             break;
         case BIT0:
         case BIT1:
@@ -178,44 +89,25 @@ ISR(PS2_INT_VECT)
         case BIT5:
         case BIT6:
         case BIT7:
+            state++;
             data >>= 1;
             if (data_in()) {
                 data |= 0x80;
-                parity++;
-            }
-            break;
-        case PARITY:
-            if (data_in()) {
-                if (!(parity & 0x01))
-                    goto ERROR;
-            } else {
-                if (parity & 0x01)
-                    goto ERROR;
             }
             break;
         case STOP:
             if (!data_in())
-                goto ERROR;
+                goto DONE;
             pbuf_enqueue(data);
             goto DONE;
             break;
         default:
-            goto ERROR;
+            goto DONE;
     }
     goto RETURN;
-ERROR:
-    ps2_error = state;
 DONE:
     state = INIT;
     data = 0;
-    parity = 1;
 RETURN:
     return;
-}
-
-/* send LED state to keyboard */
-void ps2_host_set_led(uint8_t led)
-{
-    ps2_host_send(0xED);
-    ps2_host_send(led);
 }
