@@ -140,7 +140,6 @@ uint8_t matrix_scan(void)
     }
 
     uint8_t code = xt_host_recv();
-    if (code) xprintf("%X\r\n", code);
     switch (state) {
         case INIT:
             switch (code) {
@@ -150,19 +149,13 @@ uint8_t matrix_scan(void)
                 case 0xE1:
                     state = E1;
                     break;
-                case 0x00:
-                    break;
                 default:    // normal key make
-                    if (code < 0x80) {
+                    if (code < 0x80 && code != 0x00) {
                         xprintf("make: %X\r\n", code);
                         matrix_make(code);
-                    } else if (code > 0x80 && code < 0xFF) {
+                    } else if (code > 0x80 && code < 0xFF && code != 0x00) {
                         xprintf("break %X\r\n", code);
                         matrix_break(code - 0x80);
-                    } else {
-                        matrix_clear();
-                        clear_keyboard();
-                        xprintf("unexpected scan code at INIT: %02X\n", code);
                     }
                     state = INIT;
             }
@@ -175,114 +168,72 @@ uint8_t matrix_scan(void)
                 case 0xB7:
                     state = E0_B7;
                     break;
-                case 0x00:
-                    state = INIT;
-                    break;
                 default:
-                    if (code < 0x80) {
+                    if (code < 0x80 && code != 0x00) {
                         matrix_make(move_codes(code));
-                    } else if (code > 0x80 && code < 0xFF) {
+                    } else if (code > 0x80 && code < 0xFF && code != 0x00) {
                         matrix_break(move_codes(code - 0x80));
-                    } else {
-                        matrix_clear();
-                        clear_keyboard();
-                        xprintf("unexpected scan code at E0: %02X\n", code);
                     }
                     state = INIT;
             }
             break;
         case E0_2A:
-            switch (code) {
-                case 0xE0:
-                    state = E0_2A_E0;
-                    break;
-                default:
-                    state = INIT;
-            }
+            if(code == 0xE0)
+                state = E0_2A_E0;
+            else
+                state = INIT;
             break;
         case E0_2A_E0:
-            switch (code) {
-                case 0x37:
-                    matrix_make(PRINT_SCREEN);
-                    break;
-                default:
-                    state = INIT;
-            }
+            if(code == 0x37)
+                matrix_make(PRINT_SCREEN);
+            else
+                state = INIT;
             break;
         case E0_B7:
-            switch (code) {
-                case 0xE0:
-                    state = E0_B7;
-                    break;
-                default:
-                    state = INIT;
-            }
+            if(code == 0xE0)
+                state = E0_B7;
+            else
+                state = INIT;
             break;
         case E0_B7_E0:
-          switch (code) {
-              case 0xAA:
-                  matrix_break(PRINT_SCREEN);
-                  break;
-              default:
-                  state = INIT;
-          }
+          if(code == 0xAA)
+              matrix_break(PRINT_SCREEN);
+          else
+              state = INIT;
           break;
         case E1:
-            switch (code) {
-                case 0x1D:
-                    state = E1_1D;
-                    break;
-                default:
-                    state = INIT;
-            }
+            if (code == 0x1D)
+                state = E1_1D;
+            else
+                state = INIT;
             break;
         case E1_1D:
-            switch (code) {
-                case 0x45:
-                    state = E1_1D_45;
-                    break;
-                default:
-                    state = INIT;
-            }
+            if(code == 0x45)
+                state = E1_1D_45;
+            else
+                state = INIT;
             break;
         case E1_1D_45:
-            switch (code) {
-                case 0xE1:
-                    state = E1_1D_45_E1;
-                    break;
-                default:
-                    state = INIT;
-            }
+            if(code == 0xE1)
+                state = E1_1D_45_E1;
+            else
+                state = INIT;
             break;
         case E1_1D_45_E1:
-            switch (code) {
-                case 0x9D:
-                    state = E1_1D_45_E1_9D;
-                    break;
-                default:
-                    state = INIT;
-            }
+            if(code == 0x9D)
+                state = E1_1D_45_E1_9D;
+            else
+                state = INIT;
             break;
         case E1_1D_45_E1_9D:
-            switch (code) {
-                case 0xC5:
-                    matrix_make(PAUSE);
-                    break;
-                default:
-                    state = INIT;
-            }
+            if(code == 0xC5)
+                matrix_make(PAUSE);
+            else
+                state = INIT;
             break;
         default:
             state = INIT;
     }
-
-    // TODO: request RESEND when error occurs?
-/*
-    if (PS2_IS_FAILED(ps2_error)) {
-        uint8_t ret = ps2_host_send(PS2_RESEND);
-        xprintf("Resend: %02X\n", ret);
-    }
-*/
     return 1;
 }
 

@@ -66,47 +66,28 @@ uint8_t xt_host_recv(void)
 
 ISR(XT_INT_VECT)
 {
-    static enum {
-        INIT,
-        BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7,
-        STOP,
-    } state = INIT;
+    static uint8_t state = 0;
     static uint8_t data = 0;
-    // wait for clock falling edge
-    if(state != INIT)
-        wait_clock_lo(70);
 
-    switch (state) {
-        case INIT:
-            if (data_in())
-                state++;
-            break;
-        case BIT0:
-        case BIT1:
-        case BIT2:
-        case BIT3:
-        case BIT4:
-        case BIT5:
-        case BIT6:
-        case BIT7:
+    if (state == 0) {
+        if (data_in())
             state++;
-            data >>= 1;
-            if (data_in()) {
-                data |= 0x80;
-            }
-            break;
-        case STOP:
-            if (!data_in())
-                goto DONE;
-            pbuf_enqueue(data);
-            goto DONE;
-            break;
-        default:
-            goto DONE;
+    } else if (state >= 1 && state <= 8) {
+        wait_clock_lo(20);
+        data >>= 1;
+        if (data_in())
+            data |= 0x80;
+        if (state == 8)
+            goto END;
+        state++;
+    } else {
+        goto DONE;
     }
     goto RETURN;
+END:
+    pbuf_enqueue(data);
 DONE:
-    state = INIT;
+    state = 0;
     data = 0;
 RETURN:
     return;
