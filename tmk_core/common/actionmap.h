@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /* Keymapping with 16bit action codes */
-extern const uint16_t actionmaps[][MATRIX_ROWS][MATRIX_COLS];
+extern const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS];
 
 
 /* Modified key */

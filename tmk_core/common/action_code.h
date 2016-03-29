@@ -181,9 +181,9 @@ typedef union {
 
 
 /* action utility */
-#define ACTION_NO                       0
-#define ACTION_TRANSPARENT              1
-#define ACTION(kind, param)             ((kind)<<12 | (param))
+#define ACTION_NO                       { .code = 0 }
+#define ACTION_TRANSPARENT              { .code = 1 }
+#define ACTION(kind, param)             { .code = ((kind)<<12 | (param)) }
 
 
 /*

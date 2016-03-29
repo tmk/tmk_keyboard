@@ -53,7 +53,7 @@ action_t action_for_key(uint8_t layer, keypos_t key)
         case KC_LALT:
             if (keymap_config.swap_lalt_lgui) {
                 if (keymap_config.no_gui) {
-                    return keycode_to_action(ACTION_NO);
+                    return keycode_to_action(KC_NO);
                 }
                 return keycode_to_action(KC_LGUI);
             }
@@ -63,13 +63,13 @@ action_t action_for_key(uint8_t layer, keypos_t key)
                 return keycode_to_action(KC_LALT);
             }
             if (keymap_config.no_gui) {
-                return keycode_to_action(ACTION_NO);
+                return keycode_to_action(KC_NO);
             }
             return keycode_to_action(KC_LGUI);
         case KC_RALT:
             if (keymap_config.swap_ralt_rgui) {
                 if (keymap_config.no_gui) {
-                    return keycode_to_action(ACTION_NO);
+                    return keycode_to_action(KC_NO);
                 }
                 return keycode_to_action(KC_RGUI);
             }
@@ -79,7 +79,7 @@ action_t action_for_key(uint8_t layer, keypos_t key)
                 return keycode_to_action(KC_RALT);
             }
             if (keymap_config.no_gui) {
-                return keycode_to_action(ACTION_NO);
+                return keycode_to_action(KC_NO);
             }
             return keycode_to_action(KC_RGUI);
         case KC_GRAVE:
@@ -133,23 +133,22 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 /* translates keycode to action */
 static action_t keycode_to_action(uint8_t keycode)
 {
-    action_t action = {};
     switch (keycode) {
         case KC_A ... KC_EXSEL:
         case KC_LCTRL ... KC_RGUI:
-            action.code = ACTION_KEY(keycode);
+            return (action_t)ACTION_KEY(keycode);
             break;
         case KC_SYSTEM_POWER ... KC_SYSTEM_WAKE:
-            action.code = ACTION_USAGE_SYSTEM(KEYCODE2SYSTEM(keycode));
+            return (action_t)ACTION_USAGE_SYSTEM(KEYCODE2SYSTEM(keycode));
             break;
         case KC_AUDIO_MUTE ... KC_WWW_FAVORITES:
-            action.code = ACTION_USAGE_CONSUMER(KEYCODE2CONSUMER(keycode));
+            return (action_t)ACTION_USAGE_CONSUMER(KEYCODE2CONSUMER(keycode));
             break;
         case KC_MS_UP ... KC_MS_ACCEL2:
-            action.code = ACTION_MOUSEKEY(keycode);
+            return (action_t)ACTION_MOUSEKEY(keycode);
             break;
         case KC_TRNS:
-            action.code = ACTION_TRANSPARENT;
+            return (action_t)ACTION_TRANSPARENT;
             break;
         case KC_BOOTLOADER:
             clear_keyboard();
@@ -157,10 +156,10 @@ static action_t keycode_to_action(uint8_t keycode)
             bootloader_jump(); // not return
             break;
         default:
-            action.code = ACTION_NO;
+            return (action_t)ACTION_NO;
             break;
     }
-    return action;
+    return (action_t)ACTION_NO;
 }
 
 
@@ -181,21 +180,20 @@ uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
 __attribute__ ((weak))
 action_t keymap_fn_to_action(uint8_t keycode)
 {
-    action_t action = { .code = ACTION_NO };
     switch (keycode) {
         case KC_FN0 ... KC_FN31:
             {
                 uint8_t layer = keymap_fn_layer(FN_INDEX(keycode));
                 uint8_t key = keymap_fn_keycode(FN_INDEX(keycode));
                 if (key) {
-                    action.code = ACTION_LAYER_TAP_KEY(layer, key);
+                    return (action_t)ACTION_LAYER_TAP_KEY(layer, key);
                 } else {
-                    action.code = ACTION_LAYER_MOMENTARY(layer);
+                    return (action_t)ACTION_LAYER_MOMENTARY(layer);
                 }
             }
-            return action;
+            return (action_t)ACTION_NO;
         default:
-            return action;
+            return (action_t)ACTION_NO;
     }
 }
 #endif
