@@ -37,7 +37,7 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 }
 
 
-const uint16_t PROGMEM actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const action_t PROGMEM actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Default Layer
      * ,-----------------------------------------------------------.
      * |Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|   \   |

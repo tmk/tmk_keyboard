@@ -163,7 +163,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 /*
  * Fn actions
  */
-static const uint16_t PROGMEM fn_actions[] = {
+static const action_t PROGMEM fn_actions[] = {
     ACTION_LAYER_TAP_TOGGLE(0),                  // FN0
     ACTION_LAYER_TAP_KEY(1, KC_SLASH),           // FN1
     ACTION_LAYER_TAP_KEY(2, KC_SCLN),            // FN2

@@ -22,7 +22,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                    LEFT,DOWN,RGHT,          TRNS,                         TRNS,TRNS,TRNS)
 };
 
-const uint16_t PROGMEM fn_actions[] = {
+const action_t PROGMEM fn_actions[] = {
     [0] = ACTION_LAYER_MOMENTARY(2),
     [1] = ACTION_LAYER_TAP_KEY(2, KC_SPACE),
     [2] = ACTION_LAYER_TOGGLE(1),

@@ -28,7 +28,7 @@ static const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     {{KC_CAPS}}, // test with KC_CAPS, KC_A, KC_BTLD
 };
 
-static const uint16_t fn_actions[] = {
+static const action_t fn_actions[] = {
 };
 
 /* translates key to keycode */

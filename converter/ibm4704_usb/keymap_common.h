@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // 32*8(256) byte array which converts PS/2 code into USB code
 extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-extern const uint16_t fn_actions[];
+extern const action_t fn_actions[];
 
 
 /* 107-key */

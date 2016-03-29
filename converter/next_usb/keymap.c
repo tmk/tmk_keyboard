@@ -59,7 +59,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "keycode.h"
 
 // 32*8(256) byte array which converts PS/2 code into USB code
-static const uint16_t PROGMEM fn_actions[] = {
+static const action_t PROGMEM fn_actions[] = {
     ACTION_LAYER_MOMENTARY(1),                  // FN0 - left command key
     ACTION_LAYER_MOMENTARY(1),                  // FN1 - right command key
     ACTION_KEY(KC_BSLS),                        // FN2 - number pad slash & backslash
