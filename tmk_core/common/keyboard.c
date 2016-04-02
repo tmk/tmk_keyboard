@@ -169,12 +169,12 @@ hook_scan_loop();
     // update LED
     if (led_status != host_keyboard_leds()) {
         led_status = host_keyboard_leds();
-        keyboard_set_leds(led_status);
+        if (debug_keyboard) dprintf("LED: %02X\n", led_status);
+        hook_led_update(led_status);
     }
 }
 
 void keyboard_set_leds(uint8_t leds)
 {
-    if (debug_keyboard) { debug("keyboard_set_led: "); debug_hex8(leds); debug("\n"); }
-    led_update_hook(leds);
+    led_set(leds);
 }

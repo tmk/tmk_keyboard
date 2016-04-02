@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "keyboard.h"
 #include "hooks.h"
 
 /* -------------------------------------------------
@@ -51,15 +52,7 @@ void hook_matrix_change(keyevent_t event) {
 /* Default behaviour: calls led_set (for compatibility). */
 __attribute__((weak))
 void hook_led_update(uint8_t led_status) {
-    led_set(led_status);
-}
-
-/* Called when indicator LEDs need updating from firmware. */
-/* Default behaviour: calls led_set (for compatibility). */
-void led_restore_hook(uint8_t led_status);
-__attribute__((weak))
-void hook_led_restore(uint8_t led_status) {
-    led_set(led_status);
+    keyboard_set_leds(led_status);
 }
 
 /* Called once, on checking the bootmagic combos. */

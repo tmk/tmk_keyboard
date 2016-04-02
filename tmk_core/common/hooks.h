@@ -15,61 +15,74 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hooks.h"
+#ifndef _HOOKS_H_
+#define _HOOKS_H_
 
-/* -------------------------------------------------
- * Definitions of hardware-independent default hooks
- * ------------------------------------------------- */
+#include "keyboard.h"
+#include "led.h"
 
-/* Called on layer state change event. */
+/* -------------------------------------
+ *       Hardware / one-off hooks
+ * ------------------------------------- */
+
+/* Called once, before initialising USB. */
 /* Default behaviour: do nothing. */
-__attribute__((weak))
-void hook_layer_state_change(uint8_t layer_state) {
-    (void)layer_state;
-}
+void hook_init_early(void);
 
-/* Called on default layer state change event. */
+/* Called once, after USB is connected and keyboard initialised. */
 /* Default behaviour: do nothing. */
-__attribute__((weak))
-void hook_default_layer_state_change(uint8_t default_layer_state) {
-    (void)default_layer_state;
-}
+void hook_init_late(void);
 
-/* Called periodically from the matrix scan loop (very often!) */
-/* Default behaviour: do nothing. */
-__attribute__((weak))
-void hook_scan_loop(void) {}
+/* Called once, on getting SUSPEND event from USB. */
+/* Default behaviour: enables sleep LED breathing. */
+void hook_usb_suspend(void);
 
-/* Called on matrix state change event (every keypress => often!) */
-/* Default behaviour: do nothing. */
-__attribute__((weak))
-void hook_matrix_change(keyevent_t event) {
-	(void)event;
-}
+/* Called repeatedly during the SUSPENDed state. */
+/* Default behaviour: power down and periodically check
+ * the matrix, cause wakeup if needed. */
+void hook_suspend_loop(void);
 
-/* Called on indicator LED update event (when reported from host). */
-/* Default behaviour: calls led_set (for compatibility). */
-__attribute__((weak))
-void hook_led_update(uint8_t led_status) {
-    led_set(led_status);
-}
-
-/* Called when indicator LEDs need updating from firmware. */
-/* Default behaviour: calls led_set (for compatibility). */
-void led_restore_hook(uint8_t led_status);
-__attribute__((weak))
-void hook_led_restore(uint8_t led_status) {
-    led_set(led_status);
-}
+/* Called once, on getting WAKE event from USB. */
+/* Default behaviour: disables sleep LED breathing and restores 
+ * the "normal" indicator LED status by default. */
+void hook_usb_wakeup(void);
 
 /* Called once, on checking the bootmagic combos. */
 /* Default behaviour: do nothing. */
-__attribute__((weak))
-void hook_bootmagic(void) {
-	/* An example: */
-	// #include "bootmagic.h"
-	// #include "keymap.h"
-	// if(bootmagic_scan_keycode(KC_W)) {
-	// 	// do something
-	// }
-}
+void hook_bootmagic(void);
+
+/* -------------------------------------
+ *       Keyboard / periodic hooks
+ * ------------------------------------- */
+
+/* Called periodically from the matrix scan loop (very often!) */
+/* Default behaviour: do nothing. */
+void hook_scan_loop(void);
+
+/* Called on matrix state change event (every keypress => often!) */
+/* Default behaviour: do nothing. */
+void hook_matrix_change(keyevent_t event);
+
+/* Called on layer state change event. */
+/* Default behaviour: do nothing. */
+void hook_layer_state_change(uint8_t layer_state);
+
+/* Called on default layer state change event. */
+/* Default behaviour: do nothing. */
+void hook_default_layer_state_change(uint8_t default_layer_state);
+
+/* Called on tap event. */
+/* Default behaviour: do nothing. */
+// void hook_tap_event(void);
+/* TODO */
+
+/* Called on hold event. */
+/* Default behaviour: do nothing. */
+// void hook_hold_event(void);
+/* TODO */
+
+/* Called on indicator LED update event (when reported from host). */
+/* Default behaviour: calls led_set (for compatibility). */
+void hook_led_update(uint8_t led_status);
+
+#endif /* _HOOKS_H_ */
