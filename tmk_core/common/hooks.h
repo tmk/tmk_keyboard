@@ -82,7 +82,7 @@ void hook_default_layer_state_change(uint8_t default_layer_state);
 /* TODO */
 
 /* Called on indicator LED update event (when reported from host). */
-/* Default behaviour: calls led_set (for compatibility). */
+/* Default behaviour: calls keyboard_set_leds() (for compatibility). */
 void hook_led_update(uint8_t led_status);
 
 /* Time interval-based hooks */
