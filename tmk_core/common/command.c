@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "led.h"
 #include "command.h"
 #include "backlight.h"
+#include "hooks.h"
 
 #ifdef MOUSEKEY_ENABLE
 #include "mousekey.h"
@@ -64,7 +65,6 @@ static void switch_default_layer(uint8_t layer);
 
 
 command_state_t command_state = ONESHOT;
-
 
 bool command_proc(uint8_t code)
 {
@@ -189,7 +189,7 @@ static bool command_common(uint8_t code)
             // test breathing sleep LED
             print("Sleep LED test\n");
             sleep_led_toggle();
-            led_set(host_keyboard_leds());
+            led_restore_hook(host_keyboard_leds());
             break;
 #endif
 #ifdef BOOTMAGIC_ENABLE

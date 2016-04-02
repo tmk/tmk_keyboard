@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "bootmagic.h"
 #include "eeconfig.h"
 #include "backlight.h"
+#include "hooks.h"
 #ifdef MOUSEKEY_ENABLE
 #   include "mousekey.h"
 #endif
@@ -146,6 +147,8 @@ void keyboard_task(void)
 
 MATRIX_LOOP_END:
 
+hook_scan_loop();
+
 #ifdef MOUSEKEY_ENABLE
     // mousekey repeat & acceleration
     mousekey_task();
@@ -173,5 +176,5 @@ MATRIX_LOOP_END:
 void keyboard_set_leds(uint8_t leds)
 {
     if (debug_keyboard) { debug("keyboard_set_led: "); debug_hex8(leds); debug("\n"); }
-    led_set(leds);
+    led_update_hook(leds);
 }
