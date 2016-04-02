@@ -46,6 +46,11 @@ uint32_t timer_read32(void);
 uint16_t timer_elapsed(uint16_t last);
 uint32_t timer_elapsed32(uint32_t last);
 
+uint16_t timer_hook_interval_1ms;
+uint16_t timer_hook_interval_10ms;
+uint16_t timer_hook_interval_100ms;
+uint16_t timer_hook_interval_1000ms;
+
 #ifdef __cplusplus
 }
 #endif

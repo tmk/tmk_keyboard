@@ -85,4 +85,11 @@ void hook_default_layer_state_change(uint8_t default_layer_state);
 /* Default behaviour: calls led_set (for compatibility). */
 void hook_led_update(uint8_t led_status);
 
+/* Time interval-based hooks */
+/* Default behaviour: do nothing. */
+void hook_interval_1ms(void);
+void hook_interval_10ms(void);
+void hook_interval_100ms(void);
+void hook_interval_1000ms(void);
+
 #endif /* _HOOKS_H_ */
