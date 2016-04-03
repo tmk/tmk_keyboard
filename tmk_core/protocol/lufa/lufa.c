@@ -586,7 +586,7 @@ int main(void)
 {
     setup_mcu();
     keyboard_setup();
-    hook_init_early();
+    hook_keyboard_startup();
     setup_usb();
     sei();
 
@@ -608,7 +608,7 @@ int main(void)
 #endif
 
     print("Keyboard start.\n");
-    hook_init_late();
+    hook_keyboard_init();
     while (1) {
         while (USB_DeviceState == DEVICE_STATE_Suspended) {
             print("[s]");
@@ -626,10 +626,10 @@ int main(void)
 
 /* hooks */
 __attribute__((weak))
-void hook_init_early(void) {}
+void hook_keyboard_startup(void) {}
 
 __attribute__((weak))
-void hook_init_late(void) {}
+void hook_keyboard_init(void) {}
 
  __attribute__((weak))
 void hook_usb_suspend(void)

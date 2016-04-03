@@ -152,7 +152,7 @@ void keyboard_task(void)
 
 MATRIX_LOOP_END:
 
-    hook_scan_loop();
+    hook_keyboard_loop();
 
     /* time interval-based hooks */
     if (timer_elapsed(timer_hook_interval_1ms) >= 1) {
@@ -193,7 +193,7 @@ MATRIX_LOOP_END:
     if (led_status != host_keyboard_leds()) {
         led_status = host_keyboard_leds();
         if (debug_keyboard) dprintf("LED: %02X\n", led_status);
-        hook_led_update(led_status);
+        hook_leds_change(led_status);
     }
 }
 

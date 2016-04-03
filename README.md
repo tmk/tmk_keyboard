@@ -217,7 +217,7 @@ Hooks
 Hooks allow you to execute custom code at certain predefined points in the firmware execution. To use them, just define the hook function in your keymap file, like so:
 
 ```C
-void hook_init_late(void)
+void hook_keyboard_init(void)
 {
     layer_on(5);
     print("Layer 5 enabled!");
@@ -228,17 +228,17 @@ The following hooks are available available:
 
 Hook function | Called in file | Timing
 ---|---|---
-`hook_init_early(void)` | *protocol/\<protocol>.c* | Early in the boot process, before the matrix is initialized and before a connection is made with the host. Thus, this hook has access to very few parameters, but it is a good place to define any custom parameters needed by other early processes.
-`hook_init_late(void)` | *protocol/\<protocol>.c* | Near the end of the boot process, after Boot Magic has run and LEDs have been initialized.
+`hook_keyboard_start(void)` | *protocol/\<protocol>.c* | Early in the boot process, before the matrix is initialized and before a connection is made with the host. Thus, this hook has access to very few parameters, but it is a good place to define any custom parameters needed by other early processes.
+`hook_keyboard_init(void)` | *protocol/\<protocol>.c* | Near the end of the boot process, after Boot Magic has run and LEDs have been initialized.
 `hook_bootmagic(void)` | *common/bootmagic.c* | During the Boot Magic window, after EEPROM and Bootloader checks are made, but before any other built-in Boot Magic checks are made.
 `hook_usb_suspend(void)` | *protocol/\<protocol>.c* | When the device enters USB suspend state. *Default action:* enable LED breathing.
 `hook_usb_wakeup(void)` | *protocol/\<protocol>.c* | When the device wakes up from USB suspend state. *Default action:* disable LED breathing.
 `hook_suspend_loop(void)` | *protocol/\<protocol>.c* | Continuously, while the device is in USB suspend state. *Default action:* power down and periodically check the matrix, causing wakeup if needed.
-`hook_scan_loop(void)` | *common/keyboard.c* | Continuously, during the main loop, after the matrix is checked. Note that the protocol and interrupt configuration may affect the timing. If you need precise timing, use one of the `hook_interval_*` functions listed below.
+`hook_keyboard_loop(void)` | *common/keyboard.c* | Continuously, during the main loop, after the matrix is checked. Note that the protocol and interrupt configuration may affect the timing. If you need precise timing, use one of the `hook_interval_*` functions listed below.
 `hook_matrix_change(keyevent_t event)` | *common/action.c* | When a keypress event is detected, before any other actions are processed.
 `hook_layer_state_change(uint32_t layer_state)` | *common/action_layer.c* | When any layer is turned on or off. `layer_state` is a 32-bit integer containing the 0/1 state of all 32 layers, one bit per layer (see [keymap documentation](tmk_core/doc/keymap.md)).
 `hook_default_layer_state_change(uint32_t default_layer_state)` | *common/action_layer.c* | When the default layer is changed. `default_layer_state` is a 32-bit integer with a single bit set to 1 indicating the default layer (see [keymap documentation](tmk_core/doc/keymap.md)).
-`hook_led_update(uint8_t led_status)` | *common/keyboard.c* | Whenever a change in the LED status is performed. *Default action:* call `keyboard_set_leds(led_status)`
+`hook_leds_change(uint8_t led_status)` | *common/keyboard.c* | Whenever a change in the LED status is performed. *Default action:* call `keyboard_set_leds(led_status)`
 `hook_interval_1ms(void)` | *common/keyboard.c* | Every millisecond.
 `hook_interval_10ms(void)` | *common/keyboard.c* | Every 10 milliseconds.
 `hook_interval_100ms(void)` | *common/keyboard.c* | Every 100 milliseconds.

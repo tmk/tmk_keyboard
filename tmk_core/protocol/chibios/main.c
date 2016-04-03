@@ -61,10 +61,10 @@ host_driver_t chibios_driver = {
 
 /* Default hooks defenitions. */
 __attribute__((weak))
-void hook_init_early(void) {}
+void hook_keyboard_startup(void) {}
 
 __attribute__((weak))
-void hook_init_late(void) {}
+void hook_keyboard_init(void) {}
 
 __attribute__((weak))
 void hook_suspend_loop(void) {
@@ -108,7 +108,7 @@ int main(void) {
   // TESTING
   // chThdCreateStatic(waBlinkerThread, sizeof(waBlinkerThread), NORMALPRIO, blinkerThread, NULL);
 
-  hook_init_early();
+  hook_keyboard_startup();
 
   /* Init USB */
   init_usb_driver(&USB_DRIVER);
@@ -139,7 +139,7 @@ int main(void) {
 
   print("Keyboard start.\n");
 
-  hook_init_late();
+  hook_keyboard_init();
 
   /* Main loop */
   while(true) {

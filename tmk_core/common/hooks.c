@@ -36,10 +36,10 @@ void hook_default_layer_state_change(uint8_t default_layer_state) {
     (void)default_layer_state;
 }
 
-/* Called periodically from the matrix scan loop (very often!) */
+/* Called periodically from the main loop (very often!) */
 /* Default behaviour: do nothing. */
 __attribute__((weak))
-void hook_scan_loop(void) {}
+void hook_keyboard_loop(void) {}
 
 /* Called on matrix state change event (every keypress => often!) */
 /* Default behaviour: do nothing. */
@@ -51,7 +51,7 @@ void hook_matrix_change(keyevent_t event) {
 /* Called on indicator LED update event (when reported from host). */
 /* Default behaviour: calls led_set (for compatibility). */
 __attribute__((weak))
-void hook_led_update(uint8_t led_status) {
+void hook_leds_change(uint8_t led_status) {
     keyboard_set_leds(led_status);
 }
 
