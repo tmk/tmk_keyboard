@@ -66,13 +66,3 @@ void hook_bootmagic(void) {
 	// 	// do something
 	// }
 }
-
-/* Time interval-based hooks */
-__attribute__((weak))
-void hook_interval_1ms(void) {}
-__attribute__((weak))
-void hook_interval_10ms(void) {}
-__attribute__((weak))
-void hook_interval_100ms(void) {}
-__attribute__((weak))
-void hook_interval_1000ms(void) {}

@@ -72,10 +72,6 @@ void keyboard_setup(void)
 void keyboard_init(void)
 {
     timer_init();
-    timer_hook_interval_1ms = timer_read();
-    timer_hook_interval_10ms = timer_read();
-    timer_hook_interval_100ms = timer_read();
-    timer_hook_interval_1000ms = timer_read();
 
     matrix_init();
 #ifdef PS2_MOUSE_ENABLE
@@ -153,24 +149,6 @@ void keyboard_task(void)
 MATRIX_LOOP_END:
 
     hook_keyboard_loop();
-
-    /* time interval-based hooks */
-    if (timer_elapsed(timer_hook_interval_1ms) >= 1) {
-        hook_interval_1ms();
-        timer_hook_interval_1ms = timer_read();
-    }
-    if (timer_elapsed(timer_hook_interval_10ms) >= 10) {
-        hook_interval_10ms();
-        timer_hook_interval_10ms = timer_hook_interval_1ms;
-    }
-    if (timer_elapsed(timer_hook_interval_100ms) >= 100) {
-        hook_interval_100ms();
-        timer_hook_interval_100ms = timer_hook_interval_1ms;
-    }
-    if (timer_elapsed(timer_hook_interval_1000ms) >= 1000) {
-        hook_interval_1000ms();
-        timer_hook_interval_1000ms = timer_hook_interval_1ms;
-    }
 
 #ifdef MOUSEKEY_ENABLE
     // mousekey repeat & acceleration
