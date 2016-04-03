@@ -214,15 +214,7 @@ ync option tries to keep switch state consistent with keyboard LED state.
 
 Hooks
 -----
-Hooks allow you to execute custom code at certain predefined points in the firmware execution. To use them, just define the hook function in your keymap file, like so:
-
-```C
-void hook_keyboard_init(void)
-{
-    layer_on(5);
-    print("Layer 5 enabled!");
-}
-```
+Hooks allow you to execute custom code at certain predefined points in the firmware execution. To use them, just define the hook function in your keymap file.
 
 The following hooks are available available:
 
@@ -239,10 +231,100 @@ Hook function | Called in file | Timing
 `hook_layer_state_change(uint32_t layer_state)` | *common/action_layer.c* | When any layer is turned on or off. `layer_state` is a 32-bit integer containing the 0/1 state of all 32 layers, one bit per layer (see [keymap documentation](tmk_core/doc/keymap.md)).
 `hook_default_layer_state_change(uint32_t default_layer_state)` | *common/action_layer.c* | When the default layer is changed. `default_layer_state` is a 32-bit integer with a single bit set to 1 indicating the default layer (see [keymap documentation](tmk_core/doc/keymap.md)).
 `hook_leds_change(uint8_t led_status)` | *common/keyboard.c* | Whenever a change in the LED status is performed. *Default action:* call `keyboard_set_leds(led_status)`
-`hook_interval_1ms(void)` | *common/keyboard.c* | Every millisecond.
-`hook_interval_10ms(void)` | *common/keyboard.c* | Every 10 milliseconds.
-`hook_interval_100ms(void)` | *common/keyboard.c* | Every 100 milliseconds.
-`hook_interval_1000ms(void)` | *common/keyboard.c* | Every 1,000 milliseconds (1 second).
+
+### Hooks Examples
+
+You can try these out by copying the code to your keymap file, or any .c file in the Makefile `SRC`.
+
+#### Activate keymap layer 5 on startup
+
+```C
+#include "action_layer.h"
+
+void hook_keyboard_init(void)
+{
+    layer_on(5);
+    print("Layer 5 enabled!");
+}
+```
+
+#### Blink the Caps Lock LED every .5 seconds
+
+```C
+#include "timer.h"
+#include "led.h"
+
+bool my_led_status = 0;
+uint16_t my_led_timer;
+
+void hook_keyboard_loop(void)
+{
+    // check if we've reached 500 milliseconds yet...
+    if (timer_elapsed(my_led_timer) > 500)
+    {
+        // we've reached 500 milliseconds!
+        // reset the timer
+        my_led_timer = timer_read();
+
+        // check the current LED state
+        if (my_led_status)
+        {
+            // LED is on, so let's turn it off
+            led_set(host_keyboard_leds() & (0<<USB_LED_CAPS_LOCK));
+            my_led_status = 0;
+        }
+        else
+        {
+            // LED is off, so let's turn it on
+            led_set(host_keyboard_leds() | (1<<USB_LED_CAPS_LOCK));
+            my_led_status = 1;
+        }
+    }
+}
+```
+
+#### Flash the Caps Lock LED for 20ms on every keypress
+```C
+#include "timer.h"
+#include "led.h"
+
+bool my_led_status = 0;
+uint16_t my_led_timer;
+
+void hook_matrix_change(keyevent_t event)
+{
+    // only flash LED for key press events, not key release events.
+    if (event.pressed)
+    {
+        // check the current LED status and reverse it
+        if (host_keyboard_leds() & (1<<USB_LED_CAPS_LOCK))
+        {
+            led_set(host_keyboard_leds() & (0<<USB_LED_CAPS_LOCK));
+        }
+        else {
+            led_set(host_keyboard_leds() | (1<<USB_LED_CAPS_LOCK));
+        }
+
+        my_led_status = 1;
+        my_led_timer = timer_read();
+    }
+}
+
+void hook_keyboard_loop(void)
+{
+    if (my_led_status)
+    {
+        // check if we've reached 20 milliseconds yet...
+        if (timer_elapsed(my_led_timer) > 20)
+        {
+            keyboard_set_leds(host_keyboard_leds());
+
+            my_led_status = 0;
+        }
+    }
+}
+```
+
 
 
 Start Your Own Project
