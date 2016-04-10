@@ -25,9 +25,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "print.h"
 #include "debug.h"
-
+#include "action_layer.h"
 
 static report_mouse_t mouse_report = {};
+
+#ifdef AUTO_MOUSE_LAYER
+mlh_t  mouse_layer_helper = AML_UNSET;
+uint8_t tp_buttons;
+#endif
 
 
 static void print_usb_data(void);
@@ -73,6 +78,9 @@ void ps2_mouse_task(void)
     enum { SCROLL_NONE, SCROLL_BTN, SCROLL_SENT };
     static uint8_t scroll_state = SCROLL_NONE;
     static uint8_t buttons_prev = 0;
+#ifdef AUTO_MOUSE_LAYER
+    static uint16_t mouse_layer_timer = 1;
+#endif
 
     /* receives packet from mouse */
     uint8_t rcv;
@@ -81,11 +89,60 @@ void ps2_mouse_task(void)
         mouse_report.buttons = ps2_host_recv_response();
         mouse_report.x = ps2_host_recv_response();
         mouse_report.y = ps2_host_recv_response();
+        mouse_report.buttons |= tp_buttons;
     } else {
         if (debug_mouse) print("ps2_mouse: fail to get mouse packet\n");
         return;
     }
 
+#ifdef AUTO_MOUSE_LAYER
+    /*if trackpad is moved or buttons are pressed, for auto-layer-switching*/
+    if (mouse_report.x || mouse_report.y ||
+            (mouse_report.buttons & PS2_MOUSE_BTN_MASK)) {
+        switch (mouse_layer_helper){
+            /* if mouselayer not set and trackpoint movement */
+            case AML_UNSET:
+                mouse_layer_timer = timer_read();
+                mouse_layer_helper = AML_STARTUP;
+                break;
+
+            /* during startup phase */
+            case AML_STARTUP:
+                /* if xxxms passed (with tp movement), turn on mouselayer */
+                if(TIMER_DIFF_16(timer_read(), mouse_layer_timer) >AML_STARTUP_TIME){
+                    if(!(layer_state & (1UL<<MOUSE_LAYER)))
+                        layer_on(MOUSE_LAYER);
+                    mouse_layer_helper = AML_SET;
+                    mouse_layer_timer = timer_read();
+                }
+                break;
+
+            /* if mouselayer already set, just update timer */
+            case AML_SET:
+                mouse_layer_timer = timer_read();
+                break;
+        }
+    }
+
+    else{
+    /* reset mouse layer when unused
+     * when startup time exceeds */
+        if (mouse_layer_helper == AML_STARTUP &&
+                (TIMER_DIFF_16(timer_read(), mouse_layer_timer) > AML_STARTUP_TIME)){
+            mouse_layer_helper = AML_UNSET;
+        }
+    /* when mouselayer is on, but no mouseactions done for some time */
+        if (mouse_layer_helper == AML_SET &&
+                (TIMER_DIFF_16(timer_read(), mouse_layer_timer) > AML_DURATION)){
+            mouse_layer_helper = AML_UNSET;
+            if(layer_state & (1UL<<MOUSE_LAYER))
+                layer_off(MOUSE_LAYER);
+        }
+    }
+    /* deactivate mouselayer on keypress other than mousebuttons or mods is in
+     * action.c */
+#endif
+ 
     /* if mouse moves or buttons state changes */
     if (mouse_report.x || mouse_report.y ||
             ((mouse_report.buttons ^ buttons_prev) & PS2_MOUSE_BTN_MASK)) {

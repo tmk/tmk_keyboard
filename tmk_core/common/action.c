@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "action_macro.h"
 #include "action_util.h"
 #include "action.h"
+#include "ps2_mouse.h"
 
 #ifdef DEBUG_ACTION
 #include "debug.h"
@@ -78,6 +79,16 @@ void process_action(keyrecord_t *record)
                 uint8_t mods = (action.kind.id == ACT_LMODS) ?  action.key.mods :
                                                                 action.key.mods<<4;
                 if (event.pressed) {
+#ifdef AUTO_MOUSE_LAYER
+                    /* if no mousekeys are pressed but other regular keys,
+                     * turn off the MOUSE_LAYER*/
+                    if( (action.key.code & 0b11111100)!=KC_LCTRL
+                            && tp_buttons==0) {
+                        mouse_layer_helper = AML_UNSET;
+                        if(layer_state & (1UL<<MOUSE_LAYER))
+                            layer_off(MOUSE_LAYER);
+                    }
+#endif
                     if (mods) {
                         add_weak_mods(mods);
                         send_keyboard_report();
@@ -199,13 +210,54 @@ void process_action(keyrecord_t *record)
 #endif
 #ifdef MOUSEKEY_ENABLE
         /* Mouse key */
-        case ACT_MOUSEKEY:
+        /*case ACT_MOUSEKEY:
             if (event.pressed) {
                 mousekey_on(action.key.code);
                 mousekey_send();
             } else {
                 mousekey_off(action.key.code);
                 mousekey_send();
+            }
+            break;*/
+        case ACT_MOUSEKEY:
+            if (event.pressed) {
+                switch (action.key.code)
+                {
+#ifdef AUTO_MOUSE_LAYER
+                    case KC_MS_BTN1:
+                        /* tp_buttons is global variable and processed in
+                         * ps2_mouse.c */
+                        tp_buttons |= (1<<PS2_MOUSE_BTN_LEFT);
+                        break;
+                    case KC_MS_BTN2:
+                        tp_buttons |= (1<<PS2_MOUSE_BTN_RIGHT);
+                        break;
+                    case KC_MS_BTN3:
+                        tp_buttons |= (1<<PS2_MOUSE_BTN_MIDDLE);
+                        break;
+#endif
+                    default:
+                        mousekey_on(action.key.code);
+                        mousekey_send();
+                }
+            } else {
+                switch (action.key.code)
+                {
+#ifdef AUTO_MOUSE_LAYER
+                    case KC_MS_BTN1:
+                        tp_buttons &= ~(1<<PS2_MOUSE_BTN_LEFT);
+                        break;
+                    case KC_MS_BTN2:
+                        tp_buttons &= ~(1<<PS2_MOUSE_BTN_RIGHT);
+                        break;
+                    case KC_MS_BTN3:
+                        tp_buttons &= ~(1<<PS2_MOUSE_BTN_MIDDLE);
+                        break;
+#endif                   
+                    default:
+                        mousekey_off(action.key.code);
+                        mousekey_send();
+                }
             }
             break;
 #endif
