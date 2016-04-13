@@ -65,7 +65,6 @@ static void switch_default_layer(uint8_t layer);
 
 command_state_t command_state = ONESHOT;
 
-
 bool command_proc(uint8_t code)
 {
     switch (command_state) {

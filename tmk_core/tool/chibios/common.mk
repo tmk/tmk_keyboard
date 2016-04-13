@@ -10,6 +10,7 @@ SRC +=	$(COMMON_DIR)/host.c \
 	$(COMMON_DIR)/print.c \
 	$(COMMON_DIR)/debug.c \
 	$(COMMON_DIR)/util.c \
+	$(COMMON_DIR)/hooks.c \
 	$(COMMON_DIR)/chibios/suspend.c \
 	$(COMMON_DIR)/chibios/printf.c \
 	$(COMMON_DIR)/chibios/timer.c \

@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "bootmagic.h"
 #include "eeconfig.h"
 #include "backlight.h"
+#include "hooks.h"
 #ifdef MOUSEKEY_ENABLE
 #   include "mousekey.h"
 #endif
@@ -71,6 +72,7 @@ void keyboard_setup(void)
 void keyboard_init(void)
 {
     timer_init();
+
     matrix_init();
 #ifdef PS2_MOUSE_ENABLE
     ps2_mouse_init();
@@ -146,6 +148,8 @@ void keyboard_task(void)
 
 MATRIX_LOOP_END:
 
+    hook_keyboard_loop();
+
 #ifdef MOUSEKEY_ENABLE
     // mousekey repeat & acceleration
     mousekey_task();
@@ -166,12 +170,12 @@ MATRIX_LOOP_END:
     // update LED
     if (led_status != host_keyboard_leds()) {
         led_status = host_keyboard_leds();
-        keyboard_set_leds(led_status);
+        if (debug_keyboard) dprintf("LED: %02X\n", led_status);
+        hook_leds_change(led_status);
     }
 }
 
 void keyboard_set_leds(uint8_t leds)
 {
-    if (debug_keyboard) { debug("keyboard_set_led: "); debug_hex8(leds); debug("\n"); }
     led_set(leds);
 }
