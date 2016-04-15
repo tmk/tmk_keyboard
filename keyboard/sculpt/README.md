@@ -1,6 +1,6 @@
 Microsoft Sculpt Ergonomic Desktop keyboard firmware
 ======================
-Ergonomic keyboard by Microsoft.
+Ergonomic keyboard by Microsoft modified to work with Teensy 2.0.
 
 - TODO: put original controller PCB version
 
@@ -19,16 +19,16 @@ Only keyboard with US layout was traced.
 ### Original US layout keyboard matrix
 Original US layout keboard matrix is 8 rows and 18 columns:
 
-        A     B     C     D     E     F     G     H     I
-     ----------------------------------------------------
-  1        PAUS         DEL     0     9           8  BSPC  -->
-  2        PGUP         F12  LBRC  MINS        RBRC   INS  -->
-  3        HOME        CALC     P     O           I        -->
-  4        SLCK         ENT  SCLN     L           K  BSLS  -->
-  5                     APP  SLSH  QUOT  RALT        LEFT  -->
-  6        END   RSFT  PGDN         DOT        COMM        --> 
-  7  LCTL  RGHT          UP  DOWN                     SPC  -->
-  8        PSCR         F11   EQL    F9          F8   F10  -->
+          A     B     C     D     E     F     G     H     I
+       ----------------------------------------------------
+    1        PAUS         DEL     0     9           8  BSPC  -->
+    2        PGUP         F12  LBRC  MINS        RBRC   INS  -->
+    3        HOME        CALC     P     O           I        -->
+    4        SLCK         ENT  SCLN     L           K  BSLS  -->
+    5                     APP  SLSH  QUOT  RALT        LEFT  -->
+    6        END   RSFT  PGDN         DOT        COMM        --> 
+    7  LCTL  RGHT          UP  DOWN                     SPC  -->
+    8        PSCR         F11   EQL    F9          F8   F10  -->
 
                           J     K     L     M     N     O     P     Q     R
                           -------------------------------------------------
@@ -52,16 +52,16 @@ to the same pin on Teensy.
 
 Modified matrix will have 8 rows and 17 columns and will require 25 pins:
 
-        A     B     C     D     E     F     G     H
-     ----------------------------------------------
-  1        PAUS         DEL     0     9     8  BSPC  -->
-  2        PGUP         F12  LBRC  MINS  RBRC   INS  -->
-  3        HOME        CALC     P     O     I        -->
-  4        SLCK         ENT  SCLN     L     K  BSLS  -->
-  5              RALT   APP  SLSH  QUOT        LEFT  -->
-  6        END   RSFT  PGDN         DOT  COMM        --> 
-  7  LCTL  RGHT          UP  DOWN               SPC  -->
-  8        PSCR         F11   EQL    F9    F8   F10  -->
+          A     B     C     D     E     F     G     H
+       ----------------------------------------------
+    1        PAUS         DEL     0     9     8  BSPC  -->
+    2        PGUP         F12  LBRC  MINS  RBRC   INS  -->
+    3        HOME        CALC     P     O     I        -->
+    4        SLCK         ENT  SCLN     L     K  BSLS  -->
+    5              RALT   APP  SLSH  QUOT        LEFT  -->
+    6        END   RSFT  PGDN         DOT  COMM        --> 
+    7  LCTL  RGHT          UP  DOWN               SPC  -->
+    8        PSCR         F11   EQL    F9    F8   F10  -->
 
                           I     J     K     L     M     N     O     P     Q
                           -------------------------------------------------
