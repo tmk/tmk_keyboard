@@ -12,7 +12,8 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         RCTL, RGHT, UP, DOWN, SPC, N, B, SPC, LCTL, \
         PSCR, F11, EQL, F9, F8, F10, F7, 5, F2, F1, GRV, 6), 
     /* 1: FN1 (Replaces arrows with pagination, home and end and activates
-     */        multimedia keys on top row).
+               multimedia keys on top row).
+     */
     KEYMAP(
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, \
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, VOLD, TRNS, TRNS, TRNS, \
