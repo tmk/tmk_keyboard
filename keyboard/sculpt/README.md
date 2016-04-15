@@ -78,7 +78,6 @@ Note that RALT and RSFT are now sitting on the same column (C).
 
 
 ## Keymap
-Only keyboard with US layout was traced and tested.
 
 ### 1  Original Scultp keymap
 [keymap.c](keymap.c) represents original Sculpt layout
