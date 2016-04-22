@@ -26,7 +26,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "action_macro.h"
 #include "action_util.h"
 #include "action.h"
-#include "ps2_mouse.h"
+#ifdef AUTO_MOUSE_LAYER
+    #include "ps2_mouse.h"
+#endif
 
 #ifdef DEBUG_ACTION
 #include "debug.h"
