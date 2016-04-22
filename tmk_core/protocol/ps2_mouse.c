@@ -109,7 +109,7 @@ void ps2_mouse_task(void)
             /* during startup phase */
             case AML_STARTUP:
                 /* if xxxms passed (with tp movement), turn on mouselayer */
-                if(TIMER_DIFF_16(timer_read(), mouse_layer_timer) >AML_STARTUP_TIME){
+                if(timer_elapsed(mouse_layer_timer) >AML_STARTUP_TIME){
                     if(!(layer_state & (1UL<<MOUSE_LAYER)))
                         layer_on(MOUSE_LAYER);
                     mouse_layer_helper = AML_SET;
@@ -128,12 +128,12 @@ void ps2_mouse_task(void)
     /* reset mouse layer when unused
      * when startup time exceeds */
         if (mouse_layer_helper == AML_STARTUP &&
-                (TIMER_DIFF_16(timer_read(), mouse_layer_timer) > AML_STARTUP_TIME)){
+                (timer_elapsed(mouse_layer_timer) > AML_STARTUP_TIME)){
             mouse_layer_helper = AML_UNSET;
         }
     /* when mouselayer is on, but no mouseactions done for some time */
         if (mouse_layer_helper == AML_SET &&
-                (TIMER_DIFF_16(timer_read(), mouse_layer_timer) > AML_DURATION)){
+                (timer_elapsed(mouse_layer_timer) > AML_DURATION)){
             mouse_layer_helper = AML_UNSET;
             if(layer_state & (1UL<<MOUSE_LAYER))
                 layer_off(MOUSE_LAYER);
@@ -202,7 +202,7 @@ void ps2_mouse_task(void)
         else if ((mouse_report.buttons & (PS2_MOUSE_SCROLL_BTN_MASK)) == 0) {
 #if PS2_MOUSE_SCROLL_BTN_SEND
             if (scroll_state == SCROLL_BTN &&
-                    TIMER_DIFF_16(timer_read(), scroll_button_time) < PS2_MOUSE_SCROLL_BTN_SEND) {
+                    timer_elapsed(scroll_button_time) < PS2_MOUSE_SCROLL_BTN_SEND) {
                 // send Scroll Button(down and up at once) when not scrolled
                 mouse_report.buttons |= (PS2_MOUSE_SCROLL_BTN_MASK);
                 host_mouse_send(&mouse_report);
