@@ -22,7 +22,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "action_macro.h"
 #include "wait.h"
 #include "debug.h"
+#include "bootloader.h"
 
+#ifdef BOOTMAGIC_ENABLE
+extern keymap_config_t keymap_config;
+#endif
 
 static action_t keycode_to_action(uint8_t keycode);
 
@@ -109,6 +113,9 @@ action_t action_for_key(uint8_t layer, keypos_t key)
 __attribute__ ((weak))
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
+    (void)record;
+    (void)id;
+    (void)opt;
     return MACRO_NONE;
 }
 
@@ -116,6 +123,9 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 __attribute__ ((weak))
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
+    (void)record;
+    (void)id;
+    (void)opt;
 }
 
 
@@ -123,7 +133,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 /* translates keycode to action */
 static action_t keycode_to_action(uint8_t keycode)
 {
-    action_t action;
+    action_t action = {};
     switch (keycode) {
         case KC_A ... KC_EXSEL:
         case KC_LCTRL ... KC_RGUI:
@@ -132,7 +142,7 @@ static action_t keycode_to_action(uint8_t keycode)
         case KC_SYSTEM_POWER ... KC_SYSTEM_WAKE:
             action.code = ACTION_USAGE_SYSTEM(KEYCODE2SYSTEM(keycode));
             break;
-        case KC_AUDIO_MUTE ... KC_MEDIA_REWIND:
+        case KC_AUDIO_MUTE ... KC_WWW_FAVORITES:
             action.code = ACTION_USAGE_CONSUMER(KEYCODE2CONSUMER(keycode));
             break;
         case KC_MS_UP ... KC_MS_ACCEL2:

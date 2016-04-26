@@ -3,6 +3,7 @@
 #include "action.h"
 #include "util.h"
 #include "action_layer.h"
+#include "hook.h"
 
 #ifdef DEBUG_ACTION
 #include "debug.h"
@@ -62,6 +63,7 @@ static void layer_state_set(uint32_t state)
     dprint("layer_state: ");
     layer_debug(); dprint(" to ");
     layer_state = state;
+    hook_layer_change(layer_state);
     layer_debug(); dprintln();
     clear_keyboard_but_mods(); // To avoid stuck keys
 }
@@ -114,8 +116,7 @@ void layer_debug(void)
 
 action_t layer_switch_get_action(keypos_t key)
 {
-    action_t action;
-    action.code = ACTION_TRANSPARENT;
+    action_t action = { .code = ACTION_TRANSPARENT };
 
 #ifndef NO_ACTION_LAYER
     uint32_t layers = layer_state | default_layer_state;
