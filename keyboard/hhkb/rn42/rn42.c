@@ -6,6 +6,7 @@
 #include "print.h"
 #include "timer.h"
 #include "wait.h"
+#include "rn42_task.h"
 
 
 /* Host driver */
@@ -15,7 +16,29 @@ static void send_mouse(report_mouse_t *report);
 static void send_system(uint16_t data);
 static void send_consumer(uint16_t data);
 
+// This should probably check the real connection state
+// But for now, just return if it's ready
+static bool rn42_is_connected(void)
+{
+	return !rn42_rts();
+}
+
+// The bluetooth driver does currently not put the keyboard into suspend mode
+// Although I think it should do that when the link is lost
+static bool rn42_is_suspended(void) {
+	return false;
+}
+
+static bool rn42_is_remote_wakeup_supported(void) { return false; }
+static void rn42_send_remote_wakeup(void) {}
+
 host_driver_t rn42_driver = {
+	rn42_init,
+	rn42_is_connected,
+	rn42_is_suspended,
+	rn42_task,
+	rn42_is_remote_wakeup_supported,
+	rn42_send_remote_wakeup,
     keyboard_leds,
     send_keyboard,
     send_mouse,
@@ -46,6 +69,7 @@ void rn42_init(void)
     PORTD &= ~(1<<5);
 
     serial_init();
+    rn42_task_init();
 }
 
 int16_t rn42_getc(void)
@@ -216,22 +240,28 @@ static void send_consumer(uint16_t data)
 
 
 /* Null driver for config_mode */
-static uint8_t config_keyboard_leds(void);
-static void config_send_keyboard(report_keyboard_t *report);
-static void config_send_mouse(report_mouse_t *report);
-static void config_send_system(uint16_t data);
-static void config_send_consumer(uint16_t data);
+static void config_init(void) {}
+static bool config_is_connected(void) { return false; }
+static bool config_is_suspended(void) { return false; }
+static void config_poll(void) {}
+static bool config_is_remote_wakeup_supported(void) { return false; }
+static void config_send_remote_wakeup(void) {}
+static uint8_t config_keyboard_leds(void) { return leds; }
+static void config_send_keyboard(report_keyboard_t *report) {}
+static void config_send_mouse(report_mouse_t *report) {}
+static void config_send_system(uint16_t data) {}
+static void config_send_consumer(uint16_t data) {}
 
 host_driver_t rn42_config_driver = {
+	config_init,
+	config_is_connected,
+	config_is_suspended,
+	config_poll,
+	config_is_remote_wakeup_supported,
+	config_send_remote_wakeup,
     config_keyboard_leds,
     config_send_keyboard,
     config_send_mouse,
     config_send_system,
     config_send_consumer
 };
-
-static uint8_t config_keyboard_leds(void) { return leds; }
-static void config_send_keyboard(report_keyboard_t *report) {}
-static void config_send_mouse(report_mouse_t *report) {}
-static void config_send_system(uint16_t data) {}
-static void config_send_consumer(uint16_t data) {}
