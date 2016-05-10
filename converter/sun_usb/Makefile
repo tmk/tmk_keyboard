@@ -11,8 +11,8 @@ TARGET_DIR = .
 SRC =	keymap.c \
 	matrix.c \
 	led.c \
-	command_extra.c \
-	protocol/serial_soft.c
+	command_extra.c
+
 
 CONFIG_H = config.h
 
@@ -64,8 +64,15 @@ MOUSEKEY_ENABLE = yes	# Mouse keys
 EXTRAKEY_ENABLE = yes	# Audio control and System control
 CONSOLE_ENABLE = yes	# Console for debug
 COMMAND_ENABLE = yes    # Commands for debug and configuration
+#HARDWARE_SERIAL = yes  # Use hardware serial (requires inverted serial, see README)
 #NKRO_ENABLE = yes	# USB Nkey Rollover
 
+ifdef HARDWARE_SERIAL
+	SRC := protocol/serial_uart.c $(SRC)
+	OPT_DEFS += -DHARDWARE_SERIAL
+else
+	SRC := protocol/serial_soft.c $(SRC)
+endif
 
 # Boot Section Size in bytes
 #   Teensy halfKay   512
