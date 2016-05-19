@@ -209,6 +209,8 @@ uint8_t matrix_scan(void)
         register_key(0xFF);
     } else if (key0 == 0xFF) {      // error
         xprintf("adb_host_kbd_recv: ERROR(%d)\n", codes);
+        // something wrong or plug-in
+        matrix_init();
         return key1;
     } else {
         /* Swap codes for ISO keyboard
