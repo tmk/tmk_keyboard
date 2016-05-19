@@ -52,11 +52,29 @@ POSSIBILITY OF SUCH DAMAGE.
 #define ADB_CAPS        0x39
 
 
+/* ADB commands */
+#define ADB_ADDR_KEYBOARD   2
+#define ADB_ADDR_MOUSE      3
+#define ADB_CMD_LISTEN      2
+#define ADB_CMD_TALK        3
+#define ADB_REG_0           0
+#define ADB_REG_1           1
+#define ADB_REG_2           2
+#define ADB_REG_3           3
+
+/* ADB keyboard handle id */
+#define ADB_HANDLE_M0116    0x01
+#define ADB_HANDLE_M0115    0x02
+#define ADB_HANDLE_M3501    0x02
+#define ADB_HANDLE_M1242    0x10
+
+
 // ADB host
 void     adb_host_init(void);
 bool     adb_host_psw(void);
 uint16_t adb_host_kbd_recv(void);
 uint16_t adb_host_mouse_recv(void);
+uint16_t adb_host_talk(uint8_t addr, uint8_t reg);
 void     adb_host_listen(uint8_t cmd, uint8_t data_h, uint8_t data_l);
 void     adb_host_kbd_led(uint8_t led);
 void     adb_mouse_task(void);
