@@ -433,6 +433,16 @@ Keyboard LEDs & state of keys(Register2)
      | +-----------------------------   Delete
      +-------------------------------   Reserved
 
+Address, Handler ID and bits(Register3)
+    1514131211 . . 8 7 . . . . . . 0
+     | | | | | | | | | | | | | | | |
+     | | | | | | | | +-+-+-+-+-+-+-+-   Handler ID
+     | | | | +-+-+-+-----------------   Address
+     | | | +-------------------------   0
+     | | +---------------------------   Service request enable(1 = enabled)
+     | +-----------------------------   Exeptional event(alwyas 1 if not used)
+     +-------------------------------   0
+
 ADB Bit Cells
     bit cell time: 70-130us
     low part of bit0: 60-70% of bit cell
