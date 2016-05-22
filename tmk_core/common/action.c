@@ -130,6 +130,11 @@ void process_action(keyrecord_t *record)
                         }
                         break;
     #endif
+                    case MODS_ONESHOT_TOGGLE:
+                        if (event.pressed) {
+                           oneshot_toggle();
+                        }
+                        break;
                     case MODS_TAP_TOGGLE:
                         if (event.pressed) {
                             if (tap_count <= TAPPING_TOGGLE) {
