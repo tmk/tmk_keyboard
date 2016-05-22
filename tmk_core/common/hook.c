@@ -19,43 +19,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "hook.h"
 
 /* -------------------------------------------------
- * Definitions of hardware-independent default hooks
+ * Definitions of default hooks
  * ------------------------------------------------- */
 
-/* Called on layer state change event. */
-/* Default behaviour: do nothing. */
-__attribute__((weak))
-void hook_layer_change(uint8_t layer_state) {
-    (void)layer_state;
-}
-
-/* Called periodically from the matrix scan loop (very often!) */
-/* Default behaviour: do nothing. */
 __attribute__((weak))
 void hook_keyboard_loop(void) {}
 
-/* Called on matrix state change event (every keypress => often!) */
-/* Default behaviour: do nothing. */
 __attribute__((weak))
 void hook_matrix_change(keyevent_t event) {
-	(void)event;
+    (void)event;
 }
 
-/* Called on indicator LED update event (when reported from host). */
-/* Default behaviour: calls led_set (for compatibility). */
+__attribute__((weak))
+void hook_default_layer_change(uint32_t default_layer_state) {
+    (void)default_layer_state;
+}
+
+__attribute__((weak))
+void hook_layer_change(uint32_t layer_state) {
+    (void)layer_state;
+}
+
 __attribute__((weak))
 void hook_keyboard_leds_change(uint8_t led_status) {
     keyboard_set_leds(led_status);
 }
 
-/* Called once, on checking the bootmagic combos. */
-/* Default behaviour: do nothing. */
 __attribute__((weak))
-void hook_bootmagic(void) {
-	/* An example: */
-	// #include "bootmagic.h"
-	// #include "keymap.h"
-	// if(bootmagic_scan_keycode(KC_W)) {
-	// 	// do something
-	// }
-}
+void hook_bootmagic(void) {}
