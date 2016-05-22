@@ -22,6 +22,7 @@ static void default_layer_state_set(uint32_t state)
     debug("default_layer_state: ");
     default_layer_debug(); debug(" to ");
     default_layer_state = state;
+    hook_default_layer_change(default_layer_state);
     default_layer_debug(); debug("\n");
     clear_keyboard_but_mods(); // To avoid stuck keys
 }
