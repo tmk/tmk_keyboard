@@ -74,10 +74,10 @@ void matrix_init(void)
     // wait for keyboard to boot up and receive command
     _delay_ms(1000);
 
-    // Determine ISO keyboard by handle id
+    // Determine ISO keyboard by handler id
     // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c?v=4.4#L815
-    uint16_t handle_id = adb_host_talk(ADB_ADDR_KEYBOARD, 3);
-    switch (handle_id) {
+    uint16_t handler_id = adb_host_talk(ADB_ADDR_KEYBOARD, 3);
+    switch (handler_id) {
     case 0x04: case 0x05: case 0x07: case 0x09: case 0x0D:
     case 0x11: case 0x14: case 0x19: case 0x1D: case 0xC1:
     case 0xC4: case 0xC7:
@@ -108,8 +108,8 @@ void matrix_init(void)
     _delay_ms(500);
     DDRD |= (1<<6); PORTD &= ~(1<<6);
 
-    uint16_t handle_id2 = adb_host_talk(ADB_ADDR_KEYBOARD, 3);
-    xprintf("handle_id: %02X -> %02X\n", handle_id&0xff, handle_id2&0xff);
+    uint16_t handler_id2 = adb_host_talk(ADB_ADDR_KEYBOARD, 3);
+    xprintf("handler_id: %02X -> %02X\n", (handler_id & 0xff), (handler_id2 & 0xff));
 
     return;
 }
@@ -214,6 +214,7 @@ uint8_t matrix_scan(void)
         return key1;
     } else {
         /* Swap codes for ISO keyboard
+         * https://github.com/tmk/tmk_keyboard/issues/35
          *
          * ANSI
          * ,-----------    ----------.
@@ -246,10 +247,10 @@ uint8_t matrix_scan(void)
          * *c      0x2A    0x2A    0x31    0x31(or 0x32)
          */
         if (is_iso_layout) {
-            if (key0 == 0x32) {
-                key0 = 0x0A;
-            } else if (key0 == 0x0A) {
-                key0 = 0x32;
+            if ((key0 & 0x7F) == 0x32) {
+                key0 = (key0 & 0x80) | 0x0A;
+            } else if ((key0 & 0x7F) == 0x0A) {
+                key0 = (key0 & 0x80) | 0x32;
             }
         }
         register_key(key0);
