@@ -57,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define XT_DATA_BIT    0
 #define XT_INT_INIT()  do {    \
     EICRA |= ((1<<ISC11) |      \
-              (0<<ISC10));      \
+              (1<<ISC10));      \
 } while (0)
 #define XT_INT_ON()  do {      \
     EIMSK |= (1<<INT1);         \
