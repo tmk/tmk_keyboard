@@ -86,9 +86,9 @@ bool adb_host_psw(void)
  * <http://geekhack.org/index.php?topic=14290.msg1068919#msg1068919>
  * <http://geekhack.org/index.php?topic=14290.msg1070139#msg1070139>
  */
-uint16_t adb_host_kbd_recv(void)
+uint16_t adb_host_kbd_recv(uint8_t addr)
 {
-    return adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_0);
+    return adb_host_talk(addr, ADB_REG_0);
 }
 
 #ifdef ADB_MOUSE_ENABLE
@@ -156,11 +156,11 @@ error:
     return -n;
 }
 
-void adb_host_listen(uint8_t cmd, uint8_t data_h, uint8_t data_l)
+void adb_host_listen(uint8_t addr, uint8_t reg, uint8_t data_h, uint8_t data_l)
 {
     cli();
     attention();
-    send_byte(cmd);
+    send_byte((addr<<4) | (ADB_CMD_LISTEN<<2) | reg);
     place_bit0();               // Stopbit(0)
     _delay_us(200);             // Tlt/Stop to Start
     place_bit1();               // Startbit(1)
@@ -171,12 +171,12 @@ void adb_host_listen(uint8_t cmd, uint8_t data_h, uint8_t data_l)
 }
 
 // send state of LEDs
-void adb_host_kbd_led(uint8_t led)
+void adb_host_kbd_led(uint8_t addr, uint8_t led)
 {
-    // Addr:Keyboard(0010), Cmd:Listen(10), Register2(10)
-    // send upper byte (not used)
-    // send lower byte (bit2: ScrollLock, bit1: CapsLock, bit0:
-    adb_host_listen(0x2A,0,led&0x07);
+    // Listen Register2
+    //  upper byte: not used
+    //  lower byte: bit2=ScrollLock, bit1=CapsLock, bit0=NumLock
+    adb_host_listen(addr, 2, 0, led & 0x07);
 }
 
 
@@ -325,7 +325,7 @@ Commands
 
     bits                commands
     ------------------------------------------------------
-    - - - - 0 0 0 0     Send Request(reset all devices)
+    - - - - 0 0 0 0     Send Reset(reset all devices)
     A A A A 0 0 0 1     Flush(reset a device)
     - - - - 0 0 1 0     Reserved
     - - - - 0 0 1 1     Reserved
@@ -440,7 +440,7 @@ Address, Handler ID and bits(Register3)
      | | | | +-+-+-+-----------------   Address
      | | | +-------------------------   0
      | | +---------------------------   Service request enable(1 = enabled)
-     | +-----------------------------   Exeptional event(alwyas 1 if not used)
+     | +-----------------------------   Exceptional event(alwyas 1 if not used)
      +-------------------------------   0
 
 ADB Bit Cells
