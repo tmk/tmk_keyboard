@@ -97,7 +97,7 @@ uint8_t * HIDKeyboard::reportDesc() {
         REPORT_COUNT(1), 0x06,
         REPORT_SIZE(1), 0x08,
         LOGICAL_MINIMUM(1), 0x00,
-        LOGICAL_MAXIMUM(1), 0xFF,
+        LOGICAL_MAXIMUM(2), 0xFF, 0x00,
         USAGE_PAGE(1), 0x07,                    // Key Codes
         USAGE_MINIMUM(1), 0x00,
         USAGE_MAXIMUM(1), 0xFF,
