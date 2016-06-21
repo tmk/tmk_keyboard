@@ -110,7 +110,7 @@ OPT_DEFS += -DBOOTLOADER_SIZE=4096
 
 SRC =  \
        keymap_common.c \
-       matrix.c \
+       usb_usb.cpp \
        main.cpp
 
 ifdef KEYMAP
