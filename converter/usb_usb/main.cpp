@@ -3,17 +3,9 @@
 #include <avr/power.h>
 #include <util/delay.h>
 
-// USB HID host
-#include "Usb.h"
-#include "usbhub.h"
-#include "hid.h"
-#include "hidboot.h"
-#include "parser.h"
-
 // LUFA
 #include "lufa.h"
 
-#include "timer.h"
 #include "sendchar.h"
 #include "debug.h"
 #include "keyboard.h"
@@ -64,22 +56,6 @@ static void LUFA_setup(void)
 
 
 
-/*
- * USB Host Shield HID keyboard
- */
-USB usb_host;
-USBHub hub1(&usb_host);
-HIDBoot<HID_PROTOCOL_KEYBOARD>    kbd(&usb_host);
-KBDReportParser kbd_parser;
-
-
-void led_set(uint8_t usb_led)
-{
-    kbd.SetReport(0, 0, 2, 0, 1, &usb_led);
-}
-
-
-
 int main(void)
 {
     // LED for debug
@@ -94,10 +70,6 @@ int main(void)
 
     LUFA_setup();
 
-    // USB Host Shield setup
-    usb_host.Init();
-    kbd.SetReportParser(0, (HIDReportParser*)&kbd_parser);
-
     /* NOTE: Don't insert time consuming job here.
      * It'll cause unclear initialization failure when DFU reset(worm start).
      */
@@ -111,16 +83,8 @@ int main(void)
 
     debug("init: done\n");
 
-uint16_t timer;
     for (;;) {
         keyboard_task();
-
-timer = timer_read();
-        usb_host.Task();
-timer = timer_elapsed(timer);
-if (timer > 100) {
-    debug("host.Task: "); debug_hex16(timer);  debug("\n");
-}
 
 #if !defined(INTERRUPT_CONTROL_ENDPOINT)
         // LUFA Task for control request
