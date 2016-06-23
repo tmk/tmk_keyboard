@@ -67,6 +67,7 @@ https://github.com/tmk/tmk_keyboard/wiki/TMK-Based-Projects
 [PC98]:         http://en.wikipedia.org/wiki/NEC_PC-9801
 [Sun]:          http://en.wikipedia.org/wiki/Sun-3
 [Infinity]:     https://www.massdrop.com/buy/infinity-keyboard-kit
+[tmk_core]:     https://github.com/tmk/tmk_core
 
 
 
