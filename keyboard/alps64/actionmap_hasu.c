@@ -1,4 +1,3 @@
-#include <avr/pgmspace.h>
 #include "actionmap.h"
 #include "action_code.h"
 #include "actionmap_common.h"

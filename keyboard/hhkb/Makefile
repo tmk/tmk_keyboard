@@ -49,8 +49,7 @@ TARGET_DIR = .
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC +=	keymap_common.c \
-	matrix.c \
+SRC +=	matrix.c \
 	led.c
 
 CONFIG_H = config.h

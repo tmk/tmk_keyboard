@@ -50,7 +50,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <avr/pgmspace.h>
 #include "keycode.h"
 #include "print.h"
 #include "debug.h"
@@ -59,7 +58,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "keycode.h"
 
 // 32*8(256) byte array which converts PS/2 code into USB code
-static const action_t PROGMEM fn_actions[] = {
+const action_t PROGMEM fn_actions[] = {
     ACTION_LAYER_MOMENTARY(1),                  // FN0 - left command key
     ACTION_LAYER_MOMENTARY(1),                  // FN1 - right command key
     ACTION_KEY(KC_BSLS),                        // FN2 - number pad slash & backslash
@@ -116,7 +115,7 @@ static const action_t PROGMEM fn_actions[] = {
 }
 
 
-static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     
     /* Layer 0: default
      * ,-----------------------------------------------------------. ,-----------. ,---------------.
@@ -163,15 +162,3 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     
     )
 };
-
-/* translates key to keycode */
-uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
-{
-    return pgm_read_byte(&keymaps[(layer)][(key.row)][(key.col)]);
-}
-
-/* translates Fn keycode to action */
-action_t keymap_fn_to_action(uint8_t keycode)
-{
-    return (action_t){ .code = pgm_read_word(&fn_actions[FN_INDEX(keycode)]) };
-}

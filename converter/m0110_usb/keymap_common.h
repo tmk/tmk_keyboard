@@ -15,13 +15,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <stdint.h>
-#include <avr/pgmspace.h>
 #include "keycode.h"
 #include "keymap.h"
-
-
-extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-extern const action_t fn_actions[];
 
 
 /* Common layout for M0110 and M0110A
