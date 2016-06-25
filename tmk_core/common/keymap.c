@@ -1,5 +1,5 @@
 /*
-Copyright 2013 Jun Wako <wakojun@gmail.com>
+Copyright 2013,2016 Jun Wako <wakojun@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wait.h"
 #include "debug.h"
 #include "bootloader.h"
+#if defined(__AVR__)
+#include <avr/pgmspace.h>
+#endif
 
 #ifdef BOOTMAGIC_ENABLE
 extern keymap_config_t keymap_config;
@@ -32,6 +35,7 @@ static action_t keycode_to_action(uint8_t keycode);
 
 
 /* converts key to action */
+__attribute__ ((weak))
 action_t action_for_key(uint8_t layer, keypos_t key)
 {
     uint8_t keycode = keymap_key_to_keycode(layer, key);
@@ -169,6 +173,28 @@ static action_t keycode_to_action(uint8_t keycode)
  * Legacy keymap support
  *      Consider using new keymap API instead.
  */
+extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
+extern const uint8_t fn_layer[];
+extern const uint8_t fn_keycode[];
+
+__attribute__ ((weak))
+uint8_t keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t col)
+{
+    return pgm_read_byte(&keymaps[(layer)][(row)][(col)]);
+}
+
+__attribute__ ((weak))
+uint8_t keymap_fn_layer(uint8_t index)
+{
+    return pgm_read_byte(&fn_layer[index]);
+}
+
+__attribute__ ((weak))
+uint8_t keymap_fn_keycode(uint8_t index)
+{
+    return pgm_read_byte(&fn_keycode[index]);
+}
+
 __attribute__ ((weak))
 uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
 {
@@ -196,4 +222,31 @@ action_t keymap_fn_to_action(uint8_t keycode)
             return (action_t)ACTION_NO;
     }
 }
+
+#else
+
+/* user keymaps should be defined somewhere */
+extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
+extern const action_t fn_actions[];
+
+__attribute__ ((weak))
+uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
+{
+#if defined(__AVR__)
+    return pgm_read_byte(&keymaps[(layer)][(key.row)][(key.col)]);
+#else
+    return keymaps[(layer)][(key.row)][(key.col)];
+#endif
+}
+
+__attribute__ ((weak))
+action_t keymap_fn_to_action(uint8_t keycode)
+{
+#if defined(__AVR__)
+    return (action_t)pgm_read_word(&fn_actions[FN_INDEX(keycode)]);
+#else
+    return fn_actions[FN_INDEX(keycode)];
+#endif
+}
+
 #endif
