@@ -18,6 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "action_code.h"
 #include "actionmap.h"
 
+
+/* Keymapping with 16bit action codes */
+extern const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS];
+
+
 /* Converts key to action */
 __attribute__ ((weak))
 action_t action_for_key(uint8_t layer, keypos_t key)
