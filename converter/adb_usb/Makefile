@@ -1,43 +1,3 @@
-#----------------------------------------------------------------------------
-# On command line:
-#
-# make all = Make software.
-#
-# make clean = Clean out built project files.
-#
-# make coff = Convert ELF to AVR COFF.
-#
-# make extcoff = Convert ELF to AVR Extended COFF.
-#
-# make program = Download the hex file to the device.
-#                Please customize your programmer settings(PROGRAM_CMD)
-#
-# make teensy = Download the hex file to the device, using teensy_loader_cli.
-#               (must have teensy_loader_cli installed).
-#
-# make dfu = Download the hex file to the device, using dfu-programmer (must
-#            have dfu-programmer installed).
-#
-# make flip = Download the hex file to the device, using Atmel FLIP (must
-#             have Atmel FLIP installed).
-#
-# make dfu-ee = Download the eeprom file to the device, using dfu-programmer
-#               (must have dfu-programmer installed).
-#
-# make flip-ee = Download the eeprom file to the device, using Atmel FLIP
-#                (must have Atmel FLIP installed).
-#
-# make debug = Start either simulavr or avarice as specified for debugging, 
-#              with avr-gdb or avr-insight as the front end for debugging.
-#
-# make filename.s = Just compile filename.c into the assembler code only.
-#
-# make filename.i = Create a preprocessed source file for use in submitting
-#                   bug reports to the GCC project.
-#
-# To rebuild project do "make clean" then "make all".
-#----------------------------------------------------------------------------
-
 # Target file name (without extension).
 TARGET = adb_usb_lufa
 
@@ -51,12 +11,6 @@ TARGET_DIR = .
 SRC =	matrix.c \
 	led.c \
 	adb.c
-
-ifdef KEYMAP
-    SRC := keymap_$(KEYMAP).c $(SRC)
-else
-    SRC := keymap_plain.c $(SRC)
-endif
 
 CONFIG_H = config.h
 
@@ -124,6 +78,9 @@ COMMAND_ENABLE = yes    # Commands for debug and configuration
 #SLEEP_LED_ENABLE = yes  # Breathing sleep LED during USB suspend
 #NKRO_ENABLE = yes	# USB Nkey Rollover
 ADB_MOUSE_ENABLE = yes
+#UNIMAP_ENABLE = yes
+#ACTIONMAP_ENABLE = yes         # Use 16bit actionmap instead of 8bit keymap
+#KEYMAP_SECTION_ENABLE = yes	# fixed address keymap for keymap editor
 
 # ADB Mice need acceleration for todays much bigger screens. 
 OPT_DEFS += -DADB_MOUSE_MAXACC=8
@@ -131,6 +88,26 @@ OPT_DEFS += -DADB_MOUSE_MAXACC=8
 
 # Optimize size but this may cause error "relocation truncated to fit"
 #EXTRALDFLAGS = -Wl,--relax
+
+
+#
+# Keymap file
+#
+ifdef UNIMAP_ENABLE
+    KEYMAP_FILE = unimap
+else
+    ifdef ACTIONMAP_ENABLE
+	KEYMAP_FILE = actionmap
+    else
+	KEYMAP_FILE = keymap
+    endif
+endif
+ifdef KEYMAP
+    SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
+else
+    SRC := $(KEYMAP_FILE)_plain.c $(SRC)
+endif
+
 
 # Search Path
 VPATH += $(TARGET_DIR)
