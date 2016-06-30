@@ -118,6 +118,9 @@ COMMAND_ENABLE = yes    	# Commands for debug and configuration
 NKRO_ENABLE = yes		# USB Nkey Rollover
 #KEYMAP_SECTION_ENABLE = yes	# fixed address keymap for keymap editor
 #HHKB_JP = yes			# HHKB JP support
+#UNIMAP_ENABLE = yes
+#ACTIONMAP_ENABLE = yes         # Use 16bit actionmap instead of 8bit keymap
+#KEYMAP_SECTION_ENABLE = yes	# fixed address keymap for keymap editor
 
 #OPT_DEFS += -DNO_ACTION_TAPPING
 #OPT_DEFS += -DNO_ACTION_LAYER
@@ -127,13 +130,22 @@ NKRO_ENABLE = yes		# USB Nkey Rollover
 #
 # Keymap file
 #
+ifdef UNIMAP_ENABLE
+    KEYMAP_FILE = unimap
+else
+    ifdef ACTIONMAP_ENABLE
+        KEYMAP_FILE = actionmap
+    else
+        KEYMAP_FILE = keymap
+    endif
+endif
 ifdef KEYMAP
-    SRC := keymap_$(KEYMAP).c $(SRC)
+    SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
 else
     ifdef HHKB_JP
-    	SRC := keymap_jp.c $(SRC)
+        SRC := $(KEYMAP_FILE)_jp.c $(SRC)
     else 
-    	SRC := keymap_hhkb.c $(SRC)
+        SRC := $(KEYMAP_FILE)_hhkb.c $(SRC)
     endif
 endif
 
