@@ -179,11 +179,11 @@ uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
 
 /* Legacy keymap support */
 __attribute__ ((weak))
-action_t keymap_fn_to_action(uint16_t keycode)
+action_t keymap_fn_to_action(uint8_t keycode)
 {
     action_t action = { .code = ACTION_NO };
     switch (keycode) {
-        case KC_FN0 ... KC_FN_MAX:
+        case KC_FN0 ... KC_FN31:
             {
                 uint8_t layer = keymap_fn_layer(FN_INDEX(keycode));
                 uint8_t key = keymap_fn_keycode(FN_INDEX(keycode));
