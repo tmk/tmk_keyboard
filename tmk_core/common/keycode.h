@@ -32,9 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define IS_SPECIAL(code)         ((0xA5 <= (code) && (code) <= 0xDF) || (0xE8 <= (code) && (code) <= 0xFF))
 #define IS_SYSTEM(code)          (KC_PWR       <= (code) && (code) <= KC_WAKE)
 #define IS_CONSUMER(code)        (KC_MUTE      <= (code) && (code) <= KC_WFAV)
-/* seems unused
-#define IS_FN(code)              (KC_FN0       <= (code) && (code) <= KC_FN40)
-*/
+#define IS_FN(code)              (KC_FN0       <= (code) && (code) <= KC_FN31)
 #define IS_MOUSEKEY(code)        (KC_MS_UP     <= (code) && (code) <= KC_MS_ACCEL2)
 #define IS_MOUSEKEY_MOVE(code)   (KC_MS_UP     <= (code) && (code) <= KC_MS_RIGHT)
 #define IS_MOUSEKEY_BUTTON(code) (KC_MS_BTN1   <= (code) && (code) <= KC_MS_BTN5)
@@ -43,13 +41,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MOD_BIT(code)   (1<<MOD_INDEX(code))
 #define MOD_INDEX(code) ((code) & 0x07)
+// #define FN_BIT(code)    (1<<FN_INDEX(code))
 #define FN_INDEX(code)  ((code) - KC_FN0)
- #define KC_FN_MAX 0xffff
-/* seem to be unused
 #define FN_MIN          KC_FN0
-#define FN_MAX          KC_FN40
-#define FN_BIT(code)    (1<<FN_INDEX(code))
-*/
+#define FN_MAX          0xffff
+
 
 /*
  * Short names for ease of definition of keymap

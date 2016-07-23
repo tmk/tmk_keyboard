@@ -36,7 +36,7 @@ action_t action_for_key(uint8_t layer, keypos_t key)
 {
     uint16_t keycode = keymap_key_to_keycode(layer, key);
     switch (keycode) {
-        case KC_FN0 ... KC_FN_MAX:
+        case KC_FN0 ... FN_MAX:
             return keymap_fn_to_action(keycode);
 #ifdef BOOTMAGIC_ENABLE
         case KC_CAPSLOCK:
