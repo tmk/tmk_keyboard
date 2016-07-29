@@ -119,26 +119,67 @@ function action_edit_key(code) {
 
 
 // action object
-function Action(code) {
+function Action(code = 0) {
     this.code = code;
-    this.kind = (code & 0xf000) >> 12;
+
+    Object.defineProperty(this, "kind", {
+        set: function(val)  { this.code |= (val & 0xf) << 12; },
+        get: function()     { return (this.code & 0xf000) >> 12; }
+    });
     // KEY
-    this.key_mods = (code & 0x1f00) >> 8;
-    this.key_code = code & 0x00ff;
+    Object.defineProperty(this, "key_mods", {
+        set: function(val)  { this.code |= (val & 0x1f) << 8; },
+        get: function()     { return (this.code & 0x1f00) >> 8; }
+    });
+    Object.defineProperty(this, "key_code", {
+        set: function(val)  { this.code |= (val & 0xff); },
+        get: function()     { return (this.code & 0xff); }
+    });
     // USAGE
-    this.usage_page = (code & 0x0c00) >> 10;
-    this.usage_code = code&0x003ff;
+    Object.defineProperty(this, "usage_page", {
+        set: function(val)  { this.code |= (val & 0x3) << 10; },
+        get: function()     { return (this.code & 0x0c00) >> 10; }
+    });
+    Object.defineProperty(this, "usage_code", {
+        set: function(val)  { this.code |= (val & 0x3ff); },
+        get: function()     { return (this.code & 0x3ff); }
+    });
     // ACT_LAYER_TAP
-    this.layer_tap_val = (code & 0x1f00) >> 8;
-    this.layer_tap_code = (code & 0x00ff);
+    Object.defineProperty(this, "layer_tap_val", {
+        set: function(val)  { this.code |= (val & 0x1f) << 8; },
+        get: function()     { return (this.code & 0x1f00) >> 8; }
+    });
+    Object.defineProperty(this, "layer_tap_code", {
+        set: function(val)  { this.code |= (val & 0xff); },
+        get: function()     { return (this.code & 0xff); }
+    });
     // ACT_LAYER(BITOP)
-    this.layer_bitop_op = (code & 0x0c00) >> 10;
-    this.layer_bitop_on = (code & 0x0300) >> 8;
-    this.layer_bitop_part = (code & 0x00e0) >> 5;
-    this.layer_bitop_xbit = (code & 0x0010) >> 4;
-    this.layer_bitop_bits = code & 0x000f;
+    Object.defineProperty(this, "layer_bitop_op", {
+        set: function(val)  { this.code |= (val & 0x3) << 10; },
+        get: function()     { return (this.code & 0x0c00) >> 10; }
+    });
+    Object.defineProperty(this, "layer_bitop_on", {
+        set: function(val)  { this.code |= (val & 0x3) << 8; },
+        get: function()     { return (this.code & 0x0300) >> 8; }
+    });
+    Object.defineProperty(this, "layer_bitop_part", {
+        set: function(val)  { this.code |= (val & 0x7) << 5; },
+        get: function()     { return (this.code & 0x00e0) >> 5; }
+    });
+    Object.defineProperty(this, "layer_bitop_xbit", {
+        set: function(val)  { this.code |= (val & 0x1) << 4; },
+        get: function()     { return (this.code & 0x0010) >> 4; }
+    });
+    Object.defineProperty(this, "layer_bitop_bits", {
+        set: function(val)  { this.code |= (val & 0xf); },
+        get: function()     { return (this.code & 0x000f); }
+    });
     // ACT_MOUSEKEY
-    this.mousekey_code = code & 0x00ff;
+    Object.defineProperty(this, "mousekey_code", {
+        set: function(val)  { this.code |= (val & 0xff); },
+        get: function()     { return (this.code & 0x00ff); }
+    });
+
 
     var mods_str = function(mods) {
         var mods_name = "", mods_desc = []
@@ -151,12 +192,9 @@ function Action(code) {
         return { name: mods_name, desc: mods_desc };
     };
     this.get_action = function() {
-        //console.log(this.code);
         switch ((this.code & 0xf000)>>12) {
             case ACT_LMODS:
             case ACT_RMODS:
-                console.log(this.code);
-                console.log(this.key_mods);
                 if (this.key_mods == 0) {
                     if (keycodes[this.key_code])
                         return $.extend({}, action_kinds.KEY,
@@ -198,7 +236,6 @@ function Action(code) {
                         });
                 break;
             case ACT_LAYER:
-                console.log(this.layer_bitop_op);
                 switch (this.layer_bitop_op) {
                     case OP_BIT_AND:
                         return action_kinds.LAYER_BIT_AND;
@@ -294,163 +331,25 @@ function Action(code) {
         return action_kinds.UNKNOWN;
     };
 
-
-    var _action = this.get_action();
     Object.defineProperty(this, "id", {
         get: function() {
+            var _action = this.get_action();
             return _action.id;
         }
     });
     Object.defineProperty(this, "name", {
         get: function() {
+            var _action = this.get_action();
             return _action.name;
         }
     });
     Object.defineProperty(this, "desc", {
         get: function() {
+            var _action = this.get_action();
             return _action.desc;
         }
     });
-
-    this.parse = function() {
-        switch (this.kind) {
-/*
-            case ACT_LMODS:
-            case ACT_RMODS:
-                if (this.key_mods == 0)
-                    return action_kinds.KEY;
-                else
-                    return action_kinds.MODS_KEY;
-                break;
-            case ACT_USAGE:
-                switch (this.usage_page) {
-                    case PAGE_SYSTEM:
-                        return action_kinds.USAGE_SYSTEM;
-                    case PAGE_CONSUMER:
-                        return action_kinds.USAGE_CONSUMER;
-                    default:
-                }
-                break;
-            case ACT_MOUSEKEY:
-                return action_kinds.MOUSEKEY;
-                break;
-*/
-            case ACT_LAYER:
-                console.log(this.layer_bitop_op);
-                switch (this.layer_bitop_op) {
-                    case OP_BIT_AND:
-                        return action_kinds.LAYER_BIT_AND;
-                    case OP_BIT_OR:
-                        return action_kinds.LAYER_BIT_OR;
-                    case OP_BIT_XOR:
-                        if (this.layer_bitop_on == ON_RELEASE && this.layer_bitop_xbit == 0 &&
-                                (this.layer_bitop_bits == 1 ||
-                                 this.layer_bitop_bits == 2 ||
-                                 this.layer_bitop_bits == 4 ||
-                                 this.layer_bitop_bits == 8)) {
-                            return action_kinds.LAYER_TOGGLE;
-                        }
-                        return action_kinds.LAYER_BIT_XOR;
-                    case OP_BIT_SET:
-                        return action_kinds.LAYER_BIT_SET;
-                }
-                break;
-            case ACT_LAYER_EXT:
-                break;
-/*
-            case ACT_LAYER_TAP:
-            case ACT_LAYER_TAP_EXT:
-                console.log(this.layer_tap_code);
-                switch (this.layer_tap_code) {
-                    case OP_TAP_TOGGLE:
-                        return action_kinds.LAYER_TAP_TOGGLE;
-                    case OP_ON_OFF:
-                        return action_kinds.LAYER_MOMENTARY;
-                    case OP_OFF_ON:
-                        return action_kinds.LAYER_OFF_ON;
-                    case OP_SET_CLEAR:
-                        return action_kinds.LAYER_SET_CLEAR;
-                    case 0xe0:
-                    case 0xe1:
-                    case 0xe2:
-                    case 0xe3:
-                    case 0xe4:
-                    case 0xe5:
-                    case 0xe6:
-                    case 0xe7:
-                    case 0xe8:
-                    case 0xe9:
-                    case 0xea:
-                    case 0xeb:
-                    case 0xec:
-                    case 0xed:
-                    case 0xee:
-                    case 0xef:
-                        return action_kinds.LAYER_MODS;
-                    default:
-                        return action_kinds.LAYER_TAP_KEY;
-                }
-                break;
-*/
-        }
-        return action_kinds.UNKNOWN;
-    };
 }
-/*
-Action.get_action = function() {
-        console.log(this.code);
-        switch ((this.code & 0xf000)>>12) {
-            case ACT_LMODS:
-            case ACT_RMODS:
-                if (((this.code & 0x1f00) >> 8) == 0)
-                    return { name: keycodes[code].name, desc: keycodes[code].desc };
-                else {
-                    var mods = "", mods_desc = "";
-                    if (key_mods & 0x10)  mods += "R", mods_desc += "Right ";
-                    if (key_mods & 0x01)  mods += "c", mods_desc += "Control + ";
-                    if (key_mods & 0x02)  mods += "s", mods_desc += "Shift + ";
-                    if (key_mods & 0x04)  mods += "a", mods_desc += "Alt + ";
-                    if (key_mods & 0x08)  mods += "g", mods_desc += "Gui + ";
-                    return { name: mods + "(" + keycodes[this.code].name + ")", desc: mods_desc + keycodes[this.code].desc };
-                }
-                break;
-            case ACT_LAYER_TAP:
-            case ACT_LAYER_TAP_EXT:
-                console.log(this.layer_tap_code);
-                switch (this.layer_tap_code) {
-                    case OP_TAP_TOGGLE:
-                        return action_kinds.LAYER_TAP_TOGGLE.name;
-                    case OP_ON_OFF:
-                        return action_kinds.LAYER_MOMENTARY.name;
-                    case OP_OFF_ON:
-                        return action_kinds.LAYER_OFF_ON.name;
-                    case OP_SET_CLEAR:
-                        return action_kinds.LAYER_SET_CLEAR.name;
-                    case 0xe0:
-                    case 0xe1:
-                    case 0xe2:
-                    case 0xe3:
-                    case 0xe4:
-                    case 0xe5:
-                    case 0xe6:
-                    case 0xe7:
-                    case 0xe8:
-                    case 0xe9:
-                    case 0xea:
-                    case 0xeb:
-                    case 0xec:
-                    case 0xed:
-                    case 0xee:
-                    case 0xef:
-                        return action_kinds.LAYER_MODS.name;
-                    default:
-                        return action_kinds.LAYER_TAP_KEY.name;
-                }
-                break;
-        };
-        return "UnknownAction";
-    };
-*/
 
 
 var keycodes = [];

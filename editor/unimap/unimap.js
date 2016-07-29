@@ -126,8 +126,13 @@ $(function() {
     }
     $(".action-apply").click(function(ev) {
         var act = new Action();
+        act.kind = 1;
+        act.key_code = 0xab;
+        act.code = 1111;
+        //act.layer_tap_val = 3;
         console.log("apply");
-        console.log(act);
+        console.log(act.code.toString(16));
+        console.log(act.id);
     });
 
 
@@ -143,7 +148,6 @@ $(function() {
         // get code from code button id: code-[0x]CCCC where CCCC is dec or hex number
         var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
         var act = new Action(code);
-        console.log(act.desc);
         $(this).text(act.name);
         $(this).attr({ title: act.desc });
     });
