@@ -1,10 +1,10 @@
 <html>
 <head>
     <title>TMK Keymap Editor</title>
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
     <link rel="stylesheet" href="../common/keymap_editor.css" type="text/css">
-    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="http://code.jquery.com/jquery-1.12.3.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <!-- lz-string-1.3.3.js: LZString.decompress() runs away if given short string. -->
     <script src="../common/lz-string-1.0.2.js"></script>
     <script src="../common/base64.js"></script>
@@ -223,6 +223,19 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
     <p>Note: Just ignore keys your keyboard doesn't accommodate</p>
 </div>
 
+
+<h2>Action Editor</h2>
+<div id="action_editor">
+    <select id="kind_dropdown"></select>
+    <select id="keycodes_dropdown"></select>
+    <select id="system_codes_dropdown"></select>
+    <select id="consumer_codes_dropdown"></select>
+    <select id="mousekey_codes_dropdown"></select>
+    <select id="layer_dropdown"></select>
+    <br>
+    <br>
+    <button class="action-apply" id="acction-apply">Action Apply</button>
+</div>
 
 <h2>Keycodes</h2>
 <div id="keycode_tabs" class="keycode_tabs">
@@ -472,73 +485,68 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <br>
 
         System:<br>
-        <button class="action" id="code-165"></button>
-        <button class="action" id="code-166"></button>
-        <button class="action" id="code-167"></button>
+        <button class="action" id="code-0x4081"></button>
+        <button class="action" id="code-0x4082"></button>
+        <button class="action" id="code-0x4083"></button>
         <br>
 
         Volume:<br>
-        <button class="action" id="code-168"></button>
-        <button class="action" id="code-169"></button>
-        <button class="action" id="code-170"></button>
+        <button class="action" id="code-0x44E2"></button>
+        <button class="action" id="code-0x44E9"></button>
+        <button class="action" id="code-0x44EA"></button>
         <br>
 
         Media:<br>
-        <button class="action" id="code-171"></button>
-        <button class="action" id="code-172"></button>
-        <button class="action" id="code-173"></button>
-        <button class="action" id="code-174"></button>
-        <button class="action" id="code-175"></button>
-        <button class="action" id="code-176"></button>
-        <button class="action" id="code-187"></button>
-        <button class="action" id="code-188"></button>
+        <button class="action" id="code-0x44B5"></button>
+        <button class="action" id="code-0x44B6"></button>
+        <button class="action" id="code-0x44B7"></button>
+        <button class="action" id="code-0x44CD"></button>
+        <button class="action" id="code-0x4483"></button>
+        <button class="action" id="code-0x44CC"></button>
+        <button class="action" id="code-0x44B3"></button>
+        <button class="action" id="code-0x44B4"></button>
         <br>
 
         Application:<br>
-        <button class="action" id="code-177"></button>
-        <button class="action" id="code-178"></button>
-        <button class="action" id="code-179"></button>
-        <br>
-        Web:<br>
-        <button class="action" id="code-180"></button>
-        <button class="action" id="code-181"></button>
-        <button class="action" id="code-182"></button>
-        <button class="action" id="code-183"></button>
-        <button class="action" id="code-184"></button>
-        <button class="action" id="code-185"></button>
-        <button class="action" id="code-186"></button>
-        <br>
+        <button class="action" id="code-0x458A"></button>
+        <button class="action" id="code-0x4592"></button>
+        <button class="action" id="code-0x4594"></button>
         <br>
 
-        <!--
-        <button class="action" id="code-189"></button>
-        <button class="action" id="code-190"></button>
-        <button class="action" id="code-191"></button>
-        -->
+        Web:<br>
+        <button class="action" id="code-0x4621"></button>
+        <button class="action" id="code-0x4623"></button>
+        <button class="action" id="code-0x4624"></button>
+        <button class="action" id="code-0x4625"></button>
+        <button class="action" id="code-0x4626"></button>
+        <button class="action" id="code-0x4627"></button>
+        <button class="action" id="code-0x462A"></button>
+        <br>
+        <br>
 
         Mouse key:<br>
-        <button class="action" id="code-240"></button>
-        <button class="action" id="code-241"></button>
-        <button class="action" id="code-242"></button>
-        <button class="action" id="code-243"></button>
+        <button class="action" id="code-0x50F0"></button>
+        <button class="action" id="code-0x50F1"></button>
+        <button class="action" id="code-0x50F2"></button>
+        <button class="action" id="code-0x50F3"></button>
         <br>
         <br>
-        <button class="action" id="code-244"></button>
-        <button class="action" id="code-245"></button>
-        <button class="action" id="code-246"></button>
-        <button class="action" id="code-247"></button>
-        <button class="action" id="code-248"></button>
+        <button class="action" id="code-0x50F4"></button>
+        <button class="action" id="code-0x50F5"></button>
+        <button class="action" id="code-0x50F6"></button>
+        <button class="action" id="code-0x50F7"></button>
+        <button class="action" id="code-0x50F8"></button>
         <br>
         <br>
-        <button class="action" id="code-249"></button>
-        <button class="action" id="code-250"></button>
-        <button class="action" id="code-251"></button>
-        <button class="action" id="code-252"></button>
+        <button class="action" id="code-0x50F9"></button>
+        <button class="action" id="code-0x50FA"></button>
+        <button class="action" id="code-0x50FB"></button>
+        <button class="action" id="code-0x50FC"></button>
         <br>
         <br>
-        <button class="action" id="code-253"></button>
-        <button class="action" id="code-254"></button>
-        <button class="action" id="code-255"></button>
+        <button class="action" id="code-0x50FD"></button>
+        <button class="action" id="code-0x50FE"></button>
+        <button class="action" id="code-0x50FF"></button>
         <br>
     </div>
 
@@ -550,39 +558,50 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <br>
 
         <!-- TODO: layer actions -->
-        <!-- FN0-31 -->
-        Layer Switch Momentary:<br>
-        <button class="action" id="code-192"></button>
-        <button class="action" id="code-193"></button>
-        <button class="action" id="code-194"></button>
-        <button class="action" id="code-195"></button>
-        <button class="action" id="code-196"></button>
-        <button class="action" id="code-197"></button>
-        <button class="action" id="code-198"></button>
+        Layer Switch(momentary):<br>
+        <button class="action" id="code-0xa0f1"></button>
+        <button class="action" id="code-0xa1f1"></button>
+        <button class="action" id="code-0xa2f1"></button>
+        <button class="action" id="code-0xa3f1"></button>
+        <button class="action" id="code-0xa4f1"></button>
+        <button class="action" id="code-0xa5f1"></button>
+        <button class="action" id="code-0xa6f1"></button>
+        <button class="action" id="code-0xa7f1"></button>
         <br>
-        Layer Switch Toggle:<br>
-        <button class="action" id="code-199"></button>
-        <button class="action" id="code-200"></button>
-        <button class="action" id="code-201"></button>
+        Layer Toggle:<br>
+        <button class="action" id="code-0x8a01"></button>
+        <button class="action" id="code-0x8a02"></button>
+        <button class="action" id="code-0x8a04"></button>
+        <button class="action" id="code-0x8a08"></button>
+        <button class="action" id="code-0x8a21"></button>
+        <button class="action" id="code-0x8a22"></button>
+        <button class="action" id="code-0x8a24"></button>
+        <button class="action" id="code-0x8a28"></button>
         <br>
-        Layer Switch with Tap Toggle:<br>
-        <button class="action" id="code-202"></button>
-        <button class="action" id="code-203"></button>
-        <button class="action" id="code-204"></button>
+        Layer Switch and Toggle by five taps:<br>
+        <button class="action" id="code-0xa0f0"></button>
+        <button class="action" id="code-0xa1f0"></button>
+        <button class="action" id="code-0xa2f0"></button>
+        <button class="action" id="code-0xa3f0"></button>
+        <button class="action" id="code-0xa4f0"></button>
+        <button class="action" id="code-0xa5f0"></button>
+        <button class="action" id="code-0xa6f0"></button>
+        <button class="action" id="code-0xa7f0"></button>
         <br>
-        Layer switch with Tap key:<br>
-        <button class="action" id="code-205"></button>
-        <button class="action" id="code-206"></button>
-        <button class="action" id="code-207"></button>
-        <button class="action" id="code-208"></button>
-        <button class="action" id="code-209"></button>
-        <button class="action" id="code-210"></button>
-        <button class="action" id="code-211"></button>
+        Layer Switch and Tap key:<br>
+        <button class="action" id="code-0xa12c"></button>
+        <button class="action" id="code-0xa133"></button>
+        <br>
+        Layer Switch with Modifiers:<br>
+        <button class="action" id="code-0xa1e1"></button>
+        <button class="action" id="code-0xa1e2"></button>
+        <button class="action" id="code-0xa1e4"></button>
+        <button class="action" id="code-0xa1e7"></button>
         <br>
         <br>
         Modifier with special function:<br>
-        <button class="action" id="code-212"></button>
-        <button class="action" id="code-213"></button>
+        <button class="action" id="code-0x2200"></button>
+        <button class="action" id="code-0x2201"></button>
         <button class="action" id="code-214"></button>
         <button class="action" id="code-215"></button>
         <br>

@@ -1,4 +1,4 @@
-// action kind id
+// action kind bits
 const ACT_MODS          = 0b0000;
 const ACT_LMODS         = 0b0000;
 const ACT_RMODS         = 0b0001;
@@ -8,12 +8,92 @@ const ACT_RMODS_TAP     = 0b0011;
 const ACT_USAGE         = 0b0100;
 const ACT_MOUSEKEY      = 0b0101;
 const ACT_LAYER         = 0b1000;
+const ACT_LAYER_EXT     = 0b1001;
 const ACT_LAYER_TAP     = 0b1010; /* Layer  0-15 */
 const ACT_LAYER_TAP_EXT = 0b1011; /* Layer 16-31 */
 const ACT_MACRO         = 0b1100;
 const ACT_BACKLIGHT     = 0b1101;
 const ACT_COMMAND       = 0b1110;
 const ACT_FUNCTION      = 0b1111;
+
+// Special values for key param of ACT_LAYER_TAP
+// 0xF4-FF: reserved
+const OP_TAP_TOGGLE     = 0xf0;
+const OP_ON_OFF         = 0xf1;
+const OP_OFF_ON         = 0xf2;
+const OP_SET_CLEAR      = 0xf3;
+
+// Bit operations
+const OP_BIT_AND        = 0;
+const OP_BIT_OR         = 1;
+const OP_BIT_XOR        = 2;
+const OP_BIT_SET        = 3;
+
+// Bit operation timing
+const ON_PRESS          = 1;
+const ON_RELEASE        = 2;
+const ON_BOTH           = 3;
+
+const MOD_LCTL = 0x01;
+const MOD_LSFT = 0x02;
+const MOD_LALT = 0x04;
+const MOD_LGUI = 0x08;
+const MOD_RCTL = 0x11;
+const MOD_RSFT = 0x12;
+const MOD_RALT = 0x14;
+const MOD_RGUI = 0x18;
+
+// special keycodes for MODS_TAP
+const MODS_ONESHOT      = 0x00;
+const MODS_TAP_TOGGLE   = 0x01;
+
+
+// TODO: improve description
+var action_kinds = {
+    KEY:                { id: "ACTION_KEY",                 name: "KEY",                    desc: "Normal key" },
+    MODS_KEY:           { id: "ACTION_MODS_KEY",            name: "MODS_KEY",               desc: "Modified key" },
+    MODS_TAP_KEY:       { id: "ACTION_MODS_TAP_KEY",        name: "MODS_TAP_KEY",           desc: "Tap key / Hold modifiers" },
+    MODS_ONESHOT:       { id: "ACTION_MODS_ONESHOT",        name: "MODS_ONESHOT",           desc: "Oneshot modifiers" },
+    MODS_TAP_TOGGLE:    { id: "ACTION_MODS_TAP_TOGGLE",     name: "MODS_TAP_TOGGLE",        desc: "Tap toggle modifiers" },
+    USAGE_SYSTEM:       { id: "ACTION_USAGE_SYSTEM",        name: "USAGE_SYSTEM",           desc: "System control key" },
+    USAGE_CONSUMER:     { id: "ACTION_USAGE_CONSUMER",      name: "USAGE_CONSUMER",         desc: "Consumer key" },
+    MOUSEKEY:           { id: "ACTION_MOUSEKEY",            name: "MOUSEKEY",               desc: "Mouse key" },
+    MACRO:              { id: "ACTION_MACRO",               name: "MACRO",                  desc: "Macro" },
+    MACRO_TAP:          { id: "ACTION_MACRO_TAP",           name: "MACRO_TAP",              desc: "Macro for tap key" },
+    MACRO_OPT:          { id: "ACTION_MACRO_OPT",           name: "MACRO_OPT",              desc: "Macro with option" },
+    FUNCTION:           { id: "ACTION_FUNCTION",            name: "FUNCTION",               desc: "Function" },
+    FUNCTION_TAP:       { id: "ACTION_FUNCTION_TAP",        name: "FUNCTION_TAP",           desc: "Function for tap key" },
+    FUNCTION_OPT:       { id: "ACTION_FUNCTION_OPT",        name: "FUNCTION_OPT",           desc: "Function with option" },
+    LAYER_CLEAR:        { id: "ACTION_LAYER_CLEAR",         name: "LAYER_CLEAR",            desc: "Clear all layer state" },
+    LAYER_MOMENTARY:    { id: "ACTION_LAYER_MOMENTARY",     name: "LAYER_MOMENTARY",        desc: "Momentary layer switch" },
+    LAYER_TOGGLE:       { id: "ACTION_LAYER_TOGGLE",        name: "LAYER_TOGGLE",           desc: "Toggle a layer" },
+    LAYER_INVERT:       { id: "ACTION_LAYER_INVERT",        name: "LAYER_INVERT",           desc: "Invert a layer" },
+    LAYER_ON:           { id: "ACTION_LAYER_ON",            name: "LAYER_ON",               desc: "Turn on a layer" },
+    LAYER_OFF:          { id: "ACTION_LAYER_OFF",           name: "LAYER_OFF",              desc: "Turn off a layer" },
+    LAYER_SET:          { id: "ACTION_LAYER_SET",           name: "LAYER_SET",              desc: "Turn on only a layer" },
+    LAYER_ON_OFF:       { id: "ACTION_LAYER_ON_OFF",        name: "LAYER_ON_OFF",           desc: "Turn on with press and off with release" },
+    LAYER_OFF_ON:       { id: "ACTION_LAYER_OFF_ON",        name: "LAYER_OFF_ON",           desc: "Turn off with press and on with release" },
+    LAYER_SET_CLEAR:    { id: "ACTION_LAYER_SET_CLEAR",     name: "LAYER_SET_CLEAR",        desc: "Turn on only a layer with press clear with release" },
+    LAYER_MODS:         { id: "ACTION_LAYER_MODS",          name: "LAYER_MODS",             desc: "Momentary layer switch with modifiers" },
+    LAYER_TAP_KEY:      { id: "ACTION_LAYER_TAP_KEY",       name: "LAYER_TAP_KEY",          desc: "Momentary layer switch / Tap key" },
+    LAYER_TAP_TOGGLE:   { id: "ACTION_LAYER_TAP_TOGGLE",    name: "LAYER_TAP_TOGGLE",       desc: "Momentary layer switch / Tap toggle" },
+    LAYER_BIT_AND:      { id: "ACTION_LAYER_BIT_AND",       name: "LAYER_BIT_AND",          desc: "Bit AND" },
+    LAYER_BIT_OR:       { id: "ACTION_LAYER_BIT_OR",        name: "LAYER_BIT_OR",           desc: "Bit OR" },
+    LAYER_BIT_XOR:      { id: "ACTION_LAYER_BIT_XOR",       name: "LAYER_BIT_XOR",          desc: "Bit XOR" },
+    LAYER_BIT_SET:      { id: "ACTION_LAYER_BIT_SET",       name: "LAYER_BIT_SET",          desc: "Bit SET" },
+    UNKNOWN:            { id: "ACTION_UNKNOWN",             name: "UNKNOWN",                desc: "Unknown action" },
+};
+
+var id_mods = [];
+id_mods[0x01] = { id: MOD_LCTL,     name: "Left Control",       desc: "Left Control" };
+id_mods[0x02] = { id: MOD_LSFT,     name: "Left Shift",         desc: "Left Shift" };
+id_mods[0x04] = { id: MOD_LALT,     name: "Left Alt",           desc: "Left Alt" };
+id_mods[0x08] = { id: MOD_LGUI,     name: "Left Gui",           desc: "Left Gui" };
+id_mods[0x11] = { id: MOD_RCTL,     name: "Right Control",      desc: "Right Control" };
+id_mods[0x12] = { id: MOD_RSFT,     name: "Right Shift",        desc: "Right Shift" };
+id_mods[0x14] = { id: MOD_RALT,     name: "Right Alt",          desc: "Right Alt" };
+id_mods[0x18] = { id: MOD_RGUI,     name: "Right Gui",          desc: "Right Gui" };
+
 
 // actoin usage page
 const PAGE_SYSTEM       = 0;
@@ -22,26 +102,356 @@ const PAGE_CONSUMER     = 1;
 action_usage[0] = { name: , desc:
 */
 
-function action_usage(code) {
-    return { kind: (code&0xf000)>>12, page: (code&0x0c00)>>10, usage: code&0x3ff };
-}
+function action_edit_key(code) {
+    // make action editor HTML element
+};
+// function action_edit_mods_key(code)
+// function action_edit_mods_tap_key(code)
+// function action_edit_mods_oneshot(code)
+// function action_edit_mods_tap_toggle(code)
+// function action_edit_usage_system(code)
+// function action_edit_usage_consumer(code)
+// function action_edit_mousekey(code)
+// function action_edit_layer_bitop(code)
+// function action_edit_layer_tap(code)
+// function action_edit_default_layer_set(code)
+// function action_edit_default_layer_toggle(code)
 
-function action_parse(code) {
-    switch((code&0xf000)>>12) {
-        case ACT_LMODS:
-            //console.log("ACTION_KEY");
-            //console.log(code&0xff);
-            break;
-        case ACT_USAGE:
-            console.log("ACTION_USAGE");
-            var a = action_usage(code);
-            console.log(a.page);
-            console.log(a.usage);
-            break;
-        default:
-            break;
-    }
+
+// action object
+function Action(code) {
+    this.code = code;
+    this.kind = (code & 0xf000) >> 12;
+    // KEY
+    this.key_mods = (code & 0x1f00) >> 8;
+    this.key_code = code & 0x00ff;
+    // USAGE
+    this.usage_page = (code & 0x0c00) >> 10;
+    this.usage_code = code&0x003ff;
+    // ACT_LAYER_TAP
+    this.layer_tap_val = (code & 0x1f00) >> 8;
+    this.layer_tap_code = (code & 0x00ff);
+    // ACT_LAYER(BITOP)
+    this.layer_bitop_op = (code & 0x0c00) >> 10;
+    this.layer_bitop_on = (code & 0x0300) >> 8;
+    this.layer_bitop_part = (code & 0x00e0) >> 5;
+    this.layer_bitop_xbit = (code & 0x0010) >> 4;
+    this.layer_bitop_bits = code & 0x000f;
+    // ACT_MOUSEKEY
+    this.mousekey_code = code & 0x00ff;
+
+    var mods_str = function(mods) {
+        var mods_name = "", mods_desc = []
+        if (mods & 0x01)  mods_name += "\u2303", mods_desc.push("Control");
+        if (mods & 0x02)  mods_name += "\u21E7", mods_desc.push("Shift");
+        if (mods & 0x04)  mods_name += "\u2325", mods_desc.push("Alt");
+        if (mods & 0x08)  mods_name += "\u2318", mods_desc.push("Gui");
+        mods_desc = mods_desc.join(" + ");
+        if (mods & 0x10)  mods_name = "r" + mods_name, mods_desc = "Right " + mods_desc;
+        return { name: mods_name, desc: mods_desc };
+    };
+    this.get_action = function() {
+        //console.log(this.code);
+        switch ((this.code & 0xf000)>>12) {
+            case ACT_LMODS:
+            case ACT_RMODS:
+                console.log(this.code);
+                console.log(this.key_mods);
+                if (this.key_mods == 0) {
+                    if (keycodes[this.key_code])
+                        return $.extend({}, action_kinds.KEY,
+                                { 
+                                    name: keycodes[this.key_code].name, 
+                                    desc: keycodes[this.key_code].desc
+                                });
+                } else {
+                    var _mods_str = mods_str(this.key_mods);
+                    if (keycodes[this.key_code])
+                        return $.extend({}, action_kinds.MODS_KEY,
+                                {
+                                    name: _mods_str.name + " " + keycodes[this.key_code].name,
+                                    desc: _mods_str.desc + " + " + keycodes[this.key_code].desc 
+                                });
+                }
+                break;
+            case ACT_LMODS_TAP:
+            case ACT_RMODS_TAP:
+                var _mods_str = mods_str(this.key_mods);
+                switch (this.key_code) {
+                    case MODS_ONESHOT:
+                        return $.extend({}, action_kinds.MODS_ONESHOT,
+                                {
+                                    name: _mods_str.name + " OneShot",
+                                    desc: _mods_str.desc + " OneShot"
+                                });
+                    case MODS_TAP_TOGGLE:
+                        return $.extend({}, action_kinds.MODS_TAP_TOGGLE,
+                                {
+                                    name: _mods_str.name + " TapToggle",
+                                    desc: _mods_str.desc + " TapToggle"
+                                });
+                }
+                return $.extend({}, action_kinds.MODS_TAP_KEY,
+                        {
+                            name: _mods_str.name + " " + keycodes[this.key_code].name,
+                            desc: _mods_str.desc + " " + keycodes[this.key_code].desc
+                        });
+                break;
+            case ACT_LAYER:
+                console.log(this.layer_bitop_op);
+                switch (this.layer_bitop_op) {
+                    case OP_BIT_AND:
+                        return action_kinds.LAYER_BIT_AND;
+                    case OP_BIT_OR:
+                        return action_kinds.LAYER_BIT_OR;
+                    case OP_BIT_XOR:
+                        if (this.layer_bitop_on == ON_RELEASE && this.layer_bitop_xbit == 0 &&
+                                (this.layer_bitop_bits == 1 ||
+                                 this.layer_bitop_bits == 2 ||
+                                 this.layer_bitop_bits == 4 ||
+                                 this.layer_bitop_bits == 8)) {
+                            // calculate layer: part*4 + MSB(bits)
+                            var _layer = (this.layer_bitop_part * 4);
+                            for (var _bits = this.layer_bitop_bits; _bits>>1; _bits>>=1) _layer++;
+                            return $.extend({}, action_kinds.LAYER_TOGGLE,
+                                    {
+                                        name: "T" + _layer,
+                                        desc: "Toggle on Layer " + _layer
+                                    });
+                        }
+                        return action_kinds.LAYER_BIT_XOR;
+                    case OP_BIT_SET:
+                        return action_kinds.LAYER_BIT_SET;
+                }
+                break;
+            case ACT_LAYER_EXT:
+                /* not used */
+                break;
+            case ACT_LAYER_TAP:
+            case ACT_LAYER_TAP_EXT:
+                switch (this.layer_tap_code) {
+                    case OP_TAP_TOGGLE:
+                        return $.extend({}, action_kinds.LAYER_TAP_TOGGLE,
+                                {
+                                    name: "Lt" + this.layer_tap_val,
+                                    desc: "Switch Layer " + this.layer_tap_val + " with Tap toggle"
+                                });
+                    case OP_ON_OFF:
+                        return $.extend({}, action_kinds.LAYER_MOMENTARY,
+                                {
+                                    name: "L" + this.layer_tap_val,
+                                    desc: "Change to Layer " + this.layer_tap_val + "(Momentary)"
+                                });
+                    case OP_OFF_ON:
+                        return action_kinds.LAYER_OFF_ON;
+                    case OP_SET_CLEAR:
+                        return action_kinds.LAYER_SET_CLEAR;
+                    default:
+                        if ((this.layer_tap_code & 0xf0) == 0xe0) {
+                            var _mods_str =  mods_str(this.layer_tap_code & 0x0f);
+                            return $.extend({}, action_kinds.LAYER_MODS,
+                                    {
+                                        name: "LM" + this.layer_tap_val + " " + _mods_str.name,
+                                        desc: "Change to Layer " + this.layer_tap_val + " with " + _mods_str.desc
+                                    });
+                        }
+                        else {
+                            return $.extend({}, action_kinds.LAYER_TAP_KEY,
+                                    {
+                                        name: "LT" + this.layer_tap_val + " " + keycodes[this.layer_tap_code].name,
+                                        desc: "Change to Layer " + this.layer_tap_val + " and " + keycodes[this.layer_tap_code].name + "(tap)"
+                                    });
+                        }
+                }
+                break;
+            case ACT_USAGE:
+                switch (this.usage_page) {
+                    case PAGE_SYSTEM:
+                        if (system_codes[this.usage_code])
+                            return $.extend({}, action_kinds.USAGE_SYSTEM,
+                                    {
+                                        name: system_codes[this.usage_code].name,
+                                        desc: system_codes[this.usage_code].desc
+                                    });
+                    case PAGE_CONSUMER:
+                        if (consumer_codes[this.usage_code])
+                            return $.extend({}, action_kinds.USAGE_CONSUMER,
+                                    {
+                                        name: consumer_codes[this.usage_code].name,
+                                        desc: consumer_codes[this.usage_code].desc
+                                    });
+                }
+                break;
+            case ACT_MOUSEKEY:
+                if (mousekey_codes[this.mousekey_code])
+                    return $.extend({}, action_kinds.MOUSEKEY,
+                            {
+                                name: mousekey_codes[this.mousekey_code].name,
+                                desc: mousekey_codes[this.mousekey_code].desc
+                            });
+                break;
+        };
+        return action_kinds.UNKNOWN;
+    };
+
+
+    var _action = this.get_action();
+    Object.defineProperty(this, "id", {
+        get: function() {
+            return _action.id;
+        }
+    });
+    Object.defineProperty(this, "name", {
+        get: function() {
+            return _action.name;
+        }
+    });
+    Object.defineProperty(this, "desc", {
+        get: function() {
+            return _action.desc;
+        }
+    });
+
+    this.parse = function() {
+        switch (this.kind) {
+/*
+            case ACT_LMODS:
+            case ACT_RMODS:
+                if (this.key_mods == 0)
+                    return action_kinds.KEY;
+                else
+                    return action_kinds.MODS_KEY;
+                break;
+            case ACT_USAGE:
+                switch (this.usage_page) {
+                    case PAGE_SYSTEM:
+                        return action_kinds.USAGE_SYSTEM;
+                    case PAGE_CONSUMER:
+                        return action_kinds.USAGE_CONSUMER;
+                    default:
+                }
+                break;
+            case ACT_MOUSEKEY:
+                return action_kinds.MOUSEKEY;
+                break;
+*/
+            case ACT_LAYER:
+                console.log(this.layer_bitop_op);
+                switch (this.layer_bitop_op) {
+                    case OP_BIT_AND:
+                        return action_kinds.LAYER_BIT_AND;
+                    case OP_BIT_OR:
+                        return action_kinds.LAYER_BIT_OR;
+                    case OP_BIT_XOR:
+                        if (this.layer_bitop_on == ON_RELEASE && this.layer_bitop_xbit == 0 &&
+                                (this.layer_bitop_bits == 1 ||
+                                 this.layer_bitop_bits == 2 ||
+                                 this.layer_bitop_bits == 4 ||
+                                 this.layer_bitop_bits == 8)) {
+                            return action_kinds.LAYER_TOGGLE;
+                        }
+                        return action_kinds.LAYER_BIT_XOR;
+                    case OP_BIT_SET:
+                        return action_kinds.LAYER_BIT_SET;
+                }
+                break;
+            case ACT_LAYER_EXT:
+                break;
+/*
+            case ACT_LAYER_TAP:
+            case ACT_LAYER_TAP_EXT:
+                console.log(this.layer_tap_code);
+                switch (this.layer_tap_code) {
+                    case OP_TAP_TOGGLE:
+                        return action_kinds.LAYER_TAP_TOGGLE;
+                    case OP_ON_OFF:
+                        return action_kinds.LAYER_MOMENTARY;
+                    case OP_OFF_ON:
+                        return action_kinds.LAYER_OFF_ON;
+                    case OP_SET_CLEAR:
+                        return action_kinds.LAYER_SET_CLEAR;
+                    case 0xe0:
+                    case 0xe1:
+                    case 0xe2:
+                    case 0xe3:
+                    case 0xe4:
+                    case 0xe5:
+                    case 0xe6:
+                    case 0xe7:
+                    case 0xe8:
+                    case 0xe9:
+                    case 0xea:
+                    case 0xeb:
+                    case 0xec:
+                    case 0xed:
+                    case 0xee:
+                    case 0xef:
+                        return action_kinds.LAYER_MODS;
+                    default:
+                        return action_kinds.LAYER_TAP_KEY;
+                }
+                break;
+*/
+        }
+        return action_kinds.UNKNOWN;
+    };
 }
+/*
+Action.get_action = function() {
+        console.log(this.code);
+        switch ((this.code & 0xf000)>>12) {
+            case ACT_LMODS:
+            case ACT_RMODS:
+                if (((this.code & 0x1f00) >> 8) == 0)
+                    return { name: keycodes[code].name, desc: keycodes[code].desc };
+                else {
+                    var mods = "", mods_desc = "";
+                    if (key_mods & 0x10)  mods += "R", mods_desc += "Right ";
+                    if (key_mods & 0x01)  mods += "c", mods_desc += "Control + ";
+                    if (key_mods & 0x02)  mods += "s", mods_desc += "Shift + ";
+                    if (key_mods & 0x04)  mods += "a", mods_desc += "Alt + ";
+                    if (key_mods & 0x08)  mods += "g", mods_desc += "Gui + ";
+                    return { name: mods + "(" + keycodes[this.code].name + ")", desc: mods_desc + keycodes[this.code].desc };
+                }
+                break;
+            case ACT_LAYER_TAP:
+            case ACT_LAYER_TAP_EXT:
+                console.log(this.layer_tap_code);
+                switch (this.layer_tap_code) {
+                    case OP_TAP_TOGGLE:
+                        return action_kinds.LAYER_TAP_TOGGLE.name;
+                    case OP_ON_OFF:
+                        return action_kinds.LAYER_MOMENTARY.name;
+                    case OP_OFF_ON:
+                        return action_kinds.LAYER_OFF_ON.name;
+                    case OP_SET_CLEAR:
+                        return action_kinds.LAYER_SET_CLEAR.name;
+                    case 0xe0:
+                    case 0xe1:
+                    case 0xe2:
+                    case 0xe3:
+                    case 0xe4:
+                    case 0xe5:
+                    case 0xe6:
+                    case 0xe7:
+                    case 0xe8:
+                    case 0xe9:
+                    case 0xea:
+                    case 0xeb:
+                    case 0xec:
+                    case 0xed:
+                    case 0xee:
+                    case 0xef:
+                        return action_kinds.LAYER_MODS.name;
+                    default:
+                        return action_kinds.LAYER_TAP_KEY.name;
+                }
+                break;
+        };
+        return "UnknownAction";
+    };
+*/
+
 
 var keycodes = [];
 // 0x00-FF  HID usages: {id, name(text), description(tooltip)}
@@ -285,6 +695,7 @@ keycodes[0x00EC] = {id: 'RESERVED-236',                name: 'RESERVED-236',    
 keycodes[0x00ED] = {id: 'RESERVED-237',                name: 'RESERVED-237',                desc: 'RESERVED-237'};
 keycodes[0x00EE] = {id: 'RESERVED-238',                name: 'RESERVED-238',                desc: 'RESERVED-238'};
 keycodes[0x00EF] = {id: 'RESERVED-239',                name: 'RESERVED-239',                desc: 'RESERVED-239'};
+/*
 keycodes[0x00F0] = {id: 'MS_U',                        name: 'Mouse Up',                    desc: 'Mouse UP'};
 keycodes[0x00F1] = {id: 'MS_D',                        name: 'Mouse down',                  desc: 'Mouse Down'};
 keycodes[0x00F2] = {id: 'MS_L',                        name: 'Mouse left',                  desc: 'Mouse Left'};
@@ -301,6 +712,7 @@ keycodes[0x00FC] = {id: 'WH_R',                        name: 'Wheel Right',     
 keycodes[0x00FD] = {id: 'ACL0',                        name: 'Mouse Slow',                  desc: 'Mouse Slow'};
 keycodes[0x00FE] = {id: 'ACL1',                        name: 'Mouse Medium',                desc: 'Mouse Medium'};
 keycodes[0x00FF] = {id: 'ACL2',                        name: 'Mouse Fast',                  desc: 'Mouse Fast'};
+*/
 /*
 keycodes[0x00F0] = {id: 'RESERVED-240',                name: 'RESERVED-240',                desc: 'RESERVED-240'};
 keycodes[0x00F1] = {id: 'RESERVED-241',                name: 'RESERVED-241',                desc: 'RESERVED-241'};
@@ -323,30 +735,51 @@ keycodes[0x00FF] = {id: 'RESERVED-255',                name: 'RESERVED-255',    
 /*
  * TMK actions
  */
-// System page
-keycodes[0x4081] = {id: 'PWR ',                        name: 'Sys Power',                   desc: 'System Power'};
-keycodes[0x4082] = {id: 'SLEP',                        name: 'Sys Sleep',                   desc: 'System Sleep'};
-keycodes[0x4083] = {id: 'WAKE',                        name: 'Sys Wake',                    desc: 'System Wake'};
+// Generic Desktop Page 0x01/System Control
+system_codes = [];
+system_codes[0x81] = {id: 'PWR ',                        name: 'Sys Power',                   desc: 'System Power'};
+system_codes[0x82] = {id: 'SLEP',                        name: 'Sys Sleep',                   desc: 'System Sleep'};
+system_codes[0x83] = {id: 'WAKE',                        name: 'Sys Wake',                    desc: 'System Wake'};
 
-// Consumer page
-keycodes[0x44E2] = {id: 'MUTE',                        name: 'Mute',                        desc: 'Audio Mute'};
-keycodes[0x44E9] = {id: 'VOLU',                        name: 'Vol Up',                      desc: 'Audio Vol Up'};
-keycodes[0x44EA] = {id: 'VOLD',                        name: 'Vol Down',                    desc: 'Audio Vol Down'};
-keycodes[0x44B5] = {id: 'MNXT',                        name: 'Next Track',                  desc: 'Next Track'};
-keycodes[0x44B6] = {id: 'MPRV',                        name: 'Prev Track',                  desc: 'Previous Track'};
-keycodes[0x44B7] = {id: 'MSTP',                        name: 'Stop',                        desc: 'Media Stop'};
-keycodes[0x44CD] = {id: 'MPLY',                        name: 'Play Pause',                  desc: 'Play Pause'};
-keycodes[0x4483] = {id: 'MSEL',                        name: 'Select',                      desc: 'Media Select'};
-keycodes[0x40CC] = {id: 'EJCT',                        name: 'Eject',                       desc: 'Media Eject'};
-keycodes[0x458A] = {id: 'MAIL',                        name: 'Mail',                        desc: 'Mail'};
-keycodes[0x4592] = {id: 'CALC',                        name: 'Calc',                        desc: 'Calculator'};
-keycodes[0x4594] = {id: 'MYCM',                        name: 'My Computer',                 desc: 'My Computer'};
-keycodes[0x4621] = {id: 'WSCH',                        name: 'Web Search',                  desc: 'WWW Search'};
-keycodes[0x4623] = {id: 'WHOM',                        name: 'Web Home',                    desc: 'WWW Home'};
-keycodes[0x4624] = {id: 'WBAK',                        name: 'Web Back',                    desc: 'WWW Back'};
-keycodes[0x4625] = {id: 'WFWD',                        name: 'Web Forward',                 desc: 'WWW Forward'};
-keycodes[0x4626] = {id: 'WSTP',                        name: 'Web Stop',                    desc: 'WWW Stop'};
-keycodes[0x4627] = {id: 'WREF',                        name: 'Web Refresh',                 desc: 'WWW Refresh'};
-keycodes[0x462A] = {id: 'WFAV',                        name: 'Web Favorites',               desc: 'WWW Favorites'};
-keycodes[0x44B3] = {id: 'MFFD',                        name: 'Fast Forward',                desc: 'Media Fast Forward(Mac)'};
-keycodes[0x44B4] = {id: 'MRWD',                        name: 'Rewind',                      desc: 'Media Rewind(Mac)'};
+// Consumer page 0x0C
+consumer_codes = [];
+consumer_codes[0x0E2] = {id: 'MUTE',                        name: 'Mute',                        desc: 'Audio Mute'};
+consumer_codes[0x0E9] = {id: 'VOLU',                        name: 'Vol Up',                      desc: 'Audio Vol Up'};
+consumer_codes[0x0EA] = {id: 'VOLD',                        name: 'Vol Down',                    desc: 'Audio Vol Down'};
+consumer_codes[0x0B5] = {id: 'MNXT',                        name: 'Next Track',                  desc: 'Next Track'};
+consumer_codes[0x0B6] = {id: 'MPRV',                        name: 'Prev Track',                  desc: 'Previous Track'};
+consumer_codes[0x0B7] = {id: 'MSTP',                        name: 'Stop',                        desc: 'Media Stop'};
+consumer_codes[0x0CD] = {id: 'MPLY',                        name: 'Play Pause',                  desc: 'Play Pause'};
+consumer_codes[0x083] = {id: 'MSEL',                        name: 'Select',                      desc: 'Media Select'};
+consumer_codes[0x0CC] = {id: 'EJCT',                        name: 'Eject',                       desc: 'Media Eject'};
+consumer_codes[0x18A] = {id: 'MAIL',                        name: 'Mail',                        desc: 'Mail'};
+consumer_codes[0x192] = {id: 'CALC',                        name: 'Calc',                        desc: 'Calculator'};
+consumer_codes[0x194] = {id: 'MYCM',                        name: 'My Computer',                 desc: 'My Computer'};
+consumer_codes[0x221] = {id: 'WSCH',                        name: 'Web Search',                  desc: 'WWW Search'};
+consumer_codes[0x223] = {id: 'WHOM',                        name: 'Web Home',                    desc: 'WWW Home'};
+consumer_codes[0x224] = {id: 'WBAK',                        name: 'Web Back',                    desc: 'WWW Back'};
+consumer_codes[0x225] = {id: 'WFWD',                        name: 'Web Forward',                 desc: 'WWW Forward'};
+consumer_codes[0x226] = {id: 'WSTP',                        name: 'Web Stop',                    desc: 'WWW Stop'};
+consumer_codes[0x227] = {id: 'WREF',                        name: 'Web Refresh',                 desc: 'WWW Refresh'};
+consumer_codes[0x22A] = {id: 'WFAV',                        name: 'Web Favorites',               desc: 'WWW Favorites'};
+consumer_codes[0x0B3] = {id: 'MFFD',                        name: 'Fast Forward',                desc: 'Media Fast Forward(Mac)'};
+consumer_codes[0x0B4] = {id: 'MRWD',                        name: 'Rewind',                      desc: 'Media Rewind(Mac)'};
+
+// Mouse key
+mousekey_codes = [];
+mousekey_codes[0x00F0] = {id: 'MS_U',                        name: 'Mouse Up',                    desc: 'Mouse UP'};
+mousekey_codes[0x00F1] = {id: 'MS_D',                        name: 'Mouse down',                  desc: 'Mouse Down'};
+mousekey_codes[0x00F2] = {id: 'MS_L',                        name: 'Mouse left',                  desc: 'Mouse Left'};
+mousekey_codes[0x00F3] = {id: 'MS_R',                        name: 'Mouse right',                 desc: 'Mouse Right'};
+mousekey_codes[0x00F4] = {id: 'BTN1',                        name: 'Mouse Btn1',                  desc: 'Mouse Button1'};
+mousekey_codes[0x00F5] = {id: 'BTN2',                        name: 'Mouse Btn2',                  desc: 'Mouse Button2'};
+mousekey_codes[0x00F6] = {id: 'BTN3',                        name: 'Mouse Btn3',                  desc: 'Mouse Button3'};
+mousekey_codes[0x00F7] = {id: 'BTN4',                        name: 'Mouse Btn4',                  desc: 'Mouse Button4'};
+mousekey_codes[0x00F8] = {id: 'BTN5',                        name: 'Mouse Btn5',                  desc: 'Mouse Button5'};
+mousekey_codes[0x00F9] = {id: 'WH_U',                        name: 'Wheel Up',                    desc: 'Wheel Up'};
+mousekey_codes[0x00FA] = {id: 'WH_D',                        name: 'Wheel Down',                  desc: 'Wheel Down'};
+mousekey_codes[0x00FB] = {id: 'WH_L',                        name: 'Wheel Left',                  desc: 'Wheel Left'};
+mousekey_codes[0x00FC] = {id: 'WH_R',                        name: 'Wheel Right',                 desc: 'Wheel Right'};
+mousekey_codes[0x00FD] = {id: 'ACL0',                        name: 'Mouse Slow',                  desc: 'Mouse Slow'};
+mousekey_codes[0x00FE] = {id: 'ACL1',                        name: 'Mouse Medium',                desc: 'Mouse Medium'};
+mousekey_codes[0x00FF] = {id: 'ACL2',                        name: 'Mouse Fast',                  desc: 'Mouse Fast'};

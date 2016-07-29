@@ -12,16 +12,26 @@ var load_keymap_on_keyboard = function(layer, keymap) {
         for (var col in keymap[row]) {
             var code = keymap[row][col];
             // TODO: Action
+            var act = new Action(code);
+            $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32))
+                .text(act.name)
+                .attr({ title: act.desc });
+            /*
             var key = keycodes[code];
             if (!key) continue;
             // row and column takes range of 0-32(0-9a-v)
-            $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32)).text(key.name);
-            $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32)).attr({ title: key.desc });
+            $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32))
+                .text(key.name)
+                .attr({ title: key.desc });
+            */
         }
     }
 };
 
 $(function() {
+    // jquery tooltip
+    $( document ).tooltip();
+
     // Title
     document.title = "TMK Keymap Editor for " + KEYBOARD_DESC;
     $("#page-title").text("TMK Keymap Editor for " + KEYBOARD_DESC);
@@ -57,17 +67,68 @@ $(function() {
     load_keymap_on_keyboard(0, keymaps[0]);
 
     // Select key button to edit
-    $(".key").click(function(ev, ui) {
+    $(".key").focus(function(ev) {
+        $(this).click();
+    });
+    $(".key").click(function(ev) {
         editing_key = $(this).attr('id');
 
         // grey-out key to indicate being under editing
         $(".key").removeClass("key-editing");
         $(this).addClass("key-editing");
-    }).focus(function(ev, ui) {
-        // select editing_key with tab key focus
-        $(this).click();
+        var pos = get_pos(editing_key);
+        var code = keymaps[editing_layer][pos.row][pos.col];
+        var act = new Action(code);
+
+        // TODO: set values of action editor, display/hide
+        $("#kind_dropdown").val(act.id);
+        $("#keycodes_dropdown").val(act.key_code);
+        $("#system_codes_dropdown").val(act.usage_code);
+        $("#consumer_codes_dropdown").val(act.usage_code);
+        $("#mousekey_codes_dropdown").val(act.mousekey_code);
+        $("#layer_dropdown").val(act.layer_tap_val);
+        $(this).blur();
     });
 
+
+    /*
+     * Action editor
+     */
+    for (var i in action_kinds) {
+        $("#kind_dropdown").append($("<option></option>")
+                .attr({ value: action_kinds[i].id, title: action_kinds[i].desc })
+                .text(action_kinds[i].name));
+    }
+    for (var code in keycodes) {
+        $("#keycodes_dropdown").append($("<option></option>")
+                .attr({ value: code, title: keycodes[code].desc })
+                .text(keycodes[code].name));
+    }
+    for (var code in system_codes) {
+        $("#system_codes_dropdown").append($("<option></option>")
+                .attr({ value: code, title: system_codes[code].desc })
+                .text(system_codes[code].name));
+    }
+    for (var code in consumer_codes) {
+        $("#consumer_codes_dropdown").append($("<option></option>")
+                .attr({ value: code, title: consumer_codes[code].desc })
+                .text(consumer_codes[code].name));
+    }
+    for (var code in mousekey_codes) {
+        $("#mousekey_codes_dropdown").append($("<option></option>")
+                .attr({ value: code, title: mousekey_codes[code].desc })
+                .text(mousekey_codes[code].name));
+    }
+    for (var i = 0; i < 32; i++) {
+        $("#layer_dropdown").append($("<option></option>")
+                .attr({ value: i, title: "Layer " + i })
+                .text("Layer " + i));
+    }
+    $(".action-apply").click(function(ev) {
+        var act = new Action();
+        console.log("apply");
+        console.log(act);
+    });
 
 
     /*
@@ -81,29 +142,31 @@ $(function() {
     $(".action").each(function(index) {
         // get code from code button id: code-[0x]CCCC where CCCC is dec or hex number
         var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
-        $(this).text(keycodes[code].name);
-        $(this).attr({ title: keycodes[code].desc });
+        var act = new Action(code);
+        console.log(act.desc);
+        $(this).text(act.name);
+        $(this).attr({ title: act.desc });
     });
 
     $(".action").click(function(ev,ui) {
         if (!editing_key) return;
 
-        // get matrix position from key id: key-RC where R is row and C is column in "0-v"(radix 32)
-        var pos = editing_key.match(/key-([0-9a-v])([0-9a-v])/i);
-        if (!pos) return;
-        var row = parseInt(pos[1], 32), col = parseInt(pos[2], 32);
-
-        // set text and tooltip to key button under editing
-        $("#" + editing_key).text($(this).text());
-        $("#" + editing_key).attr({ title: $(this).attr('title'), });
 
         // change keymap array
         // get code from keycode button id: code-[0x]CC where CC is dec or hex number
-        var code = $(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1];
-        keymaps[editing_layer][row][col] = parseInt(code);
+        var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
+        var pos = get_pos(editing_key);
+        keymaps[editing_layer][pos.row][pos.col] = code;
 
-        // give focus on editing_key for next tab key operation
+        // set text and tooltip to key button under editing
+        var act = new Action(code);
+        $("#" + editing_key).text(act.name);
+        $("#" + editing_key).attr({ title: act.desc });
+
+        // to give back focus on editing_key for moving to next key with Tab
+        $(this).blur();
         $("#" + editing_key).focus();
+        //$("#" + editing_key).click();
     });
 
 
@@ -197,9 +260,8 @@ function get_pos(id)
 {
     // get matrix position from key id: key-RC where R is row and C is column in "0-v"(radix 32)
     var pos = editing_key.match(/key-([0-9a-v])([0-9a-v])/i);
-    if (!pos) return;
-    var row = parseInt(pos[1], 32), col = parseInt(pos[2], 32);
-    return row, col;
+    if (!pos) throw "invalid id";
+    return { row: parseInt(pos[1], 32), col: parseInt(pos[2], 32) };
 }
 
 /*
