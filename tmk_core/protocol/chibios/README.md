@@ -1,16 +1,16 @@
 ## TMK running on top of ChibiOS
 
-This code can be used to run TMK keyboard logic on top of [ChibiOS], meaning that you can run TMK on whatever [ChibiOS] supports. The notable examples are ARM-based Teensies (3.x and LC) and on the boards with STM32 MCUs.
+This code can be used to run TMK keyboard logic on top of [ChibiOS], meaning that you can run TMK on whatever ChibiOS supports. The notable examples are PJRC Teensies(3.x and LC) with NXP Kinetis and dev boards with ST Micro STM32 MCUs.
 
 ### Usage
 
-- To use, [get a zip of chibios](https://github.com/ChibiOS/ChibiOS/archive/a7df9a891067621e8e1a5c2a2c0ceada82403afe.zip) and unpack/rename it to `tmk_core/tool/chibios/chibios`; or you can just clone [the repo](https://github.com/ChibiOS/ChibiOS) there. For Freescale/NXP Kinetis support (meaning ARM Teensies and the Infinity keyboard), you'll also need [a zip of chibios-contrib](https://github.com/ChibiOS/ChibiOS-Contrib/archive/e1311c4db6cd366cf760673f769e925741ac0ad3.zip), unpacked/renamed to `tmk_core/tool/chibios/chibios-contrib`. Likewise, for git-savvy people, just clone [the repo](https://github.com/ChibiOS/ChibiOS-Contrib) there.
-- Note: the abovementioned directories are the defaults. You can have the two chibios repositories wherever you want, just define their location in `CHIBIOS` and `CHIBIOS_CONTRIB` variables in your `Makefile`.
+- To use, get a [zip file](https://github.com/ChibiOS/ChibiOS/archive/a7df9a891067621e8e1a5c2a2c0ceada82403afe.zip) of ChibiOS and unpack/rename it to `tmk_core/tool/chibios/ChibiOS`; or you can just clone [ChibiOS repo](https://github.com/ChibiOS/ChibiOS) there. For Freescale/NXP Kinetis support (meaning Teensies 3.x/LC and the Infinity keyboard), you'll also need a [zip](https://github.com/ChibiOS/ChibiOS-Contrib/archive/e1311c4db6cd366cf760673f769e925741ac0ad3.zip) of ChibiOS-Contrib, unpacked/renamed to `tmk_core/tool/chibios/ChibiOS-Contrib`. Likewise, for git-savvy people, just clone [ChibiOS-Contrib repo](https://github.com/ChibiOS/ChibiOS-Contrib) there.
+- Note: the above mentioned directories are the defaults. You can have the two ChibiOS repositories wherever you want, just define their location in `CHIBIOS` and `CHIBIOS_CONTRIB` variables in your `Makefile`.
 - You will also need to install an ARM toolchain, for instance from [here](https://launchpad.net/gcc-arm-embedded). On linux, this is usually also present as a package for your distribution (as `gcc-arm` or something similar). On OS X, you can use [homebrew](http://brew.sh/) with an appropriate tap.
 
 ### Notes
 
-- Some comments about ChibiOS syntax and the most commonly used GPIO functions are, as well as an example for ARM Teensies, is [here](https://github.com/tmk/tmk_keyboard/blob/master/keyboard/teensy_lc_onekey/instructions.md).
+- Some comments about ChibiOS syntax and the most commonly used GPIO functions are, as well as an example for Teensies, is [here](https://github.com/tmk/tmk_keyboard/blob/master/keyboard/teensy_lc_onekey/instructions.md).
 - For gcc options, inspect `tmk_core/tool/chibios/chibios.mk`. For instance, I enabled `-Wno-missing-field-initializers`, because TMK common bits generated a lot of warnings on that.
 - For debugging, it is sometimes useful disable gcc optimisations, you can do that by adding `-O0` to `OPT_DEFS` in your `Makefile`.
 - USB string descriptors are messy. I did not find a way to cleanly generate the right structures from actual strings, so the definitions in individual keyboards' `config.h` are ugly as heck.
