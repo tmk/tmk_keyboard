@@ -140,7 +140,7 @@ $(function() {
     };
 
     // compile action code from editor
-    var get_action_code = function() {
+    var action_editor_get_code = function() {
         var action_kind = $("#kind_dropdown").val();
         var keycode = parseInt($("#keycodes_dropdown").val());
         var key_mods = parseInt($("#key_mods_dropdown").val());
@@ -188,7 +188,6 @@ $(function() {
 
     // control display of dropdown elements
     $("#kind_dropdown").change(function(ev) {
-        console.log($(this).val());
         $(".editor_dropdown").hide();
         $("#kind_dropdown").show();
         switch ($(this).val()) {
@@ -243,14 +242,9 @@ $(function() {
 
     // apply button
     $(".action-apply").click(function(ev) {
-        console.log("apply");
-        var action_code = get_action_code();
-        console.log("0x" + action_code.toString(16));
-        var act = new Action();
-        act.code = action_code;
-        console.log(act);
-        console.log(act.id);
-        console.log(act.name);
+        if (!editing_key) return;
+        var action_code = action_editor_get_code();
+        editing_key_set(action_code);
     });
 
 
@@ -277,7 +271,11 @@ $(function() {
         action_editor_set_code(code);
 
         if (!editing_key) return;
-        // change keymap array
+        $(this).blur();
+        editing_key_set(code);
+    });
+
+    var editing_key_set = function(code) {
         var pos = get_pos(editing_key);
         keymaps[editing_layer][pos.row][pos.col] = code;
 
@@ -287,10 +285,8 @@ $(function() {
         $("#" + editing_key).attr({ title: act.desc });
 
         // to give back focus on editing_key for moving to next key with Tab
-        $(this).blur();
         $("#" + editing_key).focus();
-        //$("#" + editing_key).click();
-    });
+    };
 
 
     /*
