@@ -11,19 +11,10 @@ var load_keymap_on_keyboard = function(layer, keymap) {
     for (var row in keymap) {
         for (var col in keymap[row]) {
             var code = keymap[row][col];
-            // TODO: Action
             var act = new Action(code);
             $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32))
                 .text(act.name)
                 .attr({ title: act.desc });
-            /*
-            var key = keycodes[code];
-            if (!key) continue;
-            // row and column takes range of 0-32(0-9a-v)
-            $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32))
-                .text(key.name)
-                .attr({ title: key.desc });
-            */
         }
     }
 };
@@ -78,15 +69,8 @@ $(function() {
         $(this).addClass("key-editing");
         var pos = get_pos(editing_key);
         var code = keymaps[editing_layer][pos.row][pos.col];
-        var act = new Action(code);
 
-        // TODO: set values of action editor, display/hide
-        $("#kind_dropdown").val(act.id);
-        $("#keycodes_dropdown").val(act.key_code);
-        $("#system_codes_dropdown").val(act.usage_code);
-        $("#consumer_codes_dropdown").val(act.usage_code);
-        $("#mousekey_codes_dropdown").val(act.mousekey_code);
-        $("#layer_dropdown").val(act.layer_tap_val);
+        action_editor_set_code(code);
         $(this).blur();
     });
 
@@ -94,10 +78,11 @@ $(function() {
     /*
      * Action editor
      */
-    for (var i in action_kinds) {
+    $(".editor_dropdown").hide();
+    for (var kind in action_kinds) {
         $("#kind_dropdown").append($("<option></option>")
-                .attr({ value: action_kinds[i].id, title: action_kinds[i].desc })
-                .text(action_kinds[i].name));
+                .attr({ value: action_kinds[kind].id, title: action_kinds[kind].desc })
+                .text(action_kinds[kind].name));
     }
     for (var code in keycodes) {
         $("#keycodes_dropdown").append($("<option></option>")
@@ -124,15 +109,148 @@ $(function() {
                 .attr({ value: i, title: "Layer " + i })
                 .text("Layer " + i));
     }
+    for (var code in mods_codes) {
+        $("#key_mods_dropdown").append($("<option></option>")
+                .attr({ value: code, title: mods_codes[code].desc })
+                .text(mods_codes[code].name));
+        $("#layer_mods_dropdown").append($("<option></option>")
+                .attr({ value: code, title: mods_codes[code].desc })
+                .text(mods_codes[code].name));
+    }
+    for (var code in on_codes) {
+        $("#layer_on_dropdown").append($("<option></option>")
+                .attr({ value: code, title: on_codes[code].desc })
+                .text(on_codes[code].name));
+    }
+    $(window).load(function() { action_editor_set_code(0); });
+
+    // set code to editor
+    var action_editor_set_code = function(code) {
+        var act = new Action(code);
+        $("#kind_dropdown").val(act.id);
+        $("#kind_dropdown").trigger("change");
+        $("#keycodes_dropdown").val(act.key_code);
+        $("#key_mods_dropdown").val(act.key_mods);
+        $("#system_codes_dropdown").val(act.usage_code);
+        $("#consumer_codes_dropdown").val(act.usage_code);
+        $("#mousekey_codes_dropdown").val(act.mousekey_code);
+        $("#layer_dropdown").val(act.layer_tap_val);
+        $("#layer_mods_dropdown").val(act.layer_tap_code & 0x0f);
+        $("#layer_on_dropdown").val(act.layer_bitop_op);
+    };
+
+    // compile action code from editor
+    var get_action_code = function() {
+        var action_kind = $("#kind_dropdown").val();
+        var keycode = parseInt($("#keycodes_dropdown").val());
+        var key_mods = parseInt($("#key_mods_dropdown").val());
+        var consumer_code = parseInt($("#consumer_codes_dropdown").val());
+        var system_code = parseInt($("#system_codes_dropdown").val());
+        var mousekey_code = parseInt($("#mousekey_codes_dropdown").val());
+        var layer = parseInt($("#layer_dropdown").val());
+        var layer_mods = parseInt($("#layer_mods_dropdown").val());
+        var layer_on =  parseInt($("#layer_on_dropdown").val());
+        switch (action_kind) {
+            case "KEY":
+                return kind_codes[action_kind] | keycode;
+            case "MODS_KEY":
+                return kind_codes[action_kind] | key_mods<<8 | keycode;
+            case "USAGE_SYSTEM":
+                return kind_codes[action_kind] | system_code;
+            case "USAGE_CONSUMER":
+                return kind_codes[action_kind] | consumer_code;
+            case "MOUSEKEY":
+                return kind_codes[action_kind] | mousekey_code;
+
+            case "LAYER_MOMENTARY":
+            case "LAYER_ON_OFF":
+            case "LAYER_OFF_ON":
+            case "LAYER_SET_CLEAR":
+            case "LAYER_TAP_TOGGLE":
+                return kind_codes[action_kind] | layer<<8;
+            case "LAYER_TAP_KEY":
+                return kind_codes[action_kind] | layer<<8 | keycode;
+            case "LAYER_MODS":
+                return kind_codes[action_kind] | layer<<8 | layer_mods;
+
+            case "LAYER_INVERT":
+            case "LAYER_ON":
+            case "LAYER_OFF":
+            case "LAYER_SET":
+                return kind_codes[action_kind] | layer_on<<8 | (layer/4)<<5 | 1<<(layer%4);
+            case "LAYER_TOGGLE":
+                return kind_codes[action_kind] | (layer/4)<<5 | 1<<(layer%4);
+            case "LAYER_CLEAR":
+                return kind_codes[action_kind] | layer_on<<8 | 0<<5 | 0;
+        };
+        return 0;
+    };
+
+    // control display of dropdown elements
+    $("#kind_dropdown").change(function(ev) {
+        console.log($(this).val());
+        $(".editor_dropdown").hide();
+        $("#kind_dropdown").show();
+        switch ($(this).val()) {
+            case "KEY":
+                $("#keycodes_dropdown").show();
+                break;
+            case "MODS_KEY":
+                $("#keycodes_dropdown").show();
+                $("#key_mods_dropdown").show();
+                break;
+            case "USAGE_SYSTEM":
+                $("#system_codes_dropdown").show();
+                break;
+            case "USAGE_CONSUMER":
+                $("#consumer_codes_dropdown").show();
+                break;
+            case "MOUSEKEY":
+                $("#mousekey_codes_dropdown").show();
+                break;
+
+            case "LAYER_MOMENTARY":
+            case "LAYER_ON_OFF":
+            case "LAYER_OFF_ON":
+            case "LAYER_SET_CLEAR":
+            case "LAYER_TAP_TOGGLE":
+                $("#layer_dropdown").show();
+                break;
+            case "LAYER_TAP_KEY":
+                $("#layer_dropdown").show();
+                $("#keycodes_dropdown").show();
+                break;
+            case "LAYER_MODS":
+                $("#layer_dropdown").show();
+                $("#layer_mods_dropdown").show();
+                break;
+
+            case "LAYER_INVERT":
+            case "LAYER_ON":
+            case "LAYER_OFF":
+            case "LAYER_SET":
+                $("#layer_dropdown").show();
+                $("#layer_on_dropdown").show();
+                break;
+            case "LAYER_TOGGLE":
+                $("#layer_dropdown").show();
+                break;
+            case "LAYER_CLEAR":
+                $("#layer_on_dropdown").show();
+                break;
+        };
+    });
+
+    // apply button
     $(".action-apply").click(function(ev) {
-        var act = new Action();
-        act.kind = 1;
-        act.key_code = 0xab;
-        act.code = 1111;
-        //act.layer_tap_val = 3;
         console.log("apply");
-        console.log(act.code.toString(16));
+        var action_code = get_action_code();
+        console.log("0x" + action_code.toString(16));
+        var act = new Action();
+        act.code = action_code;
+        console.log(act);
         console.log(act.id);
+        console.log(act.name);
     });
 
 
@@ -153,12 +271,13 @@ $(function() {
     });
 
     $(".action").click(function(ev,ui) {
-        if (!editing_key) return;
-
-
-        // change keymap array
         // get code from keycode button id: code-[0x]CC where CC is dec or hex number
         var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
+
+        action_editor_set_code(code);
+
+        if (!editing_key) return;
+        // change keymap array
         var pos = get_pos(editing_key);
         keymaps[editing_layer][pos.row][pos.col] = code;
 
@@ -251,8 +370,7 @@ $(function() {
 
 
 
-    // lost keymap under edting when leave the page
-    // TODO: needed only if keymap is changed
+    // prevent losing keymap under editing when leave the page
     $(window).bind('beforeunload', function(){
           return 'CAUTION: You will lost your change.';
     });
@@ -334,7 +452,7 @@ function hex_output(address, data) {
     var output = '';
     var line = [];
 
-    // TODO: refine: flatten data into one dimension array
+    // flatten data into one dimension array
     [].concat.apply([], [].concat.apply([], data)).forEach(function(e) {
         line.push(e);
         if (line.length == 16) {
