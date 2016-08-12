@@ -52,7 +52,6 @@ const MODS_TAP_TOGGLE   = 0x01;
 const FUNC_TAP = 0x08;
 
 
-// TODO: improve description
 var action_kinds = {
     KEY:                { id: "KEY",                    name: "ACTION_KEY",                 desc: "Normal key" },
     MODS_KEY:           { id: "MODS_KEY",               name: "ACTION_MODS_KEY",            desc: "Modified key" },
@@ -129,59 +128,12 @@ var kind_codes = {
     UNKNOWN:            0,
 };
 
-var id_mods = [];
-id_mods[0x01] = { id: MOD_LCTL,     name: "Left Control",       desc: "Left Control" };
-id_mods[0x02] = { id: MOD_LSFT,     name: "Left Shift",         desc: "Left Shift" };
-id_mods[0x04] = { id: MOD_LALT,     name: "Left Alt",           desc: "Left Alt" };
-id_mods[0x08] = { id: MOD_LGUI,     name: "Left Gui",           desc: "Left Gui" };
-id_mods[0x11] = { id: MOD_RCTL,     name: "Right Control",      desc: "Right Control" };
-id_mods[0x12] = { id: MOD_RSFT,     name: "Right Shift",        desc: "Right Shift" };
-id_mods[0x14] = { id: MOD_RALT,     name: "Right Alt",          desc: "Right Alt" };
-id_mods[0x18] = { id: MOD_RGUI,     name: "Right Gui",          desc: "Right Gui" };
-
-mods_codes = [];
-mods_codes[0x0] = { id: 0x0,    name: "____",   desc: "none" };
-mods_codes[0x1] = { id: 0x1,    name: "___C",   desc: "Control" };
-mods_codes[0x2] = { id: 0x2,    name: "__S_",   desc: "Shift" };
-mods_codes[0x3] = { id: 0x3,    name: "__SC",   desc: "Shift + Control" };
-mods_codes[0x4] = { id: 0x4,    name: "_A__",   desc: "Alt" };
-mods_codes[0x5] = { id: 0x5,    name: "_A_C",   desc: "Alt + Control" };
-mods_codes[0x6] = { id: 0x6,    name: "_AS_",   desc: "Alt + Shift" };
-mods_codes[0x7] = { id: 0x7,    name: "_ASC",   desc: "Alt + Shift + Control" };
-mods_codes[0x8] = { id: 0x8,    name: "G___",   desc: "Gui" };
-mods_codes[0x9] = { id: 0x9,    name: "G__C",   desc: "Gui + Control" };
-mods_codes[0xA] = { id: 0xA,    name: "G_S_",   desc: "Gui + Shift" };
-mods_codes[0xB] = { id: 0xB,    name: "G_SC",   desc: "Gui + Shift + Control" };
-mods_codes[0xC] = { id: 0xC,    name: "GA__",   desc: "Gui + Alt" };
-mods_codes[0xD] = { id: 0xD,    name: "GA_C",   desc: "Gui + Alt + Control" };
-mods_codes[0xE] = { id: 0xE,    name: "GAS_",   desc: "Gui + Alt + Shift" };
-mods_codes[0xF] = { id: 0xF,    name: "GASC",   desc: "Gui + Alt + Shift + Control" };
-
-on_codes = [];
-//on_codes[0x0] = { id: 0x1, name: "Special Use", desc: "Special Use" };
-on_codes[0x1] = { id: 0x1, name: "On Press", desc: "On Press" };
-on_codes[0x2] = { id: 0x1, name: "On Release", desc: "On Release" };
-on_codes[0x3] = { id: 0x1, name: "On Both", desc: "On Press and Release" };
 
 
 // actoin usage page
 const PAGE_SYSTEM       = 0;
 const PAGE_CONSUMER     = 1;
 
-function action_edit_key(code) {
-    // make action editor HTML element
-};
-// function action_edit_mods_key(code)
-// function action_edit_mods_tap_key(code)
-// function action_edit_mods_oneshot(code)
-// function action_edit_mods_tap_toggle(code)
-// function action_edit_usage_system(code)
-// function action_edit_usage_consumer(code)
-// function action_edit_mousekey(code)
-// function action_edit_layer_bitop(code)
-// function action_edit_layer_tap(code)
-// function action_edit_default_layer_set(code)
-// function action_edit_default_layer_toggle(code)
 
 
 // action object
@@ -418,12 +370,16 @@ function Action(code = 0) {
 }
 
 
+/*
+ * Keyboard/Keypad Page(0x07) - keycodes
+ */
 var keycodes = [];
-// 0x00-FF  HID usages: {id, name(text), description(tooltip)}
 keycodes[0x0000] = {id: 'NO  ',                        name: 'NO',                          desc: 'No action'};
 keycodes[0x0001] = {id: 'TRNS',                        name: 'TRNS',                        desc: 'Transparent'};
+/*
 keycodes[0x0002] = {id: 'POST_FAIL',                   name: 'POST_FAIL',                   desc: 'POST_FAIL'};
 keycodes[0x0003] = {id: 'UNDEFINED',                   name: 'UNDEFINED',                   desc: 'UNDEFINED'};
+*/
 keycodes[0x0004] = {id: 'A',                           name: 'A',                           desc: 'A'};
 keycodes[0x0005] = {id: 'B',                           name: 'B',                           desc: 'B'};
 keycodes[0x0006] = {id: 'C',                           name: 'C',                           desc: 'C'};
@@ -585,6 +541,7 @@ keycodes[0x00A1] = {id: 'OPER',                        name: 'OPER',            
 keycodes[0x00A2] = {id: 'CLEAR_AGAIN',                 name: 'CLEAR_AGAIN',                 desc: 'CLEAR_AGAIN'};
 keycodes[0x00A3] = {id: 'CRSEL',                       name: 'CRSEL',                       desc: 'CRSEL'};
 keycodes[0x00A4] = {id: 'EXSEL',                       name: 'EXSEL',                       desc: 'EXSEL'};
+/*
 keycodes[0x00A5] = {id: 'RESERVED-165',                name: 'RESERVED-165',                desc: 'RESERVED-165(0xA5)'};
 keycodes[0x00A6] = {id: 'RESERVED-166',                name: 'RESERVED-166',                desc: 'RESERVED-166(0xA6)'};
 keycodes[0x00A7] = {id: 'RESERVED-167',                name: 'RESERVED-167',                desc: 'RESERVED-167(0xA7)'};
@@ -596,6 +553,7 @@ keycodes[0x00AC] = {id: 'RESERVED-172',                name: 'RESERVED-172',    
 keycodes[0x00AD] = {id: 'RESERVED-173',                name: 'RESERVED-173',                desc: 'RESERVED-173(0xAD)'};
 keycodes[0x00AE] = {id: 'RESERVED-174',                name: 'RESERVED-174',                desc: 'RESERVED-174(0xAE)'};
 keycodes[0x00AF] = {id: 'RESERVED-175',                name: 'RESERVED-175',                desc: 'RESERVED-175(0xAF)'};
+*/
 keycodes[0x00B0] = {id: 'KP_00',                       name: 'KP_00',                       desc: 'KP_00'};
 keycodes[0x00B1] = {id: 'KP_000',                      name: 'KP_000',                      desc: 'KP_000'};
 keycodes[0x00B2] = {id: 'THOUSANDS_SEPARATOR',         name: 'THOUSANDS_SEPARATOR',         desc: 'THOUSANDS_SEPARATOR'};
@@ -642,8 +600,10 @@ keycodes[0x00DA] = {id: 'KP_BINARY',                   name: 'KP_BINARY',       
 keycodes[0x00DB] = {id: 'KP_OCTAL',                    name: 'KP_OCTAL',                    desc: 'KP_OCTAL'};
 keycodes[0x00DC] = {id: 'KP_DECIMAL',                  name: 'KP_DECIMAL',                  desc: 'KP_DECIMAL'};
 keycodes[0x00DD] = {id: 'KP_HEXADECIMAL',              name: 'KP_HEXADECIMAL',              desc: 'KP_HEXADECIMAL'};
-keycodes[0x00DE] = {id: 'RESERVED-222',                name: 'RESERVED-222',                desc: 'RESERVED-222'};
-keycodes[0x00DF] = {id: 'RESERVED-223',                name: 'RESERVED-223',                desc: 'RESERVED-223'};
+/*
+keycodes[0x00DE] = {id: 'RESERVED-222',                name: 'RESERVED-222',                desc: 'RESERVED-222(0xDE)'};
+keycodes[0x00DF] = {id: 'RESERVED-223',                name: 'RESERVED-223',                desc: 'RESERVED-223(0xDF)'};
+*/
 keycodes[0x00E0] = {id: 'LCTL',                        name: 'LCtrl',                       desc: 'Left Control'};
 keycodes[0x00E1] = {id: 'LSFT',                        name: 'LShift',                      desc: 'Left Shift'};
 keycodes[0x00E2] = {id: 'LALT',                        name: 'LAlt',                        desc: 'Left Alt(\u2325)'};
@@ -652,61 +612,44 @@ keycodes[0x00E4] = {id: 'RCTL',                        name: 'RCtrl',           
 keycodes[0x00E5] = {id: 'RSFT',                        name: 'RShift',                      desc: 'Right Shift'};
 keycodes[0x00E6] = {id: 'RALT',                        name: 'RAlt',                        desc: 'Right Alt(\u2325)'};
 keycodes[0x00E7] = {id: 'RGUI',                        name: 'RGui',                        desc: 'Right Windows(\u2318)'};
-keycodes[0x00E8] = {id: 'RESERVED-232',                name: 'RESERVED-232',                desc: 'RESERVED-232'};
-keycodes[0x00E9] = {id: 'RESERVED-233',                name: 'RESERVED-233',                desc: 'RESERVED-233'};
-keycodes[0x00EA] = {id: 'RESERVED-234',                name: 'RESERVED-234',                desc: 'RESERVED-234'};
-keycodes[0x00EB] = {id: 'RESERVED-235',                name: 'RESERVED-235',                desc: 'RESERVED-235'};
-keycodes[0x00EC] = {id: 'RESERVED-236',                name: 'RESERVED-236',                desc: 'RESERVED-236'};
-keycodes[0x00ED] = {id: 'RESERVED-237',                name: 'RESERVED-237',                desc: 'RESERVED-237'};
-keycodes[0x00EE] = {id: 'RESERVED-238',                name: 'RESERVED-238',                desc: 'RESERVED-238'};
-keycodes[0x00EF] = {id: 'RESERVED-239',                name: 'RESERVED-239',                desc: 'RESERVED-239'};
 /*
-keycodes[0x00F0] = {id: 'MS_U',                        name: 'Mouse Up',                    desc: 'Mouse UP'};
-keycodes[0x00F1] = {id: 'MS_D',                        name: 'Mouse down',                  desc: 'Mouse Down'};
-keycodes[0x00F2] = {id: 'MS_L',                        name: 'Mouse left',                  desc: 'Mouse Left'};
-keycodes[0x00F3] = {id: 'MS_R',                        name: 'Mouse right',                 desc: 'Mouse Right'};
-keycodes[0x00F4] = {id: 'BTN1',                        name: 'Mouse Btn1',                  desc: 'Mouse Button1'};
-keycodes[0x00F5] = {id: 'BTN2',                        name: 'Mouse Btn2',                  desc: 'Mouse Button2'};
-keycodes[0x00F6] = {id: 'BTN3',                        name: 'Mouse Btn3',                  desc: 'Mouse Button3'};
-keycodes[0x00F7] = {id: 'BTN4',                        name: 'Mouse Btn4',                  desc: 'Mouse Button4'};
-keycodes[0x00F8] = {id: 'BTN5',                        name: 'Mouse Btn5',                  desc: 'Mouse Button5'};
-keycodes[0x00F9] = {id: 'WH_U',                        name: 'Wheel Up',                    desc: 'Wheel Up'};
-keycodes[0x00FA] = {id: 'WH_D',                        name: 'Wheel Down',                  desc: 'Wheel Down'};
-keycodes[0x00FB] = {id: 'WH_L',                        name: 'Wheel Left',                  desc: 'Wheel Left'};
-keycodes[0x00FC] = {id: 'WH_R',                        name: 'Wheel Right',                 desc: 'Wheel Right'};
-keycodes[0x00FD] = {id: 'ACL0',                        name: 'Mouse Slow',                  desc: 'Mouse Slow'};
-keycodes[0x00FE] = {id: 'ACL1',                        name: 'Mouse Medium',                desc: 'Mouse Medium'};
-keycodes[0x00FF] = {id: 'ACL2',                        name: 'Mouse Fast',                  desc: 'Mouse Fast'};
-*/
-/*
-keycodes[0x00F0] = {id: 'RESERVED-240',                name: 'RESERVED-240',                desc: 'RESERVED-240'};
-keycodes[0x00F1] = {id: 'RESERVED-241',                name: 'RESERVED-241',                desc: 'RESERVED-241'};
-keycodes[0x00F2] = {id: 'RESERVED-242',                name: 'RESERVED-242',                desc: 'RESERVED-242'};
-keycodes[0x00F3] = {id: 'RESERVED-243',                name: 'RESERVED-243',                desc: 'RESERVED-243'};
-keycodes[0x00F4] = {id: 'RESERVED-244',                name: 'RESERVED-244',                desc: 'RESERVED-244'};
-keycodes[0x00F5] = {id: 'RESERVED-245',                name: 'RESERVED-245',                desc: 'RESERVED-245'};
-keycodes[0x00F6] = {id: 'RESERVED-246',                name: 'RESERVED-246',                desc: 'RESERVED-246'};
-keycodes[0x00F7] = {id: 'RESERVED-247',                name: 'RESERVED-247',                desc: 'RESERVED-247'};
-keycodes[0x00F8] = {id: 'RESERVED-248',                name: 'RESERVED-248',                desc: 'RESERVED-248'};
-keycodes[0x00F9] = {id: 'RESERVED-249',                name: 'RESERVED-249',                desc: 'RESERVED-249'};
-keycodes[0x00FA] = {id: 'RESERVED-250',                name: 'RESERVED-250',                desc: 'RESERVED-250'};
-keycodes[0x00FB] = {id: 'RESERVED-251',                name: 'RESERVED-251',                desc: 'RESERVED-251'};
-keycodes[0x00FC] = {id: 'RESERVED-252',                name: 'RESERVED-252',                desc: 'RESERVED-252'};
-keycodes[0x00FD] = {id: 'RESERVED-253',                name: 'RESERVED-253',                desc: 'RESERVED-253'};
-keycodes[0x00FE] = {id: 'RESERVED-254',                name: 'RESERVED-254',                desc: 'RESERVED-254'};
-keycodes[0x00FF] = {id: 'RESERVED-255',                name: 'RESERVED-255',                desc: 'RESERVED-255'};
+keycodes[0x00E8] = {id: 'RESERVED-232',                name: 'RESERVED-232',                desc: 'RESERVED-232(0xE8)'};
+keycodes[0x00E9] = {id: 'RESERVED-233',                name: 'RESERVED-233',                desc: 'RESERVED-233(0xE9)'};
+keycodes[0x00EA] = {id: 'RESERVED-234',                name: 'RESERVED-234',                desc: 'RESERVED-234(0xEA)'};
+keycodes[0x00EB] = {id: 'RESERVED-235',                name: 'RESERVED-235',                desc: 'RESERVED-235(0xEB)'};
+keycodes[0x00EC] = {id: 'RESERVED-236',                name: 'RESERVED-236',                desc: 'RESERVED-236(0xEC)'};
+keycodes[0x00ED] = {id: 'RESERVED-237',                name: 'RESERVED-237',                desc: 'RESERVED-237(0xED)'};
+keycodes[0x00EE] = {id: 'RESERVED-238',                name: 'RESERVED-238',                desc: 'RESERVED-238(0xEE)'};
+keycodes[0x00EF] = {id: 'RESERVED-239',                name: 'RESERVED-239',                desc: 'RESERVED-239(0xEF)'};
+keycodes[0x00F0] = {id: 'RESERVED-240',                name: 'RESERVED-240',                desc: 'RESERVED-240(0xF0)'};
+keycodes[0x00F1] = {id: 'RESERVED-241',                name: 'RESERVED-241',                desc: 'RESERVED-241(0xF1)'};
+keycodes[0x00F2] = {id: 'RESERVED-242',                name: 'RESERVED-242',                desc: 'RESERVED-242(0xF2)'};
+keycodes[0x00F3] = {id: 'RESERVED-243',                name: 'RESERVED-243',                desc: 'RESERVED-243(0xF3)'};
+keycodes[0x00F4] = {id: 'RESERVED-244',                name: 'RESERVED-244',                desc: 'RESERVED-244(0xF4)'};
+keycodes[0x00F5] = {id: 'RESERVED-245',                name: 'RESERVED-245',                desc: 'RESERVED-245(0xF5)'};
+keycodes[0x00F6] = {id: 'RESERVED-246',                name: 'RESERVED-246',                desc: 'RESERVED-246(0xF6)'};
+keycodes[0x00F7] = {id: 'RESERVED-247',                name: 'RESERVED-247',                desc: 'RESERVED-247(0xF7)'};
+keycodes[0x00F8] = {id: 'RESERVED-248',                name: 'RESERVED-248',                desc: 'RESERVED-248(0xF8)'};
+keycodes[0x00F9] = {id: 'RESERVED-249',                name: 'RESERVED-249',                desc: 'RESERVED-249(0xF9)'};
+keycodes[0x00FA] = {id: 'RESERVED-250',                name: 'RESERVED-250',                desc: 'RESERVED-250(0xFA)'};
+keycodes[0x00FB] = {id: 'RESERVED-251',                name: 'RESERVED-251',                desc: 'RESERVED-251(0xFB)'};
+keycodes[0x00FC] = {id: 'RESERVED-252',                name: 'RESERVED-252',                desc: 'RESERVED-252(0xFC)'};
+keycodes[0x00FD] = {id: 'RESERVED-253',                name: 'RESERVED-253',                desc: 'RESERVED-253(0xFD)'};
+keycodes[0x00FE] = {id: 'RESERVED-254',                name: 'RESERVED-254',                desc: 'RESERVED-254(0xFE)'};
+keycodes[0x00FF] = {id: 'RESERVED-255',                name: 'RESERVED-255',                desc: 'RESERVED-255(0xFF)'};
 */
 
 /*
- * TMK actions
+ * Generic Desktop Page(0x01) - system power control
  */
-// Generic Desktop Page 0x01/System Control
 system_codes = [];
 system_codes[0x81] = {id: 'PWR ',                        name: 'Sys Power',                   desc: 'System Power'};
 system_codes[0x82] = {id: 'SLEP',                        name: 'Sys Sleep',                   desc: 'System Sleep'};
 system_codes[0x83] = {id: 'WAKE',                        name: 'Sys Wake',                    desc: 'System Wake'};
 
-// Consumer page 0x0C
+/*
+ * Consumer page(0x0C)
+ */
 consumer_codes = [];
 consumer_codes[0x0E2] = {id: 'MUTE',                        name: 'Mute',                        desc: 'Audio Mute'};
 consumer_codes[0x0E9] = {id: 'VOLU',                        name: 'Vol Up',                      desc: 'Audio Vol Up'};
@@ -730,7 +673,9 @@ consumer_codes[0x22A] = {id: 'WFAV',                        name: 'Web Favorites
 consumer_codes[0x0B3] = {id: 'MFFD',                        name: 'Fast Forward',                desc: 'Media Fast Forward(Mac)'};
 consumer_codes[0x0B4] = {id: 'MRWD',                        name: 'Rewind',                      desc: 'Media Rewind(Mac)'};
 
-// Mouse key
+/*
+ * Mouse key - TMK specific codes
+ */
 mousekey_codes = [];
 mousekey_codes[0x00F0] = {id: 'MS_U',                        name: 'Mouse Up',                    desc: 'Mouse UP'};
 mousekey_codes[0x00F1] = {id: 'MS_D',                        name: 'Mouse down',                  desc: 'Mouse Down'};
@@ -748,3 +693,48 @@ mousekey_codes[0x00FC] = {id: 'WH_R',                        name: 'Wheel Right'
 mousekey_codes[0x00FD] = {id: 'ACL0',                        name: 'Mouse Slow',                  desc: 'Mouse Slow'};
 mousekey_codes[0x00FE] = {id: 'ACL1',                        name: 'Mouse Medium',                desc: 'Mouse Medium'};
 mousekey_codes[0x00FF] = {id: 'ACL2',                        name: 'Mouse Fast',                  desc: 'Mouse Fast'};
+
+/*
+ * Modifier key in Action
+ */
+/*
+var id_mods = [];
+mods_ids[0x01] = { id: MOD_LCTL,     name: "Left Control",       desc: "Left Control" };
+mods_ids[0x02] = { id: MOD_LSFT,     name: "Left Shift",         desc: "Left Shift" };
+mods_ids[0x04] = { id: MOD_LALT,     name: "Left Alt",           desc: "Left Alt" };
+mods_ids[0x08] = { id: MOD_LGUI,     name: "Left Gui",           desc: "Left Gui" };
+mods_ids[0x11] = { id: MOD_RCTL,     name: "Right Control",      desc: "Right Control" };
+mods_ids[0x12] = { id: MOD_RSFT,     name: "Right Shift",        desc: "Right Shift" };
+mods_ids[0x14] = { id: MOD_RALT,     name: "Right Alt",          desc: "Right Alt" };
+mods_ids[0x18] = { id: MOD_RGUI,     name: "Right Gui",          desc: "Right Gui" };
+*/
+
+/*
+ * Modifier combination in Action
+ */
+mods_codes = [];
+mods_codes[0x0] = { id: 0x0,    name: "    ",   desc: "none" };
+mods_codes[0x1] = { id: 0x1,    name: "   \u2303",   desc: "Control" };
+mods_codes[0x2] = { id: 0x2,    name: "  \u21E7 ",   desc: "Shift" };
+mods_codes[0x3] = { id: 0x3,    name: "  \u21E7\u2303",   desc: "Shift + Control" };
+mods_codes[0x4] = { id: 0x4,    name: " \u2325  ",   desc: "Alt" };
+mods_codes[0x5] = { id: 0x5,    name: " \u2325 \u2303",   desc: "Alt + Control" };
+mods_codes[0x6] = { id: 0x6,    name: " \u2325\u21E7 ",   desc: "Alt + Shift" };
+mods_codes[0x7] = { id: 0x7,    name: " \u2325\u21E7\u2303",   desc: "Alt + Shift + Control" };
+mods_codes[0x8] = { id: 0x8,    name: "\u2318   ",   desc: "Gui" };
+mods_codes[0x9] = { id: 0x9,    name: "\u2318  \u2303",   desc: "Gui + Control" };
+mods_codes[0xA] = { id: 0xA,    name: "\u2318 \u21E7 ",   desc: "Gui + Shift" };
+mods_codes[0xB] = { id: 0xB,    name: "\u2318 \u21E7\u2303",   desc: "Gui + Shift + Control" };
+mods_codes[0xC] = { id: 0xC,    name: "\u2318\u2325  ",   desc: "Gui + Alt" };
+mods_codes[0xD] = { id: 0xD,    name: "\u2318\u2325 \u2303",   desc: "Gui + Alt + Control" };
+mods_codes[0xE] = { id: 0xE,    name: "\u2318\u2325\u21E7 ",   desc: "Gui + Alt + Shift" };
+mods_codes[0xF] = { id: 0xF,    name: "\u2318\u2325\u21E7\u2303",   desc: "Gui + Alt + Shift + Control" };
+
+/*
+ * Timing of Action
+ */
+on_codes = [];
+//on_codes[0x0] = { id: 0x1, name: "Special Use", desc: "Special Use" };
+on_codes[0x1] = { id: 0x1, name: "On Press", desc: "On Press" };
+on_codes[0x2] = { id: 0x1, name: "On Release", desc: "On Release" };
+on_codes[0x3] = { id: 0x1, name: "On Both", desc: "On Press and Release" };
