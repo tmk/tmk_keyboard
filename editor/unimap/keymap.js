@@ -211,3 +211,28 @@ function hex_firmware() {
     return "\
 ";
 }
+
+
+/**********************************************************************
+ * URL encode/decode
+ **********************************************************************/
+function url_encode_keymap(obj) {
+    if (typeof LZString != "undefined" && typeof Base64 != "undefined") {
+        return Base64.encode(LZString.compress(JSON.stringify(obj)));
+    }
+    return window.btoa(JSON.stringify(obj));
+};
+
+function url_decode_keymap(str) {
+    try {
+        // lz-string-1.3.3.js: LZString.decompress() runs away if given short string.
+        if (str == null || typeof str != "string" || str.length < 30) return null;
+
+        if (typeof LZString != "undefined" && typeof Base64 != "undefined") {
+            return JSON.parse(LZString.decompress(Base64.decode(str)));
+        }
+        return JSON.parse(window.atob(str));
+    } catch (err) {
+        return null;
+    }
+};

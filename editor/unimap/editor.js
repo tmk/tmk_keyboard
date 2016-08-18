@@ -29,27 +29,6 @@ $(function() {
         return { row: parseInt(pos[1], 32), col: parseInt(pos[2], 32) };
     };
 
-    var encode_keymap = function(obj) {
-        if (typeof LZString != "undefined" && typeof Base64 != "undefined") {
-            return Base64.encode(LZString.compress(JSON.stringify(obj)));
-        }
-        return window.btoa(JSON.stringify(obj));
-    };
-
-    var decode_keymap = function(str) {
-        try {
-            // lz-string-1.3.3.js: LZString.decompress() runs away if given short string.
-            if (str == null || typeof str != "string" || str.length < 30) return null;
-
-            if (typeof LZString != "undefined" && typeof Base64 != "undefined") {
-                return JSON.parse(LZString.decompress(Base64.decode(str)));
-            }
-            return JSON.parse(window.atob(str));
-        } catch (err) {
-            return null;
-        }
-    };
-
 
     /**********************************************************************
      * General Setup
@@ -64,7 +43,7 @@ $(function() {
     /*
      * load keymap from URL hash
      */
-    var decoded = decode_keymap(document.location.hash.substring(1));
+    var decoded = url_decode_keymap(document.location.hash.substring(1));
     if (decoded != null) {
         keymaps = decoded['keymaps'];
     }
@@ -366,13 +345,13 @@ console.log(action_code.toString(16));
      **********************************************************************/
     // Share URL
     $("#keymap-share").click(function(ev, ui) {
-        var hash = encode_keymap({ keymaps: keymaps });
+        var hash = url_encode_keymap({ keymaps: keymaps });
         $("#share-url").text(document.location.origin + document.location.pathname + "#" + hash);
     });
 
     // Shorten URL
     $("#shorten-url").click(function(ev, ui) {
-        var hash = encode_keymap({ keymaps: keymaps });
+        var hash = url_encode_keymap({ keymaps: keymaps });
         var editor_url = document.location.origin + document.location.pathname;
         window.open("https://bitly.com/shorten/?url=" + encodeURIComponent(editor_url + "#" + hash));
         //window.open("http://tinyurl.com/create.php?url=" + encodeURIComponent(editor_url + "#" + hash));
@@ -405,14 +384,14 @@ console.log(action_code.toString(16));
 
     // encode keymap
     $("#keymap-encode").click(function(ev, ui) {
-        var keymap_output = encode_keymap({ keymaps: keymaps });
+        var keymap_output = url_encode_keymap({ keymaps: keymaps });
         $("#keymap-output").text(keymap_output);
     });
 
     // decode  keymap
     $("#keymap-decode").click(function(ev, ui) {
         var hash = $("#keymap-output").text();
-        var keymap_output = decode_keymap(hash);
+        var keymap_output = url_decode_keymap(hash);
         $("#keymap-output").text(JSON.stringify(keymap_output));
     });
 
