@@ -1,4 +1,7 @@
-// action kind bits
+/**********************************************************************
+ * Action code elements
+ **********************************************************************/
+// Action kind bits
 const ACT_MODS          = 0b0000;
 const ACT_LMODS         = 0b0000;
 const ACT_RMODS         = 0b0001;
@@ -16,25 +19,25 @@ const ACT_BACKLIGHT     = 0b1101;
 const ACT_COMMAND       = 0b1110;
 const ACT_FUNCTION      = 0b1111;
 
-// Special values for key param of ACT_LAYER_TAP
-// 0xF4-FF: reserved
+// Special keycodes for Layer Tap
 const OP_TAP_TOGGLE     = 0xf0;
 const OP_ON_OFF         = 0xf1;
 const OP_OFF_ON         = 0xf2;
 const OP_SET_CLEAR      = 0xf3;
 
-// Bit operations
+// Layer Bit operations
 const OP_BIT_AND        = 0;
 const OP_BIT_OR         = 1;
 const OP_BIT_XOR        = 2;
 const OP_BIT_SET        = 3;
 
-// Bit operation timing
+// Layer Bit operation timings
 const ON_SPECIAL_USE    = 0;
 const ON_PRESS          = 1;
 const ON_RELEASE        = 2;
 const ON_BOTH           = 3;
 
+// Modifier bits
 const MOD_LCTL = 0x01;
 const MOD_LSFT = 0x02;
 const MOD_LALT = 0x04;
@@ -44,58 +47,22 @@ const MOD_RSFT = 0x12;
 const MOD_RALT = 0x14;
 const MOD_RGUI = 0x18;
 
-// special keycodes for MODS_TAP
+// Special keycodes for Modifier Tap
 const MODS_ONESHOT      = 0x00;
 const MODS_TAP_TOGGLE   = 0x01;
 
-// actoin usage page
+// Actoin Usage Page
 const PAGE_SYSTEM       = 0;
 const PAGE_CONSUMER     = 1;
 
-// special opts for FUNCTION
+// Apecial opts for Function
 const FUNC_TAP = 0x08;
 
 
-var action_kinds = {
-    KEY:                { id: "KEY",                    name: "ACTION_KEY",                 desc: "Normal key" },
-    MODS_KEY:           { id: "MODS_KEY",               name: "ACTION_MODS_KEY",            desc: "Modified key" },
-    MODS_TAP_KEY:       { id: "MODS_TAP_KEY",           name: "ACTION_MODS_TAP_KEY",        desc: "Tap key / Hold modifiers" },
-    MODS_ONESHOT:       { id: "MODS_ONESHOT",           name: "ACTION_MODS_ONESHOT",        desc: "Oneshot modifiers" },
-    MODS_TAP_TOGGLE:    { id: "MODS_TAP_TOGGLE",        name: "ACTION_MODS_TAP_TOGGLE",     desc: "Tap toggle modifiers" },
-    USAGE_SYSTEM:       { id: "USAGE_SYSTEM",           name: "ACTION_USAGE_SYSTEM",        desc: "System control key" },
-    USAGE_CONSUMER:     { id: "USAGE_CONSUMER",         name: "ACTION_USAGE_CONSUMER",      desc: "Consumer key" },
-    MOUSEKEY:           { id: "MOUSEKEY",               name: "ACTION_MOUSEKEY",            desc: "Mouse key" },
-/*
-    MACRO:              { id: "MACRO",                  name: "ACTION_MACRO",               desc: "Macro" },
-    MACRO_TAP:          { id: "MACRO_TAP",              name: "ACTION_MACRO_TAP",           desc: "Macro for tap key" },
-    MACRO_OPT:          { id: "MACRO_OPT",              name: "ACTION_MACRO_OPT",           desc: "Macro with option" },
-    FUNCTION:           { id: "FUNCTION",               name: "ACTION_FUNCTION",            desc: "Function" },
-    FUNCTION_TAP:       { id: "FUNCTION_TAP",           name: "ACTION_FUNCTION_TAP",        desc: "Function for tap key" },
-    FUNCTION_OPT:       { id: "FUNCTION_OPT",           name: "ACTION_FUNCTION_OPT",        desc: "Function with option" },
-*/
-    LAYER_CLEAR:        { id: "LAYER_CLEAR",            name: "ACTION_LAYER_CLEAR",         desc: "Clear all layer state" },
-    LAYER_MOMENTARY:    { id: "LAYER_MOMENTARY",        name: "ACTION_LAYER_MOMENTARY",     desc: "Momentary layer switch" },
-    LAYER_TOGGLE:       { id: "LAYER_TOGGLE",           name: "ACTION_LAYER_TOGGLE",        desc: "Toggle a layer" },
-    LAYER_INVERT:       { id: "LAYER_INVERT",           name: "ACTION_LAYER_INVERT",        desc: "Invert a layer" },
-    LAYER_ON:           { id: "LAYER_ON",               name: "ACTION_LAYER_ON",            desc: "Turn on a layer" },
-    LAYER_OFF:          { id: "LAYER_OFF",              name: "ACTION_LAYER_OFF",           desc: "Turn off a layer" },
-    LAYER_SET:          { id: "LAYER_SET",              name: "ACTION_LAYER_SET",           desc: "Set a layer" },
-    LAYER_ON_OFF:       { id: "LAYER_ON_OFF",           name: "ACTION_LAYER_ON_OFF",        desc: "Turn on with press and off with release" },
-    LAYER_OFF_ON:       { id: "LAYER_OFF_ON",           name: "ACTION_LAYER_OFF_ON",        desc: "Turn off with press and on with release" },
-    LAYER_SET_CLEAR:    { id: "LAYER_SET_CLEAR",        name: "ACTION_LAYER_SET_CLEAR",     desc: "Turn on only a layer with press clear with release" },
-    LAYER_MODS:         { id: "LAYER_MODS",             name: "ACTION_LAYER_MODS",          desc: "Momentary layer switch with modifiers" },
-    LAYER_TAP_KEY:      { id: "LAYER_TAP_KEY",          name: "ACTION_LAYER_TAP_KEY",       desc: "Momentary layer switch / Tap key" },
-    LAYER_TAP_TOGGLE:   { id: "LAYER_TAP_TOGGLE",       name: "ACTION_LAYER_TAP_TOGGLE",    desc: "Momentary layer switch / Tap toggle" },
-/*
-    LAYER_BIT_AND:      { id: "LAYER_BIT_AND",          name: "ACTION_LAYER_BIT_AND",       desc: "Layer Bit AND" },
-    LAYER_BIT_OR:       { id: "LAYER_BIT_OR",           name: "ACTION_LAYER_BIT_OR",        desc: "Layer Bit OR" },
-    LAYER_BIT_XOR:      { id: "LAYER_BIT_XOR",          name: "ACTION_LAYER_BIT_XOR",       desc: "Layer Bit XOR" },
-    LAYER_BIT_SET:      { id: "LAYER_BIT_SET",          name: "ACTION_LAYER_BIT_SET",       desc: "Layer Bit SET" },
-    DEFAULT_LAYER_SET:  { id: "DEFAULT_LAYER_SET",      name: "ACTION_DEFAULT_LAYER_SET",   desc: "Set a default layer" },
-*/
-    UNKNOWN:            { id: "UNKNOWN",                name: "ACTION_UNKNOWN",             desc: "Unknown action" },
-};
 
+/**********************************************************************
+ * Action kind codes
+ **********************************************************************/
 var kind_codes = {
     KEY:                ACT_MODS<<12,
     MODS_KEY:           ACT_MODS<<12,
@@ -134,7 +101,9 @@ var kind_codes = {
 
 
 
-// action object
+/**********************************************************************
+ * Action Object
+ **********************************************************************/
 function Action(code = 0) {
     this.code = code;
 
@@ -368,9 +337,53 @@ function Action(code = 0) {
 }
 
 
+/**********************************************************************
+ * Action kind description
+ **********************************************************************/
+var action_kinds = {
+    KEY:                { id: "KEY",                    name: "ACTION_KEY",                 desc: "Normal key" },
+    MODS_KEY:           { id: "MODS_KEY",               name: "ACTION_MODS_KEY",            desc: "Modified key" },
+    MODS_TAP_KEY:       { id: "MODS_TAP_KEY",           name: "ACTION_MODS_TAP_KEY",        desc: "Tap key / Hold modifiers" },
+    MODS_ONESHOT:       { id: "MODS_ONESHOT",           name: "ACTION_MODS_ONESHOT",        desc: "Oneshot modifiers" },
+    MODS_TAP_TOGGLE:    { id: "MODS_TAP_TOGGLE",        name: "ACTION_MODS_TAP_TOGGLE",     desc: "Tap toggle modifiers" },
+    USAGE_SYSTEM:       { id: "USAGE_SYSTEM",           name: "ACTION_USAGE_SYSTEM",        desc: "System control key" },
+    USAGE_CONSUMER:     { id: "USAGE_CONSUMER",         name: "ACTION_USAGE_CONSUMER",      desc: "Consumer key" },
+    MOUSEKEY:           { id: "MOUSEKEY",               name: "ACTION_MOUSEKEY",            desc: "Mouse key" },
 /*
+    MACRO:              { id: "MACRO",                  name: "ACTION_MACRO",               desc: "Macro" },
+    MACRO_TAP:          { id: "MACRO_TAP",              name: "ACTION_MACRO_TAP",           desc: "Macro for tap key" },
+    MACRO_OPT:          { id: "MACRO_OPT",              name: "ACTION_MACRO_OPT",           desc: "Macro with option" },
+    FUNCTION:           { id: "FUNCTION",               name: "ACTION_FUNCTION",            desc: "Function" },
+    FUNCTION_TAP:       { id: "FUNCTION_TAP",           name: "ACTION_FUNCTION_TAP",        desc: "Function for tap key" },
+    FUNCTION_OPT:       { id: "FUNCTION_OPT",           name: "ACTION_FUNCTION_OPT",        desc: "Function with option" },
+*/
+    LAYER_CLEAR:        { id: "LAYER_CLEAR",            name: "ACTION_LAYER_CLEAR",         desc: "Clear all layer state" },
+    LAYER_MOMENTARY:    { id: "LAYER_MOMENTARY",        name: "ACTION_LAYER_MOMENTARY",     desc: "Momentary layer switch" },
+    LAYER_TOGGLE:       { id: "LAYER_TOGGLE",           name: "ACTION_LAYER_TOGGLE",        desc: "Toggle a layer" },
+    LAYER_INVERT:       { id: "LAYER_INVERT",           name: "ACTION_LAYER_INVERT",        desc: "Invert a layer" },
+    LAYER_ON:           { id: "LAYER_ON",               name: "ACTION_LAYER_ON",            desc: "Turn on a layer" },
+    LAYER_OFF:          { id: "LAYER_OFF",              name: "ACTION_LAYER_OFF",           desc: "Turn off a layer" },
+    LAYER_SET:          { id: "LAYER_SET",              name: "ACTION_LAYER_SET",           desc: "Set a layer" },
+    LAYER_ON_OFF:       { id: "LAYER_ON_OFF",           name: "ACTION_LAYER_ON_OFF",        desc: "Turn on with press and off with release" },
+    LAYER_OFF_ON:       { id: "LAYER_OFF_ON",           name: "ACTION_LAYER_OFF_ON",        desc: "Turn off with press and on with release" },
+    LAYER_SET_CLEAR:    { id: "LAYER_SET_CLEAR",        name: "ACTION_LAYER_SET_CLEAR",     desc: "Turn on only a layer with press clear with release" },
+    LAYER_MODS:         { id: "LAYER_MODS",             name: "ACTION_LAYER_MODS",          desc: "Momentary layer switch with modifiers" },
+    LAYER_TAP_KEY:      { id: "LAYER_TAP_KEY",          name: "ACTION_LAYER_TAP_KEY",       desc: "Momentary layer switch / Tap key" },
+    LAYER_TAP_TOGGLE:   { id: "LAYER_TAP_TOGGLE",       name: "ACTION_LAYER_TAP_TOGGLE",    desc: "Momentary layer switch / Tap toggle" },
+/*
+    LAYER_BIT_AND:      { id: "LAYER_BIT_AND",          name: "ACTION_LAYER_BIT_AND",       desc: "Layer Bit AND" },
+    LAYER_BIT_OR:       { id: "LAYER_BIT_OR",           name: "ACTION_LAYER_BIT_OR",        desc: "Layer Bit OR" },
+    LAYER_BIT_XOR:      { id: "LAYER_BIT_XOR",          name: "ACTION_LAYER_BIT_XOR",       desc: "Layer Bit XOR" },
+    LAYER_BIT_SET:      { id: "LAYER_BIT_SET",          name: "ACTION_LAYER_BIT_SET",       desc: "Layer Bit SET" },
+    DEFAULT_LAYER_SET:  { id: "DEFAULT_LAYER_SET",      name: "ACTION_DEFAULT_LAYER_SET",   desc: "Set a default layer" },
+*/
+    UNKNOWN:            { id: "UNKNOWN",                name: "ACTION_UNKNOWN",             desc: "Unknown action" },
+};
+
+
+/**********************************************************************
  * Keyboard/Keypad Page(0x07) - keycodes
- */
+ **********************************************************************/
 var keycodes = [];
 keycodes[0x0000] = {id: 'NO  ',                        name: 'NO',                          desc: 'No action'};
 keycodes[0x0001] = {id: 'TRNS',                        name: 'TRNS',                        desc: 'Transparent'};
@@ -637,17 +650,19 @@ keycodes[0x00FE] = {id: 'RESERVED-254',                name: 'RESERVED-254',    
 keycodes[0x00FF] = {id: 'RESERVED-255',                name: 'RESERVED-255',                desc: 'RESERVED-255(0xFF)'};
 */
 
-/*
+
+/**********************************************************************
  * Generic Desktop Page(0x01) - system power control
- */
+ **********************************************************************/
 system_codes = [];
 system_codes[0x81] = {id: 'PWR ',                        name: 'Sys Power',                   desc: 'System Power'};
 system_codes[0x82] = {id: 'SLEP',                        name: 'Sys Sleep',                   desc: 'System Sleep'};
 system_codes[0x83] = {id: 'WAKE',                        name: 'Sys Wake',                    desc: 'System Wake'};
 
-/*
- * Consumer page(0x0C)
- */
+
+/**********************************************************************
+ * Consumer page(0x0C) - media/application control
+ **********************************************************************/
 consumer_codes = [];
 consumer_codes[0x0E2] = {id: 'MUTE',                        name: 'Mute',                        desc: 'Audio Mute'};
 consumer_codes[0x0E9] = {id: 'VOLU',                        name: 'Vol Up',                      desc: 'Audio Vol Up'};
@@ -671,9 +686,10 @@ consumer_codes[0x22A] = {id: 'WFAV',                        name: 'Web Favorites
 consumer_codes[0x0B3] = {id: 'MFFD',                        name: 'Fast Forward',                desc: 'Media Fast Forward(Mac)'};
 consumer_codes[0x0B4] = {id: 'MRWD',                        name: 'Rewind',                      desc: 'Media Rewind(Mac)'};
 
-/*
+
+/**********************************************************************
  * Mouse key - TMK specific codes
- */
+ **********************************************************************/
 mousekey_codes = [];
 mousekey_codes[0x00F0] = {id: 'MS_U',                        name: 'Mouse Up',                    desc: 'Mouse UP'};
 mousekey_codes[0x00F1] = {id: 'MS_D',                        name: 'Mouse down',                  desc: 'Mouse Down'};
@@ -692,24 +708,10 @@ mousekey_codes[0x00FD] = {id: 'ACL0',                        name: 'Mouse Slow',
 mousekey_codes[0x00FE] = {id: 'ACL1',                        name: 'Mouse Medium',                desc: 'Mouse Medium'};
 mousekey_codes[0x00FF] = {id: 'ACL2',                        name: 'Mouse Fast',                  desc: 'Mouse Fast'};
 
-/*
- * Modifier key in Action
- */
-/*
-var id_mods = [];
-mods_ids[0x01] = { id: MOD_LCTL,     name: "Left Control",       desc: "Left Control" };
-mods_ids[0x02] = { id: MOD_LSFT,     name: "Left Shift",         desc: "Left Shift" };
-mods_ids[0x04] = { id: MOD_LALT,     name: "Left Alt",           desc: "Left Alt" };
-mods_ids[0x08] = { id: MOD_LGUI,     name: "Left Gui",           desc: "Left Gui" };
-mods_ids[0x11] = { id: MOD_RCTL,     name: "Right Control",      desc: "Right Control" };
-mods_ids[0x12] = { id: MOD_RSFT,     name: "Right Shift",        desc: "Right Shift" };
-mods_ids[0x14] = { id: MOD_RALT,     name: "Right Alt",          desc: "Right Alt" };
-mods_ids[0x18] = { id: MOD_RGUI,     name: "Right Gui",          desc: "Right Gui" };
-*/
 
-/*
- * Modifier combination in Action
- */
+/**********************************************************************
+ * Modifier combination
+ **********************************************************************/
 mods_codes = [];
 mods_codes[0x0] = { id: 0x0,    name: "    ",   desc: "none" };
 mods_codes[0x1] = { id: 0x1,    name: "   \u2303",   desc: "Control" };
@@ -728,9 +730,10 @@ mods_codes[0xD] = { id: 0xD,    name: "\u2318\u2325 \u2303",   desc: "Gui + Alt 
 mods_codes[0xE] = { id: 0xE,    name: "\u2318\u2325\u21E7 ",   desc: "Gui + Alt + Shift" };
 mods_codes[0xF] = { id: 0xF,    name: "\u2318\u2325\u21E7\u2303",   desc: "Gui + Alt + Shift + Control" };
 
-/*
+
+/**********************************************************************
  * Timing of Action
- */
+ **********************************************************************/
 on_codes = [];
 //on_codes[0x0] = { id: 0x1, name: "Special Use", desc: "Special Use" };
 on_codes[0x1] = { id: 0x1, name: "On Press", desc: "On Press" };
