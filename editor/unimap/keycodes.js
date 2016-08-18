@@ -48,6 +48,10 @@ const MOD_RGUI = 0x18;
 const MODS_ONESHOT      = 0x00;
 const MODS_TAP_TOGGLE   = 0x01;
 
+// actoin usage page
+const PAGE_SYSTEM       = 0;
+const PAGE_CONSUMER     = 1;
+
 // special opts for FUNCTION
 const FUNC_TAP = 0x08;
 
@@ -87,8 +91,8 @@ var action_kinds = {
     LAYER_BIT_OR:       { id: "LAYER_BIT_OR",           name: "ACTION_LAYER_BIT_OR",        desc: "Layer Bit OR" },
     LAYER_BIT_XOR:      { id: "LAYER_BIT_XOR",          name: "ACTION_LAYER_BIT_XOR",       desc: "Layer Bit XOR" },
     LAYER_BIT_SET:      { id: "LAYER_BIT_SET",          name: "ACTION_LAYER_BIT_SET",       desc: "Layer Bit SET" },
-*/
     DEFAULT_LAYER_SET:  { id: "DEFAULT_LAYER_SET",      name: "ACTION_DEFAULT_LAYER_SET",   desc: "Set a default layer" },
+*/
     UNKNOWN:            { id: "UNKNOWN",                name: "ACTION_UNKNOWN",             desc: "Unknown action" },
 };
 
@@ -96,10 +100,10 @@ var kind_codes = {
     KEY:                ACT_MODS<<12,
     MODS_KEY:           ACT_MODS<<12,
     MODS_TAP_KEY:       ACT_MODS_TAP<<12,
-    MODS_ONESHOT:       ACT_MODS_TAP<<12,
-    MODS_TAP_TOGGLE:    ACT_MODS_TAP<<12,
-    USAGE_SYSTEM:       ACT_USAGE<<12,
-    USAGE_CONSUMER:     ACT_USAGE<<12,
+    MODS_ONESHOT:       ACT_MODS_TAP<<12 | MODS_ONESHOT,
+    MODS_TAP_TOGGLE:    ACT_MODS_TAP<<12 | MODS_TAP_TOGGLE,
+    USAGE_SYSTEM:       ACT_USAGE<<12 | PAGE_SYSTEM<<10,
+    USAGE_CONSUMER:     ACT_USAGE<<12 | PAGE_CONSUMER<<10,
     MOUSEKEY:           ACT_MOUSEKEY<<12,
     MACRO:              ACT_MACRO<<12,
     MACRO_TAP:          ACT_MACRO<<12,
@@ -127,12 +131,6 @@ var kind_codes = {
     DEFAULT_LAYER_SET:  ACT_LAYER<<12 | OP_BIT_SET<<10 | ON_SPECIAL_USE<<8,
     UNKNOWN:            0,
 };
-
-
-
-// actoin usage page
-const PAGE_SYSTEM       = 0;
-const PAGE_CONSUMER     = 1;
 
 
 

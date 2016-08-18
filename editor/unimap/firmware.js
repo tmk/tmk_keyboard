@@ -2,7 +2,7 @@
  * Unimap
  */
 KEYBOARD_ID = "unimap";
-KEYBOARD_DESC = "USB to USB converter"
+KEYBOARD_DESC = "unimap editor"
 
 /* for ATMega32U2/U4 with 32KB flash */
 KEYMAP_START_ADDRESS = 0x6800;
