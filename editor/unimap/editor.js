@@ -1,5 +1,5 @@
 /*
- * TMK keymap editor
+ * TMK keymap editor - unimap/actionmap
  */
 $(function() {
     // Key button id under editing
@@ -422,4 +422,3 @@ console.log(action_code.toString(16));
           return 'CAUTION: You will lost your change.';
     });
 });
-
