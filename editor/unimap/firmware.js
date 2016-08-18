@@ -1,55 +1,5 @@
 /*
- * Unimap
- */
-KEYBOARD_ID = "unimap";
-KEYBOARD_DESC = "unimap editor"
-
-/* for ATMega32U2/U4 with 32KB flash */
-KEYMAP_START_ADDRESS = 0x6800;
-
-/* TMK USB to USB Converter
- *     https://github.com/tmk/tmk_keyboard/tree/master/converter/usb_usb
- *
- *         ,---------------. ,---------------. ,---------------.
- *         |F13|F14|F15|F16| |F17|F18|F19|F20| |F21|F22|F23|F24|
- * ,---.   |---------------| |---------------| |---------------| ,-----------. ,---------------. ,-------.
- * |Esc|   |F1 |F2 |F3 |F4 | |F5 |F6 |F7 |F8 | |F9 |F10|F11|F12| |PrS|ScL|Pau| |VDn|VUp|Mut|Pwr| | Help  |
- * `---'   `---------------' `---------------' `---------------' `-----------' `---------------' `-------'
- * ,-----------------------------------------------------------. ,-----------. ,---------------. ,-------.
- * |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY|Bsp| |Ins|Hom|PgU| |NmL|  /|  *|  -| |Stp|Agn|
- * |-----------------------------------------------------------| |-----------| |---------------| |-------|
- * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|  \  | |Del|End|PgD| |  7|  8|  9|  +| |Mnu|Und|
- * |-----------------------------------------------------------| `-----------' |---------------| |-------|
- * |CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  :|  #|Retn|               |  4|  5|  6|KP,| |Sel|Cpy|
- * |-----------------------------------------------------------|     ,---.     |---------------| |-------|
- * |Shft|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  ,|  /| RO|Shift |     |Up |     |  1|  2|  3|KP=| |Exe|Pst|
- * |-----------------------------------------------------------| ,-----------. |---------------| |-------|
- * |Ctl|Gui|Alt|MHEN|HNJ| Space  |H/E|HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  0    |  .|Ent| |Fnd|Cut|
- * `-----------------------------------------------------------' `-----------' `---------------' `-------'
- * App:         Windows Menu key
- * Gui:         Windows key, Mac ⌘ key or Meta key
- *
- * Pwr:         Power for Unix and Mac
- * VDn,Vup,Mut: Volume control for Unix and Mac
- * Stp,Agn..:   for Unix
- *
- * KP,:         Brazilian Keypad Comma
- * KP=:         Keypad = for Mac
- * <,#:         ISO keys(UK legend)
- * JPY:         Japanese Yen(￥)
- * RO:          Japanese ろ or Brazilian /
- * MHEN:        Japanese 無変換 Non Conversion
- * HENK:        Japanese 変換 Conversion
- * KANA:        Japanese かな Hiragana/Katakana
- *              https://en.wikipedia.org/wiki/Keyboard_layout#Japanese
- * H/E:         Korean 한/영 Hangul/English
- * HNJ:         Korean 한자 Hanja
- *              https://en.wikipedia.org/wiki/Keyboard_layout#Hangul_.28for_Korean.29
- *
- * Matrix: 16x16 = 256 bytes
- *         7 layers can be defined in 2KB area.(64+256*7 < 2KB < 64+256*8)
- */
-/* Universal 128-key keyboard layout(8x16)
+Unimap - Universal 128-key keyboard layout(8x16)
         ,-----------------------------------------------.
         |F13|F14|F15|F16|F17|F18|F19|F20|F21|F22|F23|F24|
 ,---.   |-----------------------------------------------|     ,-----------.     ,-----------.
@@ -79,7 +29,18 @@ HENK:        Japanese 変換(Conversion) or Korean Hangul/English
 KANA:        Japanese かな(Hiragana/Katakana)
 https://en.wikipedia.org/wiki/Keyboard_layout#Japanese
 https://en.wikipedia.org/wiki/Keyboard_layout#Hangul_.28for_Korean.29
+
+Key:    8x16 = 128 keys
+Layer:  2(bytes/action) * 128 = 256 bytes
+        8 layers can be defined in 2KB area.(256 * 8 = 2048)
 */
+// Keymap section address
+KEYMAP_START_ADDRESS = 0x6800;
+
+
+/**********************************************************************
+ * Keymaps
+ **********************************************************************/
 no_map = function() { return [
     [ 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0 ],
     [ 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0 ],
@@ -90,6 +51,7 @@ no_map = function() { return [
     [ 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0 ],
     [ 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0 ],
 ]; };
+
 transparent_map = function() { return [
     [ 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1 ],
     [ 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1 ],
@@ -131,9 +93,91 @@ keymaps = [
 ];
 
 
+/**********************************************************************
+ * Source output
+ **********************************************************************/
+function source_output(keymaps) {
+    var output = '';
+    output += "#include \"action.h\"\n";
+    output += "#include \"action_code.h\"\n";
+    output += "#include \"actionmap.h\"\n";
+    output += "\n";
+    output += "const action_t actionmaps[][";
+    output += keymaps[0].length;         // row
+    output += "][";
+    output += keymaps[0][0].length;      // col
+    output += "] __attribute__ ((section (\".keymap.keymaps\"))) = {\n";
+    for (var i in keymaps) {
+        output += "    {\n";
+        for (var j in keymaps[i]) {
+            output += "        { ";
+            for (var k in keymaps[i][j]) {
+                output += '0x' + ('0' + keymaps[i][j][k].toString(16)).substr(-2);
+                output += ',';
+            }
+            output += " },\n";
+        }
+        output += "    },\n";
+    }
+    output += "};\n";
+    return output;
+};
+
+
+/**********************************************************************
+ * Hex output
+ **********************************************************************/
+function hex_line(address, record_type, data) {
+    var hexstr2 = function(b) {
+        return ('0'+ b.toString(16)).substr(-2).toUpperCase();
+    };
+
+    var sum = 0;
+    sum += data.length;
+    sum += (address >> 8);
+    sum += (address & 0xff);
+    sum += record_type;
+
+    var line = '';
+    line += ':';
+    line += hexstr2(data.length);
+    line += hexstr2(address >> 8);
+    line += hexstr2(address & 0xff);
+    line += hexstr2(record_type);
+    for (var i = 0; i < data.length; i++) {
+        sum = (sum + data[i]);
+        line += hexstr2(data[i]);
+    }
+    line += hexstr2((~sum + 1)&0xff);  // Checksum
+    line +="\r\n";
+    return line;
+};
+
+function hex_eof() {
+    return ":00000001FF\r\n";
+};
+
+function hex_output(address, data) {
+    var output = '';
+    var line = [];
+
+    // flatten data into one dimension array
+    [].concat.apply([], [].concat.apply([], data)).forEach(function(e) {
+        line.push(e);
+        if (line.length == 16) {
+            output += hex_line(address, 0x00, line);
+            address += 16;
+            line.length = 0;   // clear array
+        }
+    });
+    if (line.length > 0) {
+        output += hex_line(address, 0x00, line);
+    }
+    return output;
+};
+
 /* hex file whthout keymap region and eof */
-function firmware_hex()
-{
+function hex_firmware() {
     /*  Flash Map of ATMega32U2/U4(32KB)
      *  +------------+ 0x0000
      *  | .vectors   | 0xac (43vectors * 4bytes)

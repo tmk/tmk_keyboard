@@ -1,25 +1,59 @@
 /*
  * TMK keymap editor
  */
-// key id under editing
-var editing_key;
-// layer under editing
-var editing_layer = 0;
-
-// load keymap on keyboard key buttons
-var load_keymap_on_keyboard = function(layer, keymap) {
-    for (var row in keymap) {
-        for (var col in keymap[row]) {
-            var code = keymap[row][col];
-            var act = new Action(code);
-            $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32))
-                .text(act.name)
-                .attr({ title: act.desc });
-        }
-    }
-};
-
 $(function() {
+    // Key button id under editing
+    var editing_key;
+    // Layer under editing
+    var editing_layer = 0;
+
+    /**********************************************************************
+     * Local functions
+     **********************************************************************/
+    var load_keymap_on_keyboard = function(keymap) {
+        for (var row in keymap) {
+            for (var col in keymap[row]) {
+                var code = keymap[row][col];
+                var act = new Action(code);
+                $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32))
+                    .text(act.name)
+                    .attr({ title: act.desc });
+            }
+        }
+    };
+
+    var get_pos = function(id) {
+        // get matrix position from key id: key-RC where R is row and C is column in "0-v"(radix 32)
+        var pos = editing_key.match(/key-([0-9a-v])([0-9a-v])/i);
+        if (!pos) throw "invalid id";
+        return { row: parseInt(pos[1], 32), col: parseInt(pos[2], 32) };
+    };
+
+    var encode_keymap = function(obj) {
+        if (typeof LZString != "undefined" && typeof Base64 != "undefined") {
+            return Base64.encode(LZString.compress(JSON.stringify(obj)));
+        }
+        return window.btoa(JSON.stringify(obj));
+    };
+
+    var decode_keymap = function(str) {
+        try {
+            // lz-string-1.3.3.js: LZString.decompress() runs away if given short string.
+            if (str == null || typeof str != "string" || str.length < 30) return null;
+
+            if (typeof LZString != "undefined" && typeof Base64 != "undefined") {
+                return JSON.parse(LZString.decompress(Base64.decode(str)));
+            }
+            return JSON.parse(window.atob(str));
+        } catch (err) {
+            return null;
+        }
+    };
+
+
+    /**********************************************************************
+     * General Setup
+     **********************************************************************/
     // jquery tooltip
     $( document ).tooltip();
 
@@ -36,26 +70,24 @@ $(function() {
     }
 
 
-
-    /*
-     * Layer selector
-     */
+    /**********************************************************************
+     * Layer Selector
+     **********************************************************************/
     $("#layer_radio").buttonset();
 
     // layer change
     $(".layer").click(function(ev, ui) {
         var layer = parseInt($(this).attr('id').match(/layer-(\d+)/)[1]);
         editing_layer = layer;
-        load_keymap_on_keyboard(layer, keymaps[layer]);
+        load_keymap_on_keyboard(keymaps[layer]);
     });
 
 
-
-    /*
+    /**********************************************************************
      * Keyboard(key buttons)
-     */
+     **********************************************************************/
     // load default keymap on startup
-    load_keymap_on_keyboard(0, keymaps[0]);
+    load_keymap_on_keyboard(keymaps[0]);
 
     // Select key button to edit
     $(".key").focus(function(ev) {
@@ -76,9 +108,51 @@ console.log(code.toString(16));
     });
 
 
-    /*
-     * Action editor
-     */
+    /**********************************************************************
+     * Action Codes
+     **********************************************************************/
+    $("#keycode_tabs").tabs({
+        heightStyle: "auto",
+    });
+
+    // read name and description from code table
+    $(".action").each(function(index) {
+        // get code from code button id: code-[0x]CCCC where CCCC is dec or hex number
+        var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
+        var act = new Action(code);
+        $(this).text(act.name);
+        $(this).attr({ title: act.desc });
+    });
+
+    $(".action").click(function(ev,ui) {
+        // get code from code button id: code-[0x]CCCC where CCCC is dec or hex number
+        var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
+console.log(code.toString(16));
+
+        action_editor_set_code(code);
+
+        if (!editing_key) return;
+        $(this).blur();
+        editing_key_set(code);
+    });
+
+    var editing_key_set = function(code) {
+        var pos = get_pos(editing_key);
+        keymaps[editing_layer][pos.row][pos.col] = code;
+
+        // set text and tooltip to key button under editing
+        var act = new Action(code);
+        $("#" + editing_key).text(act.name);
+        $("#" + editing_key).attr({ title: act.desc });
+
+        // to give back focus on editing_key for moving to next key with Tab
+        $("#" + editing_key).focus();
+    };
+
+
+    /**********************************************************************
+     * Action Code Editor
+     **********************************************************************/
     $(".editor_dropdown").hide();
     for (var kind in action_kinds) {
         $("#kind_dropdown").append($("<option></option>")
@@ -268,51 +342,28 @@ console.log(action_code.toString(16));
     });
 
 
-    /*
-     * Keycodes button tab
-     */
-    $("#keycode_tabs").tabs({
-        heightStyle: "auto",
+    /**********************************************************************
+     * Hex File Download
+     **********************************************************************/
+    $("#keymap-download").click(function(ev, ui) {
+        var content = hex_firmware() +
+                      hex_output(KEYMAP_START_ADDRESS, keymaps) +
+                      hex_eof();
+
+        // download hex file
+        var blob = new Blob([content], {type: "application/octet-stream"});
+        var hex_link = $("#hex-download");
+        hex_link.attr('href', window.URL.createObjectURL(blob));
+        hex_link.attr('download', "unimap.hex");
+        // jQuery click() doesn't work straight for 'a' element
+        // http://stackoverflow.com/questions/1694595/
+        hex_link[0].click();
     });
 
-    // Keycodes: read name and description from code table
-    $(".action").each(function(index) {
-        // get code from code button id: code-[0x]CCCC where CCCC is dec or hex number
-        var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
-        var act = new Action(code);
-        $(this).text(act.name);
-        $(this).attr({ title: act.desc });
-    });
 
-    $(".action").click(function(ev,ui) {
-        // get code from keycode button id: code-[0x]CC where CC is dec or hex number
-        var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
-console.log(code.toString(16));
-
-        action_editor_set_code(code);
-
-        if (!editing_key) return;
-        $(this).blur();
-        editing_key_set(code);
-    });
-
-    var editing_key_set = function(code) {
-        var pos = get_pos(editing_key);
-        keymaps[editing_layer][pos.row][pos.col] = code;
-
-        // set text and tooltip to key button under editing
-        var act = new Action(code);
-        $("#" + editing_key).text(act.name);
-        $("#" + editing_key).attr({ title: act.desc });
-
-        // to give back focus on editing_key for moving to next key with Tab
-        $("#" + editing_key).focus();
-    };
-
-
-    /*
+    /**********************************************************************
      * Share URL
-     */
+     **********************************************************************/
     // Share URL
     $("#keymap-share").click(function(ev, ui) {
         var hash = encode_keymap({ keymaps: keymaps });
@@ -328,27 +379,9 @@ console.log(code.toString(16));
     });
 
 
-    // Hex Save
-    $("#keymap-download").click(function(ev, ui) {
-        var content = firmware_hex() +
-                      hex_output(KEYMAP_START_ADDRESS, keymaps) +
-                      hex_eof();
-
-        // download hex file
-        var blob = new Blob([content], {type: "application/octet-stream"});
-        var hex_link = $("#hex-download");
-        hex_link.attr('href', window.URL.createObjectURL(blob));
-        hex_link.attr('download', KEYBOARD_ID + "_firmware.hex");
-        // jQuery click() doesn't work straight for 'a' element
-        // http://stackoverflow.com/questions/1694595/
-        hex_link[0].click();
-    });
-
-
-
-    /*
-     * Output options
-     */
+    /**********************************************************************
+     * Output options for debug
+     **********************************************************************/
     //$("#keymap-output").resizable();  // resizable textarea
 
     // Hex output
@@ -384,133 +417,9 @@ console.log(code.toString(16));
     });
 
 
-
     // prevent losing keymap under editing when leave the page
     $(window).bind('beforeunload', function(){
           return 'CAUTION: You will lost your change.';
     });
 });
 
-
-
-function get_pos(id)
-{
-    // get matrix position from key id: key-RC where R is row and C is column in "0-v"(radix 32)
-    var pos = editing_key.match(/key-([0-9a-v])([0-9a-v])/i);
-    if (!pos) throw "invalid id";
-    return { row: parseInt(pos[1], 32), col: parseInt(pos[2], 32) };
-}
-
-/*
- * Share URL
- */
-function encode_keymap(obj)
-{
-    if (typeof LZString != "undefined" && typeof Base64 != "undefined") {
-        return Base64.encode(LZString.compress(JSON.stringify(obj)));
-    }
-    return window.btoa(JSON.stringify(obj));
-}
-
-function decode_keymap(str)
-{
-    try {
-        /* lz-string-1.3.3.js: LZString.decompress() runs away if given short string. */
-        if (str == null || typeof str != "string" || str.length < 30) return null;
-
-        if (typeof LZString != "undefined" && typeof Base64 != "undefined") {
-            return JSON.parse(LZString.decompress(Base64.decode(str)));
-        }
-        return JSON.parse(window.atob(str));
-    } catch (err) {
-        return null;
-    }
-}
-
-/*
- * Hex file
- */
-function hexstr2(b)
-{
-    return ('0'+ b.toString(16)).substr(-2).toUpperCase();
-}
-
-function hex_line(address, record_type, data)
-{
-    var sum = 0;
-    sum += data.length;
-    sum += (address >> 8);
-    sum += (address & 0xff);
-    sum += record_type;
-
-    var line = '';
-    line += ':';
-    line += hexstr2(data.length);
-    line += hexstr2(address >> 8);
-    line += hexstr2(address & 0xff);
-    line += hexstr2(record_type);
-    for (var i = 0; i < data.length; i++) {
-        sum = (sum + data[i]);
-        line += hexstr2(data[i]);
-    }
-    line += hexstr2((~sum + 1)&0xff);  // Checksum
-    line +="\r\n";
-    return line;
-}
-
-function hex_eof()
-{
-    return ":00000001FF\r\n";
-}
-
-function hex_output(address, data) {
-    var output = '';
-    var line = [];
-
-    // flatten data into one dimension array
-    [].concat.apply([], [].concat.apply([], data)).forEach(function(e) {
-        line.push(e);
-        if (line.length == 16) {
-            output += hex_line(address, 0x00, line);
-            address += 16;
-            line.length = 0;   // clear array
-        }
-    });
-    if (line.length > 0) {
-        output += hex_line(address, 0x00, line);
-    }
-    return output;
-}
-
-
-
-/*
- * Source file
- */
-function source_output(keymaps) {
-    var output = '';
-    // keymaps
-    output += "#include \"action.h\"\n";
-    output += "#include \"action_code.h\"\n";
-    output += "#include \"actionmap.h\"\n";
-    output += "\n";
-    output += "const action_t actionmaps[][";
-    output += keymaps[0].length;         // row
-    output += "][";
-    output += keymaps[0][0].length;      // col
-    output += "] __attribute__ ((section (\".keymap.keymaps\"))) = {\n";
-    for (var i in keymaps) {
-        output += "    {\n";
-        for (var j in keymaps[i]) {
-            output += "        { ";
-            for (var k in keymaps[i][j]) {
-                output += '0x' + ('0' + keymaps[i][j][k].toString(16)).substr(-2);
-                output += ',';
-            }
-            output += " },\n";
-        }
-        output += "    },\n";
-    }
-    output += "};\n";
-    return output;
-};
