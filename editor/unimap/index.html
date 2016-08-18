@@ -214,20 +214,6 @@
 </div>
 
 
-<h2>Action Editor</h2>
-<div id="action_editor">
-    <select id="kind_dropdown"></select>
-    <select id="keycodes_dropdown" class="editor_dropdown"></select>
-    <select id="key_mods_dropdown" class="editor_dropdown"></select>
-    <select id="system_codes_dropdown" class="editor_dropdown"></select>
-    <select id="consumer_codes_dropdown" class="editor_dropdown"></select>
-    <select id="mousekey_codes_dropdown" class="editor_dropdown"></select>
-    <select id="layer_dropdown" class="editor_dropdown"></select>
-    <select id="layer_mods_dropdown" class="editor_dropdown"></select>
-    <select id="layer_on_dropdown" class="editor_dropdown"></select>
-    <button class="action-apply" id="action-apply">Action Apply</button>
-</div>
-
 <h2>Action Codes</h2>
 <div id="keycode_tabs" class="keycode_tabs">
     <ul>
@@ -235,6 +221,7 @@
     <li><a href="#tabs-other">Function and keypad</a></li>
     <li><a href="#tabs-special">System, Media and Mouse key</a></li>
     <li><a href="#tabs-layer">Layer Switching and etc.</a></li>
+    <li><a href="#tabs-editor">Code Edit</a></li>
     </ul>
 
     <!-- Main -->
@@ -418,54 +405,6 @@
         <button class="action" id="code-130" title="LOCKING_CAPS">LOCKING_CAPS</button>
         <button class="action" id="code-131" title="LOCKING_NUM">LOCKING_NUM</button>
         <button class="action" id="code-132" title="LOCKING_SCROLL">LOCKING_SCROLL</button>
-
-        <!--
-        <button class="action" id="code-140" title="INT6">INT6</button>
-        <button class="action" id="code-141" title="INT7">INT7</button>
-        <button class="action" id="code-142" title="INT8">INT8</button>
-        <button class="action" id="code-143" title="INT9">INT9</button>
-
-        <button class="action" id="code-146" title="LANG3">LANG3</button>
-        <button class="action" id="code-147" title="LANG4">LANG4</button>
-        <button class="action" id="code-148" title="LANG5">LANG5</button>
-        <button class="action" id="code-149" title="LANG6">LANG6</button>
-        <button class="action" id="code-150" title="LANG7">LANG7</button>
-        <button class="action" id="code-151" title="LANG8">LANG8</button>
-        <button class="action" id="code-152" title="LANG9">LANG9</button>
-        -->
-
-        <!--
-        <button class="action" id="code-116" title="EXECUTE">EXECUTE</button>
-        <button class="action" id="code-117" title="HELP">HELP</button>
-        <button class="action" id="code-118" title="MENU">MENU</button>
-        <button class="action" id="code-119" title="SELECT">SELECT</button>
-        <button class="action" id="code-120" title="STOP">STOP</button>
-        <button class="action" id="code-121" title="AGAIN">AGAIN</button>
-        <button class="action" id="code-122" title="UNDO">UNDO</button>
-        <button class="action" id="code-123" title="CUT">CUT</button>
-        <button class="action" id="code-124" title="COPY">COPY</button>
-        <button class="action" id="code-125" title="PASTE">PASTE</button>
-        <button class="action" id="code-126" title="FIND">FIND</button>
-        <button class="action" id="code-127" title="_MUTE">_MUTE</button>
-        <button class="action" id="code-128" title="_VOLUP">_VOLUP</button>
-        <button class="action" id="code-129" title="_VOLDOWN">_VOLDOWN</button>
-        -->
-
-        <!--
-        <button class="action" id="code-102" title="POWER">POWER</button>
-        <button class="action" id="code-153" title="ALT_ERASE">ALT_ERASE</button>
-        <button class="action" id="code-154" title="SYSREQ">SYSREQ</button>
-        <button class="action" id="code-155" title="CANCEL">CANCEL</button>
-        <button class="action" id="code-156" title="CLEAR">CLEAR</button>
-        <button class="action" id="code-157" title="PRIOR">PRIOR</button>
-        <button class="action" id="code-158" title="RETURN">RETURN</button>
-        <button class="action" id="code-159" title="SEPARATOR">SEPARATOR</button>
-        <button class="action" id="code-160" title="OUT">OUT</button>
-        <button class="action" id="code-161" title="OPER">OPER</button>
-        <button class="action" id="code-162" title="CLEAR_AGAIN">CLEAR_AGAIN</button>
-        <button class="action" id="code-163" title="CRSEL">CRSEL</button>
-        <button class="action" id="code-164" title="EXSEL">EXSEL</button>
-        -->
     </div>
 
     <!-- Special key: System, Media and Mouse key -->
@@ -613,13 +552,27 @@
         See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#43-oneshot-modifier" target="_blank">this</a> for OneShot Modifier.<br>
         </p>
     </div>
+
+    <!-- Code Editor -->
+    <div id="tabs-editor">
+        <select id="kind_dropdown"></select>
+        <select id="keycodes_dropdown" class="editor_dropdown"></select>
+        <select id="key_mods_dropdown" class="editor_dropdown"></select>
+        <select id="system_codes_dropdown" class="editor_dropdown"></select>
+        <select id="consumer_codes_dropdown" class="editor_dropdown"></select>
+        <select id="mousekey_codes_dropdown" class="editor_dropdown"></select>
+        <select id="layer_dropdown" class="editor_dropdown"></select>
+        <select id="layer_mods_dropdown" class="editor_dropdown"></select>
+        <select id="layer_on_dropdown" class="editor_dropdown"></select>
+        <button class="action-apply" id="action-apply">Action Apply</button>
+    </div>
 </div>
 
 <h3>Firmware Hex File Download:</h3>
 <button id="keymap-download" title="save file">Download</button>
 <a id="hex-download" style="display:none" ></a>
 
-<h3>Share URL:</h3>
+<h3>Share URL:(beta)</h3>
 <textarea id="share-url" rows="10" cols="80" readonly></textarea>
 <br/>
 <button id="keymap-share" title="Share">Share</button>
