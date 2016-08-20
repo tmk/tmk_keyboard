@@ -48,6 +48,19 @@ $(function() {
         keymaps = decoded['keymaps'];
     }
 
+    /*
+     * Keymap Output for debug
+     */
+    $("#debug-output").hide();
+    $("#debug-link").click(function() {
+        if ($("#debug-output").css("display") == "none") {
+            $("#debug-link-collapse").text("\u25b2");
+        } else {
+            $("#debug-link-collapse").text("\u25bc");
+        }
+        $("#debug-output").toggle("slow");
+    });
+
 
     /**********************************************************************
      * Layer Selector

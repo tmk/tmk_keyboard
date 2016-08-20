@@ -578,7 +578,8 @@
 <button id="keymap-share" title="Share">Share</button>
 <button id="shorten-url" title="Shorten">Shorten</button>
 
-<h3>Keymap Output(for debug):</h3>
+<h3><a id="debug-link">Keymap Output(for debug): <div id="debug-link-collapse" style="display:inline">&#9660;</div></a></h3>
+<div id="debug-output" class="accordion">
 <textarea id="keymap-output" rows="20" cols="80" readonly></textarea>
 <br/>
 <button id="keymap-json-generate" title="generate JSON">JSON</button>
@@ -586,6 +587,7 @@
 <button id="keymap-hex-generate" title="generate Hex">Hex</button>
 <button id="keymap-encode" title="generate URL">encode URL</button>
 <button id="keymap-decode" title="decode URL">decode URL</button>
+</div>
 
 </body>
 </html>
