@@ -337,10 +337,35 @@ console.log(action_code.toString(16));
     /**********************************************************************
      * Hex File Download
      **********************************************************************/
+    var firmware_before = [];
+    var firmware_after = [];
+    $("#firmwareFile").change(function(ev) {
+        // called after choosing file
+        console.log("change");
+        var f = ev.target.files[0];
+        var fr = new FileReader();
+
+        fr.onloadend = function(e) {
+            // TODO: support .bin format
+            var lines = hex_split_firmware(this.result, KEYMAP_START_ADDRESS, KEYMAP_SIZE);
+            firmware_before = lines.before;
+            firmware_after = lines.after;
+        };
+        fr.readAsText(f);
+    });
+
     $("#keymap-download").click(function(ev, ui) {
-        var content = hex_firmware() +
-                      hex_output(KEYMAP_START_ADDRESS, keymaps) +
-                      hex_eof();
+        // TODO: support .bin format
+        if ( $("#firmwareFile")[0].files[0] &&
+                $("#firmwareFile")[0].files[0].name.match(/\.hex/)) {
+            console.log("hex file");
+        }
+
+        var content = [].concat(firmware_before)
+                        .concat(hex_keymaps(KEYMAP_START_ADDRESS))
+                        .concat(firmware_after).join("\r\n");
+        console.log(content);
+        return;
 
         // download hex file
         var blob = new Blob([content], {type: "application/octet-stream"});
@@ -378,7 +403,7 @@ console.log(action_code.toString(16));
 
     // Hex output
     $("#keymap-hex-generate").click(function(ev, ui) {
-        $("#keymap-output").text(hex_output(KEYMAP_START_ADDRESS, keymaps));
+        $("#keymap-output").text(hex_keymaps(KEYMAP_START_ADDRESS).join("\r\n"));
     });
 
     // C source output

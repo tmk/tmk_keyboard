@@ -34,8 +34,6 @@ Key:    8x16 = 128 keys
 Layer:  2(bytes/action) * 128 = 256 bytes
         8 layers can be defined in 2KB area.(256 * 8 = 2048)
 */
-// Keymap section address
-KEYMAP_START_ADDRESS = 0x6800;
 
 
 /**********************************************************************
@@ -149,35 +147,42 @@ function hex_line(address, record_type, data) {
         line += hexstr2(data[i]);
     }
     line += hexstr2((~sum + 1)&0xff);  // Checksum
-    line +="\r\n";
     return line;
 };
 
 function hex_eof() {
-    return ":00000001FF\r\n";
+    return ":00000001FF";
 };
 
 function hex_output(address, data) {
-    var output = '';
-    var line = [];
+    var output = [];
+    var data_line = [];
 
     // flatten data into one dimension array
     [].concat.apply([], [].concat.apply([], data)).forEach(function(e) {
-        line.push(e);
-        if (line.length == 16) {
-            output += hex_line(address, 0x00, line);
+        data_line.push(e);
+        if (data_line.length == 16) {
+            output.push(hex_line(address, 0x00, data_line));
             address += 16;
-            line.length = 0;   // clear array
+            data_line.length = 0;   // clear array
         }
     });
-    if (line.length > 0) {
-        output += hex_line(address, 0x00, line);
+    if (data_line.length > 0) {
+        output += hex_line(address, 0x00, data_line);
     }
     return output;
-};
+}
+
+function hex_keymaps(address) {
+    // flatten keymaps and convert a 16bit into two 8bits
+    var keymap_data = [];
+    keymap_data = [].concat.apply([], [].concat.apply([], keymaps));
+    keymap_data = keymap_data.map(function(e) { return [(e&0xff00)>>8, e&0xff]; });
+    keymap_data = [].concat.apply([], keymap_data);
+    return hex_output(address, keymap_data);
+}
 
 /* hex file whthout keymap region and eof */
-function hex_firmware() {
     /*  Flash Map of ATMega32U2/U4(32KB)
      *  +------------+ 0x0000
      *  | .vectors   | 0xac (43vectors * 4bytes)
@@ -206,11 +211,48 @@ function hex_firmware() {
      *  |                |
      *  +----------------+
      */
-    // TODO: read hex file directly from remote URL
-    // Place HEX format string of firmware(0x0000-0x67ff) excluding keymap region.
-    return "\
-";
+// Keymap section address and size
+const KEYMAP_START_ADDRESS = 0x6800;
+const KEYMAP_SIZE = 0x800;
+
+function hex_split_firmware(hexstr, keymap_addr, keymap_size) {
+    var line_before = [];
+    var line_after = [];
+    var out = line_before;
+    var addr_offset = 0;
+    var lines = hexstr.split("\n");
+    for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+        if (line.substring(0,1) != ":") break;
+        var size = parseInt(line.substring(1,3), 16);
+        var addr = parseInt(line.substring(3,7), 16);
+        var type = line.substring(7,9);
+        if (type == "00") {
+            // data
+            if (addr + addr_offset < keymap_addr) {
+                line_before.push(line);
+                out = line_before;
+            } else if (addr + addr_offset >= keymap_addr + keymap_size) {
+                line_after.push(line);
+                out = line_after;
+            }
+        } else if (type == "04") {
+            // extended linear address
+            addr_offset = parseInt(line.substring(9, 13), 16)*0x10000;
+            if (addr_offset > keymap_addr) {
+                out = line_after;
+            }
+            out.push(line);
+        } else if (type == "01")  {
+            // end of file
+            line_after.push(line);
+        } else {
+            out.push(line);
+        }
+    }
+    return { before: line_before, after: line_after };
 }
+
 
 
 /**********************************************************************
