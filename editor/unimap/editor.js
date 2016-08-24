@@ -384,15 +384,17 @@ console.log(action_code.toString(16));
     // Share URL
     $("#keymap-share").click(function(ev, ui) {
         var hash = url_encode_keymap({ keymaps: keymaps });
-        $("#share-url").text(document.location.origin + document.location.pathname + "#" + hash);
+        var editor_url = document.location.origin + document.location.pathname + document.location.search;
+        $("#share-url").text(editor_url + "#" + hash);
     });
 
     // Shorten URL
     $("#shorten-url").click(function(ev, ui) {
         var hash = url_encode_keymap({ keymaps: keymaps });
-        var editor_url = document.location.origin + document.location.pathname;
-        window.open("https://bitly.com/shorten/?url=" + encodeURIComponent(editor_url + "#" + hash));
+        var editor_url = document.location.origin + document.location.pathname + document.location.search;
+        //window.open("https://bitly.com/shorten/?url=" + encodeURIComponent(editor_url + "#" + hash));
         //window.open("http://tinyurl.com/create.php?url=" + encodeURIComponent(editor_url + "#" + hash));
+        $("#share-url").text("http://tinyurl.com/create.php?url=" + encodeURIComponent(editor_url + "#" + hash));
     });
 
 
