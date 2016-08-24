@@ -382,9 +382,11 @@ console.log(action_code.toString(16));
      * Share URL
      **********************************************************************/
     // Share URL
+    $("#share-url-display").hide();
     $("#keymap-share").click(function(ev, ui) {
         var hash = url_encode_keymap({ keymaps: keymaps });
         var editor_url = document.location.origin + document.location.pathname + document.location.search;
+        $("#share-url-display").show();
         $("#share-url").text(editor_url + "#" + hash);
     });
 
@@ -392,9 +394,23 @@ console.log(action_code.toString(16));
     $("#shorten-url").click(function(ev, ui) {
         var hash = url_encode_keymap({ keymaps: keymaps });
         var editor_url = document.location.origin + document.location.pathname + document.location.search;
+
+        // goo.gl URL shortener
+        const GOOGLE_API_KEY = "AIzaSyCGb3QgZsj96VrtkBJVUkgnEAKQMZ5lYtA";
+        $.ajax({
+            method: "POST",
+            url: "https://www.googleapis.com/urlshortener/v1/url?key=" + GOOGLE_API_KEY,
+            contentType: "application/json; charset=utf-8",
+            data: '{ longUrl: "' + editor_url + '#' + hash + '" }'
+        }).done(function(d) {
+            $("#share-url-display").show();
+            $("#share-url").text(d.id);
+        }).fail(function(d) {
+            console.log(d);
+            console.log('{ longUrl: "' + editor_url + '#' + hash + '" }');
+        });
         //window.open("https://bitly.com/shorten/?url=" + encodeURIComponent(editor_url + "#" + hash));
         //window.open("http://tinyurl.com/create.php?url=" + encodeURIComponent(editor_url + "#" + hash));
-        $("#share-url").text("http://tinyurl.com/create.php?url=" + encodeURIComponent(editor_url + "#" + hash));
     });
 
 
