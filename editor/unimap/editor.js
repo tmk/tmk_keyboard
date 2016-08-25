@@ -343,8 +343,13 @@ console.log(action_code.toString(16));
         // called after choosing file
         console.log("change");
         var f = ev.target.files[0];
-        var fr = new FileReader();
+        if (!f) {
+            $("#firmwareURL").prop("disabled", false);
+            return;
+        }
 
+        $("#firmwareURL").prop("disabled", true);
+        var fr = new FileReader();
         fr.onloadend = function(e) {
             // TODO: support .bin format
             var lines = hex_split_firmware(this.result, KEYMAP_START_ADDRESS, KEYMAP_SIZE);
@@ -353,6 +358,38 @@ console.log(action_code.toString(16));
         };
         fr.readAsText(f);
     });
+
+    $("#firmwareURL").change(function(ev) {
+        console.log("change");
+
+        var firmware_url = $(this).val();
+        if (!firmware_url) {
+            $("#firmwareFile").prop("disabled", false);
+            return;
+        }
+
+        $("#firmwareFile").prop("disabled", true);
+        $("#firmwareURL").prop("disabled", true);
+        $.ajax({
+            method: "GET",
+            url: firmware_url,
+        }).done(function(s) {
+            console.log("done");
+            // TODO test
+            //console.log(s);
+            $("#firmwareURL_status").text("OK");
+            var lines = hex_split_firmware(s, KEYMAP_START_ADDRESS, KEYMAP_SIZE);
+            firmware_before = lines.before;
+            firmware_after = lines.after;
+        }).fail(function(d) {
+            console.log("fail");
+            console.log(d);
+            $("#firmwareURL_status").text("NG " + d.status);
+        }).always(function() {
+            $("#firmwareURL").prop("disabled", false);
+        });
+    });
+
 
     $("#keymap-download").click(function(ev, ui) {
         // TODO: support .bin format
@@ -364,8 +401,8 @@ console.log(action_code.toString(16));
         var content = [].concat(firmware_before)
                         .concat(hex_keymaps(KEYMAP_START_ADDRESS))
                         .concat(firmware_after).join("\r\n");
-        console.log(content);
-        return;
+        //console.log(content);
+        //return;
 
         // download hex file
         var blob = new Blob([content], {type: "application/octet-stream"});

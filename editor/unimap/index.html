@@ -568,12 +568,15 @@
     </div>
 </div>
 
-<h3>Base Firmware File:</h3>
-<input id="firmwareFile" type="file" accept=".hex"/>
-
 <h3>Firmware Hex File Download:</h3>
 <button id="keymap-download" title="save file">Download</button>
 <a id="hex-download" style="display:none" ></a>
+
+<h3>Base Firmware File:</h3>
+<input id="firmwareFile" type="file" accept=".hex"/>
+or URL:
+<input id="firmwareURL" type="url" size="50"/>
+<div id="firmwareURL_status" style="display:inline"></div>
 
 <h3>Share URL:</h3>
 <div id="share-url-display">
