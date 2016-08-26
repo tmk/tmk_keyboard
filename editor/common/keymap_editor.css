@@ -2,6 +2,10 @@ html * {
     font-family:helvetica, arial, sans-serif;
 }
 
+textarea {
+    font-family:monospace;
+}
+
 .key, .keync {
     box-shadow:inset -3px -3px 2px 5px #ebebeb;
     background-color:#ffffff;
