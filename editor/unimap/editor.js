@@ -400,7 +400,7 @@ console.log(action_code.toString(16));
 
         var content = [].concat(firmware_before)
                         .concat(hex_keymaps(KEYMAP_START_ADDRESS))
-                        .concat(firmware_after).join("\r\n");
+                        .concat(firmware_after).join("\r\n").concat("\r\n");
         //console.log(content);
         //return;
 

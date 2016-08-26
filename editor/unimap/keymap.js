@@ -177,7 +177,7 @@ function hex_keymaps(address) {
     // flatten keymaps and convert a 16bit into two 8bits
     var keymap_data = [];
     keymap_data = [].concat.apply([], [].concat.apply([], keymaps));
-    keymap_data = keymap_data.map(function(e) { return [(e&0xff00)>>8, e&0xff]; });
+    keymap_data = keymap_data.map(function(e) { return [e&0xff, (e&0xff00)>>8]; });
     keymap_data = [].concat.apply([], keymap_data);
     return hex_output(address, keymap_data);
 }
