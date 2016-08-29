@@ -41,12 +41,15 @@ $(function() {
     $("#page-title").text("TMK Keymap Editor");
 
     /*
-     * load keymap from URL hash
+     * load keymap from URL hash(#...)
      */
     var decoded = url_decode_keymap(document.location.hash.substring(1));
     if (decoded != null) {
         keymaps = decoded['keymaps'];
     }
+
+    // keyboard variant from URL search(?...)
+    var variant = document.location.search.substring(1);
 
     /*
      * Keymap Output for debug
@@ -360,8 +363,6 @@ console.log(action_code.toString(16));
     });
 
     $("#firmwareURL").change(function(ev) {
-        console.log("change");
-
         var firmware_url = $(this).val();
         if (!firmware_url) {
             $("#firmwareFile").prop("disabled", false);
@@ -374,9 +375,6 @@ console.log(action_code.toString(16));
             method: "GET",
             url: firmware_url,
         }).done(function(s) {
-            console.log("done");
-            // TODO test
-            //console.log(s);
             $("#firmwareURL_status").text("OK");
             var lines = hex_split_firmware(s, KEYMAP_START_ADDRESS, KEYMAP_SIZE);
             firmware_before = lines.before;
@@ -389,6 +387,14 @@ console.log(action_code.toString(16));
             $("#firmwareURL").prop("disabled", false);
         });
     });
+
+    // Set firmware URL from config
+    if (keymap_config[variant]) {
+        console.log(keymap_config[variant].firmware_url);
+        $("#firmwareURL").val(keymap_config[variant].firmware_url);
+        $("#firmwareURL").trigger("change");
+    }
+
 
 
     $("#keymap-download").click(function(ev, ui) {
