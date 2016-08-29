@@ -1,10 +1,10 @@
 ADB to USB keyboard converter
 =============================
-This firmware converts Apple ADB keyboard protocol to USB. You can use TMK Converter, PJRC Teensy2.0 and other USB AVR MCU(ATMega32U4, AT90USB64/128 or etc) for this. But binary size is probably more than 10KB and it won't fit into 8K flash.
+This firmware converts Apple ADB keyboard protocol to USB, you can use it to plug old ADB keyboard into modern computer. It works on TMK ADB-USB Converter, PJRC Teensy2.0 and other USB AVR MCU(ATMega32U4, AT90USB64/128 or etc) and needs more than 10KB flash at least.
 
-Discuss: http://geekhack.org/showwiki.php?title=Island:14290
+Discuss here: http://geekhack.org/showwiki.php?title=Island:14290
 
-TMK Converter: https://geekhack.org/index.php?topic=72052.0
+You can buy a TMK converter here: https://geekhack.org/index.php?topic=72052.0
 
 
 

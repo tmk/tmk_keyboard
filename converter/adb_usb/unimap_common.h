@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Command      = Gui
  * Option       = Alt
  * Power key    = F24
+ * Mic          = F13(Adjustable keyboard)
  */
 // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c
 // http://opensource.apple.com//source/IOHIDFamily/IOHIDFamily-701.20.10/IOHIDFamily/Cosmo_USB2ADB.c
@@ -130,26 +131,26 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
         {
             UNIMAP_F17,             // 0x40
             UNIMAP_KP_DOT,          // 0x41
-            UNIMAP_NO,              // 0x42
-            UNIMAP_KP_ASTERISK,     // 0x43
+            UNIMAP_F13,             // 0x42     Mic(Adjustable keyboard)
+            UNIMAP_KP_MINUS,        // 0x43     ADB keypad asterisk(top right)
             UNIMAP_NO,              // 0x44
-            UNIMAP_KP_PLUS,         // 0x45
+            UNIMAP_KP_COMMA,        // 0x45     ADB keypad plus
             UNIMAP_NO,              // 0x46
             UNIMAP_NUMLOCK,         // 0x47
         },
         {
-            UNIMAP_NO,              // 0x48
-            UNIMAP_NO,              // 0x49
-            UNIMAP_NO,              // 0x4A
-            UNIMAP_KP_SLASH,        // 0x4B
+            UNIMAP_VOLUME_UP,       // 0x48     Vol Up(Adjustable keyboard)
+            UNIMAP_VOLUME_DOWN,     // 0x49     Vol Down(Adjustable keyboard)
+            UNIMAP_VOLUME_MUTE,     // 0x4A     Vol Mute(Adjustable keyboard)
+            UNIMAP_KP_ASTERISK,     // 0x4B     ADB keypad slash(between equal and asterisk)
             UNIMAP_KP_ENTER,        // 0x4C
             UNIMAP_NO,              // 0x4D
-            UNIMAP_KP_MINUS,        // 0x4E
+            UNIMAP_KP_PLUS,         // 0x4E     ADB keypad minus
             UNIMAP_F18,             // 0x4F
         },
         {
             UNIMAP_F19,             // 0x50
-            UNIMAP_KP_EQUAL,        // 0x51
+            UNIMAP_KP_SLASH,        // 0x51     ADB keypad equal(next to clear/numlock)
             UNIMAP_KP_0,            // 0x52
             UNIMAP_KP_1,            // 0x53
             UNIMAP_KP_2,            // 0x54
