@@ -1,31 +1,23 @@
 <html>
 <head>
     <title>TMK Keymap Editor</title>
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
     <link rel="stylesheet" href="../common/keymap_editor.css" type="text/css">
-    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="http://code.jquery.com/jquery-1.12.3.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <!-- lz-string-1.3.3.js: LZString.decompress() runs away if given short string. -->
     <script src="../common/lz-string-1.0.2.js"></script>
     <script src="../common/base64.js"></script>
-    <script src="../common/keymap_editor.js"></script>
-    <script src="firmware.js"></script>
+    <script src="config.js"></script>
+    <script src="action.js"></script>
+    <script src="keymap.js"></script>
+    <script src="editor.js"></script>
 </head>
 
 <body>
 <h1 id="page-title">TMK Keymap Editor</h1>
 
-<h3>Instruction</h3>
-How to edit keymap
-<ol>
-    <li>Select layer</li>
-    <li>Select key to edit</li>
-    <li>Select keycode to assign to the key</li>
-    <li>Download firmware</li>
-</ol>
-See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md" target="_blank">this</a> for detailed description of keymap.
-
-<h2>Keyboard</h2>
+<h2>Universal Actionmap(unimap)</h2>
 <div id="keyboard-pane" class="keyboard-pane">
     <form>
         <div id="layer_radio">
@@ -36,9 +28,7 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <input type="radio" name="radio" class="layer" id="layer-4"/><label for="layer-4">Layer 4</label>
         <input type="radio" name="radio" class="layer" id="layer-5"/><label for="layer-5">Layer 5</label>
         <input type="radio" name="radio" class="layer" id="layer-6"/><label for="layer-6">Layer 6</label>
-        <!-- Matrix: 16x16 = 256 bytes - 7 layers can be defined in 2KB area.(64+256*7 < 2KB < 64+256*8)
         <input type="radio" name="radio" class="layer" id="layer-7"/><label for="layer-7">Layer 7</label>
-        -->
         </div>
     </form>
 
@@ -84,13 +74,10 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
     <div id="key-46" class="key" tabindex="8">Print Screen</div>
     <div id="key-47" class="key" tabindex="8">Scroll Lock</div>
     <div id="key-48" class="key" tabindex="8">Pause</div>
-    <div class="key spc050"></div>
-    <div id="key-81" class="key" tabindex="8">Volume Down</div>
-    <div id="key-80" class="key" tabindex="8">Volume Up</div>
-    <div id="key-7f" class="key" tabindex="8">Volume Mute</div>
-    <div id="key-66" class="key" tabindex="8">Power</div>
-    <div class="key spc050"></div>
-    <div id="key-75" class="key btn200" tabindex="8">Help</div>
+    <div class="key spc150"></div>
+    <div id="key-01" class="key" tabindex="8">Volume Down</div>
+    <div id="key-02" class="key" tabindex="8">Volume Up</div>
+    <div id="key-03" class="key" tabindex="8">Volume Mute</div>
     </div>
 
     <div class='keyboard-row' style="height: 25px; display: block">
@@ -110,7 +97,7 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
     <div id="key-27" class="key" tabindex="1">0</div>
     <div id="key-2d" class="key" tabindex="1">-</div>
     <div id="key-2e" class="key" tabindex="1">=</div>
-    <div id="key-89" class="key" tabindex="1">JisYen</div>
+    <div id="key-74" class="key" tabindex="1">JisYen</div>
     <div id="key-2a" class="key" tabindex="1">BSpc</div>
     <div class="key spc050"></div>
     <div id="key-49" class="key" tabindex="6">Insert</div>
@@ -121,9 +108,6 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
     <div id="key-54" class="key" tabindex="7">KP/</div>
     <div id="key-55" class="key" tabindex="7">KP*</div>
     <div id="key-56" class="key" tabindex="7">KP-</div>
-    <div class="key spc050"></div>
-    <div id="key-78" class="key" tabindex="8">Stop</div>
-    <div id="key-79" class="key" tabindex="8">Again</div>
     </div>
 
     <div class='keyboard-row'>
@@ -150,9 +134,6 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
     <div id="key-60" class="key" tabindex="7">KP8</div>
     <div id="key-61" class="key" tabindex="7">KP9</div>
     <div id="key-57" class="key" tabindex="7">KP+</div>
-    <div class="key spc050"></div>
-    <div id="key-76" class="key" tabindex="8">Menu</div>
-    <div id="key-7a" class="key" tabindex="8">Undo</div>
     </div>
 
     <div class='keyboard-row'>
@@ -178,14 +159,11 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
     <div id="key-5c" class="key" tabindex="7">KP4</div>
     <div id="key-5d" class="key" tabindex="7">KP5</div>
     <div id="key-5e" class="key" tabindex="7">KP6</div>
-    <div id="key-85" class="key" tabindex="7">KP,</div>
-    <div class="key spc050"></div>
-    <div id="key-77" class="key" tabindex="8">Select</div>
-    <div id="key-7c" class="key" tabindex="8">Copy</div>
+    <div id="key-66" class="key" tabindex="7">KP,</div>
     </div>
 
     <div class='keyboard-row'>
-    <div id="key-e1" class="key btn125" tabindex="4">Shift</div>
+    <div id="key-79" class="key btn125" tabindex="4">Shift</div>
     <div id="key-64" class="key" tabindex="4">Iso\</div>
     <div id="key-1d" class="key" tabindex="4">Z</div>
     <div id="key-1b" class="key" tabindex="4">X</div>
@@ -197,8 +175,8 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
     <div id="key-36" class="key" tabindex="4">,</div>
     <div id="key-37" class="key" tabindex="4">.</div>
     <div id="key-38" class="key" tabindex="4">/</div>
-    <div id="key-87" class="key" tabindex="4">JisRo</div>
-    <div id="key-e5" class="key btn175" tabindex="4">Shift</div>
+    <div id="key-75" class="key" tabindex="4">JisRo</div>
+    <div id="key-7d" class="key btn175" tabindex="4">Shift</div>
     <div class="key spc050"></div>
     <div class="key spc100"></div>
     <div id="key-52" class="key" tabindex="6">Up</div>
@@ -208,25 +186,20 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
     <div id="key-5a" class="key" tabindex="7">KP2</div>
     <div id="key-5b" class="key" tabindex="7">KP3</div>
     <div id="key-67" class="key" tabindex="7">KP=</div>
-    <div class="key spc050"></div>
-    <div id="key-74" class="key" tabindex="8">Execute</div>
-    <div id="key-7d" class="key" tabindex="8">Paste</div>
     </div>
 
     <div class='keyboard-row'>
-    <div id="key-e0" class="key" tabindex="5">LCtl</div>
-    <div id="key-e3" class="key" tabindex="5">LGui</div>
-    <div id="key-e2" class="key" tabindex="5">LAlt</div>
-    <div id="key-8b" class="key btn125" tabindex="5">MuHenkan</div>
-    <div id="key-91" class="key btn125" tabindex="5">Hanja</div>
-    <div id="key-2c" class="key btn175" tabindex="5">Space</div>
-    <div id="key-90" class="key btn125" tabindex="5">HanEng</div>
-    <div id="key-8a" class="key btn125" tabindex="5">Henkan</div>
-    <div id="key-88" class="key btn125" tabindex="5">Kana</div>
-    <div id="key-e6" class="key" tabindex="5">RAlt</div>
-    <div id="key-e7" class="key" tabindex="5">RGui</div>
-    <div id="key-65" class="key" tabindex="5">App</div>
-    <div id="key-e4" class="key" tabindex="5">RCtl</div>
+    <div id="key-78" class="key btn125" tabindex="5">LCtl</div>
+    <div id="key-7b" class="key btn125" tabindex="5">LGui</div>
+    <div id="key-7a" class="key btn125" tabindex="5">LAlt</div>
+    <div id="key-77" class="key btn125" tabindex="5">MuHenkan</div>
+    <div id="key-2c" class="key btn250" tabindex="5">Space</div>
+    <div id="key-76" class="key btn125" tabindex="5">Henkan</div>
+    <div id="key-00" class="key btn125" tabindex="5">Kana</div>
+    <div id="key-7e" class="key btn125" tabindex="5">RAlt</div>
+    <div id="key-7f" class="key btn125" tabindex="5">RGui</div>
+    <div id="key-65" class="key btn125" tabindex="5">App</div>
+    <div id="key-7c" class="key btn125" tabindex="5">RCtl</div>
     <div class="key spc050"></div>
     <div id="key-50" class="key" tabindex="6">Left</div>
     <div id="key-51" class="key" tabindex="6">Down</div>
@@ -235,9 +208,6 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
     <div id="key-62" class="key btn200" tabindex="7">KP0</div>
     <div id="key-63" class="key" tabindex="7">KP.</div>
     <div id="key-58" class="key" tabindex="7">KPEnt</div>
-    <div class="key spc050"></div>
-    <div id="key-7e" class="key" tabindex="8">Find</div>
-    <div id="key-7b" class="key" tabindex="8">Cut</div>
     </div>
 
     </div>
@@ -245,13 +215,14 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
 </div>
 
 
-<h2>Keycodes</h2>
+<h2>Action Codes</h2>
 <div id="keycode_tabs" class="keycode_tabs">
     <ul>
     <li><a href="#tabs-main">Main</a></li>
     <li><a href="#tabs-other">Function and keypad</a></li>
     <li><a href="#tabs-special">System, Media and Mouse key</a></li>
     <li><a href="#tabs-layer">Layer Switching and etc.</a></li>
+    <li><a href="#tabs-editor">Code Edit</a></li>
     </ul>
 
     <!-- Main -->
@@ -435,54 +406,6 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <button class="action" id="code-130" title="LOCKING_CAPS">LOCKING_CAPS</button>
         <button class="action" id="code-131" title="LOCKING_NUM">LOCKING_NUM</button>
         <button class="action" id="code-132" title="LOCKING_SCROLL">LOCKING_SCROLL</button>
-
-        <!--
-        <button class="action" id="code-140" title="INT6">INT6</button>
-        <button class="action" id="code-141" title="INT7">INT7</button>
-        <button class="action" id="code-142" title="INT8">INT8</button>
-        <button class="action" id="code-143" title="INT9">INT9</button>
-
-        <button class="action" id="code-146" title="LANG3">LANG3</button>
-        <button class="action" id="code-147" title="LANG4">LANG4</button>
-        <button class="action" id="code-148" title="LANG5">LANG5</button>
-        <button class="action" id="code-149" title="LANG6">LANG6</button>
-        <button class="action" id="code-150" title="LANG7">LANG7</button>
-        <button class="action" id="code-151" title="LANG8">LANG8</button>
-        <button class="action" id="code-152" title="LANG9">LANG9</button>
-        -->
-
-        <!--
-        <button class="action" id="code-116" title="EXECUTE">EXECUTE</button>
-        <button class="action" id="code-117" title="HELP">HELP</button>
-        <button class="action" id="code-118" title="MENU">MENU</button>
-        <button class="action" id="code-119" title="SELECT">SELECT</button>
-        <button class="action" id="code-120" title="STOP">STOP</button>
-        <button class="action" id="code-121" title="AGAIN">AGAIN</button>
-        <button class="action" id="code-122" title="UNDO">UNDO</button>
-        <button class="action" id="code-123" title="CUT">CUT</button>
-        <button class="action" id="code-124" title="COPY">COPY</button>
-        <button class="action" id="code-125" title="PASTE">PASTE</button>
-        <button class="action" id="code-126" title="FIND">FIND</button>
-        <button class="action" id="code-127" title="_MUTE">_MUTE</button>
-        <button class="action" id="code-128" title="_VOLUP">_VOLUP</button>
-        <button class="action" id="code-129" title="_VOLDOWN">_VOLDOWN</button>
-        -->
-
-        <!--
-        <button class="action" id="code-102" title="POWER">POWER</button>
-        <button class="action" id="code-153" title="ALT_ERASE">ALT_ERASE</button>
-        <button class="action" id="code-154" title="SYSREQ">SYSREQ</button>
-        <button class="action" id="code-155" title="CANCEL">CANCEL</button>
-        <button class="action" id="code-156" title="CLEAR">CLEAR</button>
-        <button class="action" id="code-157" title="PRIOR">PRIOR</button>
-        <button class="action" id="code-158" title="RETURN">RETURN</button>
-        <button class="action" id="code-159" title="SEPARATOR">SEPARATOR</button>
-        <button class="action" id="code-160" title="OUT">OUT</button>
-        <button class="action" id="code-161" title="OPER">OPER</button>
-        <button class="action" id="code-162" title="CLEAR_AGAIN">CLEAR_AGAIN</button>
-        <button class="action" id="code-163" title="CRSEL">CRSEL</button>
-        <button class="action" id="code-164" title="EXSEL">EXSEL</button>
-        -->
     </div>
 
     <!-- Special key: System, Media and Mouse key -->
@@ -493,73 +416,68 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <br>
 
         System:<br>
-        <button class="action" id="code-165"></button>
-        <button class="action" id="code-166"></button>
-        <button class="action" id="code-167"></button>
+        <button class="action" id="code-0x4081"></button>
+        <button class="action" id="code-0x4082"></button>
+        <button class="action" id="code-0x4083"></button>
         <br>
 
         Volume:<br>
-        <button class="action" id="code-168"></button>
-        <button class="action" id="code-169"></button>
-        <button class="action" id="code-170"></button>
+        <button class="action" id="code-0x44E2"></button>
+        <button class="action" id="code-0x44E9"></button>
+        <button class="action" id="code-0x44EA"></button>
         <br>
 
         Media:<br>
-        <button class="action" id="code-171"></button>
-        <button class="action" id="code-172"></button>
-        <button class="action" id="code-173"></button>
-        <button class="action" id="code-174"></button>
-        <button class="action" id="code-175"></button>
-        <button class="action" id="code-176"></button>
-        <button class="action" id="code-187"></button>
-        <button class="action" id="code-188"></button>
+        <button class="action" id="code-0x44B5"></button>
+        <button class="action" id="code-0x44B6"></button>
+        <button class="action" id="code-0x44B7"></button>
+        <button class="action" id="code-0x44CD"></button>
+        <button class="action" id="code-0x4483"></button>
+        <button class="action" id="code-0x44CC"></button>
+        <button class="action" id="code-0x44B3"></button>
+        <button class="action" id="code-0x44B4"></button>
         <br>
 
         Application:<br>
-        <button class="action" id="code-177"></button>
-        <button class="action" id="code-178"></button>
-        <button class="action" id="code-179"></button>
-        <br>
-        Web:<br>
-        <button class="action" id="code-180"></button>
-        <button class="action" id="code-181"></button>
-        <button class="action" id="code-182"></button>
-        <button class="action" id="code-183"></button>
-        <button class="action" id="code-184"></button>
-        <button class="action" id="code-185"></button>
-        <button class="action" id="code-186"></button>
-        <br>
+        <button class="action" id="code-0x458A"></button>
+        <button class="action" id="code-0x4592"></button>
+        <button class="action" id="code-0x4594"></button>
         <br>
 
-        <!--
-        <button class="action" id="code-189"></button>
-        <button class="action" id="code-190"></button>
-        <button class="action" id="code-191"></button>
-        -->
+        Web:<br>
+        <button class="action" id="code-0x4621"></button>
+        <button class="action" id="code-0x4623"></button>
+        <button class="action" id="code-0x4624"></button>
+        <button class="action" id="code-0x4625"></button>
+        <button class="action" id="code-0x4626"></button>
+        <button class="action" id="code-0x4627"></button>
+        <button class="action" id="code-0x462A"></button>
+        <br>
+        <br>
 
         Mouse key:<br>
-        <button class="action" id="code-240"></button>
-        <button class="action" id="code-241"></button>
-        <button class="action" id="code-242"></button>
-        <button class="action" id="code-243"></button>
+        <button class="action" id="code-0x50F0"></button>
+        <button class="action" id="code-0x50F1"></button>
+        <button class="action" id="code-0x50F2"></button>
+        <button class="action" id="code-0x50F3"></button>
         <br>
         <br>
-        <button class="action" id="code-244"></button>
-        <button class="action" id="code-245"></button>
-        <button class="action" id="code-246"></button>
-        <button class="action" id="code-247"></button>
-        <button class="action" id="code-248"></button>
+        <button class="action" id="code-0x50F4"></button>
+        <button class="action" id="code-0x50F5"></button>
+        <button class="action" id="code-0x50F6"></button>
+        <button class="action" id="code-0x50F7"></button>
+        <button class="action" id="code-0x50F8"></button>
         <br>
         <br>
-        <button class="action" id="code-249"></button>
-        <button class="action" id="code-250"></button>
-        <button class="action" id="code-251"></button>
-        <button class="action" id="code-252"></button>
+        <button class="action" id="code-0x50F9"></button>
+        <button class="action" id="code-0x50FA"></button>
+        <button class="action" id="code-0x50FB"></button>
+        <button class="action" id="code-0x50FC"></button>
         <br>
         <br>
-        <button class="action" id="code-253"></button>
-        <button class="action" id="code-254"></button>
-        <button class="action" id="code-255"></button>
+        <button class="action" id="code-0x50FD"></button>
+        <button class="action" id="code-0x50FE"></button>
+        <button class="action" id="code-0x50FF"></button>
         <br>
     </div>
 
@@ -571,39 +489,50 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         <br>
 
         <!-- TODO: layer actions -->
-        <!-- FN0-31 -->
-        Layer Switch Momentary:<br>
-        <button class="action" id="code-192"></button>
-        <button class="action" id="code-193"></button>
-        <button class="action" id="code-194"></button>
-        <button class="action" id="code-195"></button>
-        <button class="action" id="code-196"></button>
-        <button class="action" id="code-197"></button>
-        <button class="action" id="code-198"></button>
+        Layer Switch(momentary):<br>
+        <button class="action" id="code-0xa0f1"></button>
+        <button class="action" id="code-0xa1f1"></button>
+        <button class="action" id="code-0xa2f1"></button>
+        <button class="action" id="code-0xa3f1"></button>
+        <button class="action" id="code-0xa4f1"></button>
+        <button class="action" id="code-0xa5f1"></button>
+        <button class="action" id="code-0xa6f1"></button>
+        <button class="action" id="code-0xa7f1"></button>
         <br>
-        Layer Switch Toggle:<br>
-        <button class="action" id="code-199"></button>
-        <button class="action" id="code-200"></button>
-        <button class="action" id="code-201"></button>
+        Layer Toggle:<br>
+        <button class="action" id="code-0x8a01"></button>
+        <button class="action" id="code-0x8a02"></button>
+        <button class="action" id="code-0x8a04"></button>
+        <button class="action" id="code-0x8a08"></button>
+        <button class="action" id="code-0x8a21"></button>
+        <button class="action" id="code-0x8a22"></button>
+        <button class="action" id="code-0x8a24"></button>
+        <button class="action" id="code-0x8a28"></button>
         <br>
-        Layer Switch with Tap Toggle:<br>
-        <button class="action" id="code-202"></button>
-        <button class="action" id="code-203"></button>
-        <button class="action" id="code-204"></button>
+        Layer Switch and Toggle by five taps:<br>
+        <button class="action" id="code-0xa0f0"></button>
+        <button class="action" id="code-0xa1f0"></button>
+        <button class="action" id="code-0xa2f0"></button>
+        <button class="action" id="code-0xa3f0"></button>
+        <button class="action" id="code-0xa4f0"></button>
+        <button class="action" id="code-0xa5f0"></button>
+        <button class="action" id="code-0xa6f0"></button>
+        <button class="action" id="code-0xa7f0"></button>
         <br>
-        Layer switch with Tap key:<br>
-        <button class="action" id="code-205"></button>
-        <button class="action" id="code-206"></button>
-        <button class="action" id="code-207"></button>
-        <button class="action" id="code-208"></button>
-        <button class="action" id="code-209"></button>
-        <button class="action" id="code-210"></button>
-        <button class="action" id="code-211"></button>
+        Layer Switch and Tap key:<br>
+        <button class="action" id="code-0xa12c"></button>
+        <button class="action" id="code-0xa133"></button>
+        <br>
+        Layer Switch with Modifiers:<br>
+        <button class="action" id="code-0xa1e1"></button>
+        <button class="action" id="code-0xa1e2"></button>
+        <button class="action" id="code-0xa1e4"></button>
+        <button class="action" id="code-0xa1e7"></button>
         <br>
         <br>
         Modifier with special function:<br>
-        <button class="action" id="code-212"></button>
-        <button class="action" id="code-213"></button>
+        <button class="action" id="code-0x2200"></button>
+        <button class="action" id="code-0x2201"></button>
         <button class="action" id="code-214"></button>
         <button class="action" id="code-215"></button>
         <br>
@@ -624,19 +553,42 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
         See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap.md#43-oneshot-modifier" target="_blank">this</a> for OneShot Modifier.<br>
         </p>
     </div>
+
+    <!-- Code Editor -->
+    <div id="tabs-editor">
+        <select id="kind_dropdown"></select>
+        <select id="keycodes_dropdown" class="editor_dropdown"></select>
+        <select id="key_mods_dropdown" class="editor_dropdown"></select>
+        <select id="system_codes_dropdown" class="editor_dropdown"></select>
+        <select id="consumer_codes_dropdown" class="editor_dropdown"></select>
+        <select id="mousekey_codes_dropdown" class="editor_dropdown"></select>
+        <select id="layer_dropdown" class="editor_dropdown"></select>
+        <select id="layer_mods_dropdown" class="editor_dropdown"></select>
+        <select id="layer_on_dropdown" class="editor_dropdown"></select>
+        <button class="action-apply" id="action-apply">Action Apply</button>
+    </div>
 </div>
 
 <h3>Firmware Hex File Download:</h3>
 <button id="keymap-download" title="save file">Download</button>
 <a id="hex-download" style="display:none" ></a>
 
+<h3>Base Firmware File:</h3>
+<input id="firmwareFile" type="file" accept=".hex"/>
+or URL:
+<input id="firmwareURL" type="url" size="50"/>
+<div id="firmwareURL_status" style="display:inline"></div>
+
 <h3>Share URL:</h3>
+<div id="share-url-display">
 <textarea id="share-url" rows="10" cols="80" readonly></textarea>
 <br/>
-<button id="keymap-share" title="Share">Share</button>
-<button id="shorten-url" title="Shorten">Shorten</button>
+</div>
+<button id="keymap-share" title="Raw URL">Raw URL</button>
+<button id="shorten-url" title="URL Shortener">URL Shortener</button>
 
-<h3>Keymap Output(for debug):</h3>
+<h3><a id="debug-link">Keymap Output(for debug): <div id="debug-link-collapse" style="display:inline">&#9660;</div></a></h3>
+<div id="debug-output" class="accordion">
 <textarea id="keymap-output" rows="20" cols="80" readonly></textarea>
 <br/>
 <button id="keymap-json-generate" title="generate JSON">JSON</button>
@@ -644,6 +596,7 @@ See <a href="https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/doc/keymap
 <button id="keymap-hex-generate" title="generate Hex">Hex</button>
 <button id="keymap-encode" title="generate URL">encode URL</button>
 <button id="keymap-decode" title="decode URL">decode URL</button>
+</div>
 
 </body>
 </html>
