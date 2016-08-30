@@ -10,7 +10,6 @@ OBJDIR = ./build
 OBJECTS = \
 	$(OBJDIR)/protocol/ps2_busywait.o \
 	$(OBJDIR)/protocol/ps2_io_mbed.o \
-	$(OBJDIR)/./keymap_common.o \
 	$(OBJDIR)/./matrix.o \
 	$(OBJDIR)/./led.o \
 	$(OBJDIR)/./main.o

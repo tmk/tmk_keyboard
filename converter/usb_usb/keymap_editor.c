@@ -52,7 +52,7 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] __attribute__ ((section (".key
     ),
 };
 
-const uint16_t fn_actions[] __attribute__ ((section (".keymap.fn_actions"))) = {
+const action_t fn_actions[] __attribute__ ((section (".keymap.fn_actions"))) = {
     [0]  = ACTION_LAYER_MOMENTARY(1),
     [1]  = ACTION_LAYER_MOMENTARY(2),
     [2]  = ACTION_LAYER_MOMENTARY(3),

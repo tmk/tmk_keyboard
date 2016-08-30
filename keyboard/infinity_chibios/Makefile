@@ -9,7 +9,6 @@ TARGET_DIR = .
 
 # project specific files
 SRC =	matrix.c \
-	keymap_common.c \
 	led.c
 
 ifdef KEYMAP

@@ -7,6 +7,9 @@ Source code is available here: <https://github.com/tmk/tmk_keyboard/tree/core>
 
 Updates
 -------
+#### 2016/06/26
+Keymap framework was updated. `fn_actions[]` should be defined as `action_t` instead of `uint16_t`. And default code for keymap handling is now included in core you just need define `uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS]` and `action_t fn_actions[]`.
+
 #### 2016/02/10
 flabbergast's Chibios protocol was merged from <https://github.com/flabbergast/tmk_keyboard/tree/chibios>. See [protocol/chibios/README.md](protocol/chibios/README.md). Chibios protocol supports Cortex-M such as STM32 and Kinetis.
 

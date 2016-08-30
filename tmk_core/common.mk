@@ -17,11 +17,16 @@ SRC +=	$(COMMON_DIR)/host.c \
 
 
 # Option modules
-ifdef ACTIONMAP_ENABLE
-    SRC += $(COMMON_DIR)/actionmap.c
-    OPT_DEFS += -DACTIONMAP_ENABLE
+ifdef UNIMAP_ENABLE
+    SRC += $(COMMON_DIR)/unimap.c
+    OPT_DEFS += -DUNIMAP_ENABLE
 else
-    SRC += $(COMMON_DIR)/keymap.c
+    ifdef ACTIONMAP_ENABLE
+	SRC += $(COMMON_DIR)/actionmap.c
+	OPT_DEFS += -DACTIONMAP_ENABLE
+    else
+	SRC += $(COMMON_DIR)/keymap.c
+    endif
 endif
 
 ifdef BOOTMAGIC_ENABLE

@@ -10,7 +10,6 @@ TARGET_DIR = .
 # keyboard dependent files
 SRC =	matrix.c \
 	led.c \
-	keymap_common.c \
 	m0110.c
 
 # To use own keymap file run make like: make keymap=hasu

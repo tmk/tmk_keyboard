@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <avr/pgmspace.h>
 #include "keycode.h"
 #include "util.h"
 #include "keymap.h"
@@ -155,19 +154,3 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     */
 };
-
-
-uint8_t keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t col)
-{
-    return pgm_read_byte(&keymaps[(layer)][(row)][(col)]);
-}
-
-uint8_t keymap_fn_layer(uint8_t index)
-{
-    return pgm_read_byte(&fn_layer[index]);
-}
-
-uint8_t keymap_fn_keycode(uint8_t index)
-{
-    return pgm_read_byte(&fn_keycode[index]);
-}

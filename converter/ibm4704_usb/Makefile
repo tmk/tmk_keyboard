@@ -8,8 +8,7 @@ TMK_DIR = ../../tmk_core
 TARGET_DIR = .
 
 # project specific files
-SRC =	keymap_common.c \
-	matrix.c \
+SRC =	matrix.c \
 	led.c \
 	protocol/ibm4704.c
 

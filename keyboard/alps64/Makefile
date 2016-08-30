@@ -120,7 +120,6 @@ ifdef ACTIONMAP_ENABLE
     KEYMAP_FILE = actionmap
 else
     KEYMAP_FILE = keymap
-    SRC := keymap_common.c $(SRC)
 endif
 ifdef KEYMAP
     SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
