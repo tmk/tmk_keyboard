@@ -6,6 +6,7 @@ $(function() {
     var editing_key;
     // Layer under editing
     var editing_layer = 0;
+    var keymaps_changed = false;
 
     /**********************************************************************
      * Local functions
@@ -96,7 +97,6 @@ $(function() {
         $(this).addClass("key-editing");
         var pos = get_pos(editing_key);
         var code = keymaps[editing_layer][pos.row][pos.col];
-console.log(code.toString(16));
 
         action_editor_set_code(code);
         $(this).blur();
@@ -122,8 +122,6 @@ console.log(code.toString(16));
     $(".action").click(function(ev,ui) {
         // get code from code button id: code-[0x]CCCC where CCCC is dec or hex number
         var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
-console.log(code.toString(16));
-
         action_editor_set_code(code);
 
         if (!editing_key) return;
@@ -134,6 +132,7 @@ console.log(code.toString(16));
     var editing_key_set = function(code) {
         var pos = get_pos(editing_key);
         keymaps[editing_layer][pos.row][pos.col] = code;
+        keymaps_changed = true;
 
         // set text and tooltip to key button under editing
         var act = new Action(code);
@@ -332,7 +331,6 @@ console.log(code.toString(16));
     $(".action-apply").click(function(ev) {
         if (!editing_key) return;
         var action_code = action_editor_get_code();
-console.log(action_code.toString(16));
         editing_key_set(action_code);
     });
 
@@ -342,12 +340,13 @@ console.log(action_code.toString(16));
      **********************************************************************/
     var firmware_before = [];
     var firmware_after = [];
+    var firmware_keymaps = [];
     $("#firmwareFile").change(function(ev) {
         // called after choosing file
-        console.log("change");
         var f = ev.target.files[0];
         if (!f) {
             $("#firmwareURL").prop("disabled", false);
+            $("#keymap-load").prop("disabled", true);
             return;
         }
 
@@ -358,44 +357,75 @@ console.log(action_code.toString(16));
             var lines = hex_split_firmware(this.result, KEYMAP_START_ADDRESS, KEYMAP_SIZE);
             firmware_before = lines.before;
             firmware_after = lines.after;
+            firmware_keymaps = lines.keymaps;
         };
         fr.readAsText(f);
+        $("#keymap-load").prop("disabled", false);
     });
+
+    let loadHexURL = function(firmware_url) {
+        return $.ajax({
+            method: "GET",
+            url: firmware_url,
+            //async: false,
+        }).done(function(s) {
+            var lines = hex_split_firmware(s, KEYMAP_START_ADDRESS, KEYMAP_SIZE);
+            firmware_before = lines.before;
+            firmware_after = lines.after;
+            firmware_keymaps = lines.keymaps;
+        });
+    };
 
     $("#firmwareURL").change(function(ev) {
         var firmware_url = $(this).val();
         if (!firmware_url) {
+            $("#firmwareURL_status").text("");
             $("#firmwareFile").prop("disabled", false);
+            $("#keymap-load").prop("disabled", true);
             return;
         }
 
         $("#firmwareFile").prop("disabled", true);
         $("#firmwareURL").prop("disabled", true);
-        $.ajax({
-            method: "GET",
-            url: firmware_url,
-        }).done(function(s) {
+        loadHexURL(firmware_url).done(function(s) {
             $("#firmwareURL_status").text("OK");
-            var lines = hex_split_firmware(s, KEYMAP_START_ADDRESS, KEYMAP_SIZE);
-            firmware_before = lines.before;
-            firmware_after = lines.after;
+            $("#keymap-load").prop("disabled", false);
         }).fail(function(d) {
-            console.log("fail");
-            console.log(d);
             $("#firmwareURL_status").text("NG " + d.status);
+            $("#keymap-load").prop("disabled", true);
         }).always(function() {
             $("#firmwareURL").prop("disabled", false);
         });
     });
 
-    // Set firmware URL from config
-    if (keymap_config[variant]) {
-        console.log(keymap_config[variant].firmware_url);
+    // Set firmware URL from config at startup
+    if (keymap_config[variant] && keymap_config[variant].firmware_url) {
         $("#firmwareURL").val(keymap_config[variant].firmware_url);
-        $("#firmwareURL").trigger("change");
+
+        $("#firmwareFile").prop("disabled", true);
+        $("#firmwareURL").prop("disabled", true);
+        loadHexURL(keymap_config[variant].firmware_url).done(function(s) {
+            // load keymap from firmware
+            keymaps = $.extend(true, [], firmware_keymaps); // copy
+            while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
+            load_keymap_on_keyboard(keymaps[editing_layer]);
+            $("#firmwareURL_status").text("OK");
+            $("#keymap-load").prop("disabled", false);
+        }).fail(function(d) {
+            $("#firmwareURL_status").text("NG " + d.status);
+            $("#keymap-load").prop("disabled", true);
+        }).always(function() {
+            $("#firmwareURL").prop("disabled", false);
+        });
     }
 
-
+    $("#keymap-load").prop("disabled", true);
+    $("#keymap-load").click(function(ev, ui) {
+        // load keymap from firmware
+        keymaps = $.extend(true, [], firmware_keymaps); // copy
+        while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
+        load_keymap_on_keyboard(keymaps[editing_layer]);
+    });
 
     $("#keymap-download").click(function(ev, ui) {
         // TODO: support .bin format
@@ -407,8 +437,6 @@ console.log(action_code.toString(16));
         var content = [].concat(firmware_before)
                         .concat(hex_keymaps(KEYMAP_START_ADDRESS))
                         .concat(firmware_after).join("\r\n").concat("\r\n");
-        //console.log(content);
-        //return;
 
         // download hex file
         var blob = new Blob([content], {type: "application/octet-stream"});

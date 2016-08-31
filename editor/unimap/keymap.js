@@ -39,6 +39,11 @@ Layer:  2(bytes/action) * 128 = 256 bytes
 /**********************************************************************
  * Keymaps
  **********************************************************************/
+// keymaps[8-layers][8-rows][16-cols]
+const KEYMAP_LAYERS = 8;
+const KEYMAP_ROW = 8;
+const KEYMAP_COL = 16;
+
 no_map = function() { return [
     [ 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0 ],
     [ 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0 ],
@@ -125,6 +130,38 @@ function source_output(keymaps) {
 /**********************************************************************
  * Hex output
  **********************************************************************/
+/*  Flash Map of ATMega32U2/U4(32KB)
+ *  +------------+ 0x0000
+ *  | .vectors   | 0xac (43vectors * 4bytes)
+ *  | .progmem   | PROGMEM variables and PSTR
+ *  | .init0-9   |
+ *  | .text      | code
+ *  | .fini9-0   |
+ *  |            | > text region
+ *  |------------| _etext
+ *  | .data      |
+ *  | .bss       |
+ *  | .noinit    |
+ *  |            | > data region
+ *  |------------| 0x6800
+ *  | .keymap    | > keymap region(2KB)
+ *  |------------| 0x7000
+ *  | bootloader | 4KB
+ *  +------------+ 0x7FFF
+ *
+ *  keymap region(.keymap):
+ *  +----------------+
+ *  |                |
+ *  |                |
+ *  | keymaps[][][]  | < 2KB-64
+ *  |                |
+ *  |                |
+ *  +----------------+
+ */
+// Keymap section address and size
+const KEYMAP_START_ADDRESS = 0x6800;
+const KEYMAP_SIZE = 0x800;
+
 function hex_line(address, record_type, data) {
     var hexstr2 = function(b) {
         return ('0'+ b.toString(16)).substr(-2).toUpperCase();
@@ -182,42 +219,11 @@ function hex_keymaps(address) {
     return hex_output(address, keymap_data);
 }
 
-/* hex file whthout keymap region and eof */
-    /*  Flash Map of ATMega32U2/U4(32KB)
-     *  +------------+ 0x0000
-     *  | .vectors   | 0xac (43vectors * 4bytes)
-     *  | .progmem   | PROGMEM variables and PSTR
-     *  | .init0-9   |
-     *  | .text      | code
-     *  | .fini9-0   |
-     *  |            | > text region
-     *  |------------| _etext
-     *  | .data      |
-     *  | .bss       |
-     *  | .noinit    |
-     *  |            | > data region
-     *  |------------| 0x6800
-     *  | .keymap    | > keymap region(2KB)
-     *  |------------| 0x7000
-     *  | bootloader | 4KB
-     *  +------------+ 0x7FFF
-     *
-     *  keymap region(.keymap):
-     *  +----------------+
-     *  |                |
-     *  |                |
-     *  | keymaps[][][]  | < 2KB-64
-     *  |                |
-     *  |                |
-     *  +----------------+
-     */
-// Keymap section address and size
-const KEYMAP_START_ADDRESS = 0x6800;
-const KEYMAP_SIZE = 0x800;
-
 function hex_split_firmware(hexstr, keymap_addr, keymap_size) {
+    // split ihex content into three parts; lines above/below of keymap and keymap itself
     var line_before = [];
     var line_after = [];
+    var keymap_raw = [];
     var out = line_before;
     var addr_offset = 0;
     var lines = hexstr.split("\n");
@@ -235,11 +241,21 @@ function hex_split_firmware(hexstr, keymap_addr, keymap_size) {
             } else if (addr + addr_offset >= keymap_addr + keymap_size) {
                 line_after.push(line);
                 out = line_after;
+            } else {
+                // keymap 16bit codes
+                var v = 0;
+                for (var j = 0; j < size; j++) {
+                    if (j % 2 == 1) {
+                        keymap_raw.push(parseInt(line.substring(9+(j*2), 11+(j*2)), 16)<<8 | v);
+                    } else {
+                        v = parseInt(line.substring(9+(j*2), 11+(j*2)), 16);
+                    }
+                }
             }
         } else if (type == "04") {
             // extended linear address
             addr_offset = parseInt(line.substring(9, 13), 16)*0x10000;
-            if (addr_offset > keymap_addr) {
+            if (addr_offset >= keymap_addr + keymap_size) {
                 out = line_after;
             }
             out.push(line);
@@ -250,7 +266,18 @@ function hex_split_firmware(hexstr, keymap_addr, keymap_size) {
             out.push(line);
         }
     }
-    return { before: line_before, after: line_after };
+
+    // form keymap array: 8x16
+    var keymap_ret = [];
+    var layer = []
+    for (;keymap_raw.length > 0;) {
+        layer.push(keymap_raw.splice(0,16));
+        if (layer.length == 8) {
+            keymap_ret.push(layer);
+            layer = [];
+        }
+    }
+    return { before: line_before, after: line_after, keymaps: keymap_ret };
 }
 
 

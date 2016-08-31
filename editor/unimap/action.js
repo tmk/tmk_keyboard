@@ -349,14 +349,12 @@ var action_kinds = {
     USAGE_SYSTEM:       { id: "USAGE_SYSTEM",           name: "ACTION_USAGE_SYSTEM",        desc: "System control key" },
     USAGE_CONSUMER:     { id: "USAGE_CONSUMER",         name: "ACTION_USAGE_CONSUMER",      desc: "Consumer key" },
     MOUSEKEY:           { id: "MOUSEKEY",               name: "ACTION_MOUSEKEY",            desc: "Mouse key" },
-/*
     MACRO:              { id: "MACRO",                  name: "ACTION_MACRO",               desc: "Macro" },
     MACRO_TAP:          { id: "MACRO_TAP",              name: "ACTION_MACRO_TAP",           desc: "Macro for tap key" },
     MACRO_OPT:          { id: "MACRO_OPT",              name: "ACTION_MACRO_OPT",           desc: "Macro with option" },
     FUNCTION:           { id: "FUNCTION",               name: "ACTION_FUNCTION",            desc: "Function" },
     FUNCTION_TAP:       { id: "FUNCTION_TAP",           name: "ACTION_FUNCTION_TAP",        desc: "Function for tap key" },
     FUNCTION_OPT:       { id: "FUNCTION_OPT",           name: "ACTION_FUNCTION_OPT",        desc: "Function with option" },
-*/
     LAYER_CLEAR:        { id: "LAYER_CLEAR",            name: "ACTION_LAYER_CLEAR",         desc: "Clear all layer state" },
     LAYER_MOMENTARY:    { id: "LAYER_MOMENTARY",        name: "ACTION_LAYER_MOMENTARY",     desc: "Momentary layer switch" },
     LAYER_TOGGLE:       { id: "LAYER_TOGGLE",           name: "ACTION_LAYER_TOGGLE",        desc: "Toggle a layer" },
@@ -370,13 +368,11 @@ var action_kinds = {
     LAYER_MODS:         { id: "LAYER_MODS",             name: "ACTION_LAYER_MODS",          desc: "Momentary layer switch with modifiers" },
     LAYER_TAP_KEY:      { id: "LAYER_TAP_KEY",          name: "ACTION_LAYER_TAP_KEY",       desc: "Momentary layer switch / Tap key" },
     LAYER_TAP_TOGGLE:   { id: "LAYER_TAP_TOGGLE",       name: "ACTION_LAYER_TAP_TOGGLE",    desc: "Momentary layer switch / Tap toggle" },
-/*
     LAYER_BIT_AND:      { id: "LAYER_BIT_AND",          name: "ACTION_LAYER_BIT_AND",       desc: "Layer Bit AND" },
     LAYER_BIT_OR:       { id: "LAYER_BIT_OR",           name: "ACTION_LAYER_BIT_OR",        desc: "Layer Bit OR" },
     LAYER_BIT_XOR:      { id: "LAYER_BIT_XOR",          name: "ACTION_LAYER_BIT_XOR",       desc: "Layer Bit XOR" },
     LAYER_BIT_SET:      { id: "LAYER_BIT_SET",          name: "ACTION_LAYER_BIT_SET",       desc: "Layer Bit SET" },
     DEFAULT_LAYER_SET:  { id: "DEFAULT_LAYER_SET",      name: "ACTION_DEFAULT_LAYER_SET",   desc: "Set a default layer" },
-*/
     UNKNOWN:            { id: "UNKNOWN",                name: "ACTION_UNKNOWN",             desc: "Unknown action" },
 };
 
@@ -552,7 +548,6 @@ keycodes[0x00A1] = {id: 'OPER',                        name: 'OPER',            
 keycodes[0x00A2] = {id: 'CLEAR_AGAIN',                 name: 'CLEAR_AGAIN',                 desc: 'CLEAR_AGAIN'};
 keycodes[0x00A3] = {id: 'CRSEL',                       name: 'CRSEL',                       desc: 'CRSEL'};
 keycodes[0x00A4] = {id: 'EXSEL',                       name: 'EXSEL',                       desc: 'EXSEL'};
-/*
 keycodes[0x00A5] = {id: 'RESERVED-165',                name: 'RESERVED-165',                desc: 'RESERVED-165(0xA5)'};
 keycodes[0x00A6] = {id: 'RESERVED-166',                name: 'RESERVED-166',                desc: 'RESERVED-166(0xA6)'};
 keycodes[0x00A7] = {id: 'RESERVED-167',                name: 'RESERVED-167',                desc: 'RESERVED-167(0xA7)'};
@@ -564,7 +559,6 @@ keycodes[0x00AC] = {id: 'RESERVED-172',                name: 'RESERVED-172',    
 keycodes[0x00AD] = {id: 'RESERVED-173',                name: 'RESERVED-173',                desc: 'RESERVED-173(0xAD)'};
 keycodes[0x00AE] = {id: 'RESERVED-174',                name: 'RESERVED-174',                desc: 'RESERVED-174(0xAE)'};
 keycodes[0x00AF] = {id: 'RESERVED-175',                name: 'RESERVED-175',                desc: 'RESERVED-175(0xAF)'};
-*/
 keycodes[0x00B0] = {id: 'KP_00',                       name: 'KP_00',                       desc: 'KP_00'};
 keycodes[0x00B1] = {id: 'KP_000',                      name: 'KP_000',                      desc: 'KP_000'};
 keycodes[0x00B2] = {id: 'THOUSANDS_SEPARATOR',         name: 'THOUSANDS_SEPARATOR',         desc: 'THOUSANDS_SEPARATOR'};
@@ -611,10 +605,8 @@ keycodes[0x00DA] = {id: 'KP_BINARY',                   name: 'KP_BINARY',       
 keycodes[0x00DB] = {id: 'KP_OCTAL',                    name: 'KP_OCTAL',                    desc: 'KP_OCTAL'};
 keycodes[0x00DC] = {id: 'KP_DECIMAL',                  name: 'KP_DECIMAL',                  desc: 'KP_DECIMAL'};
 keycodes[0x00DD] = {id: 'KP_HEXADECIMAL',              name: 'KP_HEXADECIMAL',              desc: 'KP_HEXADECIMAL'};
-/*
 keycodes[0x00DE] = {id: 'RESERVED-222',                name: 'RESERVED-222',                desc: 'RESERVED-222(0xDE)'};
 keycodes[0x00DF] = {id: 'RESERVED-223',                name: 'RESERVED-223',                desc: 'RESERVED-223(0xDF)'};
-*/
 keycodes[0x00E0] = {id: 'LCTL',                        name: 'LCtrl',                       desc: 'Left Control'};
 keycodes[0x00E1] = {id: 'LSFT',                        name: 'LShift',                      desc: 'Left Shift'};
 keycodes[0x00E2] = {id: 'LALT',                        name: 'LAlt',                        desc: 'Left Alt(\u2325)'};
@@ -623,7 +615,6 @@ keycodes[0x00E4] = {id: 'RCTL',                        name: 'RCtrl',           
 keycodes[0x00E5] = {id: 'RSFT',                        name: 'RShift',                      desc: 'Right Shift'};
 keycodes[0x00E6] = {id: 'RALT',                        name: 'RAlt',                        desc: 'Right Alt(\u2325)'};
 keycodes[0x00E7] = {id: 'RGUI',                        name: 'RGui',                        desc: 'Right Windows(\u2318)'};
-/*
 keycodes[0x00E8] = {id: 'RESERVED-232',                name: 'RESERVED-232',                desc: 'RESERVED-232(0xE8)'};
 keycodes[0x00E9] = {id: 'RESERVED-233',                name: 'RESERVED-233',                desc: 'RESERVED-233(0xE9)'};
 keycodes[0x00EA] = {id: 'RESERVED-234',                name: 'RESERVED-234',                desc: 'RESERVED-234(0xEA)'};
@@ -648,7 +639,6 @@ keycodes[0x00FC] = {id: 'RESERVED-252',                name: 'RESERVED-252',    
 keycodes[0x00FD] = {id: 'RESERVED-253',                name: 'RESERVED-253',                desc: 'RESERVED-253(0xFD)'};
 keycodes[0x00FE] = {id: 'RESERVED-254',                name: 'RESERVED-254',                desc: 'RESERVED-254(0xFE)'};
 keycodes[0x00FF] = {id: 'RESERVED-255',                name: 'RESERVED-255',                desc: 'RESERVED-255(0xFF)'};
-*/
 
 
 /**********************************************************************
