@@ -405,7 +405,7 @@ $(function() {
         $("#firmwareFile").prop("disabled", true);
         $("#firmwareURL").prop("disabled", true);
         loadHexURL(keymap_config[variant].firmware_url).done(function(s) {
-            // load keymap from firmware if hash(keymap) is not existed in URL
+            // load keymap from firmware if #hash(keymap) doesn't exist in URL
             if (!document.location.hash) {
                 keymaps = $.extend(true, [], firmware_keymaps); // copy
                 while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
