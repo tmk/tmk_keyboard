@@ -11,4 +11,7 @@ keymap_config = {
     adb_usb_rev1: {
         firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/adb_usb/binary/adb_usb_rev1_unimap.hex",
     }
+    usb_usb: {
+        firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/usb_usb/binary/usb_usb_unimap.hex",
+    }
 }
