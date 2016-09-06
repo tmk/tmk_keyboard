@@ -336,21 +336,46 @@ $(function() {
 
 
     /**********************************************************************
-     * Hex File Download
+     * Base firmware setting
      **********************************************************************/
     var firmware_before = [];
     var firmware_after = [];
     var firmware_keymaps = [];
+
+    // Base firmware - Select from config
+    for (var prod in keymap_config) {
+        $("#firmware-dropdown").append($("<option></option>")
+                .attr({ value: prod, title: keymap_config[prod].desc })
+                .text(keymap_config[prod].desc));
+    }
+    $("#firmware-dropdown").change(function() {
+        let v = $(this).val();
+        $("#firmware-download").prop("disabled", true);
+        $("#keymap-load").prop("disabled", true);
+
+        if (!keymap_config[v]) { return; }
+        $("#firmware-dropdown").prop("disabled", true);
+        loadHexURL(keymap_config[v].firmware_url).done(function(s) {
+            $("#firmware-download").prop("disabled", false);
+            $("#keymap-load").prop("disabled", false);
+        }).fail(function() {
+            $("#firmware-download").prop("disabled", true);
+            $("#keymap-load").prop("disabled", true);
+        }).always(function() {
+            $("#firmware-dropdown").prop("disabled", false);
+        });
+    });
+
+    // Base firmware - File chooser
     $("#firmwareFile").change(function(ev) {
         // called after choosing file
         var f = ev.target.files[0];
         if (!f) {
-            $("#firmwareURL").prop("disabled", false);
+            $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
             return;
         }
 
-        $("#firmwareURL").prop("disabled", true);
         var fr = new FileReader();
         fr.onloadend = function(e) {
             // TODO: support .bin format
@@ -358,11 +383,13 @@ $(function() {
             firmware_before = lines.before;
             firmware_after = lines.after;
             firmware_keymaps = lines.keymaps;
+            $("#firmware-download").prop("disabled", false);
+            $("#keymap-load").prop("disabled", false);
         };
         fr.readAsText(f);
-        $("#keymap-load").prop("disabled", false);
     });
 
+    // Base firmware - URL loader
     let loadHexURL = function(firmware_url) {
         return $.ajax({
             method: "GET",
@@ -375,23 +402,20 @@ $(function() {
             firmware_keymaps = lines.keymaps;
         });
     };
-
     $("#firmwareURL").change(function(ev) {
         var firmware_url = $(this).val();
         if (!firmware_url) {
-            $("#firmwareURL_status").text("");
-            $("#firmwareFile").prop("disabled", false);
+            $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
             return;
         }
 
-        $("#firmwareFile").prop("disabled", true);
         $("#firmwareURL").prop("disabled", true);
         loadHexURL(firmware_url).done(function(s) {
-            $("#firmwareURL_status").text("OK");
+            $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
         }).fail(function(d) {
-            $("#firmwareURL_status").text("NG " + d.status);
+            $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
         }).always(function() {
             $("#firmwareURL").prop("disabled", false);
@@ -400,10 +424,9 @@ $(function() {
 
     // Set firmware URL from config at startup
     if (keymap_config[variant] && keymap_config[variant].firmware_url) {
-        $("#firmwareURL").val(keymap_config[variant].firmware_url);
+        $("#firmware-dropdown").val(variant);
+        //$("#firmwareURL").val(keymap_config[variant].firmware_url);
 
-        $("#firmwareFile").prop("disabled", true);
-        $("#firmwareURL").prop("disabled", true);
         loadHexURL(keymap_config[variant].firmware_url).done(function(s) {
             // load keymap from firmware if #hash(keymap) doesn't exist in URL
             if (!document.location.hash) {
@@ -411,16 +434,16 @@ $(function() {
                 while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
                 load_keymap_on_keyboard(keymaps[editing_layer]);
             }
-            $("#firmwareURL_status").text("OK");
+            $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
         }).fail(function(d) {
-            $("#firmwareURL_status").text("NG " + d.status);
+            $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
         }).always(function() {
-            $("#firmwareURL").prop("disabled", false);
         });
     }
 
+    // Load keymap from base firmware
     $("#keymap-load").prop("disabled", true);
     $("#keymap-load").click(function(ev, ui) {
         // load keymap from firmware
@@ -429,7 +452,42 @@ $(function() {
         load_keymap_on_keyboard(keymaps[editing_layer]);
     });
 
-    $("#keymap-download").click(function(ev, ui) {
+    // Base firmeare - radio button
+    $(".base-firm").change(function() {
+        console.log($(this).val());
+        $("#firmware-download").prop("disabled", true);
+        $("#keymap-load").prop("disabled", true);
+        switch ($(this).val()) {
+            case "config":
+                $("#firmware-dropdown").prop("disabled", false);
+                $("#firmwareURL").prop("disabled", true);
+                $("#firmwareFile").prop("disabled", true);
+                $("#keymap-load").prop("disabled", true);
+                $("#firmware-dropdown").trigger("change");
+                break;
+            case "url":
+                $("#firmware-dropdown").prop("disabled", true);
+                $("#firmwareURL").prop("disabled", false);
+                $("#firmwareFile").prop("disabled", true);
+                $("#keymap-load").prop("disabled", true);
+                $("#firmwareURL").trigger("change");
+                break;
+            case "file":
+                $("#firmware-dropdown").prop("disabled", true);
+                $("#firmwareURL").prop("disabled", true);
+                $("#firmwareFile").prop("disabled", false);
+                $("#keymap-load").prop("disabled", true);
+                $("#firmwareFile").trigger("change");
+                break;
+        };
+    });
+
+
+    /**********************************************************************
+     * Download firmware
+     **********************************************************************/
+    $("#firmware-download").prop("disabled", true);
+    $("#firmware-download").click(function(ev, ui) {
         // TODO: support .bin format
         if ( $("#firmwareFile")[0].files[0] &&
                 $("#firmwareFile")[0].files[0].name.match(/\.hex/)) {

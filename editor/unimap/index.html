@@ -542,14 +542,32 @@
 </div>
 
 <h3>Firmware Hex File Download:</h3>
-<button id="keymap-download" title="save file">Download</button>
+<button id="firmware-download" title="save file">Download</button>
 <a id="hex-download" style="display:none" ></a>
 
 <h3>Base Firmware File:</h3>
-<input id="firmwareFile" type="file" accept=".hex"/>
-or URL:
+You can select a product or supply your own firmware to edit its keymap. The firmware should be built with unimap enabled.
+
+<div>
+<input type="radio" name="base-firm" class="base-firm" value="config" checked="checked" />
+<label for="firm-config">Select </label>
+<select id="firmware-dropdown" class="firmware-dropdown">
+    <option value="none" selected>None</option>
+</select>
+</div>
+
+<div>
+<input type="radio" name="base-firm" class="base-firm" value="url" />
+<label for="firm-url">URL </label>
 <input id="firmwareURL" type="url" size="50"/>
 <div id="firmwareURL_status" style="display:inline"></div>
+</div>
+
+<div>
+<input type="radio" name="base-firm" class="base-firm" value="file" />
+<label for="firm-file">File</label>
+<input id="firmwareFile" type="file" accept=".hex"/>
+</div>
 
 <br/>
 <br/>
