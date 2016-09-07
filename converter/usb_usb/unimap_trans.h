@@ -42,25 +42,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * |Ctl|Gui|Alt|MHEN|     Space      |HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  0    |  .|Ent|
  * `-----------------------------------------------------------' `-----------' `---------------'
  */
-
-/* USB 16x16
-*         ,---------------. ,---------------. ,---------------.
-*         |F13|F14|F15|F16| |F17|F18|F19|F20| |F21|F22|F23|F24|
-* ,---.   |---------------| |---------------| |---------------| ,-----------. ,---------------. ,-------.
-* |Esc|   |F1 |F2 |F3 |F4 | |F5 |F6 |F7 |F8 | |F9 |F10|F11|F12| |PrS|ScL|Pau| |VDn|VUp|Mut|Pwr| | Help  |
-* `---'   `---------------' `---------------' `---------------' `-----------' `---------------' `-------'
-* ,-----------------------------------------------------------. ,-----------. ,---------------. ,-------.
-* |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY|Bsp| |Ins|Hom|PgU| |NmL|  /|  *|  -| |Stp|Agn|
-* |-----------------------------------------------------------| |-----------| |---------------| |-------|
-* |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|  \  | |Del|End|PgD| |  7|  8|  9|  +| |Mnu|Und|
-* |-----------------------------------------------------------| `-----------' |---------------| |-------|
-* |CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  :|  #|Retn|               |  4|  5|  6|KP,| |Sel|Cpy|
-* |-----------------------------------------------------------|     ,---.     |---------------| |-------|
-* |Shft|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  ,|  /| RO|Shift |     |Up |     |  1|  2|  3|KP=| |Exe|Pst|
-* |-----------------------------------------------------------| ,-----------. |---------------| |-------|
-* |Ctl|Gui|Alt|MHEN|HNJ| Space  |H/E|HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  0    |  .|Ent| |Fnd|Cut|
-* `-----------------------------------------------------------' `-----------' `---------------' `-------'
-*/
 const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
     { UNIMAP_KANA,  UNIMAP_VOLUME_DOWN, UNIMAP_VOLUME_UP, UNIMAP_VOLUME_MUTE, UNIMAP_A, UNIMAP_B, UNIMAP_C, UNIMAP_D,
       UNIMAP_E,     UNIMAP_F,     UNIMAP_G,     UNIMAP_H,     UNIMAP_I,     UNIMAP_J,     UNIMAP_K,     UNIMAP_L },
@@ -90,7 +71,7 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
       UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    }, /* C8-CF */ \
     { UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,      /* D0-D7 */ \
       UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    }, /* D8-DF */ \
-    { UNIMAP_LCTRL, UNIMAP_LSHIFT,UNIMAP_LALT,  UNIMAP_LGUI,  UNIMAP_RCTRL, UNIMAP_RSHIFT,UNIMAP_RALT,  UNIMAP_RGUI,     /* E0-E7 */ \
+    { UNIMAP_LCTRL, UNIMAP_LSHIFT,UNIMAP_LALT,  UNIMAP_LGUI,  UNIMAP_RCTRL, UNIMAP_RSHIFT,UNIMAP_RALT,  UNIMAP_RGUI,    /* E0-E7 */ \
       UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    }, /* E8-EF */ \
     { UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,      /* F0-F7 */ \
       UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    }, /* F8-FF */ \
