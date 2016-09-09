@@ -421,7 +421,7 @@ flip: $(TARGET).hex
 
 dfu: $(TARGET).hex
 	@echo -n dfu-programmer: waiting
-	@until dfu-programmer atmega32u4 get bootloader-version > /dev/null 2>&1; do \
+	@until dfu-programmer $(MCU) get bootloader-version > /dev/null 2>&1; do \
 		echo  -n "."; \
 		sleep 1; \
 	done
