@@ -30,4 +30,10 @@ keymap_config = {
         firmware_format: "ihex",
         layout: "layout-128key.html",
     },
+    next_usb: {
+        desc: "NeXT-USB Converter",
+        firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/next_usb/binary/next_usb_unimap.hex",
+        firmware_format: "ihex",
+        layout: "layout-next_usb.html",
+    }
 }

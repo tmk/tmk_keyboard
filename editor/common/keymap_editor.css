@@ -78,6 +78,9 @@ textarea {
 .btn625 { width:287.5px; }  /* 312.5    - 25 */
 .btn700 { width:325px; }    /* 350      - 25 */
 .btn750 { width:350px; }    /* 375      - 25 */
+.btn800 { width:375px; }    /* 400      - 25 */
+.btn850 { width:400px; }    /* 425      - 25 */
+.btn900 { width:425px; }    /* 450      - 25 */
 
 .spc025 { width:12.5px; visibility:hidden; padding:0; border:0; margin:0; }
 .spc050 { width:0px; visibility:hidden; }
