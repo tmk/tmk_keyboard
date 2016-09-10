@@ -1,4 +1,0 @@
-TARGET = usb_usb_editor
-KEYMAP_SECTION_ENABLE = yes	# fixed address keymap for keymap editor
-KEYMAP = editor
-include Makefile

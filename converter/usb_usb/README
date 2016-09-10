@@ -61,13 +61,22 @@ Limitation
 Only supports 'HID Boot protocol'.
 Not support keyboard LED yet.
 
-Note that the converter can host only USB "boot protocol" keyboard(6KRO) and not NKRO, it is possible to support NKRO keyboard but you will need to write HID report parser for that. Every NKRO keyboard can have different HID report and it is difficult to support all kind of NKRO keyboards in the market.
+Note that the converter can host only USB "boot protocol" keyboard(6KRO), not NKRO, it is possible to support NKRO keyboard but you will need to write HID report parser for that. Every NKRO keyboard can have different HID report and it is difficult to support all kind of NKRO keyboards in the market.
+
+
+
+Keymap editor
+-------------
+You can editor keymap and download firmware with web brwoser.
+
+- http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?usb_usb
 
 
 
 Update
 ------
 2014/12/11  Added Hub support(confirmed with HHKB pro2)
+2016/09/10  Unimap editor support
 
 
 
