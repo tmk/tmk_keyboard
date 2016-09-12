@@ -1,4 +1,4 @@
-TARGET = m0110_rev1_unimap
+TARGET = m0110_usb_rev1_unimap
 UNIMAP_ENABLE = yes
 KEYMAP_SECTION_ENABLE = yes
 MCU = atmega32u4

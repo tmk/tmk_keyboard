@@ -68,7 +68,7 @@ Use `Maefile.rev1` for TMK converter rev.1 and Teensy(ATMega32u4), instead.
 
 Keymap
 ------
-To create your own keymap copy existent keymap file to `keymap_<name>.c` and edit it. You can build with `make -f Makfile.rev2 KEYMAP=<name>`.
+To create your own keymap copy existent keymap file to `keymap_<name>.c` and edit it. You can build with `make -f Makefile.rev2 KEYMAP=<name>`.
 
 Or you can edit keymap on web browser and download firmware.
 

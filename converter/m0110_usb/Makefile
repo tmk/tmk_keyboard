@@ -1,5 +1,5 @@
 # Target file name (without extension).
-TARGET ?= m0110_lufa
+TARGET ?= m0110_usb
 
 # Directory common source filess exist
 TMK_DIR ?= ../../tmk_core
