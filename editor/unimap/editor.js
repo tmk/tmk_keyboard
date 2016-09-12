@@ -8,27 +8,20 @@ $(function() {
     var editing_layer = 0;
     var keymaps_changed = false;
 
-    /**********************************************************************
-     * Local functions
-     **********************************************************************/
-    var load_keymap_on_keyboard = function(keymap) {
-        for (var row in keymap) {
-            for (var col in keymap[row]) {
-                var code = keymap[row][col];
-                var act = new Action(code);
-                $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32))
-                    .text(act.name)
-                    .attr({ title: act.desc });
-            }
-        }
-    };
+    // keyboard variant from URL search(?...)
+    let variant = document.location.search.substring(1);
 
-    var get_pos = function(id) {
-        // get matrix position from key id: key-RC where R is row and C is column in "0-v"(radix 32)
-        var pos = editing_key.match(/key-([0-9a-v])([0-9a-v])/i);
-        if (!pos) throw "invalid id";
-        return { row: parseInt(pos[1], 32), col: parseInt(pos[2], 32) };
-    };
+    // keyboard layout
+    let layout = CONFIG.layout_default;
+    if (CONFIG.keymap[variant] && CONFIG.keymap[variant].layout) {
+        layout = CONFIG.keymap[variant].layout;
+    }
+
+    // load keymap from URL hash(#...)
+    var decoded = url_decode_keymap(document.location.hash.substring(1));
+    if (decoded != null) {
+        keymaps = decoded['keymaps'];
+    }
 
 
     /**********************************************************************
@@ -40,30 +33,6 @@ $(function() {
     // Title
     document.title = "TMK Keymap Editor";
     $("#page-title").text("TMK Keymap Editor");
-
-    /*
-     * load keymap from URL hash(#...)
-     */
-    var decoded = url_decode_keymap(document.location.hash.substring(1));
-    if (decoded != null) {
-        keymaps = decoded['keymaps'];
-    }
-
-    // keyboard variant from URL search(?...)
-    var variant = document.location.search.substring(1);
-
-    /*
-     * Keymap Output for debug
-     */
-    $("#debug-output").hide();
-    $("#debug-link").click(function() {
-        if ($("#debug-output").css("display") == "none") {
-            $("#debug-link-collapse").text("\u25b2");
-        } else {
-            $("#debug-link-collapse").text("\u25bc");
-        }
-        $("#debug-output").toggle("slow");
-    });
 
 
     /**********************************************************************
@@ -78,29 +47,17 @@ $(function() {
         load_keymap_on_keyboard(keymaps[layer]);
     });
 
-
-    /**********************************************************************
-     * Keyboard(key buttons)
-     **********************************************************************/
-    // load default keymap on startup
-    load_keymap_on_keyboard(keymaps[0]);
-
-    // Select key button to edit
-    $(".key").focus(function(ev) {
-        $(this).click();
-    });
-    $(".key").click(function(ev) {
-        editing_key = $(this).attr('id');
-
-        // grey-out key to indicate being under editing
-        $(".key").removeClass("key-editing");
-        $(this).addClass("key-editing");
-        var pos = get_pos(editing_key);
-        var code = keymaps[editing_layer][pos.row][pos.col];
-
-        action_editor_set_code(code);
-        $(this).blur();
-    });
+    var load_keymap_on_keyboard = function(keymap) {
+        for (var row in keymap) {
+            for (var col in keymap[row]) {
+                var code = keymap[row][col];
+                var act = new Action(code);
+                $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32))
+                    .text(act.name)
+                    .attr({ title: act.desc });
+            }
+        }
+    };
 
 
     /**********************************************************************
@@ -128,6 +85,13 @@ $(function() {
         $(this).blur();
         editing_key_set(code);
     });
+
+    var get_pos = function(id) {
+        // get matrix position from key id: key-RC where R is row and C is column in "0-v"(radix 32)
+        var pos = editing_key.match(/key-([0-9a-v])([0-9a-v])/i);
+        if (!pos) throw "invalid id";
+        return { row: parseInt(pos[1], 32), col: parseInt(pos[2], 32) };
+    };
 
     var editing_key_set = function(code) {
         var pos = get_pos(editing_key);
@@ -342,22 +306,42 @@ $(function() {
     var firmware_after = [];
     var firmware_keymaps = [];
 
+    // Load ihex firmware
+    let loadHexURL = function(firmware_url) {
+        return $.ajax({
+            method: "GET",
+            url: firmware_url,
+            //async: false,
+        }).done(function(s) {
+            var lines = hex_split_firmware(s, KEYMAP_START_ADDRESS, KEYMAP_SIZE);
+            firmware_before = lines.before;
+            firmware_after = lines.after;
+            firmware_keymaps = lines.keymaps;
+        });
+    };
+
     // Base firmware - Select from config
-    for (var prod in keymap_config) {
+    for (var prod in CONFIG.keymap) {
         $("#firmware-dropdown").append($("<option></option>")
-                .attr({ value: prod, title: keymap_config[prod].desc })
-                .text(keymap_config[prod].desc));
+                .attr({ value: prod, title: CONFIG.keymap[prod].desc })
+                .text(CONFIG.keymap[prod].desc));
     }
     $("#firmware-dropdown").change(function() {
         let v = $(this).val();
         $("#firmware-download").prop("disabled", true);
         $("#keymap-load").prop("disabled", true);
 
-        if (!keymap_config[v]) { return; }
+        if (!CONFIG.keymap[v]) { return; }
         $("#firmware-dropdown").prop("disabled", true);
-        loadHexURL(keymap_config[v].firmware_url).done(function(s) {
+        loadHexURL(CONFIG.keymap[v].firmware_url).done(function(s) {
             $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
+
+            if (CONFIG.keymap[v].layout) {
+                layout_load(CONFIG.keymap[v].layout);
+            } else {
+                layout_load(CONFIG.layout_default);
+            }
         }).fail(function() {
             $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
@@ -389,19 +373,6 @@ $(function() {
         fr.readAsText(f);
     });
 
-    // Base firmware - URL loader
-    let loadHexURL = function(firmware_url) {
-        return $.ajax({
-            method: "GET",
-            url: firmware_url,
-            //async: false,
-        }).done(function(s) {
-            var lines = hex_split_firmware(s, KEYMAP_START_ADDRESS, KEYMAP_SIZE);
-            firmware_before = lines.before;
-            firmware_after = lines.after;
-            firmware_keymaps = lines.keymaps;
-        });
-    };
     $("#firmwareURL").change(function(ev) {
         var firmware_url = $(this).val();
         if (!firmware_url) {
@@ -421,27 +392,6 @@ $(function() {
             $("#firmwareURL").prop("disabled", false);
         });
     });
-
-    // Set firmware URL from config at startup
-    if (keymap_config[variant] && keymap_config[variant].firmware_url) {
-        $("#firmware-dropdown").val(variant);
-        //$("#firmwareURL").val(keymap_config[variant].firmware_url);
-
-        loadHexURL(keymap_config[variant].firmware_url).done(function(s) {
-            // load keymap from firmware if #hash(keymap) doesn't exist in URL
-            if (!document.location.hash) {
-                keymaps = $.extend(true, [], firmware_keymaps); // copy
-                while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
-                load_keymap_on_keyboard(keymaps[editing_layer]);
-            }
-            $("#firmware-download").prop("disabled", false);
-            $("#keymap-load").prop("disabled", false);
-        }).fail(function(d) {
-            $("#firmware-download").prop("disabled", true);
-            $("#keymap-load").prop("disabled", true);
-        }).always(function() {
-        });
-    }
 
     // Load keymap from base firmware
     $("#keymap-load").prop("disabled", true);
@@ -549,6 +499,15 @@ $(function() {
     /**********************************************************************
      * Output options for debug
      **********************************************************************/
+    $("#debug-output").hide();
+    $("#debug-link").click(function() {
+        if ($("#debug-output").css("display") == "none") {
+            $("#debug-link-collapse").text("\u25b2");
+        } else {
+            $("#debug-link-collapse").text("\u25bc");
+        }
+        $("#debug-output").toggle("slow");
+    });
     //$("#keymap-output").resizable();  // resizable textarea
 
     // Hex output
@@ -587,5 +546,63 @@ $(function() {
     // prevent losing keymap under editing when leave the page
     $(window).bind('beforeunload', function(){
           return 'CAUTION: You will lost your change.';
+    });
+
+
+    /**********************************************************************
+     * Load firmware from URL in config
+     **********************************************************************/
+    let lh = $.Deferred().resolve();
+    if (CONFIG.keymap[variant] && CONFIG.keymap[variant].firmware_url) {
+        $("#firmware-dropdown").val(variant);
+
+        lh = loadHexURL(CONFIG.keymap[variant].firmware_url).done(function(s) {
+            // load keymap from firmware if #hash(keymap) doesn't exist in URL
+            if (!document.location.hash) {
+                keymaps = $.extend(true, [], firmware_keymaps); // copy
+                while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
+            }
+            $("#firmware-download").prop("disabled", false);
+            $("#keymap-load").prop("disabled", false);
+        }).fail(function(d) {
+            $("#firmware-download").prop("disabled", true);
+            $("#keymap-load").prop("disabled", true);
+        }).always(function() {
+        });
+    }
+
+    /**********************************************************************
+     * Load keyboard layout
+     **********************************************************************/
+    let layout_load = function(layout) {
+        $("#keyboard-outline").load(layout, function() {
+            // executed after loading layout and creating DOM
+            /**********************************************************************
+             * Keyboard(key buttons)
+             **********************************************************************/
+            // Select key button to edit
+            $(".key").focus(function(ev) {
+                $(this).click();
+            });
+            $(".key").click(function(ev) {
+                editing_key = $(this).attr('id');
+
+                // grey-out key to indicate being under editing
+                $(".key").removeClass("key-editing");
+                $(this).addClass("key-editing");
+                var pos = get_pos(editing_key);
+                var code = keymaps[editing_layer][pos.row][pos.col];
+
+                action_editor_set_code(code);
+                $(this).blur();
+            });
+
+            load_keymap_on_keyboard(keymaps[editing_layer]);
+        });
+    };
+
+    // wait for loading keymap form firmware
+    $.when(lh).then(function() {
+        layout_load(layout);
     });
 });
