@@ -2,22 +2,22 @@
  * Action code elements
  **********************************************************************/
 // Action kind bits
-ACT_MODS          = 0b0000;
-ACT_LMODS         = 0b0000;
-ACT_RMODS         = 0b0001;
-ACT_MODS_TAP      = 0b0010;
-ACT_LMODS_TAP     = 0b0010;
-ACT_RMODS_TAP     = 0b0011;
-ACT_USAGE         = 0b0100;
-ACT_MOUSEKEY      = 0b0101;
-ACT_LAYER         = 0b1000;
-ACT_LAYER_EXT     = 0b1001;
-ACT_LAYER_TAP     = 0b1010; /* Layer  0-15 */
-ACT_LAYER_TAP_EXT = 0b1011; /* Layer 16-31 */
-ACT_MACRO         = 0b1100;
-ACT_BACKLIGHT     = 0b1101;
-ACT_COMMAND       = 0b1110;
-ACT_FUNCTION      = 0b1111;
+ACT_MODS          = 0;  // 0b0000;
+ACT_LMODS         = 0;  // 0b0000;
+ACT_RMODS         = 1;  // 0b0001;
+ACT_MODS_TAP      = 2;  // 0b0010;
+ACT_LMODS_TAP     = 2;  // 0b0010;
+ACT_RMODS_TAP     = 3;  // 0b0011;
+ACT_USAGE         = 4;  // 0b0100;
+ACT_MOUSEKEY      = 5;  // 0b0101;
+ACT_LAYER         = 8;  // 0b1000;
+ACT_LAYER_EXT     = 9;  // 0b1001;
+ACT_LAYER_TAP     = 10; // 0b1010; /* Layer  0-15 */
+ACT_LAYER_TAP_EXT = 11; // 0b1011; /* Layer 16-31 */
+ACT_MACRO         = 12; // 0b1100;
+ACT_BACKLIGHT     = 13; // 0b1101;
+ACT_COMMAND       = 14; // 0b1110;
+ACT_FUNCTION      = 15; // 0b1111;
 
 // Special keycodes for Layer Tap
 OP_TAP_TOGGLE     = 0xf0;
