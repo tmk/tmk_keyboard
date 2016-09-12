@@ -40,9 +40,9 @@ Layer:  2(bytes/action) * 128 = 256 bytes
  * Keymaps
  **********************************************************************/
 // keymaps[8-layers][8-rows][16-cols]
-const KEYMAP_LAYERS = 8;
-const KEYMAP_ROW = 8;
-const KEYMAP_COL = 16;
+KEYMAP_LAYERS = 8;
+KEYMAP_ROW = 8;
+KEYMAP_COL = 16;
 
 no_map = function() { return [
     [ 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0 ],
@@ -159,8 +159,8 @@ function source_output(keymaps) {
  *  +----------------+
  */
 // Keymap section address and size
-const KEYMAP_START_ADDRESS = 0x6800;
-const KEYMAP_SIZE = 0x800;
+KEYMAP_START_ADDRESS = 0x6800;
+KEYMAP_SIZE = 0x800;
 
 function hex_line(address, record_type, data) {
     var hexstr2 = function(b) {

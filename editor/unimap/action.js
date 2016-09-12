@@ -2,61 +2,61 @@
  * Action code elements
  **********************************************************************/
 // Action kind bits
-const ACT_MODS          = 0b0000;
-const ACT_LMODS         = 0b0000;
-const ACT_RMODS         = 0b0001;
-const ACT_MODS_TAP      = 0b0010;
-const ACT_LMODS_TAP     = 0b0010;
-const ACT_RMODS_TAP     = 0b0011;
-const ACT_USAGE         = 0b0100;
-const ACT_MOUSEKEY      = 0b0101;
-const ACT_LAYER         = 0b1000;
-const ACT_LAYER_EXT     = 0b1001;
-const ACT_LAYER_TAP     = 0b1010; /* Layer  0-15 */
-const ACT_LAYER_TAP_EXT = 0b1011; /* Layer 16-31 */
-const ACT_MACRO         = 0b1100;
-const ACT_BACKLIGHT     = 0b1101;
-const ACT_COMMAND       = 0b1110;
-const ACT_FUNCTION      = 0b1111;
+ACT_MODS          = 0b0000;
+ACT_LMODS         = 0b0000;
+ACT_RMODS         = 0b0001;
+ACT_MODS_TAP      = 0b0010;
+ACT_LMODS_TAP     = 0b0010;
+ACT_RMODS_TAP     = 0b0011;
+ACT_USAGE         = 0b0100;
+ACT_MOUSEKEY      = 0b0101;
+ACT_LAYER         = 0b1000;
+ACT_LAYER_EXT     = 0b1001;
+ACT_LAYER_TAP     = 0b1010; /* Layer  0-15 */
+ACT_LAYER_TAP_EXT = 0b1011; /* Layer 16-31 */
+ACT_MACRO         = 0b1100;
+ACT_BACKLIGHT     = 0b1101;
+ACT_COMMAND       = 0b1110;
+ACT_FUNCTION      = 0b1111;
 
 // Special keycodes for Layer Tap
-const OP_TAP_TOGGLE     = 0xf0;
-const OP_ON_OFF         = 0xf1;
-const OP_OFF_ON         = 0xf2;
-const OP_SET_CLEAR      = 0xf3;
+OP_TAP_TOGGLE     = 0xf0;
+OP_ON_OFF         = 0xf1;
+OP_OFF_ON         = 0xf2;
+OP_SET_CLEAR      = 0xf3;
 
 // Layer Bit operations
-const OP_BIT_AND        = 0;
-const OP_BIT_OR         = 1;
-const OP_BIT_XOR        = 2;
-const OP_BIT_SET        = 3;
+OP_BIT_AND        = 0;
+OP_BIT_OR         = 1;
+OP_BIT_XOR        = 2;
+OP_BIT_SET        = 3;
 
 // Layer Bit operation timings
-const ON_SPECIAL_USE    = 0;
-const ON_PRESS          = 1;
-const ON_RELEASE        = 2;
-const ON_BOTH           = 3;
+ON_SPECIAL_USE    = 0;
+ON_PRESS          = 1;
+ON_RELEASE        = 2;
+ON_BOTH           = 3;
 
 // Modifier bits
-const MOD_LCTL = 0x01;
-const MOD_LSFT = 0x02;
-const MOD_LALT = 0x04;
-const MOD_LGUI = 0x08;
-const MOD_RCTL = 0x11;
-const MOD_RSFT = 0x12;
-const MOD_RALT = 0x14;
-const MOD_RGUI = 0x18;
+MOD_LCTL = 0x01;
+MOD_LSFT = 0x02;
+MOD_LALT = 0x04;
+MOD_LGUI = 0x08;
+MOD_RCTL = 0x11;
+MOD_RSFT = 0x12;
+MOD_RALT = 0x14;
+MOD_RGUI = 0x18;
 
 // Special keycodes for Modifier Tap
-const MODS_ONESHOT      = 0x00;
-const MODS_TAP_TOGGLE   = 0x01;
+MODS_ONESHOT      = 0x00;
+MODS_TAP_TOGGLE   = 0x01;
 
 // Actoin Usage Page
-const PAGE_SYSTEM       = 0;
-const PAGE_CONSUMER     = 1;
+PAGE_SYSTEM       = 0;
+PAGE_CONSUMER     = 1;
 
 // Apecial opts for Function
-const FUNC_TAP = 0x08;
+FUNC_TAP = 0x08;
 
 
 

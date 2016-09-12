@@ -478,7 +478,7 @@ $(function() {
         var editor_url = document.location.origin + document.location.pathname + document.location.search;
 
         // goo.gl URL shortener
-        const GOOGLE_API_KEY = "AIzaSyCGb3QgZsj96VrtkBJVUkgnEAKQMZ5lYtA";
+        GOOGLE_API_KEY = "AIzaSyCGb3QgZsj96VrtkBJVUkgnEAKQMZ5lYtA";
         $.ajax({
             method: "POST",
             url: "https://www.googleapis.com/urlshortener/v1/url?key=" + GOOGLE_API_KEY,
@@ -500,11 +500,11 @@ $(function() {
      * Output options for debug
      **********************************************************************/
     $("#debug-output").hide();
-    $("#debug-link").click(function() {
+    $("#debug-collapse").click(function() {
         if ($("#debug-output").css("display") == "none") {
-            $("#debug-link-collapse").text("\u25b2");
+            $("#debug-collapse").text("\u25b2");
         } else {
-            $("#debug-link-collapse").text("\u25bc");
+            $("#debug-collapse").text("\u25bc");
         }
         $("#debug-output").toggle("slow");
     });
