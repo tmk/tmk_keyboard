@@ -1,0 +1,3 @@
+TARGET = m0110_rev1
+MCU = atmega32u4
+include Makefile
