@@ -49,6 +49,30 @@ CONFIG = {
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/next_usb/binary/next_usb_unimap.hex",
             firmware_format: "ihex",
             layout: "layout-next_usb.html",
-        }
+        },
+        m0110_usb: {
+            desc: "M0110-USB Converter rev.2(M0110)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/m0110_usb/binary/m0110_usb_rev2_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-m0110_usb.html",
+        },
+        m0110_usb_m0110a: {
+            desc: "M0110-USB Converter rev.2(M0110A)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/m0110_usb/binary/m0110_usb_rev2_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-m0110_usb_m0110a.html",
+        },
+        m0110_usb_rev1: {
+            desc: "M0110-USB Converter rev.1(M0110)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/m0110_usb/binary/m0110_usb_rev1_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-m0110_usb.html",
+        },
+        m0110_usb_rev1_m0110a: {
+            desc: "M0110-USB Converter rev.1(M0110A)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/m0110_usb/binary/m0110_usb_rev1_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-m0110_usb_m0110a.html",
+        },
     },
 };
