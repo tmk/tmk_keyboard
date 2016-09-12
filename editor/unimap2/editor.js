@@ -16,7 +16,7 @@ $(function() {
     if (keymap_config[variant] && keymap_config[variant].layout) {
         layout = keymap_config[variant].layout;
     }
-    
+
     // load keymap from URL hash(#...)
     var decoded = url_decode_keymap(document.location.hash.substring(1));
     if (decoded != null) {
@@ -336,6 +336,11 @@ $(function() {
         loadHexURL(keymap_config[v].firmware_url).done(function(s) {
             $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
+
+            // TODO: load layout
+            if (keymap_config[v].layout) {
+                layout_load(keymap_config[v].layout);
+            }
         }).fail(function() {
             $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
@@ -546,16 +551,15 @@ $(function() {
     /**********************************************************************
      * Load firmware from URL in config
      **********************************************************************/
+    let lh = $.Deferred().resolve();
     if (keymap_config[variant] && keymap_config[variant].firmware_url) {
         $("#firmware-dropdown").val(variant);
 
-        loadHexURL(keymap_config[variant].firmware_url).done(function(s) {
+        lh = loadHexURL(keymap_config[variant].firmware_url).done(function(s) {
             // load keymap from firmware if #hash(keymap) doesn't exist in URL
             if (!document.location.hash) {
                 keymaps = $.extend(true, [], firmware_keymaps); // copy
                 while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
-                console.log("load keymap from firmare");
-                load_keymap_on_keyboard(keymaps[editing_layer]);
             }
             $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
@@ -569,32 +573,35 @@ $(function() {
     /**********************************************************************
      * Load keyboard layout
      **********************************************************************/
-    $("#keyboard-outline").load(layout, function() {
-        // executed after loading layout and creating DOM
-        console.log(variant);
-        console.log("loaded");
+    let layout_load = function(layout) {
+        $("#keyboard-outline").load(layout, function() {
+            // executed after loading layout and creating DOM
+            /**********************************************************************
+             * Keyboard(key buttons)
+             **********************************************************************/
+            // Select key button to edit
+            $(".key").focus(function(ev) {
+                $(this).click();
+            });
+            $(".key").click(function(ev) {
+                editing_key = $(this).attr('id');
 
-        // load default keymap on startup
-        load_keymap_on_keyboard(keymaps[editing_layer]);
+                // grey-out key to indicate being under editing
+                $(".key").removeClass("key-editing");
+                $(this).addClass("key-editing");
+                var pos = get_pos(editing_key);
+                var code = keymaps[editing_layer][pos.row][pos.col];
 
-        /**********************************************************************
-         * Keyboard(key buttons)
-         **********************************************************************/
-        // Select key button to edit
-        $(".key").focus(function(ev) {
-            $(this).click();
+                action_editor_set_code(code);
+                $(this).blur();
+            });
+
+            load_keymap_on_keyboard(keymaps[editing_layer]);
         });
-        $(".key").click(function(ev) {
-            editing_key = $(this).attr('id');
+    };
 
-            // grey-out key to indicate being under editing
-            $(".key").removeClass("key-editing");
-            $(this).addClass("key-editing");
-            var pos = get_pos(editing_key);
-            var code = keymaps[editing_layer][pos.row][pos.col];
-
-            action_editor_set_code(code);
-            $(this).blur();
-        });
+    // wait for loading keymap form firmware
+    $.when(lh).then(function() {
+        layout_load(layout);
     });
 });
