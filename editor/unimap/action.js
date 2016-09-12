@@ -104,7 +104,7 @@ var kind_codes = {
 /**********************************************************************
  * Action Object
  **********************************************************************/
-function Action(code = 0) {
+function Action(code) {
     this.code = code;
 
     Object.defineProperty(this, "kind", {
