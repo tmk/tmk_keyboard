@@ -12,9 +12,9 @@ $(function() {
     let variant = document.location.search.substring(1);
 
     // keyboard layout
-    let layout = "layout-128key.html";
-    if (keymap_config[variant] && keymap_config[variant].layout) {
-        layout = keymap_config[variant].layout;
+    let layout = CONFIG.layout_default;
+    if (CONFIG.keymap[variant] && CONFIG.keymap[variant].layout) {
+        layout = CONFIG.keymap[variant].layout;
     }
 
     // load keymap from URL hash(#...)
@@ -321,25 +321,26 @@ $(function() {
     };
 
     // Base firmware - Select from config
-    for (var prod in keymap_config) {
+    for (var prod in CONFIG.keymap) {
         $("#firmware-dropdown").append($("<option></option>")
-                .attr({ value: prod, title: keymap_config[prod].desc })
-                .text(keymap_config[prod].desc));
+                .attr({ value: prod, title: CONFIG.keymap[prod].desc })
+                .text(CONFIG.keymap[prod].desc));
     }
     $("#firmware-dropdown").change(function() {
         let v = $(this).val();
         $("#firmware-download").prop("disabled", true);
         $("#keymap-load").prop("disabled", true);
 
-        if (!keymap_config[v]) { return; }
+        if (!CONFIG.keymap[v]) { return; }
         $("#firmware-dropdown").prop("disabled", true);
-        loadHexURL(keymap_config[v].firmware_url).done(function(s) {
+        loadHexURL(CONFIG.keymap[v].firmware_url).done(function(s) {
             $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
 
-            // TODO: load layout
-            if (keymap_config[v].layout) {
-                layout_load(keymap_config[v].layout);
+            if (CONFIG.keymap[v].layout) {
+                layout_load(CONFIG.keymap[v].layout);
+            } else {
+                layout_load(CONFIG.layout_default);
             }
         }).fail(function() {
             $("#firmware-download").prop("disabled", true);
@@ -552,10 +553,10 @@ $(function() {
      * Load firmware from URL in config
      **********************************************************************/
     let lh = $.Deferred().resolve();
-    if (keymap_config[variant] && keymap_config[variant].firmware_url) {
+    if (CONFIG.keymap[variant] && CONFIG.keymap[variant].firmware_url) {
         $("#firmware-dropdown").val(variant);
 
-        lh = loadHexURL(keymap_config[variant].firmware_url).done(function(s) {
+        lh = loadHexURL(CONFIG.keymap[variant].firmware_url).done(function(s) {
             // load keymap from firmware if #hash(keymap) doesn't exist in URL
             if (!document.location.hash) {
                 keymaps = $.extend(true, [], firmware_keymaps); // copy
