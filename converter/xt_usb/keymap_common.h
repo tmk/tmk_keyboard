@@ -28,10 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keymap.h"
 
 
-// 32*8(256) byte array which converts PS/2 code into USB code
-extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-extern const uint16_t fn_actions[];
-
 /* All keys */
 #define KEYMAP_ALL( \
     K00,    K02,K03,K04,K05,K06,K07,K08,K09,K0A,K0B,K0C,K0D, K0E,K0F,K0G,                   \

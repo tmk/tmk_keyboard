@@ -1,7 +1,7 @@
 Keycode Symbol Table
 ====================
 Keycodes are defined in `common/keycode.h`.
-Range of 00-A4 and E0-E7 are identical with HID Usage:
+Range of 00-A4 and E0-E7 are identical with HID Usage of Keyboard/Keypad Page(0x07):
 <http://www.usb.org/developers/devclass_docs/Hut1_11.pdf>
 Virtual keycodes are defined out of above range to support special actions.
 
@@ -186,30 +186,35 @@ KC_RGUI                             E7 Keyboard Right GUI(Windows/Apple/Meta key
 /* 
  * Virtual keycodes
  */
-/* System Control */
+/* Generic Desktop Page(0x01) - System Control */
 KC_SYSTEM_POWER     KC_PWR          System Power Down
 KC_SYSTEM_SLEEP     KC_SLEP         System Sleep
 KC_SYSTEM_WAKE      KC_WAKE         System Wake
-/* Consumer Page */
-KC_AUDIO_MUTE       KC_MUTE
-KC_AUDIO_VOL_UP     KC_VOLU
-KC_AUDIO_VOL_DOWN   KC_VOLD
-KC_MEDIA_NEXT_TRACK KC_MNXT
-KC_MEDIA_PREV_TRACK KC_MPRV
-KC_MEDIA_STOP       KC_MSTP
-KC_MEDIA_PLAY_PAUSE KC_MPLY
-KC_MEDIA_SELECT     KC_MSEL
-KC_MAIL             KC_MAIL
-KC_CALCULATOR       KC_CALC
-KC_MY_COMPUTER      KC_MYCM
-KC_WWW_SEARCH       KC_WSCH
-KC_WWW_HOME         KC_WHOM
-KC_WWW_BACK         KC_WBAK
-KC_WWW_FORWARD      KC_WFWD
-KC_WWW_STOP         KC_WSTP
-KC_WWW_REFRESH      KC_WREF
-KC_WWW_FAVORITES    KC_WFAV
-/* Mousekey */
+
+/* Consumer Page(0x07) */
+KC_AUDIO_MUTE       KC_MUTE         Mute
+KC_AUDIO_VOL_UP     KC_VOLU         Volume Increment
+KC_AUDIO_VOL_DOWN   KC_VOLD         Volume Decrement
+KC_MEDIA_NEXT_TRACK KC_MNXT         Scan Next Track
+KC_MEDIA_PREV_TRACK KC_MPRV         Scan Previous Track
+KC_MEDIA_STOP       KC_MSTP         Stop
+KC_MEDIA_FAST_FORWARD   KC_MFFD     Fast Forward
+KC_MEDIA_REWIND     KC_MRWD         Rewind
+KC_MEDIA_PLAY_PAUSE KC_MPLY         Play/Pause
+KC_EJCT             KC_MEDIA_EJECT  Stop/Eject
+KC_MEDIA_SELECT     KC_MSEL         AL Consumer Control Configuration
+KC_MAIL             KC_MAIL         AL Email Reader
+KC_CALCULATOR       KC_CALC         AL Calculator
+KC_MY_COMPUTER      KC_MYCM         AL Local Machine Browser
+KC_WWW_SEARCH       KC_WSCH         AC Search
+KC_WWW_HOME         KC_WHOM         AC Home
+KC_WWW_BACK         KC_WBAK         AC Back
+KC_WWW_FORWARD      KC_WFWD         AC Forward
+KC_WWW_STOP         KC_WSTP         AC Stop
+KC_WWW_REFRESH      KC_WREF         AC Refresh
+KC_WWW_FAVORITES    KC_WFAV         AC Bookmarks
+
+/* Mousekey - TMK specific */
 KC_MS_UP            KC_MS_U         Mouse Cursor Up
 KC_MS_DOWN          KC_MS_D         Mouse Cursor Down
 KC_MS_LEFT          KC_MS_L         Mouse Cursor Left
@@ -226,7 +231,8 @@ KC_MS_WH_RIGHT      KC_WH_R         Mouse Wheel Right
 KC_MS_ACCEL0        KC_ACL0         Mouse Acceleration 0
 KC_MS_ACCEL1        KC_ACL1         Mouse Acceleration 1
 KC_MS_ACCEL2        KC_ACL2         Mouse Acceleration 2
-/* Fn key */
+
+/* Fn key - TMK specific */
 KC_FN0
 KC_FN1
 KC_FN2

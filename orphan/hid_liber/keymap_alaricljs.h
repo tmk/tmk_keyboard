@@ -56,6 +56,6 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
-static const uint16_t PROGMEM fn_actions[] = {
+static const action_t PROGMEM fn_actions[] = {
 	[1] = ACTION_LAYER_MOMENTARY(1),		// activate layer 1 when FN1 pressed
 };

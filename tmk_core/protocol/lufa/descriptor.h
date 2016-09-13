@@ -155,7 +155,7 @@ typedef struct
 #define MOUSE_EPSIZE                8
 #define EXTRAKEY_EPSIZE             8
 #define CONSOLE_EPSIZE              32
-#define NKRO_EPSIZE                 16
+#define NKRO_EPSIZE                 32
 
 
 uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,

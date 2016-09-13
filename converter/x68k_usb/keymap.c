@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <avr/pgmspace.h>
 #include "keycode.h"
 #include "action.h"
 #include "util.h"
@@ -72,7 +71,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 
-static const uint16_t fn_actions[] PROGMEM = {
+const action_t fn_actions[] PROGMEM = {
     [0] = ACTION_FUNCTION(0),   // toggle all LEDs
 };
 
@@ -92,7 +91,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 }
 
 
-static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* X68000 Keyboard Scan codes
     ,---. ,---.    ,-------------------,    ,-------------------.  ,-----------. ,---------------.
     | 61| | 62|    | 63| 64| 65| 66| 67|    | 68| 69| 6A| 6B| 6C|  | 5A| 5B| 5C| | 5D| 52| 53| 54|
@@ -128,16 +127,3 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
          LGUI,LALT,MHEN,     SPC,      HENK,KANA,APP, ZKHK,                       F14,      F15,      P0,  PCMM,PDOT
     ),
 };
-
-
-/* translates key to keycode */
-uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
-{
-    return pgm_read_byte(&keymaps[(layer)][(key.row)][(key.col)]);
-}
-
-/* translates Fn keycode to action */
-action_t keymap_fn_to_action(uint8_t keycode)
-{
-    return (action_t){ .code = pgm_read_word(&fn_actions[FN_INDEX(keycode)]) };
-}

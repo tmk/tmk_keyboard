@@ -95,7 +95,7 @@ Note that ***higher layers have priority in the layer stack***. The firmware sta
 
 
 ### 0.3 Keymap Example
-The keymap is defined in the **`keymaps[]`** array, a 2-dimensional array of rows and columns corresponding to positions in the keyboard matrix. But most often the layers are defined using C macros to allow for easier reading and editing of the keymap files. To use complex actions you need to define `Fn` keycodes in the **`fn_actions[]`** array.
+The keymap is defined in the **`uint8_t keymaps[]`** array, a 2-dimensional array of rows and columns corresponding to positions in the keyboard matrix. But most often the layers are defined using C macros to allow for easier reading and editing of the keymap files. To use complex actions you need to define `Fn` action in the **`action_t fn_actions[]`** array.
 
 This is a keymap example for the [HHKB](http://en.wikipedia.org/wiki/Happy_Hacking_Keyboard) keyboard.
 This example has three layers: the QWERTY base layer, and two overlay layers for cursor and mousekey control, respectively.
@@ -109,7 +109,7 @@ In this example,
 
 You can find other keymap definitions in file `keymap.c` located on project directories.
 
-    static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+    const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         /* 0: Qwerty
          * ,-----------------------------------------------------------.
          * |Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|  \|  `|
@@ -167,7 +167,7 @@ You can find other keymap definitions in file `keymap.c` located on project dire
                     LGUI,LALT,          BTN1,               RALT,TRNS),
     };
 
-    static const uint16_t PROGMEM fn_actions[] = {
+    const action_t PROGMEM fn_actions[] = {
         ACTION_LAYER_MOMENTARY(1),                  // FN0
         ACTION_LAYER_TAP_KEY(2, KC_SCLN),           // FN1
         ACTION_LAYER_TOGGLE(2),                     // FN2
@@ -214,7 +214,7 @@ There are 8 modifiers which has discrimination between left and right.
 - `KC_WSCH`, `KC_WHOM`, `KC_WBAK`, `KC_WFWD`, `KC_WSTP`, `KC_WREF`, `KC_WFAV` for web browser operation
 
 ### 1.5 Fn key
-`KC_FNnn` are keycodes for `Fn` key which not given any actions at the beginning unlike most of keycodes has its own inborn action. To use these keycodes in `KEYMAP()` you need to assign action you want at first. Action of `Fn` key is defined in `fn_actions[]` and its index of the array is identical with number part of `KC_FNnn`. Thus `KC_FN0` keycode indicates the action defined in first element of the array. ***32 `Fn` keys can be defined at most.***
+`KC_FNnn` are keycodes for `Fn` key which not given any actions at the beginning unlike most of keycodes has its own inborn action. To use these keycodes in `KEYMAP()` you need to assign action you want at first. Action of `Fn` key is defined in `action_t fn_actions[]` and its index of the array is identical with number part of `KC_FNnn`. Thus `KC_FN0` keycode indicates the action defined in first element of the array. ***32 `Fn` keys can be defined at most.***
 
 ### 1.6 Keycode Table
  See keycode table in [`doc/keycode.txt`](./keycode.txt) for description of keycodes.
@@ -443,7 +443,7 @@ To define tappable `Function` action in keymap use this.
 #### 2.4.3 Implement user function
 `Function` actions can be defined freely with C by user in callback function:
 
-    void keymap_call_function(keyrecord_t *event, uint8_t id, uint8_t opt)
+    void action_function(keyrecord_t *record, uint8_t id, uint8_t opt);
 
 This C function is called every time key is operated, argument `id` selects action to be performed and `opt` can be used for option. Function `id` can be 0-255 and `opt` can be 0-15.
 
@@ -598,13 +598,13 @@ Legacy Keymap uses two arrays `fn_layer[]` and `fn_keycode[]` to define Fn key. 
 
 In following setting example, `Fn0`, `Fn1` and `Fn2` switch layer to 1, 2 and 2 respectively. `Fn2` registers `Space` key when tapping while `Fn0` and `Fn1` doesn't send any key.
 
-    static const uint8_t PROGMEM fn_layer[] = {
+    const uint8_t PROGMEM fn_layer[] = {
         1,              // Fn0
         2,              // Fn1
         2,              // Fn2
     };
 
-    static const uint8_t PROGMEM fn_keycode[] = {
+    const uint8_t PROGMEM fn_keycode[] = {
         KC_NO,          // Fn0
         KC_NO,          // Fn1
         KC_SPC,         // Fn2

@@ -108,7 +108,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 /*
  * Fn action definition
  */
-const uint16_t PROGMEM fn_actions[] = {
+const action_t PROGMEM fn_actions[] = {
     [0] = ACTION_LAYER_MOMENTARY(1),
     [1] = ACTION_LAYER_TAP_KEY(2, KC_SPACE),
     [2] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),    // tilde

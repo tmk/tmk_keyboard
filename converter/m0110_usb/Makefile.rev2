@@ -1,0 +1,3 @@
+TARGET = m0110_usb_rev2
+MCU = atmega32u2
+include Makefile

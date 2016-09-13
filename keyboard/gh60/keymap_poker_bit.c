@@ -40,7 +40,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,          UP,   \
         TRNS,TRNS,TRNS,          TRNS,                    TRNS,LEFT,DOWN,RGHT),
 };
-const uint16_t PROGMEM fn_actions[] = {
+const action_t PROGMEM fn_actions[] = {
     /* Poker Layout */
     [0] = ACTION_LAYER_BIT_XOR(1, 0b0101, ON_BOTH),   // Poker Fn(with fix for Esc)
     [1] = ACTION_LAYER_TOGGLE(5),                     // Poker Arrow toggle

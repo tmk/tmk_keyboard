@@ -40,10 +40,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LOCKING_RESYNC_ENABLE
 
 
-/* legacy keymap support */
-#define USE_LEGACY_KEYMAP
-
-
 /* ADB port setting */
 #define ADB_PORT        PORTD
 #define ADB_PIN         PIND

@@ -1,32 +1,41 @@
 # Target file name (without extension).
-TARGET = m0110_lufa
+TARGET ?= m0110_usb
 
 # Directory common source filess exist
-TMK_DIR = ../../tmk_core
+TMK_DIR ?= ../../tmk_core
 
 # Directory keyboard dependent files exist
-TARGET_DIR = .
+TARGET_DIR ?= .
 
 # keyboard dependent files
-SRC =	matrix.c \
+SRC ?=	matrix.c \
 	led.c \
-	keymap_common.c \
 	m0110.c
 
-# To use own keymap file run make like: make keymap=hasu
-ifdef KEYMAP
-    SRC += keymap_$(KEYMAP).c
+#
+# Keymap file
+#
+ifdef UNIMAP_ENABLE
+    KEYMAP_FILE = unimap
 else
-    SRC += keymap_default.c
+    ifdef ACTIONMAP_ENABLE
+	KEYMAP_FILE = actionmap
+    else
+	KEYMAP_FILE = keymap
+    endif
+endif
+ifdef KEYMAP
+    SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
+else
+    SRC := $(KEYMAP_FILE).c $(SRC)
 endif
 
-CONFIG_H = config.h
+CONFIG_H ?= config.h
 
 
 # MCU name, you MUST set this to match the board you are using
 # type "make clean" after changing this, so all files will be rebuilt
-MCU = atmega32u2       # TMK converter rev2
-#MCU = atmega32u4       # TMK converter rev1
+MCU ?= atmega32u2
 
 
 # Processor frequency.
@@ -34,14 +43,14 @@ MCU = atmega32u2       # TMK converter rev2
 #   so your program will run at the correct speed.  You should also set this
 #   variable to same clock speed.  The _delay_ms() macro uses this, and many
 #   examples use this variable to calculate timings.  Do not add a "UL" here.
-F_CPU = 16000000
+F_CPU ?= 16000000
 
 
 #
 # LUFA specific
 #
 # Target architecture (see library "Board Types" documentation).
-ARCH = AVR8
+ARCH ?= AVR8
 
 # Input clock frequency.
 #     This will define a symbol, F_USB, in all source code files equal to the
@@ -54,7 +63,7 @@ ARCH = AVR8
 #
 #     If no clock division is performed on the input clock inside the AVR (via the
 #     CPU clock adjust registers or the clock division fuses), this will be equal to F_CPU.
-F_USB = $(F_CPU)
+F_USB ?= $(F_CPU)
 
 # Interrupt driven control endpoint task
 OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
@@ -70,19 +79,19 @@ OPT_DEFS += -DBOOTLOADER_SIZE=4096
 # Build Options
 #   *Comment out* to disable the options.
 #
-#BOOTMAGIC_ENABLE = yes	# Virtual DIP switch configuration(+1000)
-MOUSEKEY_ENABLE = yes	# Mouse keys(+4700)
-EXTRAKEY_ENABLE = yes	# Audio control and System control(+450)
-CONSOLE_ENABLE = yes	# Console for debug(+400)
-COMMAND_ENABLE = yes    # Commands for debug and configuration
-#SLEEP_LED_ENABLE = yes  # Breathing sleep LED during USB suspend
-#NKRO_ENABLE = yes	# USB Nkey Rollover - not yet supported in LUFA
-#KEYMAP_SECTION_ENABLE = yes	# fixed address keymap for keymap editor
+#BOOTMAGIC_ENABLE ?= yes	# Virtual DIP switch configuration(+1000)
+MOUSEKEY_ENABLE ?= yes	# Mouse keys(+4700)
+EXTRAKEY_ENABLE ?= yes	# Audio control and System control(+450)
+CONSOLE_ENABLE ?= yes	# Console for debug(+400)
+COMMAND_ENABLE ?= yes    # Commands for debug and configuration
+#SLEEP_LED_ENABLE ?= yes  # Breathing sleep LED during USB suspend
+#NKRO_ENABLE ?= yes	# USB Nkey Rollover - not yet supported in LUFA
+#KEYMAP_SECTION_ENABLE ?= yes	# fixed address keymap for keymap editor
 
 
 
 #---------------- Programming Options --------------------------
-PROGRAM_CMD = teensy_loader_cli -mmcu=$(MCU) -w -v $(TARGET).hex
+PROGRAM_CMD ?= teensy_loader_cli -mmcu=$(MCU) -w -v $(TARGET).hex
 
 
 # Search Path

@@ -9,7 +9,6 @@ OBJDIR = ./build
 
 OBJECTS = \
 	$(OBJDIR)/matrix.o \
-	$(OBJDIR)/keymap_common.o \
 	$(OBJDIR)/led.o \
 	$(OBJDIR)/main.o
 

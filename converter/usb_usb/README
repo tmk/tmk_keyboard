@@ -1,21 +1,31 @@
 USB to USB keyboard protocol converter
 ======================================
+See for detail and discussion.
+https://geekhack.org/index.php?topic=69169.0
+
 
 Hardware requirement
 --------------------
-Arduino Leonardo
-    http://arduino.cc/en/Main/ArduinoBoardLeonardo 
+There are two options.
 
-Circuit@Home USB Host Shield 2.0
+### TMK USB-USB Converter
+You can buy a fully assembled converter from me here.
+
+    https://geekhack.org/index.php?topic=69169.0
+
+### Arduino Leonardo + Circuit@Home USB Host Shield 2.0
+Buying Arduino Leonardo and USB Host Shield 2.0(from Circuit@home) will be better, you won't need even soldering iron.
+
+    http://arduino.cc/en/Main/ArduinoBoardLeonardo 
     https://www.circuitsathome.com/products-page/arduino-shields/usb-host-shield-2-0-for-arduino-assembled/
 
-Buying Arduino Leonardo and USB Host Shield 2.0(from Circuit@home) will be the easiest way, you won't need even soldering iron.
-Arduino's Shield will also work well but I think Sparkfun's needs to be modified.
+Other compatible boards like Arduino's Shield will also work well but I think Sparkfun's needs to be modified.
 
     http://arduino.cc/en/Main/ArduinoUSBHostShield
     https://www.sparkfun.com/products/9947
 
 Also Pro Micro 3.3V(not Mini) or Teensy with mini host shield will work with some fixes on signal/power routing.
+
     https://www.circuitsathome.com/products-page/arduino-shields/usb-host-shield-for-arduino-pro-mini
     https://www.sparkfun.com/products/12587
     https://www.pjrc.com/teensy/td_libs_USBHostShield.html
@@ -24,6 +34,8 @@ Also Pro Micro 3.3V(not Mini) or Teensy with mini host shield will work with som
 
 Build firmware
 --------------
+Build.
+
     $ git clone git://github.com/tmk/tmk_keyboard.git
     $ cd tmk_keyboard
     $ git submodule init
@@ -31,7 +43,12 @@ Build firmware
     $ cd converter/usb_usb
     $ make
 
-Program converter. Push reset button on Leonardo before run this command. Serial port name(COM17) depends your system. On Linux I got /dev/ttyACM0.
+And Program converter. Push button on TMK converter and just run this.
+
+    $ make dfu
+
+
+In case of Leonardo push reset button then run command. Serial port name(COM17) depends your system. On Linux I got /dev/ttyACM0.
 
     $ DEV=COM17 make program
     or
@@ -44,13 +61,22 @@ Limitation
 Only supports 'HID Boot protocol'.
 Not support keyboard LED yet.
 
-Note that the converter can host only USB "boot protocol" keyboard(6KRO) and not NKRO, it is possible to support NKRO keyboard but you will need to write HID report parser for that. Every NKRO keyboard can have different HID report and it is difficult to support all kind of NKRO keyboards in the market.
+Note that the converter can host only USB "boot protocol" keyboard(6KRO), not NKRO, it is possible to support NKRO keyboard but you will need to write HID report parser for that. Every NKRO keyboard can have different HID report and it is difficult to support all kind of NKRO keyboards in the market.
+
+
+
+Keymap editor
+-------------
+You can editor keymap and download firmware with web brwoser.
+
+- http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?usb_usb
 
 
 
 Update
 ------
 2014/12/11  Added Hub support(confirmed with HHKB pro2)
+2016/09/10  Unimap editor support
 
 
 

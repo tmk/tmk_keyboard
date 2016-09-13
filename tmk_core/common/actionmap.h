@@ -24,10 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
 
-/* Keymapping with 16bit action codes */
-extern const uint16_t actionmaps[][MATRIX_ROWS][MATRIX_COLS];
-
-
 /* Modified key */
 #define AC_c(kc)                ACTION_MODS_KEY(MOD_LCTL, KC_##kc)
 #define AC_s(kc)                ACTION_MODS_KEY(MOD_LSFT, KC_##kc)

@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keymap.h"
 
 extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-extern const uint16_t fn_actions[];
+extern const action_t fn_actions[];
 
 #define KEYMAP( \
         K08,      K09, K18, K19, K28, K29, K38, K39, K48, K49, K58, K59, K68,    K69, K88, K89, \

@@ -1,0 +1,51 @@
+Unimap
+======
+universal keymapping framework
+using logical 128-key keyboard layout independent from physical keyboad matrix
+
+unimap is actually an actionmap whose size is row:8xcol:16.
+
+/* Keymapping with 16bit action codes */
+extern const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS];
+
+/* Universal 128-key keyboard layout(8x16)
+        ,-----------------------------------------------.
+        |F13|F14|F15|F16|F17|F18|F19|F20|F21|F22|F23|F24|
+,---.   |-----------------------------------------------|     ,-----------.     ,-----------.
+|Esc|   |F1 |F2 |F3 |F4 |F5 |F6 |F7 |F8 |F9 |F10|F11|F12|     |PrS|ScL|Pau|     |VDn|VUp|Mut|
+`---'   `-----------------------------------------------'     `-----------'     `-----------'
+,-----------------------------------------------------------. ,-----------. ,---------------.
+|  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY|Bsp| |Ins|Hom|PgU| |NmL|  /|  *|  -|
+|-----------------------------------------------------------| |-----------| |---------------|
+|Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|  \  | |Del|End|PgD| |  7|  8|  9|  +|
+|-----------------------------------------------------------| `-----------' |---------------|
+|CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  #|Retn|               |  4|  5|  6|KP,|
+|-----------------------------------------------------------|     ,---.     |---------------|
+|Shft|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  ,|  /| RO|Shift |     |Up |     |  1|  2|  3|KP=|
+|-----------------------------------------------------------| ,-----------. |---------------|
+|Ctl|Gui|Alt|MHEN|     Space      |HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  0    |  .|Ent|
+`-----------------------------------------------------------' `-----------' `---------------'
+App:         Windows Menu key
+Gui:         Windows key, Mac ⌘ key or Meta key
+VDn Vup Mut: Volume control
+< #:         ISO keys(in UK legend)
+KP=:         Keypad = for Mac
+KP,:         Brazilian Keypad Comma
+JPY:         Japanese Yen(￥)
+RO:          Japanese ろ(Ro) or Brazilian /(Slash)
+MHEN:        Japanese 無変換(Non Conversion) or Korean Hanja
+HENK:        Japanese 変換(Conversion) or Korean Hangul/English
+KANA:        Japanese かな(Hiragana/Katakana)
+https://en.wikipedia.org/wiki/Keyboard_layout#Japanese
+https://en.wikipedia.org/wiki/Keyboard_layout#Hangul_.28for_Korean.29
+*/
+
+
+when refering to keymapping physical matrix position needed to be translated into logical one on unimap
+the translation is defined in unimap array
+
+row and col of unimap positon is encoded as follows
+position = (row << 4) | col
+
+// table translates matrix to universal keymap
+extern const uint8_t unimap_trans[MATRIX_ROWS][MATRIX_COLS];

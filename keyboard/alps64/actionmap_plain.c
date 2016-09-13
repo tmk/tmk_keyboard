@@ -1,4 +1,3 @@
-#include <avr/pgmspace.h>
 #include "actionmap.h"
 #include "action_code.h"
 #include "actionmap_common.h"
@@ -10,7 +9,7 @@
 #define AC_LM1      ACTION_LAYER_MOMENTARY(1)                   // HHKB layer
 
 
-const uint16_t PROGMEM actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const action_t PROGMEM actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Default Layer
      * ,-----------------------------------------------------------.
      * |Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|BSpc   |

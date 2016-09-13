@@ -1,5 +1,5 @@
 /*
-Copyright 2013 Jun Wako <wakojun@gmail.com>
+Copyright 2013,2016 Jun Wako <wakojun@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wait.h"
 #include "debug.h"
 #include "bootloader.h"
+#if defined(__AVR__)
+#include <avr/pgmspace.h>
+#endif
 
 #ifdef BOOTMAGIC_ENABLE
 extern keymap_config_t keymap_config;
@@ -32,6 +35,7 @@ static action_t keycode_to_action(uint8_t keycode);
 
 
 /* converts key to action */
+__attribute__ ((weak))
 action_t action_for_key(uint8_t layer, keypos_t key)
 {
     uint8_t keycode = keymap_key_to_keycode(layer, key);
@@ -53,7 +57,7 @@ action_t action_for_key(uint8_t layer, keypos_t key)
         case KC_LALT:
             if (keymap_config.swap_lalt_lgui) {
                 if (keymap_config.no_gui) {
-                    return keycode_to_action(ACTION_NO);
+                    return keycode_to_action(KC_NO);
                 }
                 return keycode_to_action(KC_LGUI);
             }
@@ -63,13 +67,13 @@ action_t action_for_key(uint8_t layer, keypos_t key)
                 return keycode_to_action(KC_LALT);
             }
             if (keymap_config.no_gui) {
-                return keycode_to_action(ACTION_NO);
+                return keycode_to_action(KC_NO);
             }
             return keycode_to_action(KC_LGUI);
         case KC_RALT:
             if (keymap_config.swap_ralt_rgui) {
                 if (keymap_config.no_gui) {
-                    return keycode_to_action(ACTION_NO);
+                    return keycode_to_action(KC_NO);
                 }
                 return keycode_to_action(KC_RGUI);
             }
@@ -79,7 +83,7 @@ action_t action_for_key(uint8_t layer, keypos_t key)
                 return keycode_to_action(KC_RALT);
             }
             if (keymap_config.no_gui) {
-                return keycode_to_action(ACTION_NO);
+                return keycode_to_action(KC_NO);
             }
             return keycode_to_action(KC_RGUI);
         case KC_GRAVE:
@@ -133,23 +137,22 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 /* translates keycode to action */
 static action_t keycode_to_action(uint8_t keycode)
 {
-    action_t action = {};
     switch (keycode) {
         case KC_A ... KC_EXSEL:
         case KC_LCTRL ... KC_RGUI:
-            action.code = ACTION_KEY(keycode);
+            return (action_t)ACTION_KEY(keycode);
             break;
         case KC_SYSTEM_POWER ... KC_SYSTEM_WAKE:
-            action.code = ACTION_USAGE_SYSTEM(KEYCODE2SYSTEM(keycode));
+            return (action_t)ACTION_USAGE_SYSTEM(KEYCODE2SYSTEM(keycode));
             break;
         case KC_AUDIO_MUTE ... KC_WWW_FAVORITES:
-            action.code = ACTION_USAGE_CONSUMER(KEYCODE2CONSUMER(keycode));
+            return (action_t)ACTION_USAGE_CONSUMER(KEYCODE2CONSUMER(keycode));
             break;
         case KC_MS_UP ... KC_MS_ACCEL2:
-            action.code = ACTION_MOUSEKEY(keycode);
+            return (action_t)ACTION_MOUSEKEY(keycode);
             break;
         case KC_TRNS:
-            action.code = ACTION_TRANSPARENT;
+            return (action_t)ACTION_TRANSPARENT;
             break;
         case KC_BOOTLOADER:
             clear_keyboard();
@@ -157,10 +160,10 @@ static action_t keycode_to_action(uint8_t keycode)
             bootloader_jump(); // not return
             break;
         default:
-            action.code = ACTION_NO;
+            return (action_t)ACTION_NO;
             break;
     }
-    return action;
+    return (action_t)ACTION_NO;
 }
 
 
@@ -170,6 +173,28 @@ static action_t keycode_to_action(uint8_t keycode)
  * Legacy keymap support
  *      Consider using new keymap API instead.
  */
+extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
+extern const uint8_t fn_layer[];
+extern const uint8_t fn_keycode[];
+
+__attribute__ ((weak))
+uint8_t keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t col)
+{
+    return pgm_read_byte(&keymaps[(layer)][(row)][(col)]);
+}
+
+__attribute__ ((weak))
+uint8_t keymap_fn_layer(uint8_t index)
+{
+    return pgm_read_byte(&fn_layer[index]);
+}
+
+__attribute__ ((weak))
+uint8_t keymap_fn_keycode(uint8_t index)
+{
+    return pgm_read_byte(&fn_keycode[index]);
+}
+
 __attribute__ ((weak))
 uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
 {
@@ -181,21 +206,47 @@ uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
 __attribute__ ((weak))
 action_t keymap_fn_to_action(uint8_t keycode)
 {
-    action_t action = { .code = ACTION_NO };
     switch (keycode) {
         case KC_FN0 ... KC_FN31:
             {
                 uint8_t layer = keymap_fn_layer(FN_INDEX(keycode));
                 uint8_t key = keymap_fn_keycode(FN_INDEX(keycode));
                 if (key) {
-                    action.code = ACTION_LAYER_TAP_KEY(layer, key);
+                    return (action_t)ACTION_LAYER_TAP_KEY(layer, key);
                 } else {
-                    action.code = ACTION_LAYER_MOMENTARY(layer);
+                    return (action_t)ACTION_LAYER_MOMENTARY(layer);
                 }
             }
-            return action;
+            return (action_t)ACTION_NO;
         default:
-            return action;
+            return (action_t)ACTION_NO;
     }
 }
+
+#else
+
+/* user keymaps should be defined somewhere */
+extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
+extern const action_t fn_actions[];
+
+__attribute__ ((weak))
+uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
+{
+#if defined(__AVR__)
+    return pgm_read_byte(&keymaps[(layer)][(key.row)][(key.col)]);
+#else
+    return keymaps[(layer)][(key.row)][(key.col)];
+#endif
+}
+
+__attribute__ ((weak))
+action_t keymap_fn_to_action(uint8_t keycode)
+{
+#if defined(__AVR__)
+    return (action_t)pgm_read_word(&fn_actions[FN_INDEX(keycode)]);
+#else
+    return fn_actions[FN_INDEX(keycode)];
+#endif
+}
+
 #endif

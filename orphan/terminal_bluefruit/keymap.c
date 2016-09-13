@@ -177,7 +177,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 
-static const uint16_t fn_actions[] PROGMEM = {
+static const action_t fn_actions[] PROGMEM = {
     [0] = ACTION_DEFAULT_LAYER_SET(0),
     [1] = ACTION_LAYER_MOMENTARY(1),
     [2] = ACTION_LAYER_MOMENTARY(2), //ACTION_LAYER_ON(2, ON_RELEASE),

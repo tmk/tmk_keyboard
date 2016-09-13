@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <avr/pgmspace.h>
 #include "keycode.h"
 #include "action.h"
 #include "action_macro.h"
@@ -72,7 +71,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
   ,---------------------------------------------------------------.
   | 60| 61| 62| 63| 64| 65| 66| 67| 68| 69| 6A| 6B| 36| 37| 3F| 3E|
@@ -114,7 +113,6 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
               LGUI, LALT, LCTL, LSFT,      SPC,      SPC,   RALT
     ),
 };
-static const uint8_t PROGMEM overlays[][MATRIX_ROWS][MATRIX_COLS] = {};
 
 /*
  * Macro definition
@@ -163,7 +161,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 /*
  * Fn actions
  */
-static const uint16_t PROGMEM fn_actions[] = {
+const action_t PROGMEM fn_actions[] = {
     ACTION_LAYER_TAP_TOGGLE(0),                  // FN0
     ACTION_LAYER_TAP_KEY(1, KC_SLASH),           // FN1
     ACTION_LAYER_TAP_KEY(2, KC_SCLN),            // FN2
@@ -172,37 +170,3 @@ static const uint16_t PROGMEM fn_actions[] = {
     ACTION_MACRO(RBRACKET),                      // FN5
     ACTION_MACRO(DUMMY),                         // FN6
 };
-
-
-
-
-
-
-/*
- * No need to edit.
- */
-#define KEYMAPS_SIZE    (sizeof(keymaps) / sizeof(keymaps[0]))
-#define FN_ACTIONS_SIZE (sizeof(fn_actions) / sizeof(fn_actions[0]))
-
-/* translates key to keycode */
-uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
-{
-    if (layer < KEYMAPS_SIZE) {
-        return pgm_read_byte(&keymaps[(layer)][(key.row)][(key.col)]);
-    } else {
-        // fall back to layer 0
-        return pgm_read_byte(&keymaps[0][(key.row)][(key.col)]);
-    }
-}
-
-/* translates Fn keycode to action */
-action_t keymap_fn_to_action(uint8_t keycode)
-{
-    action_t action;
-    if (FN_INDEX(keycode) < FN_ACTIONS_SIZE) {
-        action.code = pgm_read_word(&fn_actions[FN_INDEX(keycode)]);
-    } else {
-        action.code = ACTION_NO;
-    }
-    return action;
-}
