@@ -451,12 +451,17 @@ $(function() {
 
         // download hex file
         var blob = new Blob([content], {type: "application/octet-stream"});
-        var hex_link = $("#hex-download");
-        hex_link.attr('href', window.URL.createObjectURL(blob));
-        hex_link.attr('download', "unimap.hex");
-        // jQuery click() doesn't work straight for 'a' element
-        // http://stackoverflow.com/questions/1694595/
-        hex_link[0].click();
+        // For MicroSoft IE and Edge support
+        if (window.navigator.msSaveBlob) {
+            window.navigator.msSaveBlob(blob, "unimap.hex");
+        } else {
+            var hex_link = $("#hex-download");
+            hex_link.attr('href', window.URL.createObjectURL(blob));
+            hex_link.attr('download', "unimap.hex");
+            // jQuery click() doesn't work straight for 'a' element
+            // http://stackoverflow.com/questions/1694595/
+            hex_link[0].click();
+        }
     });
 
 
