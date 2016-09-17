@@ -55,22 +55,18 @@ const action_t PROGMEM fn_actions[] = {
     [2]  = ACTION_LAYER_TAP_KEY(3, KC_TAB),
     [3]  = ACTION_FUNCTION(GNAPLED_TOGGLE),
     [4]  = ACTION_FUNCTION(GNAPLED_STEP_MODE),
-	[5]  = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),
-	[6]  = ACTION_MODS_KEY(MOD_LSFT, KC_1),
-	[7]  = ACTION_MODS_KEY(MOD_LSFT, KC_2),
-	[8]  = ACTION_MODS_KEY(MOD_LSFT, KC_3),
-	[9]  = ACTION_MODS_KEY(MOD_LSFT, KC_4),
-	[10] = ACTION_MODS_KEY(MOD_LSFT, KC_5),
-	[11] = ACTION_MODS_KEY(MOD_LSFT, KC_6),
-	[12] = ACTION_MODS_KEY(MOD_LSFT, KC_7),
-	[13] = ACTION_MODS_KEY(MOD_LSFT, KC_8),
-	[14] = ACTION_MODS_KEY(MOD_LSFT, KC_9),
-	[15] = ACTION_MODS_KEY(MOD_LSFT, KC_0),
+    [5]  = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),
+    [6]  = ACTION_MODS_KEY(MOD_LSFT, KC_1),
+    [7]  = ACTION_MODS_KEY(MOD_LSFT, KC_2),
+    [8]  = ACTION_MODS_KEY(MOD_LSFT, KC_3),
+    [9]  = ACTION_MODS_KEY(MOD_LSFT, KC_4),
+    [10] = ACTION_MODS_KEY(MOD_LSFT, KC_5),
+    [11] = ACTION_MODS_KEY(MOD_LSFT, KC_6),
+    [12] = ACTION_MODS_KEY(MOD_LSFT, KC_7),
+    [13] = ACTION_MODS_KEY(MOD_LSFT, KC_8),
+    [14] = ACTION_MODS_KEY(MOD_LSFT, KC_9),
+    [15] = ACTION_MODS_KEY(MOD_LSFT, KC_0),
 };
-
-void matrix_init_user(void) {
-
-}
 
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt) {
   switch (id) {
@@ -89,9 +85,9 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt) {
 
 //GNAP keymap functions
 void gnaplight_step(void) {
-	serial_send(101);
+    serial_send(101);
 }
 
 void gnaplight_toggle(void) {
-	serial_send(100);
+    serial_send(100);
 }

@@ -142,7 +142,7 @@ void keyboard_task(void)
                     // record a processed key
                     matrix_prev[r] ^= ((matrix_row_t)1<<c);
 #ifdef GNAP_ENABLE
-					//send single byte with value of row column
+                    //send single byte with value of row column
                     serial_send((r*16)+c);
 #endif
                     // process a key per task call
