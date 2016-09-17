@@ -27,7 +27,6 @@ CONFIG = {
         },
         adb_usb: {
             desc: "ADB-USB Converter(new; ATMega32u2)",
-            id: "adb_usb",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/adb_usb/binary/adb_usb_rev2_unimap.hex",
             firmware_format: "ihex",
             layout: "layout-adb_usb.html",
@@ -73,6 +72,18 @@ CONFIG = {
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/m0110_usb/binary/m0110_usb_rev1_unimap.hex",
             firmware_format: "ihex",
             layout: "layout-m0110_usb_m0110a.html",
+        },
+        ps2_usb: {
+            desc: "PS/2-USB Converter(Rev.2 ATMega32u2)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ps2_usb/binary/ps2_usb_rev2_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-128key.html",
+        },
+        ps2_usb_rev1: {
+            desc: "PS/2-USB Converter(Rev.1 ATMega32u4)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ps2_usb/binary/ps2_usb_rev1_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-128key.html",
         },
     },
 };
