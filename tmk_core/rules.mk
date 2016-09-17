@@ -506,7 +506,10 @@ extcoff: $(TARGET).elf
 	@echo $(MSG_EXTENDED_COFF) $(TARGET).cof
 	$(COFFCONVERT) -O coff-ext-avr $< $(TARGET).cof
 
-
+# Convert hex to bin.
+flashbin: $(TARGET).hex
+	$(OBJCOPY) -Iihex -Obinary $(TARGET).hex $(TARGET).bin
+	$(COPY) $(TARGET).bin FLASH.bin; 
 
 # Create final output files (.hex, .eep) from ELF output file.
 %.hex: %.elf
@@ -603,6 +606,7 @@ clean_list :
 	$(REMOVE) $(TARGET).map
 	$(REMOVE) $(TARGET).sym
 	$(REMOVE) $(TARGET).lss
+	$(REMOVE) $(TARGET).bin
 	$(REMOVE) $(OBJ)
 	$(REMOVE) $(LST)
 	$(REMOVE) $(OBJ:.o=.s)
