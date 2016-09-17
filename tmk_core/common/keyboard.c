@@ -43,6 +43,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef ADB_MOUSE_ENABLE
 #include "adb.h"
 #endif
+#ifdef GNAP_ENABLE
+#   include "protocol/serial.h"
+#endif
 
 
 #ifdef MATRIX_HAS_GHOST
@@ -138,6 +141,10 @@ void keyboard_task(void)
                     hook_matrix_change(e);
                     // record a processed key
                     matrix_prev[r] ^= ((matrix_row_t)1<<c);
+#ifdef GNAP_ENABLE
+					//send single byte with value of row column
+                    serial_send((r*16)+c);
+#endif
                     // process a key per task call
                     goto MATRIX_LOOP_END;
                 }
