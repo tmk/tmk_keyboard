@@ -12,7 +12,7 @@ Pinout
 	Rows D1, D0, D4, C6 
 	Cols D7, E6, B4, B5, B6, B2, B3, B1, F7, F6, F5, F4
 	
-gnap.c contains functions to send bytes to the LED controller. The Arduino code interprets these to change modes or brightness.
+keymap_gnap.c contains functions to send bytes to the LED controller. The Arduino code interprets these to change modes or brightness.
 
 	//GNAP keymap functions
 	void gnaplight_step(void) {
