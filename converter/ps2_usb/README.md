@@ -5,36 +5,30 @@ This firmware converts PS/2 keyboard protocol to USB.(It supports Scan Code Set 
 
 Connect Wires
 -------------
-In case of Teensy2.0(ATMega32U4):
-
 1. Connect **Vcc** and **GND**.
 2. Connect **Clock** and **Data** line. 
     - **Interrupt**:   **Clock** is on `PD1` and **Data** on `PD0`.(Recommended. Soarer's converter compatible)
     - **Busywait**:    **Clock** is on `PD1` and **Data** on `PD0`.
     - **USART**:       **Clock** is on `PD5` and **Data** on `PD2`.
-3. Optionally you need pull-up resistor. 1K-10K Ohm is OK.
+3. You need pull-up resistors. 1K-10K Ohm would be fine.
 
 To change pin configuration edit **config.h** and **Makefile**.
 
 
 Build Firmware
 --------------
-For **PJRC Teensy** just run `make`:
+For **TMK converter Rev.2**:
 
-    $ make clean
-    $ make
+    $ make -f Makefile.rev2 clean
+    $ make -f Makefile.rev2 KEYMAP=plain
 
-To select keymap:
+To program firmware push the button on converter and run:
 
-    $ make clean
-    $ make KEYMAP=[plain|jis|spacefn|...]
-
-After that you will find HEX file `ps2_usb_lufa.hex` in current directory.
+    $ make -f Makefile.rev2 KEYMAP=plain dfu
 
 
-- For **TMK converter Rev.1** use `make -f Makefile.tmk_rev1` instead of `make` and HEX file is `ps2_usb_tmk_rev1.hex`.
-
-- For **TMK converter Rev.2** use `make -f Makefile.tmk_rev2` instead of `make` and HEX file is `ps2_usb_tmk_rev2.hex`.
+- For **TMK converter Rev.1** use `make -f Makefile.rev1` instead.
+- To select keymap use `jis`, `spacefn` or your own in place of `plain`.
 
 
 Keymap
