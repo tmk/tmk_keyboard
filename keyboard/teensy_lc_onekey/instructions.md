@@ -7,7 +7,7 @@ You'll need to install an ARM toolchain, for instance from [gcc ARM embedded](ht
 Next, you'll need ChibiOS. For Teensies, you'll need code from two repositories: [chibios-main](https://github.com/ChibiOS/ChibiOS) and [chibios-contrib](https://github.com/ChibiOS/ChibiOS-Contrib).
 If you're not using git, you can just download a [zip of chibios from here](https://github.com/ChibiOS/ChibiOS/archive/a7df9a891067621e8e1a5c2a2c0ceada82403afe.zip), unpack the zip, and rename/move the unpacked directory (named `ChibiOS-<long_hash_here>`) to `tmk_core/tool/chibios/ChibiOS` (so that the file `tmk_core/tool/chibios/ChibiOS/license.txt` exists). Now the same procedure with a [zip of chibios-contrib from here](https://github.com/ChibiOS/ChibiOS-Contrib/archive/e1311c4db6cd366cf760673f769e925741ac0ad3.zip): unpack and move `ChibiOS-Contrib-<long_hash_here>` to `tmk_core/tool/chibios/ChibiOS-Contrib`.
 
-If you're using git, you can just clone the two repos inside `tmk_core/tools/chibios`: [chibios](https://github.com/ChibiOS/ChibiOS) and [chibios-contrib](https://github.com/ChibiOS/ChibiOS-Contrib).
+If you're using git, you can just clone the two repos inside `tmk_core/tool/chibios`: [chibios](https://github.com/ChibiOS/ChibiOS) and [chibios-contrib](https://github.com/ChibiOS/ChibiOS-Contrib).
 
 (Why do we need chibios-contrib? Well, the main repo focuses on STM32 chips, and Freescale/NXP Kinetis chips are supported via the Contrib repository.)
 
