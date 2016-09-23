@@ -25,8 +25,8 @@ keypos_t unimap_translate(keypos_t key)
         unimap_trans[key.row][key.col];
 #endif
     return (keypos_t) {
-        .row = ((unimap_pos & 0x70) >> 4),
-        .col = (unimap_pos & 0x0F)
+        .row = ((unimap_pos & 0xf0) >> 4),
+        .col = (unimap_pos & 0x0f)
     };
 }
 
@@ -35,11 +35,13 @@ __attribute__ ((weak))
 action_t action_for_key(uint8_t layer, keypos_t key)
 {
     keypos_t uni = unimap_translate(key);
-    if ((uni.row << 4 | uni.col) == UNIMAP_NO) return (action_t)ACTION_NO;
+    if ((uni.row << 4 | uni.col) == UNIMAP_NO) {
+        return (action_t)ACTION_NO;
+    }
 #if defined(__AVR__)
-    return (action_t)pgm_read_word(&actionmaps[(layer)][(uni.row)][(uni.col)]);
+    return (action_t)pgm_read_word(&actionmaps[(layer)][(uni.row & 0x7)][(uni.col)]);
 #else
-    return actionmaps[(layer)][(uni.row)][(uni.col)];
+    return actionmaps[(layer)][(uni.row & 0x7)][(uni.col)];
 #endif
 }
 

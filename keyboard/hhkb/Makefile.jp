@@ -1,4 +1,3 @@
 TARGET = hhkb_jp
 HHKB_JP = yes
-NKRO_ENABLE = no
 include Makefile

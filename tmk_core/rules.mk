@@ -420,6 +420,13 @@ flip: $(TARGET).hex
 	batchisp -hardware usb -device $(MCU) -operation start reset 0
 
 dfu: $(TARGET).hex
+	@echo -n dfu-programmer: waiting
+	@until dfu-programmer $(MCU) get bootloader-version > /dev/null 2>&1; do \
+		echo  -n "."; \
+		sleep 1; \
+	done
+	@echo
+
 ifneq (, $(findstring 0.7, $(shell dfu-programmer --version 2>&1)))
 	dfu-programmer $(MCU) erase --force
 else
