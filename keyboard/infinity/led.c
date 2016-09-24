@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "led.h"
 
 
-/* HHKB has no LEDs */
+/* TODO: setup led support for 1.1a version of the board */
 void led_set(uint8_t usb_led)
 {
 }
