@@ -39,7 +39,7 @@ void matrix_init(void)
     gpio_init_in_ex(&col[5], PTD6, PullDown);
     gpio_init_in_ex(&col[6], PTD7, PullDown);
 
-#ifdef INFINITY_LED
+#ifndef INFINITY_LED
     /* Row(strobe) */
     gpio_init_out_ex(&row[0], PTB0, 0);
     gpio_init_out_ex(&row[1], PTB1, 0);
