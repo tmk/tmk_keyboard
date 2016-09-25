@@ -15,7 +15,7 @@ SRC =	matrix.c \
 ifdef KEYMAP
     SRC := keymap_$(KEYMAP).c $(SRC)
 else
-    SRC := keymap_tv44.c $(SRC)
+    SRC := keymap_planck.c $(SRC)
 endif
 
 CONFIG_H = config.h

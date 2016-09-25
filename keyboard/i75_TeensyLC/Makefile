@@ -1,5 +1,5 @@
 # Target file name (without extension).
-PROJECT = tv44_30
+PROJECT = planck_tlc
 
 # Directory common source files exist
 TMK_DIR = ../../tmk_core
@@ -10,12 +10,12 @@ TARGET_DIR = .
 # project specific files
 SRC =	matrix.c \
 		keymap_common.c \
-	    led.c
+	    led.c 
 
 ifdef KEYMAP
     SRC := keymap_$(KEYMAP).c $(SRC)
 else
-    SRC := keymap_planck.c $(SRC)
+    SRC := keymap_i75.c $(SRC)
 endif
 
 CONFIG_H = config.h
@@ -26,7 +26,7 @@ CONFIG_H = config.h
 # - For Teensies, FAMILY = KINETIS and SERIES is either
 #   KL2x (LC) or K20x (3.0,3.1,3.2).
 MCU_FAMILY = KINETIS
-MCU_SERIES = K20x
+MCU_SERIES = KL2x
 
 # Linker script to use
 # - it should exist either in <chibios>/os/common/ports/ARMCMx/compilers/GCC/ld/
@@ -36,7 +36,7 @@ MCU_SERIES = K20x
 #   - MKL26Z64 for Teensy LC
 #   - MK20DX128 for Teensy 3.0
 #   - MK20DX256 for Teensy 3.1 and 3.2
-MCU_LDSCRIPT = MK20DX128
+MCU_LDSCRIPT = MKL26Z64
 
 # Startup code to use
 #  - it should exist in <chibios>/os/common/ports/ARMCMx/compilers/GCC/mk/
@@ -44,7 +44,7 @@ MCU_LDSCRIPT = MK20DX128
 #   - kl2x for Teensy LC
 #   - k20x5 for Teensy 3.0
 #   - k20x7 for Teensy 3.1 and 3.2
-MCU_STARTUP = k20x5
+MCU_STARTUP = kl2x
 
 # Board: it should exist either in <chibios>/os/hal/boards/
 #  or <this_dir>/boards
@@ -52,15 +52,15 @@ MCU_STARTUP = k20x5
 #   - PJRC_TEENSY_LC for Teensy LC
 #   - PJRC_TEENSY_3 for Teensy 3.0
 #   - PJRC_TEENSY_3_1 for Teensy 3.1 or 3.2
-BOARD = PJRC_TEENSY_3
+BOARD = PJRC_TEENSY_LC
 
 # Cortex version
-# Teensy LC is cortex-m0; Teensy 3.x are cortex-m4
-MCU  = cortex-m4
+# Teensy LC is cortex-m0plus; Teensy 3.x are cortex-m4
+MCU  = cortex-m0plus
 
 # ARM version, CORTEX-M0/M1 are 6, CORTEX-M3/M4/M7 are 7
 # I.e. 6 for Teensy LC; 7 for Teensy 3.x
-ARMV = 7
+ARMV = 6
 
 # Build Options
 #   comment out to disable the options.

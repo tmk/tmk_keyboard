@@ -34,7 +34,7 @@ extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
 extern const uint16_t fn_actions[];
 
 
-/* TV44 keymap definition macro
+/* Planck keymap definition macro
  */
 #define KEYMAP( \
     K00, K01, K02, K03, K04, K05, K06, K07, K08, K09, K0A, K0B, \
