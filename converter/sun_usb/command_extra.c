@@ -18,7 +18,7 @@ bool command_extra(uint8_t code)
             print("Home:        Toggle Bell\n");
             print("End:         Toggle Click\n");
             print("PgUp:        LED all On\n");
-            print("PgDown:      LED all On\n");
+            print("PgDown:      LED all Off\n");
             print("Insert:      Layout\n");
             print("Delete:      Reset\n");
             return false;
