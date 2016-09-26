@@ -26,7 +26,7 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] __attribute__ ((section ("
 const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
 #endif
     UNIMAP(
-              MPLY,NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  PWR,
+              MPLY,NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  F24,
     ESC,      F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12,           PSCR,SLCK,PAUS,         VOLD,VOLU,MUTE,
     FN0, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, NO,  BSPC,     INS, HOME,PGUP,    NLCK,PEQL,PSLS,PAST,
     TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,     FN1,      DEL, END, PGDN,    P7,  P8,  P9,  PMNS,
