@@ -50,6 +50,10 @@
 #include "suspend.h"
 #include "hook.h"
 
+#ifdef LUFA_DEBUG_SUART
+#include "avr/suart.h"
+#endif
+
 #include "descriptor.h"
 #include "lufa.h"
 
@@ -217,6 +221,7 @@ void EVENT_USB_Device_StartOfFrame(void)
  */
 void EVENT_USB_Device_ConfigurationChanged(void)
 {
+    print("[c]");
     bool ConfigSuccess = true;
 
     /* Setup Keyboard HID Report Endpoints */
@@ -270,6 +275,7 @@ Other Device    Required    Optional    Optional    Optional    Optional    Opti
  */
 void EVENT_USB_Device_ControlRequest(void)
 {
+    print("[r]");
     uint8_t* ReportData = NULL;
     uint8_t  ReportSize = 0;
 
@@ -494,6 +500,9 @@ static void send_consumer(uint16_t data)
 #define SEND_TIMEOUT 5
 int8_t sendchar(uint8_t c)
 {
+#ifdef LUFA_DEBUG_SUART
+    xmit(c);
+#endif
     // Not wait once timeouted.
     // Because sendchar() is called so many times, waiting each call causes big lag.
     static bool timeouted = false;
@@ -551,6 +560,9 @@ ERROR_EXIT:
 #else
 int8_t sendchar(uint8_t c)
 {
+#ifdef LUFA_DEBUG_SUART
+    xmit(c);
+#endif
     return 0;
 }
 #endif
@@ -578,12 +590,15 @@ static void setup_usb(void)
 
     // for Console_Task
     USB_Device_EnableSOFEvents();
-    print_set_sendchar(sendchar);
 }
 
 int main(void)  __attribute__ ((weak));
 int main(void)
 {
+#ifdef LUFA_DEBUG_SUART
+    DDRD |= (1<<SUART_OUT_BIT);
+#endif
+    print_set_sendchar(sendchar);
     setup_mcu();
     hook_early_init();
     keyboard_setup();
