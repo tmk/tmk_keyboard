@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "util.h"
 #include "debug.h"
 #include "ps2.h"
+#include "host.h"
+#include "led.h"
 #include "matrix.h"
 
 
@@ -213,6 +215,12 @@ uint8_t matrix_scan(void)
                         matrix_clear();
                         clear_keyboard();
                         print("Overrun\n");
+                        state = INIT;
+                        break;
+                    case 0xAA:  // Self-test passed
+                    case 0xFC:  // Self-test failed
+                        printf("BAT %s\n", (code == 0xAA) ? "OK" : "NG");
+                        led_set(host_keyboard_leds());
                         state = INIT;
                         break;
                     default:    // normal key make
