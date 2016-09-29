@@ -1,12 +1,14 @@
 IBM 4704 to USB keyboard converter
 ==================================
 This firmware converts IBM 4704 keyboard protocol to USB HID.
+Keyboard initialization process takes a few seconds at start up. **You may need to plug USB cable after hooking up your keyboard to the converter.**
 
-Keyboard initialization process takes a few seconds at start up. During that you will hear buzzer from the keyboard. **You need to plug USB cable after hooking up your keyboard to the converter.**
+TMK Converter for IBM4704 is available here: https://geekhack.org/index.php?topic=72052.0
 
 
 Update
 ------
+- 2016/09/30  Unimap editor support
 - 2015/09/07  Added keymap for Alps 102-key. Thanks, tai @ geekhack!
 - 2015/05/05  Added keymaps for 107-key, 77-key and 50-key. Thanks, orihalcon @ geekhack!
 - 2015/05/19  Fixed a protocol handling bug.
@@ -63,17 +65,17 @@ Just run `make`:
 
     $ make -f <makefile>
 
-For TMK Converter rev.1 use `Makefile.tmk_rev1` as makefile:
+For TMK Converter rev.1 use `Makefile.rev1` as makefile:
 
-    $ make -f Makefile.tmk_rev1
+    $ make -f Makefile.rev1
 
-For TMK Converter rev.2 use `Makefile.tmk_rev2` as makefile:
+For TMK Converter rev.2 use `Makefile.rev2` as makefile:
 
-    $ make -f Makefile.tmk_rev2
+    $ make -f Makefile.rev2
 
 To select keymap:
 
-    $ make -f <makefile> KEYMAP=[plain|...]
+    $ make -f <makefile> KEYMAP=[plain|alsp102key|...]
 
 To indentify your TMK Converter revision see [this](https://github.com/tmk/keyboard_converter#pcb-revisions).
 
