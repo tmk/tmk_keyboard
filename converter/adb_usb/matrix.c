@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "matrix.h"
 #include "report.h"
 #include "host.h"
+#include "led.h"
 
 
 
@@ -100,6 +101,8 @@ void matrix_init(void)
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
+
+    led_set(host_keyboard_leds());
 
     debug_enable = true;
     //debug_matrix = true;
