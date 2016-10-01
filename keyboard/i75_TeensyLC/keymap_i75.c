@@ -21,7 +21,3 @@ KEYMAP(
 const action_t PROGMEM fn_actions[] = {
     [0]  = ACTION_LAYER_MOMENTARY(1),
 };
-
-void action_function(keyrecord_t *record, uint8_t id, uint8_t opt) {
-
-}
