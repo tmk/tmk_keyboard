@@ -1,5 +1,5 @@
 # Target file name (without extension).
-PROJECT = tv44_30
+PROJECT = i75_30
 
 # Directory common source files exist
 TMK_DIR = ../../tmk_core

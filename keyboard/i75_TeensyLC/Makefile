@@ -1,5 +1,5 @@
 # Target file name (without extension).
-PROJECT = planck_tlc
+PROJECT = i75_tlc
 
 # Directory common source files exist
 TMK_DIR = ../../tmk_core
