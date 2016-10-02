@@ -1,0 +1,2 @@
+OPT_DEFS += -DINFINITY_PROTOTYPE
+include Makefile

@@ -26,8 +26,12 @@ http://cache.freescale.com/files/32bit/doc/data_sheet/K20P48M50SF0.pdf
 Pin Usage
 =========
 Key Matrix:
-    Strobe(output high):            PTB0 PTB1 PTB2 PTB3 PTB16 PTB17 PTC4 PTC5 PTD0
-    Sense(input with pull-down):    PTD1 PTD2 PTD3 PTD4 PTD5 PTD6 PTD7
+	For v1.0 (without LED support)
+		strobe(output high):            ptb0 ptb1 ptb2 ptb3 ptb16 ptb17 ptc4 ptc5 ptd0
+		sense(input with pull-down):    ptd1 ptd2 ptd3 ptd4 ptd5 ptd6 ptd7
+	For v1.1a (with LED support)
+		strobe(output high):            ptc0 ptc1 ptc2 ptc3 ptc4 ptc5 ptc6 ptc7 ptd0
+		sense(input with pull-down):    ptd1 ptd2 ptd3 ptd4 ptd5 ptd6 ptd7
 
 
 SWD pinout:
@@ -47,7 +51,7 @@ kiibohd bootloader: Lib/mk20dx128vlf5.bootloader.ld
             | .vectors          | ------------.    | StackPointer0 |     of Bootloader
             | .startup          |              \   | ResetHandler1 |
             | .rodata           |               `--+---------------+ 0xF8
-0x0000_0400 | .flashconfig(0x10)| 
+0x0000_0400 | .flashconfig(0x10)|
       _0410 | .text             |
             | .init             |
 0x0000_1000 +-------------------+ -----------------+---------------+ Vector table
@@ -62,7 +66,7 @@ kiibohd bootloader: Lib/mk20dx128vlf5.bootloader.ld
 
 0x1FFF_E000 +-------------------+ -----------------+---------------+ Vector table
       _E0F8 |                   | ------------.    |               |     of App(copied)
-            |                   |              \   |               |  
+            |                   |              \   |               |
             |                   |               `--+---------------+ mbed NVIC
             |                   |
             | RAM               |
