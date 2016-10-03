@@ -82,4 +82,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PS2_INT_VECT    INT1_vect
 #endif
 
+#ifdef LUFA_DEBUG_SUART
+#   define SUART_OUT_DDR   DDRD
+#   define SUART_OUT_PORT  PORTD
+#   define SUART_OUT_BIT   4
+#   define SUART_IN_DDR    DDRD
+#   define SUART_IN_PIN    PIND
+#   define SUART_IN_BIT    4
+#endif
+
 #endif
