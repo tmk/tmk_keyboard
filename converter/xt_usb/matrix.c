@@ -28,7 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 static void matrix_make(uint8_t code);
 static void matrix_break(uint8_t code);
-static void matrix_clear(void);
 #ifdef MATRIX_HAS_GHOST
 static bool matrix_has_ghost_in_row(uint8_t row);
 #endif
@@ -326,8 +325,7 @@ static void matrix_break(uint8_t code)
     }
 }
 
-inline
-static void matrix_clear(void)
+void matrix_clear(void)
 {
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
 }
