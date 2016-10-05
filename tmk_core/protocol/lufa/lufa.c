@@ -693,7 +693,7 @@ void hook_usb_suspend_entry(void)
     keyboard_led_stats = 0;
     led_set(keyboard_led_stats);
 
-    matrix_init();
+    matrix_clear();
     clear_keyboard();
 #ifdef SLEEP_LED_ENABLE
     sleep_led_enable();
