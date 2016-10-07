@@ -123,39 +123,39 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |-----------------------------------------------------------| |-----------| |---------------|
      * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|     | |VoD|   |PgD| |  7|  8|  9|  -|
      * |-----------------------------------------------------'     | `---'   `---' |-----------|---|
-     * |Ctrl  |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  Return|               |  4|  5|  6|  +|
+     * |FN0   |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  Return|               |  4|  5|  6|  +|
      * |-----------------------------------------------------------|     ,---.     |---------------|
      * |Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|Shift     |     |Up |     |  1|  2|  3|   |
      * |-----------------------------------------------------------| ,-----------. |-----------|Ent|
-     * |LAlt |LGui |              Space                |FN0  |RAlt | |Lef|Dow|Rig| |      0|  .|   |
+     * |LCtrl|LAlt |              Space                |LGUI |RCtrl| |Lef|Dow|Rig| |      0|  .|   |
      * `-----------------------------------------------------------' `-----------' `---------------'
      */
     KEYMAP(
     ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSPC,  VOLU,MUTE,PGUP,  GRV, BSLS,PSLS,PAST,
     TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,BSLS,  VOLD,     PGDN,  P7,  P8,  P9,  PMNS,
-    LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     ENT,                    P4,  P5,  P6,  PPLS,
+    FN0, A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     ENT,                    P4,  P5,  P6,  PPLS,
     LSFT,     Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,     RSFT,       UP,         P1,  P2,  P3,  
-    LALT,LGUI,                    SPC,                          FN0, RALT,  LEFT,DOWN,RGHT,  P0,       PDOT,PENT
+    LCTL,LALT,                    SPC,                          LGUI, RCTL,  LEFT,DOWN,RGHT,  P0,       PDOT,PENT
     
     ),
 
     /* Layer 1: HHKB like
      * ,-----------------------------------------------------------. ,-----------. ,---------------.
-     * |  `| F1| F2| F3| F4| F5| F6| F7| F8| F9|F10|F11|F12|  Del  | |   |   |   | |Num|   |   |   |
+     * |  `| F1| F2| F3| F4| F5| F6| F7| F8| F9|F10|F11|F12|  Del  | |Ins|   |Hom| |Num|Psc|Slk|Pau|
      * |-----------------------------------------------------------| |-----------| |---------------|
-     * |Caps |  \|   |   |   |   |   |   |Psc|Slk|Pau|Up |Ins|     | |   |   |   | |   |   |   |   |
+     * |Caps |  \|   |   |   |   |   |   |Psc|Slk|Pau|Up |Ins|     | |Del|   |End| |   |   |   |   |
      * |-----------------------------------------------------'     | `---'   `---' |-----------|---|
      * |      |VoD|VoU|Mut|   |   |  *|  /|Hom|PgU|Lef|Rig|        |               |   |   |   |   |
      * |-----------------------------------------------------------|     ,---.     |---------------|
-     * |        |UND|CUT|COP|PST|   |  +|  -|End|PgD|Dow|          |     |PgU|     |   |   |   |   |
+     * |Caps    |UND|CUT|COP|PST|   |  +|  -|End|PgD|Dow|      Caps|     |PgU|     |   |   |   |   |
      * |-----------------------------------------------------------| ,-----------. |-----------|   |
      * |     |     |                                   |     |     | |Hom|PgD|End| |       |   |   |
      * `-----------------------------------------------------------' `-----------' `---------------'
      */
     KEYMAP(
     
-    GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, DEL,   TRNS,TRNS,TRNS,  NLCK,TRNS,TRNS,TRNS,
-    CAPS,BSLS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,UP,  INS, TRNS,  TRNS,     TRNS,  TRNS,TRNS,TRNS,TRNS,
+    GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, DEL,    INS,TRNS,HOME,  NLCK,PSCR,SLCK,PAUS,
+    CAPS,BSLS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,UP,  INS, TRNS,   DEL,      END,  TRNS,TRNS,TRNS,TRNS,
     TRNS,VOLD,VOLU,MUTE,TRNS,TRNS,PAST,PSLS,HOME,PGUP,LEFT,RGHT,     TRNS,                   TRNS,TRNS,TRNS,TRNS,
     TRNS,     FN4, FN5, FN6, FN7, TRNS,PPLS,PMNS,END, PGDN,DOWN,     TRNS,       PGUP,       TRNS,TRNS,TRNS,  
     TRNS,TRNS,                    TRNS,                         TRNS,TRNS,  HOME,PGDN,END,   TRNS,     TRNS,TRNS
