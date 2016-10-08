@@ -43,18 +43,6 @@ static matrix_row_t _matrix0[MATRIX_ROWS];
 static matrix_row_t _matrix1[MATRIX_ROWS];
 
 
-inline
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
-
 void matrix_init(void)
 {
 #ifdef DEBUG
@@ -153,39 +141,10 @@ uint8_t matrix_scan(void)
     return 1;
 }
 
-bool matrix_is_modified(void)
-{
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        if (matrix[i] != matrix_prev[i])
-            return true;
-    }
-    return false;
-}
-
-inline
-bool matrix_has_ghost(void)
-{
-    return false;
-}
-
-inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & (1<<col));
-}
-
 inline
 matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
-}
-
-void matrix_print(void)
-{
-    print("\nr/c 01234567\n");
-    for (uint8_t row = 0; row < matrix_rows(); row++) {
-        xprintf("%02X: %08b\n", row, bitrev(matrix_get_row(row)));
-    }
 }
 
 void matrix_power_up(void) {

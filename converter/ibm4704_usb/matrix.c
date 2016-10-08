@@ -52,18 +52,6 @@ static uint8_t matrix[MATRIX_ROWS];
 #define COL(code)      (code&0x07)
 
 
-inline
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
-
 static void enable_break(void)
 {
     print("Enable break: ");
@@ -121,26 +109,10 @@ uint8_t matrix_scan(void)
 }
 
 inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & (1<<col));
-}
-
-inline
 uint8_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
 }
-
-void matrix_print(void)
-{
-    print("\nr/c 01234567\n");
-    for (uint8_t row = 0; row < matrix_rows(); row++) {
-        xprintf("%02X: %08b\n", row, bitrev(matrix_get_row(row)));
-    }
-}
-
-
 
 inline
 static void matrix_make(uint8_t code)

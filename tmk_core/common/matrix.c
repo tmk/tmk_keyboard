@@ -33,7 +33,6 @@ uint8_t matrix_cols(void)
 __attribute__ ((weak))
 void matrix_clear(void)
 {
-    matrix_init();
 }
 
 __attribute__ ((weak))
@@ -55,23 +54,22 @@ void matrix_print(void)
 #elif (MATRIX_COLS <= 32)
     print("r/c 0123456789ABCDEF0123456789ABCDEF\n");
 #endif
+
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        xprintf("%02X:", row);
 
 #if (MATRIX_COLS <= 8)
-        print_bin_reverse8(matrix_get_row(row));
+        xprintf("%02X: %08b%s\n", row, bitrev(matrix_get_row(row)),
 #elif (MATRIX_COLS <= 16)
-        print_bin_reverse16(matrix_get_row(row));
+        xprintf("%02X: %016b%s\n", row, bitrev16(matrix_get_row(row)),
 #elif (MATRIX_COLS <= 32)
-        print_bin_reverse32(matrix_get_row(row));
+        xprintf("%02X: %032b%s\n", row, bitrev32(matrix_get_row(row)),
 #endif
-
 #ifdef MATRIX_HAS_GHOST
-        if (matrix_has_ghost_in_row(row)) {
-            print(" <ghost");
-        }
+        matrix_has_ghost_in_row(row) ?  " <ghost" : ""
+#else
+        ""
 #endif
-        print("\n");
+        );
     }
 }
 

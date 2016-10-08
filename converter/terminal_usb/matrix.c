@@ -28,9 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 static void matrix_make(uint8_t code);
 static void matrix_break(uint8_t code);
-#ifdef MATRIX_HAS_GHOST
-static bool matrix_has_ghost_in_row(uint8_t row);
-#endif
 
 
 /*
@@ -49,20 +46,6 @@ static uint8_t matrix[MATRIX_ROWS];
 #define ROW(code)      (code>>3)
 #define COL(code)      (code&0x07)
 
-static bool is_modified = false;
-
-
-inline
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
 
 void matrix_init(void)
 {
@@ -92,8 +75,6 @@ uint8_t matrix_scan(void)
         READY,
         F0,
     } state = RESET;
-
-    is_modified = false;
 
     uint8_t code;
     if ((code = ps2_host_recv())) {
@@ -172,83 +153,17 @@ uint8_t matrix_scan(void)
     return 1;
 }
 
-bool matrix_is_modified(void)
-{
-    return is_modified;
-}
-
-inline
-bool matrix_has_ghost(void)
-{
-#ifdef MATRIX_HAS_GHOST
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        if (matrix_has_ghost_in_row(i))
-            return true;
-    }
-#endif
-    return false;
-}
-
-inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & (1<<col));
-}
-
 inline
 uint8_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
 }
 
-void matrix_print(void)
-{
-    print("\nr/c 01234567\n");
-    for (uint8_t row = 0; row < matrix_rows(); row++) {
-        phex(row); print(": ");
-        pbin_reverse(matrix_get_row(row));
-#ifdef MATRIX_HAS_GHOST
-        if (matrix_has_ghost_in_row(row)) {
-            print(" <ghost");
-        }
-#endif
-        print("\n");
-    }
-}
-
-uint8_t matrix_key_count(void)
-{
-    uint8_t count = 0;
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        count += bitpop(matrix[i]);
-    }
-    return count;
-}
-
-#ifdef MATRIX_HAS_GHOST
-inline
-static bool matrix_has_ghost_in_row(uint8_t row)
-{
-    // no ghost exists in case less than 2 keys on
-    if (((matrix[row] - 1) & matrix[row]) == 0)
-        return false;
-
-    // ghost exists in case same state as other row
-    for (uint8_t i=0; i < MATRIX_ROWS; i++) {
-        if (i != row && (matrix[i] & matrix[row]) == matrix[row])
-            return true;
-    }
-    return false;
-}
-#endif
-
-
 inline
 static void matrix_make(uint8_t code)
 {
     if (!matrix_is_on(ROW(code), COL(code))) {
         matrix[ROW(code)] |= 1<<COL(code);
-        is_modified = true;
     }
 }
 
@@ -257,6 +172,5 @@ static void matrix_break(uint8_t code)
 {
     if (matrix_is_on(ROW(code), COL(code))) {
         matrix[ROW(code)] &= ~(1<<COL(code));
-        is_modified = true;
     }
 }
