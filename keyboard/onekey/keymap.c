@@ -26,12 +26,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keymap.h"
 
 
-static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     {{KC_A}},
 };
 
 /*
  * Fn action definition
  */
-static const action_t PROGMEM fn_actions[] = {
+const action_t PROGMEM fn_actions[] = {
 };

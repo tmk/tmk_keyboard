@@ -48,3 +48,8 @@ OPT_DEFS += $(LUFA_OPTS)
 
 # This indicates using LUFA stack
 OPT_DEFS += -DPROTOCOL_LUFA
+
+ifeq (yes,$(strip $(LUFA_DEBUG_SUART)))
+    SRC += common/avr/suart.S
+    LUFA_OPTS += -DLUFA_DEBUG_SUART
+endif

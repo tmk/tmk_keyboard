@@ -114,7 +114,7 @@ OPT_DEFS += -DBOOTLOADER_SIZE=4096
 CONSOLE_ENABLE = yes	# Console for debug(+400)
 #COMMAND_ENABLE = yes    # Commands for debug and configuration
 #SLEEP_LED_ENABLE = yes  # Breathing sleep LED during USB suspend
-#NKRO_ENABLE = yes	# USB Nkey Rollover - not yet supported in LUFA
+#NKRO_ENABLE = yes	# USB Nkey Rollover
 
 #PS2_MOUSE_ENABLE = yes  # PS/2 mouse(TrackPoint) support
 #PS2_USE_BUSYWAIT = yes # uses primitive reference code
