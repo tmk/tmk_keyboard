@@ -1,0 +1,3 @@
+TARGET = alps64_actionmap
+ACTIONMAP_ENABLE = yes	# Use 16bit action codes in keymap instead of 8bit keycodes
+include Makefile
