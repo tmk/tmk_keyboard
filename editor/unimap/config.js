@@ -109,5 +109,11 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-ibm4704_usb_alps102key.html",
         },
+        alps64: {
+            desc: "Alps64 PCB",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/keyboard/alps64/binary/alps64_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-alps64.html",
+        },
     },
 };

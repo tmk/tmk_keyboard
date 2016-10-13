@@ -336,17 +336,17 @@ $(function() {
         loadHexURL(CONFIG.keymap[v].firmware_url).done(function(s) {
             $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
+        }).fail(function() {
+            $("#firmware-download").prop("disabled", true);
+            $("#keymap-load").prop("disabled", true);
+        }).always(function() {
+            $("#firmware-dropdown").prop("disabled", false);
 
             if (CONFIG.keymap[v].layout) {
                 layout_load(CONFIG.keymap[v].layout);
             } else {
                 layout_load(CONFIG.layout_default);
             }
-        }).fail(function() {
-            $("#firmware-download").prop("disabled", true);
-            $("#keymap-load").prop("disabled", true);
-        }).always(function() {
-            $("#firmware-dropdown").prop("disabled", false);
         });
     });
 
@@ -555,28 +555,6 @@ $(function() {
 
 
     /**********************************************************************
-     * Load firmware from URL in config
-     **********************************************************************/
-    let lh = $.Deferred().resolve();
-    if (CONFIG.keymap[variant] && CONFIG.keymap[variant].firmware_url) {
-        $("#firmware-dropdown").val(variant);
-
-        lh = loadHexURL(CONFIG.keymap[variant].firmware_url).done(function(s) {
-            // load keymap from firmware if #hash(keymap) doesn't exist in URL
-            if (!document.location.hash) {
-                keymaps = $.extend(true, [], firmware_keymaps); // copy
-                while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
-            }
-            $("#firmware-download").prop("disabled", false);
-            $("#keymap-load").prop("disabled", false);
-        }).fail(function(d) {
-            $("#firmware-download").prop("disabled", true);
-            $("#keymap-load").prop("disabled", true);
-        }).always(function() {
-        });
-    }
-
-    /**********************************************************************
      * Load keyboard layout
      **********************************************************************/
     let layout_load = function(layout) {
@@ -606,8 +584,27 @@ $(function() {
         });
     };
 
-    // wait for loading keymap form firmware
-    $.when(lh).then(function() {
+    /**********************************************************************
+     * Load firmware from URL in config
+     **********************************************************************/
+    if (CONFIG.keymap[variant] && CONFIG.keymap[variant].firmware_url) {
+        $("#firmware-dropdown").val(variant);
+
+        loadHexURL(CONFIG.keymap[variant].firmware_url).done(function(s) {
+            // load keymap from firmware if #hash(keymap) doesn't exist in URL
+            if (!document.location.hash) {
+                keymaps = $.extend(true, [], firmware_keymaps); // copy
+                while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
+            }
+            $("#firmware-download").prop("disabled", false);
+            $("#keymap-load").prop("disabled", false);
+        }).fail(function(d) {
+            $("#firmware-download").prop("disabled", true);
+            $("#keymap-load").prop("disabled", true);
+        }).always(function() {
+            layout_load(layout);
+        });
+    } else {
         layout_load(layout);
-    });
+    }
 });
