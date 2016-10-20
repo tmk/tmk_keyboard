@@ -22,10 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* USB Device descriptor parameter */
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x0A0C
-#define DEVICE_VER      0x000B
+#define DEVICE_VER      0x000A
 #define MANUFACTURER    di0ib
-#define PRODUCT         The Flanck Keyboard
-#define DESCRIPTION     A tactile switch keyboard
+#define PRODUCT         The KWARK Keyboard
+#define DESCRIPTION     A compact keyboard
 
 /* key matrix size */
 #define MATRIX_ROWS 4
@@ -47,19 +47,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)) \
 )
 
-/* ws2812 RGB LED */
-#define ws2812_PORTREG  PORTD
-#define ws2812_DDRREG   DDRD
-#define ws2812_pin PD2
-#define RGBLED_NUM 4     // Number of LEDs
-#ifndef RGBLIGHT_HUE_STEP
-#define RGBLIGHT_HUE_STEP 10
-#endif
-#ifndef RGBLIGHT_SAT_STEP
-#define RGBLIGHT_SAT_STEP 17
-#endif
-#ifndef RGBLIGHT_VAL_STEP
-#define RGBLIGHT_VAL_STEP 17
+/* Enable GNAP matrix serial output */
+#define GNAP_ENABLE
+
+/* USART configuration */
+#ifdef __AVR_ATmega32U4__
+#      define SERIAL_UART_BAUD 9600
+#      define SERIAL_UART_DATA UDR1	
+#      define SERIAL_UART_UBRR (F_CPU / (16UL * SERIAL_UART_BAUD) - 1)
+#      define SERIAL_UART_RXD_VECT USART1_RX_vect
+#      define SERIAL_UART_TXD_READY (UCSR1A & _BV(UDRE1))
+#      define SERIAL_UART_INIT() do { \
+            /* baud rate */ \
+            UBRR1L = SERIAL_UART_UBRR; \
+            /* baud rate */ \
+            UBRR1H = SERIAL_UART_UBRR >> 8; \
+            /* enable TX */ \
+            UCSR1B = _BV(TXEN1); \
+            /* 8-bit data */ \
+            UCSR1C = _BV(UCSZ11) | _BV(UCSZ10); \
+            sei(); \
+        } while(0)
+#   else
+#       error "USART configuration is needed."
 #endif
 
 /*
