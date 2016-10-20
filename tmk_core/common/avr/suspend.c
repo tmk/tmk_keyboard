@@ -96,7 +96,11 @@ void suspend_idle(uint8_t time)
 
 void suspend_power_down(void)
 {
-#ifdef SUSPEND_MODE_STANDBY
+#ifdef NO_SUSPEND_POWER_DOWN
+    ;
+#elif defined(SUSPEND_MODE_NOPOWERSAVE)
+    ;
+#elif defined(SUSPEND_MODE_STANDBY)
     standby();
 #elif defined(SUSPEND_MODE_IDLE)
     idle();

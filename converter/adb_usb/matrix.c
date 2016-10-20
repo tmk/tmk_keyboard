@@ -31,43 +31,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "host.h"
 
 
-#if (MATRIX_COLS > 16)
-#   error "MATRIX_COLS must not exceed 16"
-#endif
-#if (MATRIX_ROWS > 255)
-#   error "MATRIX_ROWS must not exceed 255"
-#endif
 
 
 static bool has_media_keys = false;
 static bool is_iso_layout = false;
-static bool is_modified = false;
 static report_mouse_t mouse_report = {};
 
 // matrix state buffer(1:on, 0:off)
-#if (MATRIX_COLS <= 8)
-static uint8_t matrix[MATRIX_ROWS];
-#else
-static uint16_t matrix[MATRIX_ROWS];
-#endif
+static matrix_row_t matrix[MATRIX_ROWS];
 
-#ifdef MATRIX_HAS_GHOST
-static bool matrix_has_ghost_in_row(uint8_t row);
-#endif
 static void register_key(uint8_t key);
 
-
-inline
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
 
 void matrix_init(void)
 {
@@ -208,8 +182,6 @@ uint8_t matrix_scan(void)
     uint16_t codes;
     uint8_t key0, key1;
 
-    is_modified = false;
-
     codes = extra_key;
     extra_key = 0xFFFF;
 
@@ -328,92 +300,11 @@ uint8_t matrix_scan(void)
     return 1;
 }
 
-bool matrix_is_modified(void)
-{
-    return is_modified;
-}
-
 inline
-bool matrix_has_ghost(void)
-{
-#ifdef MATRIX_HAS_GHOST
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        if (matrix_has_ghost_in_row(i))
-            return true;
-    }
-#endif
-    return false;
-}
-
-inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & (1<<col));
-}
-
-inline
-#if (MATRIX_COLS <= 8)
-uint8_t matrix_get_row(uint8_t row)
-#else
-uint16_t matrix_get_row(uint8_t row)
-#endif
+matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
 }
-
-void matrix_print(void)
-{
-    if (!debug_matrix) return;
-#if (MATRIX_COLS <= 8)
-    print("r/c 01234567\n");
-#else
-    print("r/c 0123456789ABCDEF\n");
-#endif
-    for (uint8_t row = 0; row < matrix_rows(); row++) {
-        phex(row); print(": ");
-#if (MATRIX_COLS <= 8)
-        pbin_reverse(matrix_get_row(row));
-#else
-        pbin_reverse16(matrix_get_row(row));
-#endif
-#ifdef MATRIX_HAS_GHOST
-        if (matrix_has_ghost_in_row(row)) {
-            print(" <ghost");
-        }
-#endif
-        print("\n");
-    }
-}
-
-uint8_t matrix_key_count(void)
-{
-    uint8_t count = 0;
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-#if (MATRIX_COLS <= 8)
-        count += bitpop(matrix[i]);
-#else
-        count += bitpop16(matrix[i]);
-#endif
-    }
-    return count;
-}
-
-#ifdef MATRIX_HAS_GHOST
-inline
-static bool matrix_has_ghost_in_row(uint8_t row)
-{
-    // no ghost exists in case less than 2 keys on
-    if (((matrix[row] - 1) & matrix[row]) == 0)
-        return false;
-
-    // ghost exists in case same state as other row
-    for (uint8_t i=0; i < MATRIX_ROWS; i++) {
-        if (i != row && (matrix[i] & matrix[row]) == matrix[row])
-            return true;
-    }
-    return false;
-}
-#endif
 
 inline
 static void register_key(uint8_t key)
@@ -426,5 +317,4 @@ static void register_key(uint8_t key)
     } else {
         matrix[row] |=  (1<<col);
     }
-    is_modified = true;
 }

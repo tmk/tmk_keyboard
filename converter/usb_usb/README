@@ -59,7 +59,6 @@ In case of Leonardo push reset button then run command. Serial port name(COM17) 
 Limitation
 ----------
 Only supports 'HID Boot protocol'.
-Not support keyboard LED yet.
 
 Note that the converter can host only USB "boot protocol" keyboard(6KRO), not NKRO, it is possible to support NKRO keyboard but you will need to write HID report parser for that. Every NKRO keyboard can have different HID report and it is difficult to support all kind of NKRO keyboards in the market.
 
@@ -77,6 +76,7 @@ Update
 ------
 2014/12/11  Added Hub support(confirmed with HHKB pro2)
 2016/09/10  Unimap editor support
+2016/10/18  Fix LED state at startup
 
 
 

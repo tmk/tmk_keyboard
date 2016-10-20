@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "matrix.h"
 #include "led.h"
+#include "host.h"
+#include "keyboard.h"
 
 
 /* KEY CODE to Matrix
@@ -151,6 +153,16 @@ uint8_t matrix_scan(void) {
         dprintf("host.Task: %d\n", timer);
     }
 
+    static uint8_t usb_state = 0;
+    if (usb_state != usb_host.getUsbTaskState()) {
+        usb_state = usb_host.getUsbTaskState();
+        dprintf("usb_state: %02X\n", usb_state);
+
+        // restore LED state when keyboard comes up
+        if (usb_state == USB_STATE_RUNNING) {
+            keyboard_set_leds(host_keyboard_leds());
+        }
+    }
     return 1;
 }
 

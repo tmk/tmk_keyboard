@@ -32,6 +32,10 @@ typedef  uint32_t   matrix_row_t;
 #error "MATRIX_COLS: invalid value"
 #endif
 
+#if (MATRIX_ROWS > 255)
+#error "MATRIX_ROWS must not exceed 255"
+#endif
+
 #define MATRIX_IS_ON(row, col)  (matrix_get_row(row) && (1<<col))
 
 
