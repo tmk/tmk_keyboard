@@ -2,7 +2,7 @@
 ![KWARK 1.0 Assembled](kwark.jpg)
 ======================
 KWARK dual matrix, dual controller. Per key LED control, reactive lighting.
-
+![KWARK 1.0 PCB Front](pcb_top.png)
 Based on the GNAP!
 
 Dual Pro Micro's. One running TMK, the other running an Arduino sketch driving the LEDs. Pro Micro's are connected to each other via hardware serial UART.
@@ -12,7 +12,7 @@ Pinout
 	Rows D1, D0, D4, C6 
 	Cols D7, E6, B4, B5, B6, B2, B3, B1, F7, F6, F5, F4
 	
-keymap_gnap.c contains functions to send bytes to the LED controller. The Arduino code interprets these to change modes or brightness.
+keymap_kwark.c contains functions to send bytes to the LED controller. The Arduino code interprets these to change modes or brightness.
 
 	//GNAP keymap functions
 	void gnaplight_step(void) {
