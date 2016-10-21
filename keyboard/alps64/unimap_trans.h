@@ -22,6 +22,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "unimap.h"
 
 
+#define UNIMAP_ALPS64( \
+    K35,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K2D,K2E,K74,K2A, \
+    K2B,K14,K1A,K08,K15,K17,K1C,K18,K0C,K12,K13,K2F,K30,    K31, \
+    K39,K04,K16,K07,K09,K0A,K0B,K0D,K0E,K0F,K33,K34,        K28, \
+    K79,K64,K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,    K7D,K29, \
+    K78,K7B,K7A,            K2C,                K65,K7E,K7F,K7C  \
+) UNIMAP( \
+            NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,                                     \
+    K29,    NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,       NO, NO, NO,       NO, NO, NO, \
+    K35,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K2D,K2E,K74,K2A,  NO, NO, NO,   NO, NO, NO, NO, \
+    K2B,K14,K1A,K08,K15,K17,K1C,K18,K0C,K12,K13,K2F,K30,    K31,  NO, NO, NO,   NO, NO, NO, NO, \
+    K39,K04,K16,K07,K09,K0A,K0B,K0D,K0E,K0F,K33,K34,    NO, K28,                NO, NO, NO, NO, \
+    K79,K64,K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,    NO, K7D,      NO,       NO, NO, NO, NO, \
+    K78,K7B,K7A,NO,         K2C,        NO, NO, K7E,K7F,K65,K7C,  NO, NO, NO,   NO,     NO, NO  \
+)
+
+
 /* Mapping to Universal keyboard layout
  * ,-----------------------------------------------------------.
  * |`  |  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY|Bsp|
