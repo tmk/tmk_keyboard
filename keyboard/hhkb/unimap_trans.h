@@ -14,12 +14,55 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef UNIMAP_COMMON_H
-#define UNIMAP_COMMON_H
+#ifndef UNIMAP_TRANS_H
+#define UNIMAP_TRANS_H
 
 #include <stdint.h>
-#include <avr/pgmspace.h>
+#include <stdbool.h>
+#include "keycode.h"
+#include "action.h"
+#include "action_code.h"
+#include "action_layer.h"
+#include "action_macro.h"
+#include "action_util.h"
+#include "report.h"
+#include "host.h"
+#include "print.h"
+#include "debug.h"
 #include "unimap.h"
+
+
+#define UNIMAP_HHKB( \
+    K35,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K2D,K2E,K74,K2A, \
+    K2B,K14,K1A,K08,K15,K17,K1C,K18,K0C,K12,K13,K2F,K30,    K31, \
+    K39,K04,K16,K07,K09,K0A,K0B,K0D,K0E,K0F,K33,K34,        K28, \
+    K79,    K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,    K7D,K7C, \
+        K7A,K7B,            K2C,                K7F,K7E          \
+) UNIMAP( \
+            NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,                                     \
+    NO,     NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,       NO, NO, NO,       NO, NO, NO, \
+    K35,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K2D,K2E,K74,K2A,  NO, NO, NO,   NO, NO, NO, NO, \
+    K2B,K14,K1A,K08,K15,K17,K1C,K18,K0C,K12,K13,K2F,K30,    K31,  NO, NO, NO,   NO, NO, NO, NO, \
+    K39,K04,K16,K07,K09,K0A,K0B,K0D,K0E,K0F,K33,K34,    NO, K28,                NO, NO, NO, NO, \
+    K79,NO, K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,    NO, K7D,      NO,       NO, NO, NO, NO, \
+    NO, K7B,K7A,NO,         K2C,        NO, NO, K7E,K7F,NO, K7C,  NO, NO, NO,   NO,     NO, NO  \
+)
+
+#define UNIMAP_JP( \
+    K35,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K2D,K2E,K74,K2A,  \
+    K2B,K14,K1A,K08,K15,K17,K1C,K18,K0C,K12,K13,K2F,K30,          \
+    K39,K04,K16,K07,K09,K0A,K0B,K0D,K0E,K0F,K33,K34,K32,    K28,  \
+    K79,    K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,K75,K52,K7D, \
+    K78,K29,K7B,K7A,K77,    K2C,    K76,K00,K7E,K7C,K50,K51,K4F  \
+) UNIMAP( \
+            NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,                                     \
+    K29,    NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, NO,       NO, NO, NO,       NO, NO, NO, \
+    K35,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K2D,K2E,K74,K2A,  NO, NO, NO,   NO, NO, NO, NO, \
+    K2B,K14,K1A,K08,K15,K17,K1C,K18,K0C,K12,K13,K2F,K30,    NO,   NO, NO, NO,   NO, NO, NO, NO, \
+    K39,K04,K16,K07,K09,K0A,K0B,K0D,K0E,K0F,K33,K34,    K32,K28,                NO, NO, NO, NO, \
+    K79,NO, K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,    K75,K7D,      K52,      NO, NO, NO, NO, \
+    K78,K7B,K7A,K77,        K2C,        K76,K00,K7E,NO, NO, K7C,  K50,K51,K4F,  NO,     NO, NO  \
+)
 
 
 /* Mapping to Universal keyboard layout
