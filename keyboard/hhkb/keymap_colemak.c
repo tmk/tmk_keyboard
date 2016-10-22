@@ -11,8 +11,8 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
 #endif
     /* Layer 0: Default Layer */
     KEYMAP_JP(ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, ZKHK,BSPC, \
-              TAB, Q,   W,   F,   J,   G,   Y,   U,   I,   O,   P,   LBRC,RBRC, \
-              LCTL,A,   R,   S,   T,   D,   H,   N,   E,   L,   SCLN,QUOT,BSLS,ENT, \
+              TAB, Q,   W,   F,   P,   G,   J,   L,   U,   Y,   SCLN,   LBRC,RBRC, \
+              LCTL,A,   R,   S,   T,   D,   H,   N,   E,   I,   O,QUOT,BSLS,ENT, \
               LSFT,Z,   X,   C,   V,   B,   K,   M,   COMM,DOT, SLSH,RO,  UP,  RSFT, \
               FN0, LALT,LALT,LGUI,LGUI,     SPC,      ENT,BSPC,RALT,FN0, LEFT,DOWN,RGHT),
 
