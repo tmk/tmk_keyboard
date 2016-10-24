@@ -77,13 +77,13 @@ CONFIG = {
             desc: "PS/2-USB Converter rev.2",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ps2_usb/binary/ps2_usb_rev2_unimap.hex",
             firmware_format: "ihex",
-            layout: "layout-128key.html",
+            layout: "layout-ps2_usb.html",
         },
         ps2_usb_rev1: {
             desc: "PS/2-USB Converter rev.1",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ps2_usb/binary/ps2_usb_rev1_unimap.hex",
             firmware_format: "ihex",
-            layout: "layout-128key.html",
+            layout: "layout-ps2_usb.html",
         },
         ibm4704_usb: {
             desc: "IBM4704-USB Converter rev.2 for 62/77/107-key",
