@@ -1,18 +1,14 @@
 PROJECT = infinity
 
-TMK_DIR = ../..
-MBED_DIR = $(TMK_DIR)/mbed-sdk
+TMK_DIR = ../../tmk_core
+MBED_DIR = $(TMK_DIR)/tool/mbed/mbed-sdk
 
-#VPATH += $(MBED_DIR):$(TMK_DIR)
-vpath %.s .:$(MBED_DIR):$(TMK_DIR)
-vpath %.c .:$(MBED_DIR):$(TMK_DIR)
-vpath %.cpp .:$(MBED_DIR):$(TMK_DIR)
+VPATH += $(TMK_DIR):$(MBED_DIR)
 
 OBJDIR = ./build
 
 OBJECTS = \
 	$(OBJDIR)/matrix.o \
-	$(OBJDIR)/keymap_common.o \
 	$(OBJDIR)/led.o \
 	$(OBJDIR)/main.o
 
@@ -33,9 +29,9 @@ INCLUDE_PATHS = -I.
 #MOUSEKEY_ENABLE = yes
 
 
+include $(TMK_DIR)/tool/mbed/common.mk
 include mbed-infinity.mk
 include $(TMK_DIR)/tool/mbed/mbed.mk
-include $(TMK_DIR)/tool/mbed/common.mk
 include $(TMK_DIR)/tool/mbed/gcc.mk
 
 program: $(OBJDIR)/$(PROJECT).bin

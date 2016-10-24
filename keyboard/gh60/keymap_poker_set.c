@@ -65,7 +65,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Fn action definition
  */
-const uint16_t PROGMEM fn_actions[] = {
+const action_t PROGMEM fn_actions[] = {
     /* Poker Layout */
     [0] = ACTION_LAYER_SET(4, ON_PRESS),     // FN0 move to Fn'd             when press
     [1] = ACTION_LAYER_SET(5, ON_PRESS),     // FN1 move to Fn'd arrow       when press

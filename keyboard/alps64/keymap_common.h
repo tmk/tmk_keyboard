@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <avr/pgmspace.h>
 #include "keycode.h"
 #include "action.h"
 #include "action_macro.h"
@@ -28,10 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "print.h"
 #include "debug.h"
 #include "keymap.h"
-
-
-extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-extern const uint16_t fn_actions[];
 
 
 /* Alps64 keymap definition macro */
@@ -60,11 +55,11 @@ extern const uint16_t fn_actions[];
     K31, K42, K51, K61, K62, K71, K72, K01, K02, K11, K12, K21, \
     K30, K40, K50,           K60,                          K00, K10, K20  \
 ) KEYMAP( \
-    K36, K37, K46, K47, K56, K57, K66, K67, K76, K77, K06, K07, K17, NO,  K27, \
+    K36, K37, K46, K47, K56, K57, K66, K67, K76, K77, K06, K07, K17, NUHS,K27, \
     K34, K35, K44, K45, K54, K55, K64, K65, K75, K05, K15, K16, K25, K24, \
     K32, K33, K43, K52, K53, K63, K73, K74, K03, K04, K13, K14, K23, \
-    K31, NO,  K42, K51, K61, K62, K71, K72, K01, K02, K11, K12, K21, NO,  \
-    K30, K40, K50,           K60,                     NO,  K00, K10, K20  \
+    K31, NUBS,K42, K51, K61, K62, K71, K72, K01, K02, K11, K12, K21, ESC, \
+    K30, K40, K50,           K60,                     APP, K00, K10, K20  \
 )
 
 #endif

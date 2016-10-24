@@ -27,7 +27,7 @@
 # make flip-ee = Download the eeprom file to the device, using Atmel FLIP
 #                (must have Atmel FLIP installed).
 #
-# make debug = Start either simulavr or avarice as specified for debugging, 
+# make debug = Start either simulavr or avarice as specified for debugging,
 #              with avr-gdb or avr-insight as the front end for debugging.
 #
 # make filename.s = Just compile filename.c into the assembler code only.
@@ -39,15 +39,15 @@
 #----------------------------------------------------------------------------
 
 # Target file name (without extension).
-TARGET = usb_usb
+TARGET ?= usb_usb
 
-TOP_DIR = ../..
+TMK_DIR ?= ../../tmk_core
 
 # Directory keyboard dependent files exist
-TARGET_DIR = .
+TARGET_DIR ?= .
 
 # MCU name
-MCU = atmega32u4
+MCU ?= atmega32u4
 
 
 # Processor frequency.
@@ -61,7 +61,7 @@ MCU = atmega32u4
 #     does not *change* the processor frequency - it should merely be updated to
 #     reflect the processor speed set externally so that the code can use accurate
 #     software delays.
-F_CPU = 16000000
+F_CPU ?= 16000000
 
 
 
@@ -69,7 +69,7 @@ F_CPU = 16000000
 # LUFA specific
 #
 # Target architecture (see library "Board Types" documentation).
-ARCH = AVR8
+ARCH ?= AVR8
 # Input clock frequency.
 #     This will define a symbol, F_USB, in all source code files equal to the
 #     input clock frequency (before any prescaling is performed) in Hz. This value may
@@ -81,7 +81,7 @@ ARCH = AVR8
 #
 #     If no clock division is performed on the input clock inside the AVR (via the
 #     CPU clock adjust registers or the clock division fuses), this will be equal to F_CPU.
-F_USB = $(F_CPU)
+F_USB ?= $(F_CPU)
 # Interrupt driven control endpoint task
 OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 
@@ -90,10 +90,11 @@ OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 # Build Options
 #   comment out to disable the options.
 #
-MOUSEKEY_ENABLE = yes	# Mouse keys
-EXTRAKEY_ENABLE = yes	# Media control and System control
-CONSOLE_ENABLE = yes	# Console for debug
-#NKRO_ENABLE = yes	# USB Nkey Rollover
+MOUSEKEY_ENABLE ?= yes	# Mouse keys
+EXTRAKEY_ENABLE ?= yes	# Media control and System control
+CONSOLE_ENABLE ?= yes	# Console for debug
+#COMMAND_ENABLE ?= yes    # Commands for debug and configuration
+#NKRO_ENABLE ?= yes	# USB Nkey Rollover
 
 # Boot Section Size in bytes
 #   Teensy halfKay   512
@@ -101,27 +102,40 @@ CONSOLE_ENABLE = yes	# Console for debug
 #   LUFA bootloader  4096
 OPT_DEFS += -DBOOTLOADER_SIZE=4096
 
+#LDFLAGS += -Wl,--relax
 
+#OPT_DEFS += -DNO_ACTION_TAPPING
+#OPT_DEFS += -DNO_ACTION_LAYER
+#OPT_DEFS += -DNO_ACTION_MACRO
 
-SRC =  \
-       keymap_common.c \
-       matrix.c \
-       led.c \
+SRC ?=  usb_usb.cpp \
        main.cpp
 
-ifdef KEYMAP
-    SRC := keymap_$(KEYMAP).c $(SRC)
+#
+# Keymap file
+#
+ifeq (yes,$(strip $(UNIMAP_ENABLE)))
+    KEYMAP_FILE = unimap
 else
-    SRC := keymap.c $(SRC)
+    ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
+        KEYMAP_FILE = actionmap
+    else
+        KEYMAP_FILE = keymap
+    endif
+endif
+ifdef KEYMAP
+    SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
+else
+    SRC := $(KEYMAP_FILE).c $(SRC)
 endif
 
-CONFIG_H = config.h
+CONFIG_H ?= config.h
 
 
 
 # Search Path
 VPATH += $(TARGET_DIR)
-VPATH += $(TOP_DIR)
+VPATH += $(TMK_DIR)
 
 
 
@@ -130,7 +144,7 @@ PROGRAM_CMD = avrdude -p$(MCU) -cavr109 -b57600 -Uflash:w:$(TARGET).hex -P$(DEV)
 
 
 
-include $(TOP_DIR)/protocol/usb_hid.mk
-include $(TOP_DIR)/protocol/lufa.mk
-include $(TOP_DIR)/common.mk
-include $(TOP_DIR)/rules.mk
+include $(TMK_DIR)/protocol/usb_hid.mk
+include $(TMK_DIR)/protocol/lufa.mk
+include $(TMK_DIR)/common.mk
+include $(TMK_DIR)/rules.mk

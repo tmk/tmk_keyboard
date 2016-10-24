@@ -39,6 +39,7 @@ void matrix_init(void)
     gpio_init_in_ex(&col[5], PTD6, PullDown);
     gpio_init_in_ex(&col[6], PTD7, PullDown);
 
+#ifndef INFINITY_LED
     /* Row(strobe) */
     gpio_init_out_ex(&row[0], PTB0, 0);
     gpio_init_out_ex(&row[1], PTB1, 0);
@@ -49,6 +50,18 @@ void matrix_init(void)
     gpio_init_out_ex(&row[6], PTC4, 0);
     gpio_init_out_ex(&row[7], PTC5, 0);
     gpio_init_out_ex(&row[8], PTD0, 0);
+#else
+    gpio_init_out_ex(&row[0], PTC0, 0);
+    gpio_init_out_ex(&row[1], PTC1, 0);
+    gpio_init_out_ex(&row[2], PTC2, 0);
+    gpio_init_out_ex(&row[3], PTC3, 0);
+    gpio_init_out_ex(&row[4], PTC4, 0);
+    gpio_init_out_ex(&row[5], PTC5, 0);
+    gpio_init_out_ex(&row[6], PTC6, 0);
+    gpio_init_out_ex(&row[7], PTC7, 0);
+    gpio_init_out_ex(&row[8], PTD0, 0);
+
+#endif
 }
 
 uint8_t matrix_scan(void)

@@ -43,17 +43,9 @@ static void unselect_rows(void);
 static void select_row(uint8_t row);
 
 
-inline
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
+#define LED_ON()    do { DDRC |= (1<<5); PORTC |= (1<<5); } while (0)
+#define LED_OFF()   do { DDRC &= ~(1<<5); PORTC &= ~(1<<5); } while (0)
+#define LED_TGL()   do { DDRC |= (1<<5); PINC |= (1<<5); } while (0)
 
 void matrix_init(void)
 {
@@ -66,6 +58,12 @@ void matrix_init(void)
         matrix[i] = 0;
         matrix_debouncing[i] = 0;
     }
+
+    //debug
+    debug_matrix = true;
+    LED_ON();
+    _delay_ms(500);
+    LED_OFF();
 }
 
 uint8_t matrix_scan(void)
@@ -98,25 +96,9 @@ uint8_t matrix_scan(void)
 }
 
 inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & ((matrix_row_t)1<<col));
-}
-
-inline
 matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
-}
-
-void matrix_print(void)
-{
-    print("\nr/c 0123456789ABCDEF\n");
-    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        phex(row); print(": ");
-        pbin_reverse16(matrix_get_row(row));
-        print("\n");
-    }
 }
 
 /* Column pin configuration
@@ -147,7 +129,7 @@ static void unselect_rows(void)
     DDRD  &= ~0b01111111;
     PORTD &= ~0b01111111;
     DDRC  &= ~0b00000100;
-    PORTD &= ~0b00000100;
+    PORTC &= ~0b00000100;
 }
 
 static void select_row(uint8_t row)

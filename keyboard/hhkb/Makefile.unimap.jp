@@ -1,0 +1,5 @@
+TARGET = hhkb_jp_unimap
+HHKB_JP = yes
+UNIMAP_ENABLE = yes
+KEYMAP_SECTION_ENABLE = yes
+include Makefile

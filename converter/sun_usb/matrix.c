@@ -24,6 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "matrix.h"
 #include "debug.h"
 #include "protocol/serial.h"
+#include "led.h"
+#include "host.h"
 
 
 /*
@@ -46,20 +48,6 @@ static uint8_t matrix[MATRIX_ROWS];
 #define ROW(code)      ((code>>3)&0xF)
 #define COL(code)      (code&0x07)
 
-static bool is_modified = false;
-
-
-inline
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
 
 void matrix_init(void)
 {
@@ -72,13 +60,26 @@ void matrix_init(void)
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
 
+    // wait for keyboard coming up
+    // otherwise LED status update fails
+    print("Reseting ");
+    while (1) {
+        print(".");
+        while (serial_recv());
+        serial_send(0x01);
+        _delay_ms(500);
+        if (serial_recv() == 0xFF) {
+            _delay_ms(500);
+            if (serial_recv() == 0x04)
+                break;
+        }
+    }
+    print(" Done\n");
     return;
 }
 
 uint8_t matrix_scan(void)
 {
-    is_modified = false;
-
     uint8_t code;
     code = serial_recv();
     if (!code) return 0;
@@ -86,17 +87,26 @@ uint8_t matrix_scan(void)
     debug_hex(code); debug(" ");
 
     switch (code) {
-        case 0xFF:  // reset success
-        case 0xFE:  // layout
-        case 0x7E:  // reset fail
-            if (code == 0xFF) print("reset: 0xFF ");
-            if (code == 0x7E) print("reset fail: 0x7E ");
-            if (code == 0xFE) print("layout: 0xFE ");
-            // response byte
+        case 0xFF:  // reset success: FF 04
+            print("reset: ");
             _delay_ms(500);
-            if (code = serial_recv()) print_hex8(code);
-            print("\n");
-            // FALL THROUGH
+            code = serial_recv();
+            xprintf("%02X\n", code);
+            if (code == 0x04) {
+                // LED status
+                led_set(host_keyboard_leds());
+            }
+            return 0;
+        case 0xFE:  // layout: FE <layout>
+            print("layout: ");
+            _delay_ms(500);
+            xprintf("%02X\n", serial_recv());
+            return 0;
+        case 0x7E:  // reset fail: 7E 01
+            print("reset fail: ");
+            _delay_ms(500);
+            xprintf("%02X\n", serial_recv());
+            return 0;
         case 0x7F:
             // all keys up
             for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
@@ -107,56 +117,18 @@ uint8_t matrix_scan(void)
         // break code
         if (matrix_is_on(ROW(code), COL(code))) {
             matrix[ROW(code)] &= ~(1<<COL(code));
-            is_modified = true;
         }
     } else {
         // make code
         if (!matrix_is_on(ROW(code), COL(code))) {
             matrix[ROW(code)] |=  (1<<COL(code));
-            is_modified = true;
         }
     }
     return code;
-}
-
-bool matrix_is_modified(void)
-{
-    return is_modified;
-}
-
-inline
-bool matrix_has_ghost(void)
-{
-    return false;
-}
-
-inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & (1<<col));
 }
 
 inline
 uint8_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
-}
-
-void matrix_print(void)
-{
-    print("\nr/c 01234567\n");
-    for (uint8_t row = 0; row < matrix_rows(); row++) {
-        phex(row); print(": ");
-        pbin_reverse(matrix_get_row(row));
-        print("\n");
-    }
-}
-
-uint8_t matrix_key_count(void)
-{
-    uint8_t count = 0;
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        count += bitpop(matrix[i]);
-    }
-    return count;
 }

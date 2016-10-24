@@ -66,20 +66,6 @@ static uint8_t matrix[MATRIX_ROWS];
 
 static bool is_modified = false;
 
-/* number of matrix rows */
-inline
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-/* number of matrix columns */
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
-
 #ifndef NEXT_KBD_LED1_ON
 #define NEXT_KBD_LED1_ON
 #endif
@@ -160,7 +146,7 @@ void matrix_init(void)
 /* scan all key states on matrix */
 uint8_t matrix_scan(void)
 {
-    _delay_ms(20);
+    _delay_ms(5);
     
     //next_kbd_set_leds(false, false);
     NEXT_KBD_LED1_OFF;
@@ -187,17 +173,19 @@ uint8_t matrix_scan(void)
     
     uint32_t resp = (next_kbd_recv());
     
-    if (resp == NEXT_KBD_KMBUS_IDLE)
+    if (!resp || resp == NEXT_KBD_KMBUS_IDLE)
     {
         return 0;
     }
     
     NEXT_KBD_LED1_ON;
     
+#ifdef NEXT_KBD_SHIFT_FLASH_LEDS
     next_kbd_set_leds(
         NEXT_KBD_PRESSED_SHIFT_LEFT(resp) ? true : false, 
         NEXT_KBD_PRESSED_SHIFT_RGHT(resp) ? true : false
     );
+#endif
     
     dprintf("[ r=%04lX keycode=%02X pressed=%X CTRL=%X SHIFT_LEFT=%X SHIFT_RGHT=%X CMD_LEFT=%X CMD_RGHT=%X ALT_LEFT=%X ALT_RGHT=%X ]\n", \
         resp, \
@@ -225,29 +213,11 @@ uint8_t matrix_scan(void)
     return 1;
 }
 
-/* whether modified from previous scan. used after matrix_scan. */
-bool matrix_is_modified()
-{
-    return is_modified;
-}
-
-/* whether a switch is on */
-inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & (1<<col));
-}
-
 /* matrix state on row */
 inline
 uint8_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
-}
-
-/* print matrix for debug */
-void matrix_print(void)
-{
 }
 
 inline

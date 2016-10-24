@@ -34,10 +34,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_COLS 7   // Sense
 
 /* key combination for command */
-#define IS_COMMAND() (keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT))) 
+#define IS_COMMAND() (keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)))
 
 
 /* for prototype */
 //#define INFINITY_PROTOTYPE
+
+/* Version 1.1a of the board */
+//#define INFINITY_LED
 
 #endif

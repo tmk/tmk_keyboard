@@ -41,25 +41,10 @@ static uint8_t debouncing = DEBOUNCE;
 static matrix_row_t matrix[MATRIX_ROWS];
 static matrix_row_t matrix_debouncing[MATRIX_ROWS];
 
-#ifdef MATRIX_HAS_GHOST
-static bool matrix_has_ghost_in_row(uint8_t row);
-#endif
 static matrix_row_t read_cols(void);
 static void unselect_rows(void);
 static void select_row(uint8_t row);
 
-
-inline
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
 
 void matrix_init(void)
 {
@@ -110,55 +95,11 @@ uint8_t matrix_scan(void)
     return 1;
 }
 
-bool matrix_is_modified(void)
-{
-    if (debouncing) return false;
-    return true;
-}
-
-inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & ((matrix_row_t)1<<col));
-}
-
 inline
 matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
 }
-
-void matrix_print(void)
-{
-    print("\nr/c 01234567\n");
-    for (uint8_t row = 0; row < matrix_rows(); row++) {
-        phex(row); print(": ");
-        pbin_reverse(matrix_get_row(row));
-#ifdef MATRIX_HAS_GHOST
-        if (matrix_has_ghost_in_row(row)) {
-            print(" <ghost");
-        }
-#endif
-        print("\n");
-    }
-}
-
-#ifdef MATRIX_HAS_GHOST
-inline
-static bool matrix_has_ghost_in_row(uint8_t row)
-{
-    // no ghost exists in case less than 2 keys on
-    if (((matrix[row] - 1) & matrix[row]) == 0)
-        return false;
-
-    // ghost exists in case same state as other row
-    for (uint8_t i=0; i < MATRIX_ROWS; i++) {
-        if (i != row && (matrix[i] & matrix[row]))
-            return true;
-    }
-    return false;
-}
-#endif
 
 inline
 static matrix_row_t read_cols(void)

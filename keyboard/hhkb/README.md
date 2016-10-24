@@ -46,7 +46,7 @@ See [doc/HHKB.txt](doc/HHKB.txt) and files under [doc/](doc/) for internal of HH
 
 
 ##Build Firmware & Program
-See [this document](../../doc/build.md) first.
+See [this document](../../tmk_core/doc/build.md) first.
 
 ### Configuration
 If your target is **HHKB JP** you need to set `HHKB_JP` build option in `Makefile` or use `Makefile.jp` instead of `Makefile`.
@@ -76,7 +76,7 @@ Use [Teensy Loader] if your controller is Teensy/Teensy++.
 
 
 ##Keymap
-To define your own keymap create file named `keymap_<name>.c` and see [keymap document](../../doc/keymap.md) and existent keymap files.
+To define your own keymap create file named `keymap_<name>.c` and see [keymap document](../../tmk_core/doc/keymap.md) and existent keymap files.
 
 
 ##Hardware

@@ -2,14 +2,13 @@
 TARGET = ps2_usb_vusb
 
 # Directory common source filess exist
-TOP_DIR = ../..
+TMK_DIR = ../../tmk_core
 
 # Directory keyboard dependent files exist
 TARGET_DIR = .
 
 # keyboard dependent files
-SRC = keymap_common.c \
-	matrix.c \
+SRC = 	matrix.c \
 	led.c
 
 ifdef KEYMAP
@@ -18,11 +17,11 @@ else
     SRC := keymap_plain.c $(SRC)
 endif
 
-# Use USART for PS/2. With V-USB INT and BUSYWAIT code is not useful.
-SRC += protocol/ps2_usart.c
-OPT_DEFS += -DPS2_USE_USART
-
 CONFIG_H = config.h
+
+
+# Use USART for PS/2. With V-USB INT and BUSYWAIT code is not useful.
+PS2_USE_USART = yes
 
 
 # V-USB debug level: To use ps2_usart.c level must be 0
@@ -36,7 +35,8 @@ OPT_DEFS += -DDEBUG_LEVEL=0
 #MCU = atmega32u4       # Teensy 2.0
 #MCU = at90usb646       # Teensy++ 1.0
 #MCU = at90usb1286      # Teensy++ 2.0
-MCU = atmega168
+#MCU = atmega168
+MCU = atmega328p
 
 
 # Processor frequency.
@@ -44,7 +44,7 @@ MCU = atmega168
 #   so your program will run at the correct speed.  You should also set this
 #   variable to same clock speed.  The _delay_ms() macro uses this, and many
 #   examples use this variable to calculate timings.  Do not add a "UL" here.
-F_CPU = 20000000
+F_CPU = 12000000
 
 
 # Build Options
@@ -98,10 +98,10 @@ OPT_DEFS += -DBOOTLOADER_SIZE=2048
 
 # Search Path
 VPATH += $(TARGET_DIR)
-VPATH += $(TOP_DIR)
+VPATH += $(TMK_DIR)
 
 
-include $(TOP_DIR)/protocol.mk
-include $(TOP_DIR)/common.mk
-include $(TOP_DIR)/protocol/vusb.mk
-include $(TOP_DIR)/rules.mk
+include $(TMK_DIR)/protocol.mk
+include $(TMK_DIR)/common.mk
+include $(TMK_DIR)/protocol/vusb.mk
+include $(TMK_DIR)/rules.mk

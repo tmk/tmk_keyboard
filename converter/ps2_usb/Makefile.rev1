@@ -1,0 +1,17 @@
+TARGET ?= ps2_usb_rev1
+MCU = atmega32u4
+CONFIG_H = config_rev1.h
+BOOTLOADER_SIZE = 4096
+
+BOOTMAGIC_ENABLE ?= no
+MOUSEKEY_ENABLE ?= yes
+EXTRAKEY_ENABLE ?= yes
+CONSOLE_ENABLE ?= yes
+COMMAND_ENABLE ?= yes
+NKRO_ENABLE ?= yes
+
+PS2_USE_USART = yes
+PS2_USE_INT = no
+PS2_USE_BUSYWAIT = no
+
+include Makefile

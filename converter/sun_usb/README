@@ -1,10 +1,17 @@
 Sun to USB keyboard protocol converter
 ======================================
 Target MCU is ATMega32u4 but other USB capable AVR will also work.
-Supported keyboards: Sun Type 5 Keyboard, CTCSP SHORT TYPE KEYBOARD(CKUB)
 
-CTCSP SHORT TYPE KEYBOARD: http://imgur.com/a/QIv6p
+This converter will work with Sun Type 2-5 Keyboards.
 
+
+Tested on:
+Sun Type 3 Keyboard: http://blog.daveastels.com.s3-website-us-west-2.amazonaws.com/2014/12/27/type-3-keyboard.html
+CTCSP SHORT TYPE KEYBOARD(Type 5): http://imgur.com/a/QIv6p
+
+
+Keymap of Type 3(keymap_sun3.c) were impoted from dastels's repository.
+https://github.com/dastels/tmk_keyboard/tree/master/converter/sun3_usb
 
 
 
@@ -41,7 +48,9 @@ Frame format: 1-Start bit, 8-Data bits, No-Parity, 1-Stop bit
     To use AVR UART engine you need external inverter in front of RX and TX pin.
     Otherwise you can software serial routine to communicate the keyboard.
 
-This converter uses software method, you doesn't need any inverter part.
+This converter uses software method by default, so you don't need any inverter part.  But
+it can also be built with 'make HARDWARE_SERIAL=y' to enable hardware serial if there
+is an inverter present.  Good results have been obtained using a 74LS04 and hardware serial.
 
 
 Commands From System To Keyboard
