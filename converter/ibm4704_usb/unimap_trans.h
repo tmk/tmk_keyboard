@@ -32,9 +32,9 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = { // 16*8
      * |-------| |-----------------------------------------------------------| |-----------| |---------------|
      * | F5| F6| |Caps  |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  #|Retn| |PrS|ScL|Pau| |  4|  5|  6|KP,|
      * |-------| |-----------------------------------------------------------| |-----------| |---------------|
-     * | F7| F8| |Shif|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift | |F11| Up|F12| |  1|  2|  3|KP=|
+     * | F7| F8| |Shif|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift | |F11| Up|F12| |  1|  2|  3|Ent|
      * |-------| |-----------------------------------------------------------| |-----------| |---------------|
-     * | F9|F10| |Ctrl |Gui|Alt  |         Space             |Alt* |Gui|Ctrl | |Lef|Dow|Rig| |Esc|  0|KP.|Ent|
+     * | F9|F10| |Ctrl |Gui|Alt  |         Space             |Alt* |Gui|Ctrl | |Lef|Dow|Rig| |Esc|  0|KP.|KP=|
      * `-------' `-----------------------------------------------------------' `-----------' `---------------'
      * scan codes
      * ,-------. ,-----------------------------------------------------------. ,-----------. ,---------------.
@@ -60,8 +60,8 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = { // 16*8
     { UNIMAP_M,    UNIMAP_COMM, UNIMAP_DOT,  UNIMAP_SLSH, UNIMAP_RO,   UNIMAP_RSFT, UNIMAP_NUBS, UNIMAP_LALT }, // 38-3F
     { UNIMAP_SPC,  UNIMAP_LGUI, UNIMAP_RGUI, UNIMAP_NO,   UNIMAP_F7,   UNIMAP_F8,   UNIMAP_F1,   UNIMAP_NLCK }, // 40-47
     { UNIMAP_PSLS, UNIMAP_PAST, UNIMAP_PMNS, UNIMAP_P7,   UNIMAP_P8,   UNIMAP_P9,   UNIMAP_PPLS, UNIMAP_NO   }, // 48-4F
-    { UNIMAP_P4,   UNIMAP_P5,   UNIMAP_P6,   UNIMAP_PCMM, UNIMAP_F9,   UNIMAP_F10,  UNIMAP_F3,   UNIMAP_PENT }, // 50-57
-    { UNIMAP_P2,   UNIMAP_P3,   UNIMAP_PEQL, UNIMAP_ESC,  UNIMAP_P0,   UNIMAP_PDOT, UNIMAP_P1,   UNIMAP_NO   }, // 58-5F
+    { UNIMAP_P4,   UNIMAP_P5,   UNIMAP_P6,   UNIMAP_PCMM, UNIMAP_F9,   UNIMAP_F10,  UNIMAP_F3,   UNIMAP_PEQL }, // 50-57
+    { UNIMAP_P2,   UNIMAP_P3,   UNIMAP_PENT, UNIMAP_ESC,  UNIMAP_P0,   UNIMAP_PDOT, UNIMAP_P1,   UNIMAP_NO   }, // 58-5F
     { UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_F2,   UNIMAP_SLCK, UNIMAP_F4,   UNIMAP_DOWN }, // 60-67
     { UNIMAP_NO,   UNIMAP_NO,   UNIMAP_INS,  UNIMAP_HOME, UNIMAP_PGUP, UNIMAP_DEL,  UNIMAP_END,  UNIMAP_PGDN }, // 68-6F
     { UNIMAP_PSCR, UNIMAP_F5,   UNIMAP_PAUS, UNIMAP_NO,   UNIMAP_F11,  UNIMAP_UP,   UNIMAP_F12,  UNIMAP_F6   }, // 70-77
@@ -75,9 +75,9 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = { // 16*8
      * |---------------------------------------------------------------| |-----------| |---------------|
      * |Caps  |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  #|Retn| F3| |PrS|ScL|Pau| |  4|  5|  6|KP,|
      * |---------------------------------------------------------------| |-----------| |---------------|
-     * |Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift | F4| |F11| Up|F12| |  1|  2|  3|KP=|
+     * |Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift | F4| |F11| Up|F12| |  1|  2|  3|Ent|
      * |---------------------------------------------------------------| |-----------| |---------------|
-     * |Ctrl |Gui|Alt  |         Space             |Alt  |Gui|  Ctrl   | |Lef|Dow|Rig| |Esc|  0|KP.|Ent|
+     * |Ctrl |Gui|Alt  |         Space             |Alt  |Gui|  Ctrl   | |Lef|Dow|Rig| |Esc|  0|KP.|KP=|
      * `---------------------------------------------------------------' `-----------' `---------------'
      * ,---------------------------------------------------------------. ,-----------. ,---------------.
      * | 00| 0F| 01| 02| 03| 04| 05| 06| 07| 08| 09| 0A| 0B| 0C| 0D| 0E| | 44| 45| 46| | 43| 41| 42| 4A|
@@ -100,13 +100,13 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = { // 16*8
     { UNIMAP_LSFT, UNIMAP_LCTL, UNIMAP_Z,    UNIMAP_X,    UNIMAP_C,    UNIMAP_V,    UNIMAP_B,    UNIMAP_N    }, // 30-37
     { UNIMAP_M,    UNIMAP_COMM, UNIMAP_DOT,  UNIMAP_SLSH, UNIMAP_RO,   UNIMAP_RSFT, UNIMAP_F4,   UNIMAP_LALT }, // 38-3F
     { UNIMAP_SPC,  UNIMAP_PSLS, UNIMAP_PAST, UNIMAP_NLCK, UNIMAP_INS,  UNIMAP_HOME, UNIMAP_PGUP, UNIMAP_LGUI }, // 40-47
-    { UNIMAP_RGUI, UNIMAP_NO,   UNIMAP_PMNS, UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_PENT, UNIMAP_RALT }, // 48-4F
+    { UNIMAP_RGUI, UNIMAP_NO,   UNIMAP_PMNS, UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_PEQL, UNIMAP_RALT }, // 48-4F
     { UNIMAP_P7,   UNIMAP_P8,   UNIMAP_P9,   UNIMAP_PDOT, UNIMAP_DEL,  UNIMAP_END,  UNIMAP_PGDN, UNIMAP_RGHT }, // 50-57
     { UNIMAP_NO,   UNIMAP_NO,   UNIMAP_PPLS, UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,  }, // 58-5F
     { UNIMAP_P4,   UNIMAP_P5,   UNIMAP_P6,   UNIMAP_P0,   UNIMAP_PSCR, UNIMAP_SLCK, UNIMAP_PAUS, UNIMAP_DOWN }, // 60-67
     { UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_PCMM, UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,  }, // 68-6F
     { UNIMAP_P1,   UNIMAP_P2,   UNIMAP_P3,   UNIMAP_ESC,  UNIMAP_F11,  UNIMAP_UP,   UNIMAP_F12,  UNIMAP_LEFT }, // 70-77
-    { UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,  }  // 78-7F
+    { UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_PENT, UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,  }  // 78-7F
 #endif
 };
 
