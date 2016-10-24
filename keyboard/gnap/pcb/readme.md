@@ -9,3 +9,8 @@ EasyEDA ordering info:
     Surface Finish: HASL;
     Copper Weight: 1;
     Panelized PCBs: 1
+
+1.2 Changes
+
+    Added Mini USB connector
+    Added mounting holes
