@@ -2,6 +2,8 @@ EasyEDA ordering info:
 
 1.2
 
+![GNAP! 1.2 PCB Front](gnap1_2top.png)
+
     238.1mm Max* 76.2mm Max;
     Layers: 2;
     PCB Thickness: 1.6mm;
@@ -17,6 +19,8 @@ EasyEDA ordering info:
     Added mounting holes
     
 2.0
+
+![GNAP! 2.0 PCB Front](gnap2_0top.png)
 
     242.9mm Max* 81mm Max;
     Layers: 2;
