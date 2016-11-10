@@ -1,5 +1,6 @@
 ## i75 keyboard firmware
 ![i75 1.0 Assembled](i75.jpg)
+![i75 1.0 Pro Micro](promicro.jpg)
 ======================
 i75 keyboard. 9x9 matrix.
 ![i75 1.0 PCB Front](pcb-front.png)
