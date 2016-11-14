@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AC_c(kc)                ACTION_MODS_KEY(MOD_LCTL, KC_##kc)
 #define AC_s(kc)                ACTION_MODS_KEY(MOD_LSFT, KC_##kc)
 #define AC_a(kc)                ACTION_MODS_KEY(MOD_LALT, KC_##kc)
-#define AC_g(kc)                ACTION_MODS_KEY(MOD_LSFT, KC_##kc)
+#define AC_g(kc)                ACTION_MODS_KEY(MOD_LGUI, KC_##kc)
 
 /* Normal key */
 #define AC_NO			ACTION_KEY(KC_NO)
