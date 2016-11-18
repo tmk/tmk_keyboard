@@ -9,6 +9,10 @@ Info for ordering from EasyEDA.com
     Copper Weight: 1;
     Panelized PCBs: 1
 
+1.1 Changes
+
+    Holtite compatible switch/LED holes
+    Wider slots
 
 Gerber files released under https://creativecommons.org/licenses/by-sa/4.0/
 
