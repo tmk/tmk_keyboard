@@ -145,7 +145,7 @@ action_t keymap_fn_to_action(uint8_t keycode)
     if (FN_INDEX(keycode) < FN_ACTIONS_SIZE) {
         action.code = pgm_read_word(&fn_actions[FN_INDEX(keycode)]);
     } else {
-        action.code = ACTION_NO;
+        return (action_t)ACTION_NO;
     }
     return action;
 }
