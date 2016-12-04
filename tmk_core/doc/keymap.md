@@ -569,6 +569,7 @@ This registers modifier key(s) simultaneously with layer switching.
 
     ACTION_LAYER_MODS(2, MOD_LSFT | MOD_LALT)
 
+This function can only register left-sided modifiers. The handedness of the modifier (left/right) is an extra bit that is not able to be passed through into the layer system. See: [`common/action_code.h`](../common/action_code.h), the spec for ACT_LAYER_TAP only allows four bits for the mods, whereas the mods themselves require five bits, with the high bit being the left/right handedness.
 
 
 ## 4. Tapping
