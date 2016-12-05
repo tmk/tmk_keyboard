@@ -9,6 +9,8 @@ The board has push button on PTA4 and LED on PTD7. The button works as 'a' key a
 
 ELF board
 ---------
+This board acommodates 48QFN chip.
+
 ### prototypte pinout
 - pcb layout  https://deskthority.net/resources/image/33293
 - schematic  https://deskthority.net/resources/image/33252
@@ -21,17 +23,53 @@ ELF board
     32  Bl                        13
     31 .........24 23............ 14
 
-    1   PTD6        12  PTC3         23  GND        34  PTE20
+    1   PTD6        12  PTC3         23  GND        34  PTE20*
     2   PTD5        13  PTC2         24  PTA18      35  PTA20   Reset
     3   PTD4        14  PTC1         25  3.3V       36  PTA3    SWD_DIO
-    4   PTD3        15  PTC0         26  NMI        37  PTA0    SWD_CLK
-    5   PTD2        16  PTB17        27  PTA2       38  3.3V
-    6   PTD1        17  PTB16        28  PTA1       39  GND
-    7   PTD0        18  PTB3         29  PTE25      40  VBUS    VREGIN
-    8   PTC7        19  PTB2         30  PTE24      41  USB D-
+    4   PTD3*       15  PTC0*        26  PTA4 NMI   37  PTA0    SWD_CLK
+    5   PTD2*       16  PTB17*       27  PTA2       38  3.3V
+    6   PTD1*       17  PTB16*       28  PTA1       39  GND
+    7   PTD0*       18  PTB3*        29  PTE25*     40  VBUS    VREGIN
+    8   PTC7        19  PTB2*        30  PTE24*     41  USB D-
     9   PTC6        20  PTB1         31  PTE30      42  USB D+
-    10  PTC5        21  PTB0         32  PTE29      43  GND
-    11  PTC4        22  PTA19        33  PTE21      44  USB Shield
+    10  PTC5        21  PTB0         32  PTE29*     43  GND
+    11  PTC4        22  PTA19        33  PTE21*     44  USB Shield
+
+
+TMK KL27Z breakout
+------------------
+This board acommodates 48QFN chip.
+
+### Pinputs
+
+    _\ conn /_
+    1       28
+    :        :
+    :  PROG  :
+    :  RST   :
+    14      15
+    ----------
+
+    1  VUSB            28  GND
+    2  VIN VREGIN      27  PTD4
+    3  PTD5            26  PTC7
+    4  PTD6            25  PTC6
+    5  PTD7            24  PTC5
+    6  PTE0*           23  PTC4
+
+    7  3.3V            22  GND
+    8  PTE30           21  PTC3
+    9  PTA0 SWD_CLK    20  PTC2
+    10 PTA1            19  PTC1
+    11 PTA2            18  PTB1
+    12 PTA3 SWD_DIO    17  PTB0
+    13 PTA4 NMI        16  PTA20 Reset
+    14 PTA18           15  PTA19
+
+
+#### Pinouts difference between 32QFN and 48QFN
+48QFN doesn't have PTE0
+32QFN doesn't have PTD0-3, PTC0, PTE20-21,24,25,29, PTB2-3,16,17
 
 ### ROM bootloader pins
 See Reference Manual Chapter 13.
@@ -46,7 +84,7 @@ See Reference Manual Chapter 13.
     PTC5 SPI0_SCK *
 
 Due to errata e9457, need to pull-up `SPI0_SS_b`(or `SPI0_SCK`) to prevent false detection of SPI.
-The errata doesn't refer UART though, `LPUART0_RX` also requires pull-up or down resisitor from experience. 
+The errata doesn't refer UART though, `LPUART0_RX` also requires pull-up or down resisitor from experience.
 Without resistor it easily false-detects activity on UART interface with finger touch on the pin.
 
 

@@ -1,5 +1,5 @@
 # Target file name (without extension).
-PROJECT = kl27z
+PROJECT = kl27z_onekey
 
 # Directory common source files exist
 TMK_DIR = ../../tmk_core
