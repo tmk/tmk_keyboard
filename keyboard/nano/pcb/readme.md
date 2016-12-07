@@ -1,3 +1,6 @@
+![nano top](pcb-top.png)
+![nano bottom](pcb-bottom.png)
+
 EasyEDA ordering info:
 
     34.3mm Max* 17.8mm Max;
