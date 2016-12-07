@@ -28,9 +28,9 @@ Copyright 2016 Jun Wako <wakojun@gmail.com>
 |-----------------------------------------------------------| `-----------' |---------------|
 |CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  #|Entr|               |  4|  5|  6|KP,|
 |-----------------------------------------------------------|     ,---.     |---------------|
-|Shft|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift |     |Up |     |  1|  2|  3|KP=|
+|Shft|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift |     |Up |     |  1|  2|  3|Ent|
 |-----------------------------------------------------------| ,-----------. |---------------|
-|Ctl|Gui|Alt|MHEN|     Space      |HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  0    |  .|Ent|
+|Ctl|Gui|Alt|MHEN|     Space      |HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  0    |  .|KP=|
 `-----------------------------------------------------------' `-----------' `---------------'
 App:         Windows Menu key
 Gui:         Windows key, Mac ⌘ key or Meta key
@@ -52,8 +52,8 @@ https://en.wikipedia.org/wiki/Keyboard_layout#Hangul_.28for_Korean.29
     K35,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K2D,K2E,K74,K2A,  K49,K4A,K4B,  K53,K54,K55,K56, \
     K2B,K14,K1A,K08,K15,K17,K1C,K18,K0C,K12,K13,K2F,K30,    K31,  K4C,K4D,K4E,  K5F,K60,K61,K57, \
     K39,K04,K16,K07,K09,K0A,K0B,K0D,K0E,K0F,K33,K34,    K32,K28,                K5C,K5D,K5E,K66, \
-    K79,K64,K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,    K75,K7D,      K52,      K59,K5A,K5B,K67, \
-    K78,K7B,K7A,K77,        K2C,        K76,K00,K7E,K7F,K65,K7C,  K50,K51,K4F,  K62,    K63,K58  \
+    K79,K64,K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,    K75,K7D,      K52,      K59,K5A,K5B,K58, \
+    K78,K7B,K7A,K77,        K2C,        K76,K00,K7E,K7F,K65,K7C,  K50,K51,K4F,      K62,K63,K67  \
 ) { \
     { AC_##K00, AC_##K01, AC_##K02, AC_##K03, AC_##K04, AC_##K05, AC_##K06, AC_##K07,   /* 00-07 */ \
       AC_##K08, AC_##K09, AC_##K0A, AC_##K0B, AC_##K0C, AC_##K0D, AC_##K0E, AC_##K0F }, /* 08-0F */ \

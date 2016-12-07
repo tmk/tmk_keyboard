@@ -35,8 +35,8 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
     ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, NO,  BSPC,     VOLU,MUTE,PGUP,    GRV, BSLS,PSLS,PAST,
     TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,     BSLS,     VOLD,NO,  PGDN,    P7,  P8,  P9,  PMNS,
     LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     NO,  ENT,                         P4,  P5,  P6,  PPLS,
-    LSFT,NO,  Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,     NO,  RSFT,          UP,           P1,  P2,  P3,  NO,
-    LALT,LGUI,NO,  NO,            SPC,           NO,  NO,  NO,  NO,  FN0, RALT,     LEFT,DOWN,RGHT,    P0,       PDOT,PENT
+    LSFT,NO,  Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,     NO,  RSFT,          UP,           P1,  P2,  P3,  PENT,
+    LALT,LGUI,NO,  NO,            SPC,           NO,  NO,  NO,  NO,  FN0, RALT,     LEFT,DOWN,RGHT,    P0,       PDOT,NO
     ),
     UNIMAP(
               TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,

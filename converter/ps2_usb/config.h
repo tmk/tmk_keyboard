@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* key combination for command */
 #define IS_COMMAND() ( \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)) || \
-    keyboard_report->mods == (MOD_BIT(KC_LCTRL) | MOD_BIT(KC_RSHIFT)) \
+    keyboard_report->mods == (MOD_BIT(KC_LALT) | MOD_BIT(KC_RALT)) \
 )
 
 
@@ -61,7 +61,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * PS/2 Pin interrupt
  */
 #ifdef PS2_USE_INT
-#if defined(__AVR_ATmega16U4__) || defined(__AVR_ATmega32U4__)
+#if defined(__AVR_ATmega16U4__) || defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega32U2__)
 /* uses INT1 for clock line(ATMega32U4) */
 #define PS2_CLOCK_PORT  PORTD
 #define PS2_CLOCK_PIN   PIND

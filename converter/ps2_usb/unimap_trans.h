@@ -22,6 +22,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "unimap.h"
 
 
+#define UNIMAP_PS2( \
+            K68,K69,K6A,K6B,K6C,K6D,K6E,K6F,K70,K71,K72,K73,                                     \
+    K29,    K3A,K3B,K3C,K3D,K3E,K3F,K40,K41,K42,K43,K44,K45,      K46,K47,K48,      K01,K02,K03, \
+    K35,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K2D,K2E,K74,K2A,  K49,K4A,K4B,  K53,K54,K55,K56, \
+    K2B,K14,K1A,K08,K15,K17,K1C,K18,K0C,K12,K13,K2F,K30,    K31,  K4C,K4D,K4E,  K5F,K60,K61,K57, \
+    K39,K04,K16,K07,K09,K0A,K0B,K0D,K0E,K0F,K33,K34,        K28,                K5C,K5D,K5E,K66, \
+    K79,K64,K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,    K75,K7D,      K52,      K59,K5A,K5B,K58, \
+    K78,K7B,K7A,K77,        K2C,        K76,K00,K7E,K7F,K65,K7C,  K50,K51,K4F,  K32,K62,K63,K67  \
+) UNIMAP ( \
+            K68,K69,K6A,K6B,K6C,K6D,K6E,K6F,K70,K71,K72,K73,                                     \
+    K29,    K3A,K3B,K3C,K3D,K3E,K3F,K40,K41,K42,K43,K44,K45,      K46,K47,K48,      K01,K02,K03, \
+    K35,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K2D,K2E,K74,K2A,  K49,K4A,K4B,  K53,K54,K55,K56, \
+    K2B,K14,K1A,K08,K15,K17,K1C,K18,K0C,K12,K13,K2F,K30,    K31,  K4C,K4D,K4E,  K5F,K60,K61,K57, \
+    K39,K04,K16,K07,K09,K0A,K0B,K0D,K0E,K0F,K33,K34,    K32,K28,                K5C,K5D,K5E,K66, \
+    K79,K64,K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,    K75,K7D,      K52,      K59,K5A,K5B,K58, \
+    K78,K7B,K7A,K77,        K2C,        K76,K00,K7E,K7F,K65,K7C,  K50,K51,K4F,      K62,K63,K67  \
+)
+
+
 /* Mapping to Universal keyboard layout
  *
  * Universal keyboard layout
@@ -35,11 +54,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * |-----------------------------------------------------------| |-----------| |---------------|
  * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|  \  | |Del|End|PgD| |  7|  8|  9|  +|
  * |-----------------------------------------------------------| `-----------' |---------------|
- * |CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  #|Retn|               |  4|  5|  6|KP,|
+ * |CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '| ^a|Retn|               |  4|  5|  6|KP,|
  * |-----------------------------------------------------------|     ,---.     |---------------|
  * |Shft|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift |     |Up |     |  1|  2|  3|KP=|
  * |-----------------------------------------------------------| ,-----------. |---------------|
- * |Ctl|Gui|Alt|MHEN|     Space      |HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  0    |  .|Ent|
+ * |Ctl|Gui|Alt|MHEN|     Space      |HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  #|  0|  .|Ent|
  * `-----------------------------------------------------------' `-----------' `---------------'
  *
  * PS/2 scan codes
@@ -54,16 +73,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * |-----------------------------------------------------------| |-----------| |---------------|
  * | 0D  | 15| 1D| 24| 2D| 2C| 35| 3C| 43| 44| 4D| 54| 5B|  5D | | F1| E9| FA| | 6C| 75| 7D| 79|
  * |-----------------------------------------------------------| `-----------' |---------------|
- * | 58   | 1C| 1B| 23| 2B| 34| 33| 3B| 42| 4B| 4C| 52| --| 5A |               | 6B| 73| 74| 6D|
+ * | 58   | 1C| 1B| 23| 2B| 34| 33| 3B| 42| 4B| 4C| 52| ^a| 5A |               | 6B| 73| 74| 6D|
  * |-----------------------------------------------------------|     ,---.     |---------------|
- * | 12 | 61| 1A| 22| 21| 2A| 32| 31| 3A| 41| 49| 4A| 51|  59  |     | F5|     | 69| 72| 7A| 0F|
+ * | 12 | 61| 1A| 22| 21| 2A| 32| 31| 3A| 41| 49| 4A| 51|  59  |     | F5|     | 69| 72| 7A| DA|
  * |-----------------------------------------------------------| ,-----------. |---------------|
- * | 14| 9F| 11| 67 |     29         | 64 | 13 | 91| A7| AF| 94| | EB| F2| F4| |   70  | 71| DA|
+ * | 14| 9F| 11| 67 |     29         | 64 | 13 | 91| A7| AF| 94| | EB| F2| F4| | 68| 70| 71| 63|
  * `-----------------------------------------------------------' `-----------' `---------------'
+ * ^a: ISO hash key uses identical scancode 5D to US backslash.
+ * 51, 63, 68, 6D: hidden keys in IBM model M
  */
 const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
     { UNIMAP_NO,    UNIMAP_F9,    UNIMAP_NO,    UNIMAP_F5,    UNIMAP_F3,    UNIMAP_F1,    UNIMAP_F2,    UNIMAP_F12   }, /* 00-07 */
-    { UNIMAP_F13,   UNIMAP_F10,   UNIMAP_F8,    UNIMAP_F6,    UNIMAP_F4,    UNIMAP_TAB,   UNIMAP_GRV,   UNIMAP_PEQL  }, /* 08-0F */
+    { UNIMAP_F13,   UNIMAP_F10,   UNIMAP_F8,    UNIMAP_F6,    UNIMAP_F4,    UNIMAP_TAB,   UNIMAP_GRV,   UNIMAP_NO    }, /* 08-0F */
     { UNIMAP_F14,   UNIMAP_LALT,  UNIMAP_LSHIFT,UNIMAP_KANA,  UNIMAP_LCTL,  UNIMAP_Q,     UNIMAP_1,     UNIMAP_NO    }, /* 10-17 */
     { UNIMAP_F15,   UNIMAP_NO,    UNIMAP_Z,     UNIMAP_S,     UNIMAP_A,     UNIMAP_W,     UNIMAP_2,     UNIMAP_NO    }, /* 18-1F */
     { UNIMAP_F16,   UNIMAP_C,     UNIMAP_X,     UNIMAP_D,     UNIMAP_E,     UNIMAP_4,     UNIMAP_3,     UNIMAP_NO    }, /* 20-27 */
@@ -74,8 +95,8 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
     { UNIMAP_F21,   UNIMAP_DOT,   UNIMAP_SLASH, UNIMAP_L,     UNIMAP_SCOLON,UNIMAP_P,     UNIMAP_MINUS, UNIMAP_NO    }, /* 48-4F */
     { UNIMAP_F22,   UNIMAP_RO,    UNIMAP_QUOTE, UNIMAP_NO,    UNIMAP_LBRC,  UNIMAP_EQUAL, UNIMAP_NO,    UNIMAP_F23   }, /* 50-57 */
     { UNIMAP_CAPS,  UNIMAP_RSHIFT,UNIMAP_ENTER, UNIMAP_RBRC,  UNIMAP_NO,    UNIMAP_BSLASH,UNIMAP_NO,    UNIMAP_F24   }, /* 58-5F */
-    { UNIMAP_NO,    UNIMAP_NUBS,  UNIMAP_NO,    UNIMAP_NO,    UNIMAP_HENK,  UNIMAP_NO,    UNIMAP_BSPACE,UNIMAP_MHEN  }, /* 60-67 */
-    { UNIMAP_NO,    UNIMAP_P1,    UNIMAP_JYEN,  UNIMAP_P4,    UNIMAP_P7,    UNIMAP_PCMM,  UNIMAP_NO,    UNIMAP_NO    }, /* 68-6F */
+    { UNIMAP_NO,    UNIMAP_NUBS,  UNIMAP_NO,    UNIMAP_PEQL,  UNIMAP_HENK,  UNIMAP_NO,    UNIMAP_BSPACE,UNIMAP_MHEN  }, /* 60-67 */
+    { UNIMAP_NUHS,  UNIMAP_P1,    UNIMAP_JYEN,  UNIMAP_P4,    UNIMAP_P7,    UNIMAP_PCMM,  UNIMAP_NO,    UNIMAP_NO    }, /* 68-6F */
     { UNIMAP_P0,    UNIMAP_PDOT,  UNIMAP_P2,    UNIMAP_P5,    UNIMAP_P6,    UNIMAP_P8,    UNIMAP_ESC,   UNIMAP_NLCK  }, /* 70-77 */
     { UNIMAP_F11,   UNIMAP_PPLS,  UNIMAP_P3,    UNIMAP_PMNS,  UNIMAP_PAST,  UNIMAP_P9,    UNIMAP_SLCK,  UNIMAP_NO    }, /* 78-7F */
     { UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_F7,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    }, /* 80-87 */
@@ -97,4 +118,3 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 #endif
-

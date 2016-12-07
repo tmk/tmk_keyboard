@@ -37,9 +37,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * |-----------------------------------------------------------| `-----------' |---------------|
  * |CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  #|Retn|               |  4|  5|  6|KP,|
  * |-----------------------------------------------------------|     ,---.     |---------------|
- * |Shft|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift |     |Up |     |  1|  2|  3|KP=|
+ * |Shft|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift |     |Up |     |  1|  2|  3|Ent|
  * |-----------------------------------------------------------| ,-----------. |---------------|
- * |Ctl|Gui|Alt|MHEN|     Space      |HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  0    |  .|Ent|
+ * |Ctl|Gui|Alt|MHEN|     Space      |HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  0    |  .|KP=|
  * `-----------------------------------------------------------' `-----------' `---------------'
  *
  * NeXT Matrix(Scan code)

@@ -379,19 +379,33 @@ Default Layer also has bitwise operations, they are executed when key is release
     ACTION_DEFAULT_LAYER_BIT_SET(part, bits)
 
 
-
 ### 2.3 Macro action
-***TBD***
+`Macro` actions allow you to register a complex sequence of keystrokes when a key is pressed, where macros are simple sequences of keypresses.
 
-`Macro` action indicates complex key strokes.
- 
-    MACRO( D(LSHIFT), D(D), END )
-    MACRO( U(D), U(LSHIFT), END )
-    MACRO( I(255), T(H), T(E), T(L), T(L), W(255), T(O), END )
+    ACTION_MACRO(id)
+    ACTION_MACRO_TAP(id)
 
-#### 2.3.1 Macro Commands
-- **MACRO()**
-- **MACRO_NONE**
+`id` is an 8-bit user-defined value the macro getter function can use to pick the specific macro.
+
+
+#### 2.3.1 Implementing Macro getter function
+To implement `macro` functions, the macro lookup list must be implemented: 
+
+    const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt);
+
+The function must always return a valid macro, and default implementation of `action_get_macro` always returns `MACRO_NONE` which has no effect.
+  
+#### 2.3.1.1 Limitations
+Similar to the Function Action system, the selector functions is passed  a `keyrecord_t` object, so it can inspect the key state (e.g. different macros on key press or release), and key itself.
+  
+Unlike the Function Action system,`macros` are pre-recorded key sequences, so you can only select from a list. If you want to use dynamic macros then you should look at the more complex function action system. 
+
+#### 2.3.2 Implementing/Defining Macro sequences
+Macros are of the form (must be wrapped by the `MACRO` function, and end with an `END` mark)
+
+    MACRO( ..., END )
+    
+Within each macro, the following commands can be used:
 
 - **I()**   change interval of stroke.
 - **D()**   press key
@@ -401,19 +415,25 @@ Default Layer also has bitwise operations, they are executed when key is release
 - **SM()**  store modifier state
 - **RM()**  restore modifier state
 - **CM()**  clear modifier state
-- **END**   end mark
+
+e.g.:
+
+    MACRO( D(LSHIFT), D(D), END )  // hold down LSHIFT and D - will print 'D'  
+    MACRO( U(D), U(LSHIFT), END )  // release U and LSHIFT keys (an event.pressed == False counterpart for the one above)
+    MACRO( I(255), T(H), T(E), T(L), T(L), W(255), T(O), END ) // slowly print out h-e-l-l---o
 
 #### 2.3.2 Examples
-***TBD***
+
+in keymap.c, define `action_get_macro`
 
     const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
     {
         switch (id) {
-            case HELLO:
+            case 0:
                 return (record->event.pressed ?
                         MACRO( I(0), T(H), T(E), T(L), T(L), W(255), T(O), END ) :
                         MACRO_NONE );
-            case ALT_TAB:
+            case 1:
                 return (record->event.pressed ?
                         MACRO( D(LALT), D(TAB), END ) :
                         MACRO( U(TAB), END ));
@@ -421,7 +441,12 @@ Default Layer also has bitwise operations, they are executed when key is release
         return MACRO_NONE;
     }
 
-
+in keymap.c, bind items in `fn_actions` to the macro function
+  
+    const action_t PROGMEM fn_actions[] = {
+         [0] = ACTION_MACRO(0), // will print 'hello' for example
+         [1] = ACTION_MACRO(1),
+    };
 
 
 ### 2.4 Function action
@@ -544,6 +569,7 @@ This registers modifier key(s) simultaneously with layer switching.
 
     ACTION_LAYER_MODS(2, MOD_LSFT | MOD_LALT)
 
+This function can only register left-sided modifiers. The handedness of the modifier (left/right) is an extra bit that is not able to be passed through into the layer system. See: [`common/action_code.h`](../common/action_code.h), the spec for ACT_LAYER_TAP only allows four bits for the mods, whereas the mods themselves require five bits, with the high bit being the left/right handedness.
 
 
 ## 4. Tapping
