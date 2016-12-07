@@ -24,13 +24,13 @@ void led_set(uint8_t usb_led)
 {
     if (usb_led & (1<<USB_LED_CAPS_LOCK)) {
         // output low
-        DDRB &= ~(1<<0);
+        DDRB |= (1<<0);
         PORTB &= ~(1<<0);
         DDRD |= (1<<5);
         PORTD &= ~(1<<5);
     } else {
         // Hi-Z
-        DDRB |= (1<<0);
+        DDRB &= ~(1<<0);
         PORTB &= ~(1<<0);
         DDRD &= ~(1<<5);
         PORTD &= ~(1<<5);

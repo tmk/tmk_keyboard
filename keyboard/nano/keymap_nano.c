@@ -8,8 +8,8 @@ KEYMAP(
 ),
 
 KEYMAP(
-  TRNS,  F2,    F3,    F4,
-  F5,    F6,    F7,    F8
+  TRNS,  FN2,   FN3,   FN4,
+  FN5,   FN6,   FN7,   FN8
 ),
 };
 
