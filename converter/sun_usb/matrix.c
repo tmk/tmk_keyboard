@@ -75,6 +75,8 @@ void matrix_init(void)
         }
     }
     print(" Done\n");
+
+    PORTD &= ~(1<<6);
     return;
 }
 
