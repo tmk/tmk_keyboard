@@ -1,5 +1,5 @@
 /*
-Copyright 2011 Jun WAKO <wakojun@gmail.com>
+Copyright 2010,2011,2012,2013 Jun WAKO <wakojun@gmail.com>
 
 This software is licensed with a Modified BSD License.
 All of this is supposed to be Free Software, Open Source, DFSG-free,
@@ -35,60 +35,60 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ADB_H
-#define ADB_H
+/*
+ * PS/2 protocol Pin interrupt version
+ */
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+#include "pbuff.h"
+#include "xt.h"
+#include "xt_io.h"
+#include "wait.h"
+#include "print.h"
 
-#if !(defined(ADB_PORT) && \
-      defined(ADB_PIN)  && \
-      defined(ADB_DDR)  && \
-      defined(ADB_DATA_BIT))
-#   error "ADB port setting is required in config.h"
-#endif
+void xt_host_init(void)
+{
+    XT_INT_INIT();
+    XT_INT_ON();
+}
 
-#define ADB_POWER       0x7F
-#define ADB_CAPS        0x39
+/* get data received by interrupt */
+uint8_t xt_host_recv(void)
+{
+    if (pbuf_has_data()) {
+        return pbuf_dequeue();
+    } else {
+        return 0;
+    }
+}
 
+ISR(XT_INT_VECT)
+{
+    static uint8_t state = 0;
+    static uint8_t data = 0;
 
-/* ADB commands */
-// Default Address
-#define ADB_ADDR_DONGLE     1
-#define ADB_ADDR_KEYBOARD   2
-#define ADB_ADDR_MOUSE      3
-#define ADB_ADDR_TABLET     4
-#define ADB_ADDR_APPLIANCE  7
-// Command Type
-#define ADB_CMD_RESET       0
-#define ADB_CMD_FLUSH       1
-#define ADB_CMD_LISTEN      2
-#define ADB_CMD_TALK        3
-// Register
-#define ADB_REG_0           0
-#define ADB_REG_1           1
-#define ADB_REG_2           2
-#define ADB_REG_3           3
-
-/* ADB keyboard handler id */
-#define ADB_HANDLER_M0116               0x01
-#define ADB_HANDLER_IIGS                0x01
-#define ADB_HANDLER_M0115               0x02
-#define ADB_HANDLER_M3501               0x02
-#define ADB_HANDLER_M1242_ANSI          0x10
-#define ADB_HANDLER_EXTENDED_PROTOCOL   0x03
-
-
-// ADB host
-void     adb_host_init(void);
-bool     adb_host_psw(void);
-uint16_t adb_host_kbd_recv(uint8_t addr);
-uint16_t adb_host_mouse_recv(void);
-uint16_t adb_host_talk(uint8_t addr, uint8_t reg);
-void     adb_host_listen(uint8_t addr, uint8_t reg, uint8_t data_h, uint8_t data_l);
-void     adb_host_kbd_led(uint8_t addr, uint8_t led);
-void     adb_mouse_task(void);
-void     adb_mouse_init(void);
-
-
-#endif
+    if (state == 0) {
+        if (data_in())
+            state++;
+    } else if (state >= 1 && state <= 8) {
+        wait_clock_lo(20);
+        data >>= 1;
+        if (data_in())
+            data |= 0x80;
+        if (state == 8)
+            goto END;
+        state++;
+    } else {
+        goto DONE;
+    }
+    goto RETURN;
+END:
+    pbuf_enqueue(data);
+DONE:
+    state = 0;
+    data = 0;
+RETURN:
+    return;
+}

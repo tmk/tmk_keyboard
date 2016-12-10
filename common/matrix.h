@@ -32,6 +32,10 @@ typedef  uint32_t   matrix_row_t;
 #error "MATRIX_COLS: invalid value"
 #endif
 
+#if (MATRIX_ROWS > 255)
+#error "MATRIX_ROWS must not exceed 255"
+#endif
+
 #define MATRIX_IS_ON(row, col)  (matrix_get_row(row) && (1<<col))
 
 
@@ -57,7 +61,12 @@ bool matrix_is_on(uint8_t row, uint8_t col);
 matrix_row_t matrix_get_row(uint8_t row);
 /* print matrix for debug */
 void matrix_print(void);
+/* clear matrix */
+void matrix_clear(void);
 
+#ifdef MATRIX_HAS_GHOST
+bool matrix_has_ghost_in_row(uint8_t row);
+#endif
 
 /* power control */
 void matrix_power_up(void);

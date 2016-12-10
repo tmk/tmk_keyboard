@@ -30,16 +30,6 @@ __asm__ __volatile__ (  \
 )
 
 
-void suspend_idle(uint8_t time)
-{
-    cli();
-    set_sleep_mode(SLEEP_MODE_IDLE);
-    sleep_enable();
-    sei();
-    sleep_cpu();
-    sleep_disable();
-}
-
 /* Power down MCU with watchdog timer
  * wdto: watchdog timer timeout defined in <avr/wdt.h>
  *          WDTO_15MS
@@ -80,13 +70,45 @@ static void power_down(uint8_t wdto)
     wdt_disable();
 }
 
-void suspend_power_down(void)
+static void standby(void)
 {
-    power_down(WDTO_15MS);
+    set_sleep_mode(SLEEP_MODE_STANDBY);
+    sleep_enable();
+    sei();
+    sleep_cpu();
+    sleep_disable();
 }
 
-__attribute__ ((weak)) void matrix_power_up(void) {}
-__attribute__ ((weak)) void matrix_power_down(void) {}
+static void idle(void)
+{
+    set_sleep_mode(SLEEP_MODE_IDLE);
+    sleep_enable();
+    sei();
+    sleep_cpu();
+    sleep_disable();
+}
+
+
+void suspend_idle(uint8_t time)
+{
+    idle();
+}
+
+void suspend_power_down(void)
+{
+#ifdef NO_SUSPEND_POWER_DOWN
+    ;
+#elif defined(SUSPEND_MODE_NOPOWERSAVE)
+    ;
+#elif defined(SUSPEND_MODE_STANDBY)
+    standby();
+#elif defined(SUSPEND_MODE_IDLE)
+    idle();
+#else
+    power_down(WDTO_15MS);
+#endif
+}
+
 bool suspend_wakeup_condition(void)
 {
     matrix_power_up();
@@ -102,6 +124,7 @@ bool suspend_wakeup_condition(void)
 void suspend_wakeup_init(void)
 {
     // clear keyboard state
+    matrix_clear();
     clear_keyboard();
 #ifdef BACKLIGHT_ENABLE
     backlight_init();
