@@ -11,3 +11,18 @@ Pinout
     row: B6, B2, B3, B1, F7
 
 Mosfet on B5 to control backlight.
+
+BOM
+
+    1	Pro Micro
+    2	12pin SIP headers
+    30	1n4148 diodes
+    30	switches
+
+Needed if you want LEDs
+
+    30	LEDs
+    30	Resistors for LEDs. Use online LED caculator to choose value
+    1	FDS6630A or DMN3018SSS-13 SOIC FET
+    1	100ohm resistor
+    1	100Kilo ohm resistor
