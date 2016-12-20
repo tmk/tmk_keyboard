@@ -65,7 +65,7 @@ void matrix_init(void)
 
     // Determine ISO keyboard by handler id
     // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c?v=4.4#L815
-    uint16_t handler_id = adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
+    uint8_t handler_id = (uint8_t) adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
     switch (handler_id) {
     case 0x04: case 0x05: case 0x07: case 0x09: case 0x0D:
     case 0x11: case 0x14: case 0x19: case 0x1D: case 0xC1:
