@@ -132,12 +132,6 @@ static void print_rn42(void)
         xprintf("%c", c);
     }
 }
-
-static void clear_rn42(void)
-{
-    while (rn42_getc() != -1) ;
-}
-
 #define SEND_STR(str)       send_str(PSTR(str))
 #define SEND_COMMAND(cmd)   send_command(PSTR(cmd))
 
