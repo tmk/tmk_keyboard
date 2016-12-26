@@ -2,6 +2,7 @@
 #define RN42_H
 
 #include <stdbool.h>
+#include "host_driver.h"
 
 host_driver_t rn42_driver;
 host_driver_t rn42_config_driver;
@@ -19,5 +20,11 @@ void rn42_cts_hi(void);
 void rn42_cts_lo(void);
 bool rn42_linked(void);
 void rn42_set_leds(uint8_t l);
+
+const char *rn42_send_command(const char *cmd);
+void rn42_send_str(const char *str);
+void rn42_print_response(void);
+#define SEND_STR(str)       rn42_send_str(PSTR(str))
+#define SEND_COMMAND(cmd)   rn42_send_command(PSTR(cmd))
 
 #endif

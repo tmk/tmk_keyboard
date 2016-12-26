@@ -125,40 +125,6 @@ void rn42_task(void)
  ******************************************************************************/
 static host_driver_t *prev_driver = &rn42_driver;
 
-static void print_rn42(void)
-{
-    int16_t c;
-    while ((c = rn42_getc()) != -1) {
-        xprintf("%c", c);
-    }
-}
-
-static void clear_rn42(void)
-{
-    while (rn42_getc() != -1) ;
-}
-
-#define SEND_STR(str)       send_str(PSTR(str))
-#define SEND_COMMAND(cmd)   send_command(PSTR(cmd))
-
-static void send_str(const char *str)
-{
-    uint8_t c;
-    while ((c = pgm_read_byte(str++)))
-        rn42_putc(c);
-}
-
-static const char *send_command(const char *cmd)
-{
-    static const char *s;
-    send_str(cmd);
-    wait_ms(500);
-    s = rn42_gets(100);
-    xprintf("%s\r\n", s);
-    print_rn42();
-    return s;
-}
-
 static void enter_command_mode(void)
 {
     prev_driver = host_get_driver();
@@ -171,7 +137,7 @@ static void enter_command_mode(void)
     wait_ms(1100);          // need 1 sec
     SEND_COMMAND("$$$");
     wait_ms(600);           // need 1 sec
-    print_rn42();
+    rn42_print_response();
     const char *s = SEND_COMMAND("v\r\n");
     if (strncmp("v", s, 1) != 0) SEND_COMMAND("+\r\n"); // local echo on
 }
