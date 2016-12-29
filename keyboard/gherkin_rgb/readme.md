@@ -1,4 +1,8 @@
 ## gherkin keyboard firmware
+
+RGB info here http://www.40percent.club/2016/12/rainbow-pickle.html
+
+
 ![gherkin 1.0 Assembled](gherkin.jpg)
 ======================
 gherkin keyboard. 6x5 matrix.
