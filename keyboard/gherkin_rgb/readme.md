@@ -16,6 +16,8 @@ Pinout
 
 Mosfet on B5 to control backlight.
 
+WS2812b data pin on F6.
+
 BOM
 
     1	Pro Micro
