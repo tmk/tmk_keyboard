@@ -1,6 +1,6 @@
 More information in blog:
 
-http://www.40percent.club/search/label/gnap
+http://www.40percent.club/search/label/gnap Scroll down and read the older post first.
 
 
 BOM for PCB
