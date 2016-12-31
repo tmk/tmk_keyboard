@@ -17,8 +17,8 @@ Needed in addition if you want LEDs
 
     1	Pro Micro  (5v, 16MHz)
     2	12pin SIP headers or a 24 pin socket
-    47	LEDs
-    4	Resistors for LEDs. Use online LED caculator to choose value
+    47	LEDs, Use the brightest possible, LEDs will be on only 1/12th the time at full brightness due to matrix scanning.
+    4	Resistors for LEDs. Use online LED caculator to choose value. Target 10ma ouutput.
 
 Needed for GNAP 2.0
 
