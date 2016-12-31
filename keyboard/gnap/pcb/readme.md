@@ -1,3 +1,31 @@
+More information in blog:
+
+http://www.40percent.club/search/label/gnap
+
+
+BOM for PCB
+
+    1	Pro Micro (5v, 16MHz)
+    2	12pin SIP headers or a 24 pin socket
+    47	1n4148 diodes
+    47	switches
+    1	mini USB connector Molex part 54819-0519
+    1	cut up micro USB cable
+
+
+Needed in addition if you want LEDs
+
+    1	Pro Micro  (5v, 16MHz)
+    2	12pin SIP headers or a 24 pin socket
+    47	LEDs
+    4	Resistors for LEDs. Use online LED caculator to choose value
+
+Needed for GNAP 2.0
+
+    1	Cherry PCB mount 2U stabilizer
+
+
+
 EasyEDA ordering info:
 
 1.2
