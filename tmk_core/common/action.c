@@ -535,7 +535,9 @@ bool is_tap_key(keypos_t key)
         case ACT_LAYER_TAP:
         case ACT_LAYER_TAP_EXT:
             switch (action.layer_tap.code) {
-                case 0x00 ... 0xdf:
+                case KC_A ... KC_EXSEL:
+                case KC_KP_00 ... KC_KP_HEXADECIMAL:
+                case KC_LCTRL ... KC_RGUI:
                 case OP_TAP_TOGGLE:
                     return true;
             }

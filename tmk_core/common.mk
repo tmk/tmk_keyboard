@@ -21,6 +21,7 @@ SRC +=	$(COMMON_DIR)/host.c \
 ifeq (yes,$(strip $(UNIMAP_ENABLE)))
     SRC += $(COMMON_DIR)/unimap.c
     OPT_DEFS += -DUNIMAP_ENABLE
+    OPT_DEFS += -DACTIONMAP_ENABLE
 else
     ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
 	SRC += $(COMMON_DIR)/actionmap.c
