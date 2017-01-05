@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define IS_ERROR(code)           (KC_ROLL_OVER <= (code) && (code) <= KC_UNDEFINED)
+#define IS_ANY(code)             (KC_A         <= (code) && (code) <= 0xFF)
 
 #ifndef ACTIONMAP_ENABLE
 #define IS_KEY(code)             (KC_A         <= (code) && (code) <= KC_EXSEL)
