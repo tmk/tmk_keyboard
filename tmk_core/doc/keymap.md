@@ -604,12 +604,15 @@ Say you want to type 'The', you have to push and hold Shift key before type 't' 
 
 Oneshot effect is cancel unless following key is pressed down within `ONESHOT_TIMEOUT` of `config.h`. No timeout when it is `0` or not defined.
 
+Oneshot modifiers can be turned on or off by using the following action.  This affects any modifiers that have been set as oneshot modifiers in the keymap or actionmap.  So if a the above action was set (oneshot modifier on left shift) and then this action is called once, the left shift will behave normally.  If the toggle action is called again, left shift will behave as a oneshot modifier.
+
+    ACTION_MODS_ONESHOT_TOGGLE()
+
 
 ### 4.4 Tap Toggle Mods
 Similar to layer tap toggle, this works as a momentary modifier when holding, but toggles on with several taps. A single tap will 'unstick' the modifier again.
 
     ACTION_MODS_TAP_TOGGLE(MOD_LSFT)
-
 
 
 

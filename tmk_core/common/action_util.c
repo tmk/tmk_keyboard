@@ -46,11 +46,24 @@ report_keyboard_t *keyboard_report = &(report_keyboard_t){};
 
 #ifndef NO_ACTION_ONESHOT
 static int8_t oneshot_mods = 0;
+static bool oneshot_active = true;
 #if (defined(ONESHOT_TIMEOUT) && (ONESHOT_TIMEOUT > 0))
 static int16_t oneshot_time = 0;
 #endif
 #endif
 
+void oneshot_toggle(void) {
+    oneshot_active = ! oneshot_active;
+    dprintf("Oneshot: active: %d\n",oneshot_active);
+}
+
+void oneshot_enable(void) {
+    oneshot_active = true;
+}
+
+void oneshot_disable(void) {
+    oneshot_active = false;
+}
 
 void send_keyboard_report(void) {
     keyboard_report->mods  = real_mods;
@@ -122,10 +135,12 @@ void clear_weak_mods(void) { weak_mods = 0; }
 #ifndef NO_ACTION_ONESHOT
 void set_oneshot_mods(uint8_t mods)
 {
-    oneshot_mods = mods;
+    if ( oneshot_active ) {
+        oneshot_mods = mods;
 #if (defined(ONESHOT_TIMEOUT) && (ONESHOT_TIMEOUT > 0))
-    oneshot_time = timer_read();
+        oneshot_time = timer_read();
 #endif
+     }
 }
 void clear_oneshot_mods(void)
 {
@@ -135,8 +150,6 @@ void clear_oneshot_mods(void)
 #endif
 }
 #endif
-
-
 
 
 /*
