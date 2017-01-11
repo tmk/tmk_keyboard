@@ -86,7 +86,7 @@ var kind_codes = {
     LAYER_OFF:          ACT_LAYER<<12 | OP_BIT_AND<<10,
     LAYER_SET:          ACT_LAYER<<12 | OP_BIT_SET<<10,
     LAYER_TAP_KEY:      ACT_LAYER_TAP<<12,
-    LAYER_MODS:         ACT_LAYER_TAP<<12 | 0xe0,
+    LAYER_MODS:         ACT_LAYER_TAP<<12 | 0xc0,
     LAYER_TAP_TOGGLE:   ACT_LAYER_TAP<<12 | OP_TAP_TOGGLE,
     LAYER_ON_OFF:       ACT_LAYER_TAP<<12 | OP_ON_OFF,
     LAYER_OFF_ON:       ACT_LAYER_TAP<<12 | OP_OFF_ON,
@@ -168,12 +168,16 @@ function Action(code) {
 
     var mods_str = function(mods) {
         var mods_name = "", mods_desc = []
-        if (mods & 0x01)  mods_name += "\u2303", mods_desc.push("Control");
-        if (mods & 0x02)  mods_name += "\u21E7", mods_desc.push("Shift");
-        if (mods & 0x04)  mods_name += "\u2325", mods_desc.push("Alt");
         if (mods & 0x08)  mods_name += "\u2318", mods_desc.push("Gui");
+        if (mods & 0x04)  mods_name += "\u2325", mods_desc.push("Alt");
+        if (mods & 0x02)  mods_name += "\u21E7", mods_desc.push("Shift");
+        if (mods & 0x01)  mods_name += "\u2303", mods_desc.push("Control");
         mods_desc = mods_desc.join(" + ");
-        if (mods & 0x10)  mods_name = "r" + mods_name, mods_desc = "Right " + mods_desc;
+        if (mods & 0x10 && mods & 0x0f) {
+            mods_name = "R" + mods_name, mods_desc = "Right " + mods_desc;
+        } else {
+            mods_name = "L" + mods_name, mods_desc = "Left " + mods_desc;
+        }
         return { name: mods_name, desc: mods_desc };
     };
     this.get_action = function() {
@@ -269,8 +273,9 @@ function Action(code) {
                     case OP_SET_CLEAR:
                         return action_kinds.LAYER_SET_CLEAR;
                     default:
-                        if ((this.layer_tap_code & 0xf0) == 0xe0) {
-                            var _mods_str =  mods_str(this.layer_tap_code & 0x0f);
+                        /* 0xc0 ... 0xdf */
+                        if ((this.layer_tap_code & 0xe0) == 0xc0) {
+                            var _mods_str =  mods_str(this.layer_tap_code & 0x1f);
                             return $.extend({}, action_kinds.LAYER_MODS,
                                     {
                                         name: "LM" + this.layer_tap_val + " " + _mods_str.name,
@@ -703,22 +708,38 @@ mousekey_codes[0x00FF] = {id: 'ACL2',                        name: 'Mouse Fast',
  * Modifier combination
  **********************************************************************/
 mods_codes = [];
-mods_codes[0x0] = { id: 0x0,    name: "    ",   desc: "none" };
-mods_codes[0x1] = { id: 0x1,    name: "   \u2303",   desc: "Control" };
-mods_codes[0x2] = { id: 0x2,    name: "  \u21E7 ",   desc: "Shift" };
-mods_codes[0x3] = { id: 0x3,    name: "  \u21E7\u2303",   desc: "Shift + Control" };
-mods_codes[0x4] = { id: 0x4,    name: " \u2325  ",   desc: "Alt" };
-mods_codes[0x5] = { id: 0x5,    name: " \u2325 \u2303",   desc: "Alt + Control" };
-mods_codes[0x6] = { id: 0x6,    name: " \u2325\u21E7 ",   desc: "Alt + Shift" };
-mods_codes[0x7] = { id: 0x7,    name: " \u2325\u21E7\u2303",   desc: "Alt + Shift + Control" };
-mods_codes[0x8] = { id: 0x8,    name: "\u2318   ",   desc: "Gui" };
-mods_codes[0x9] = { id: 0x9,    name: "\u2318  \u2303",   desc: "Gui + Control" };
-mods_codes[0xA] = { id: 0xA,    name: "\u2318 \u21E7 ",   desc: "Gui + Shift" };
-mods_codes[0xB] = { id: 0xB,    name: "\u2318 \u21E7\u2303",   desc: "Gui + Shift + Control" };
-mods_codes[0xC] = { id: 0xC,    name: "\u2318\u2325  ",   desc: "Gui + Alt" };
-mods_codes[0xD] = { id: 0xD,    name: "\u2318\u2325 \u2303",   desc: "Gui + Alt + Control" };
-mods_codes[0xE] = { id: 0xE,    name: "\u2318\u2325\u21E7 ",   desc: "Gui + Alt + Shift" };
-mods_codes[0xF] = { id: 0xF,    name: "\u2318\u2325\u21E7\u2303",   desc: "Gui + Alt + Shift + Control" };
+mods_codes[0x00] = { id: 0x0,    name: "",                          desc: "none" };
+mods_codes[0x01] = { id: 0x1,    name: "L\u2303",                   desc: "Left Control" };
+mods_codes[0x02] = { id: 0x2,    name: "L\u21E7",                   desc: "Left Shift" };
+mods_codes[0x03] = { id: 0x3,    name: "L\u21E7\u2303",             desc: "Left Shift + Control" };
+mods_codes[0x04] = { id: 0x4,    name: "L\u2325",                   desc: "Left Alt" };
+mods_codes[0x05] = { id: 0x5,    name: "L\u2325\u2303",             desc: "Left Alt + Control" };
+mods_codes[0x06] = { id: 0x6,    name: "L\u2325\u21E7",             desc: "Left Alt + Shift" };
+mods_codes[0x07] = { id: 0x7,    name: "L\u2325\u21E7\u2303",       desc: "Left Alt + Shift + Control" };
+mods_codes[0x08] = { id: 0x8,    name: "L\u2318",                   desc: "Left Gui" };
+mods_codes[0x09] = { id: 0x9,    name: "L\u2318\u2303",             desc: "Left Gui + Control" };
+mods_codes[0x0A] = { id: 0xA,    name: "L\u2318\u21E7",             desc: "Left Gui + Shift" };
+mods_codes[0x0B] = { id: 0xB,    name: "L\u2318\u21E7\u2303",       desc: "Left Gui + Shift + Control" };
+mods_codes[0x0C] = { id: 0xC,    name: "L\u2318\u2325",             desc: "Left Gui + Alt" };
+mods_codes[0x0D] = { id: 0xD,    name: "L\u2318\u2325\u2303",       desc: "Left Gui + Alt + Control" };
+mods_codes[0x0E] = { id: 0xE,    name: "L\u2318\u2325\u21E7",       desc: "Left Gui + Alt + Shift" };
+mods_codes[0x0F] = { id: 0xF,    name: "L\u2318\u2325\u21E7\u2303", desc: "Left Gui + Alt + Shift + Control" };
+//mods_codes[0x10] = { id: 0x10,   name: "",                          desc: "none" };
+mods_codes[0x11] = { id: 0x11,   name: "R\u2303",                   desc: "Right Control" };
+mods_codes[0x12] = { id: 0x12,   name: "R\u21E7",                   desc: "Right Shift" };
+mods_codes[0x13] = { id: 0x13,   name: "R\u21E7\u2303",             desc: "Right Shift + Control" };
+mods_codes[0x14] = { id: 0x14,   name: "R\u2325",                   desc: "Right Alt" };
+mods_codes[0x15] = { id: 0x15,   name: "R\u2325\u2303",             desc: "Right Alt + Control" };
+mods_codes[0x16] = { id: 0x16,   name: "R\u2325\u21E7",             desc: "Right Alt + Shift" };
+mods_codes[0x17] = { id: 0x17,   name: "R\u2325\u21E7\u2303",       desc: "Right Alt + Shift + Control" };
+mods_codes[0x18] = { id: 0x18,   name: "R\u2318",                   desc: "Right Gui" };
+mods_codes[0x19] = { id: 0x19,   name: "R\u2318\u2303",             desc: "Right Gui + Control" };
+mods_codes[0x1A] = { id: 0x1A,   name: "R\u2318\u21E7",             desc: "Right Gui + Shift" };
+mods_codes[0x1B] = { id: 0x1B,   name: "R\u2318\u21E7\u2303",       desc: "Right Gui + Shift + Control" };
+mods_codes[0x1C] = { id: 0x1C,   name: "R\u2318\u2325",             desc: "Right Gui + Alt" };
+mods_codes[0x1D] = { id: 0x1D,   name: "R\u2318\u2325\u2303",       desc: "Right Gui + Alt + Control" };
+mods_codes[0x1E] = { id: 0x1E,   name: "R\u2318\u2325\u21E7",       desc: "Right Gui + Alt + Shift" };
+mods_codes[0x1F] = { id: 0x1F,   name: "R\u2318\u2325\u21E7\u2303", desc: "Right Gui + Alt + Shift + Control" };
 
 
 /**********************************************************************

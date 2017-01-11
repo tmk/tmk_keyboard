@@ -168,7 +168,7 @@ $(function() {
         $("#consumer_codes_dropdown").val(act.usage_code);
         $("#mousekey_codes_dropdown").val(act.mousekey_code);
         $("#layer_dropdown").val(act.layer_tap_val);
-        $("#layer_mods_dropdown").val(act.layer_tap_code & 0x0f);
+        $("#layer_mods_dropdown").val(act.layer_tap_code & 0x1f);
         $("#layer_on_dropdown").val(act.layer_bitop_op);
     };
 
