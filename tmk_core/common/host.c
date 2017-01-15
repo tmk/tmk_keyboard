@@ -94,7 +94,7 @@ void host_consumer_send(uint16_t report)
     }
 }
 
-uint16_t host_last_sysytem_report(void)
+uint16_t host_last_system_report(void)
 {
     return last_system_report;
 }

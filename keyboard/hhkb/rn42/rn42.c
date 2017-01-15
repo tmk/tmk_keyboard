@@ -134,6 +134,34 @@ static uint8_t leds = 0;
 static uint8_t keyboard_leds(void) { return leds; }
 void rn42_set_leds(uint8_t l) { leds = l; }
 
+
+void rn42_send_str(const char *str)
+{
+    uint8_t c;
+    while ((c = pgm_read_byte(str++)))
+        rn42_putc(c);
+}
+
+const char *rn42_send_command(const char *cmd)
+{
+    static const char *s;
+    rn42_send_str(cmd);
+    wait_ms(500);
+    s = rn42_gets(100);
+    xprintf("%s\r\n", s);
+    rn42_print_response();
+    return s;
+}
+
+void rn42_print_response(void)
+{
+    int16_t c;
+    while ((c = rn42_getc()) != -1) {
+        xprintf("%c", c);
+    }
+}
+
+
 static void send_keyboard(report_keyboard_t *report)
 {
     // wake from deep sleep

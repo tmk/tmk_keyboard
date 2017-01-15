@@ -225,7 +225,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    K36,K3A,K37,            K31,                K3B,K3C,K3D, K52,    K41,K4C  \
 ) { \
   { KC_##K00, KC_##K01, KC_##K02, KC_##K03, KC_##K04, KC_##K05, KC_##K06, KC_##K07 }, \
-  { KC_##K08, KC_##K09, KC_##K0A  KC_##K0B, KC_##K0C, KC_##K0D, KC_##K0E, KC_##K0F }, \
+  { KC_##K08, KC_##K09, KC_##K0A, KC_##K0B, KC_##K0C, KC_##K0D, KC_##K0E, KC_##K0F }, \
   { KC_##K10, KC_##K11, KC_##K12, KC_##K13, KC_##K14, KC_##K15, KC_##K16, KC_##K17 }, \
   { KC_##K18, KC_##K19, KC_##K1A, KC_##K1B, KC_##K1C, KC_##K1D, KC_##K1E, KC_##K1F }, \
   { KC_##K20, KC_##K21, KC_##K22, KC_##K23, KC_##K24, KC_##K25, KC_##K26, KC_##K27 }, \

@@ -1033,7 +1033,7 @@ void init_usb_driver(USBDriver *usbp) {
 
   chVTObjectInit(&keyboard_idle_timer);
 #ifdef CONSOLE_ENABLE
-  obqObjectInit(&console_buf_queue, console_queue_buffer, CONSOLE_EPSIZE, CONSOLE_QUEUE_CAPACITY, console_queue_onotify, (void*)usbp);
+  obqObjectInit(&console_buf_queue, true, console_queue_buffer, CONSOLE_EPSIZE, CONSOLE_QUEUE_CAPACITY, console_queue_onotify, (void*)usbp);
   chVTObjectInit(&console_flush_timer);
 #endif
 }

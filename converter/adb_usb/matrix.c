@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "matrix.h"
 #include "report.h"
 #include "host.h"
+#include "led.h"
 
 
 
@@ -64,7 +65,7 @@ void matrix_init(void)
 
     // Determine ISO keyboard by handler id
     // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c?v=4.4#L815
-    uint16_t handler_id = adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
+    uint8_t handler_id = (uint8_t) adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
     switch (handler_id) {
     case 0x04: case 0x05: case 0x07: case 0x09: case 0x0D:
     case 0x11: case 0x14: case 0x19: case 0x1D: case 0xC1:
@@ -100,6 +101,8 @@ void matrix_init(void)
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
+
+    led_set(host_keyboard_leds());
 
     debug_enable = true;
     //debug_matrix = true;
