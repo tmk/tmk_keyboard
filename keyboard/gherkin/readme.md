@@ -15,8 +15,8 @@ Mosfet on B5 to control backlight.
 BOM
 
     1	Pro Micro
-    2	12pin SIP headers
-    30	1n4148 diodes
+    2	12pin SIP headers, or 1 24 pin machined pin DIP socket
+    30	1n4148 diodes, save the cut off leads for use with machined pin socket
     30	switches
 
 Needed if you want LEDs
