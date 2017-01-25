@@ -9,10 +9,10 @@
 void battery_init(void)
 {
     // blink 
-    battery_led(LED_ON);  _delay_ms(500);
-    battery_led(LED_OFF); _delay_ms(500);
-    battery_led(LED_ON);  _delay_ms(500);
-    battery_led(LED_OFF); _delay_ms(500);
+    battery_led(LED_ON);  _delay_ms(100);
+    battery_led(LED_OFF); _delay_ms(100);
+    battery_led(LED_ON);  _delay_ms(100);
+    battery_led(LED_OFF); _delay_ms(100);
     // LED indicates charger status
     battery_led(LED_CHARGER);
 
