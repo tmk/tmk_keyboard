@@ -1,0 +1,34 @@
+COL
+---
+Anode side, senses keys with internal pull-up.
+
+Left to right:
+
+    PTD6
+    PTD5
+    PTD4
+    PTD3
+    
+    PTA19
+    PTA18
+    PTA4 NMI
+    PTA2
+    PTA1
+    
+    PTE25
+    PTE24
+    PTE30
+    PTE29
+    PTE21
+    
+ROW
+----
+Cathod side, given strobe with output low.
+
+Top to bottom:
+
+    PTB3
+    PTB16
+    PTB17
+    PTC0
+    PTC1
