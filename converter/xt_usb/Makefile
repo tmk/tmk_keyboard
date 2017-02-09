@@ -71,6 +71,7 @@ F_USB = $(F_CPU)
 #   LUFA bootloader  4096
 #   USBaspLoader     2048
 OPT_DEFS += -DBOOTLOADER_SIZE=512
+#OPT_DEFS += -DBOOTLOADER_SIZE=4096
 
 
 # Build Options
@@ -88,6 +89,10 @@ NKRO_ENABLE = yes	# USB Nkey Rollover
 #
 XT_USE_INT = yes	# uses external interrupt for falling edge of PS/2 clock pin
 
+
+# Various Ornery Keyboard Options
+#
+XT_ZENITH_BLACK = no	# enable code to support Zenith Z-150 "black label" XT, don't enable for regular XT
 
 # Optimize size but this may cause error "relocation truncated to fit"
 #EXTRALDFLAGS = -Wl,--relax

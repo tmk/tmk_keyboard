@@ -32,6 +32,10 @@ ifeq (yes,$(strip $(XT_USE_INT)))
     OPT_DEFS += -DXT_USE_INT
 endif
 
+ifeq (yes,$(strip $(XT_ZENITH_BLACK)))
+    OPT_DEFS += -DXT_ZENITH_BLACK
+endif
+
 
 ifeq (yes,$(strip $(SERIAL_MOUSE_MICROSOFT_ENABLE)))
     SRC += $(PROTOCOL_DIR)/serial_mouse_microsoft.c
