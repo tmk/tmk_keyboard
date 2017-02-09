@@ -71,7 +71,6 @@ F_USB = $(F_CPU)
 #   LUFA bootloader  4096
 #   USBaspLoader     2048
 OPT_DEFS += -DBOOTLOADER_SIZE=512
-#OPT_DEFS += -DBOOTLOADER_SIZE=4096
 
 
 # Build Options
