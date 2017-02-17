@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "unimap_trans.h"
 
 
-#define AC_L1       ACTION_LAYER_MOMENTARY(1)
+#define AC_L1       ACTION_LAYER_TAP_KEY(1, KC_RGUI)
 
 
 #ifdef KEYMAP_SECTION_ENABLE
@@ -43,7 +43,7 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
         TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,     BSLS, \
         LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,          ENT,  \
         LSFT,NUBS,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,     RSFT,ESC,  \
-        LCTL,LGUI,LALT,          SPC,                          APP, RALT,RGUI,L1),
+        LCTL,LGUI,LALT,          SPC,                          APP, RALT,L1,  RCTL),
 
     [1] = UNIMAP_ALPS64( \
         ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,  \

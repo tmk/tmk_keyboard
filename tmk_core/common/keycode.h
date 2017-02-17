@@ -25,7 +25,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define IS_ERROR(code)           (KC_ROLL_OVER <= (code) && (code) <= KC_UNDEFINED)
 #define IS_ANY(code)             (KC_A         <= (code) && (code) <= 0xFF)
+
+#ifndef ACTIONMAP_ENABLE
 #define IS_KEY(code)             (KC_A         <= (code) && (code) <= KC_EXSEL)
+#else
+#define IS_KEY(code)             ((KC_A         <= (code) && (code) <= KC_EXSEL) || \
+                                  (KC_KP_00     <= (code) && (code) <= KC_KP_HEXADECIMAL))
+#endif
+
 #define IS_MOD(code)             (KC_LCTRL     <= (code) && (code) <= KC_RGUI)
 
 
@@ -179,7 +186,7 @@ enum hid_keyboard_keypad_usage {
     KC_ROLL_OVER,
     KC_POST_FAIL,
     KC_UNDEFINED,
-    KC_A,
+    KC_A,               /* 0x04 */
     KC_B,
     KC_C,
     KC_D,
@@ -341,10 +348,7 @@ enum hid_keyboard_keypad_usage {
     KC_CRSEL,
     KC_EXSEL,           /* 0xA4 */
 
-    /* NOTE: 0xA5-DF are used for internal special purpose */
-
-#if 0
-    /* NOTE: Following codes(0xB0-DD) are not used. Leave them for reference. */
+    /* NOTE: Following code range(0xB0-DD) are shared with special codes of 8-bit keymap */
     KC_KP_00            = 0xB0,
     KC_KP_000,
     KC_THOUSANDS_SEPARATOR,
@@ -391,7 +395,6 @@ enum hid_keyboard_keypad_usage {
     KC_KP_OCTAL,
     KC_KP_DECIMAL,
     KC_KP_HEXADECIMAL,  /* 0xDD */
-#endif
 
     /* Modifiers */
     KC_LCTRL            = 0xE0,
@@ -401,13 +404,11 @@ enum hid_keyboard_keypad_usage {
     KC_RCTRL,
     KC_RSHIFT,
     KC_RALT,
-    KC_RGUI,
-
-    /* NOTE: 0xE8-FF are used for internal special purpose */
+    KC_RGUI,            /* 0xE7 */
 };
 
-/* Special keycodes */
-/* NOTE: 0xA5-DF and 0xE8-FF are used for internal special purpose */
+/* Special keycodes for 8-bit keymap
+   NOTE: 0xA5-DF and 0xE8-FF are used for internal special purpose */
 enum internal_special_keycodes {
     /* System Control */
     KC_SYSTEM_POWER     = 0xA5,
