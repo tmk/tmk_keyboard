@@ -11,7 +11,7 @@ Key matrix pinout
     col: D4, C6, D7, E6
     row: B4, B5, B6
 
-	
+
 LED matrix pinout
 
     col: F4, F5, F6, F7
@@ -20,7 +20,7 @@ LED matrix pinout
 
 BOM
 
-    1	Pro Micro
+    1	Pro Micro (5V, 16MHz)
     2	12pin SIP headers, or 1 24 pin machined pin DIP socket
     12	1n4148 diodes, save the cut off leads for use with machined pin socket
     12	switches
@@ -32,4 +32,4 @@ Needed if you want LEDs
 
 Optional for i2c
 
-    2	5k resistors (R4, R5)
+    2	4.7k resistors (R4, R5)
