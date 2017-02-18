@@ -25,8 +25,11 @@ BOM
     12	1n4148 diodes, save the cut off leads for use with machined pin socket
     12	switches
 
-	
 Needed if you want LEDs
 
     12	LEDs
-    3	Resistors for LEDs. Use online LED caculator to choose value. Target 10mA single LED output.
+    3	Resistors for LEDs (R1-R3). Use online LED caculator to choose value. Target 10mA single LED output.
+
+Optional for i2c
+
+    2	5k resistors (R4, R5)
