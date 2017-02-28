@@ -408,8 +408,17 @@ gccversion :
 
 
 # Program the device.  
-program: $(TARGET).hex $(TARGET).eep
+program: $(TARGET).hex $(TARGET).eep chksize
 	$(PROGRAM_CMD)
+
+HEX_SIZE=$(SIZE) -t $(TARGET).hex|tail -1|cut -f2
+chksize: $(TARGET).hex $(TARGET).eep
+	@echo "Size:`$(HEX_SIZE)`"
+	@if [ `$(HEX_SIZE)` -lt 28000 ]; then \
+	echo "Size check passed.";echo;echo;\
+	else \
+	echo;echo -n "Firmware size is too big to be flashed.\nTry to disable some functions to reduce the size.\n"; exit 1;\
+	fi
 
 teensy: $(TARGET).hex
 	teensy_loader_cli -mmcu=$(MCU) -w -v $(TARGET).hex
@@ -627,4 +636,4 @@ $(shell mkdir $(OBJDIR) 2>/dev/null)
 .PHONY : all begin finish end sizebefore sizeafter gccversion \
 build elf hex eep lss sym coff extcoff \
 clean clean_list debug gdb-config show_path \
-program teensy dfu flip dfu-ee flip-ee dfu-start
+program teensy dfu flip dfu-ee flip-ee dfu-start chksize
