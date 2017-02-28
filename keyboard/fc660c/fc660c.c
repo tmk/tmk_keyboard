@@ -1,5 +1,5 @@
 /*
-Copyright 2011 Jun Wako <wakojun@gmail.com>
+Copyright 2017 Jun Wako <wakojun@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,14 +26,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "util.h"
 #include "timer.h"
 #include "matrix.h"
-#include "hhkb_avr.h"
 #include <avr/wdt.h>
 #include "suspend.h"
 #include "lufa.h"
+#include "led.h"
+#include "fc660c.h"
 
 
-// matrix power saving
-#define MATRIX_POWER_SAVE       10000
 static uint32_t matrix_last_modified = 0;
 
 // matrix state buffer(1:on, 0:off)
@@ -45,9 +44,10 @@ static matrix_row_t _matrix1[MATRIX_ROWS];
 
 void matrix_init(void)
 {
-#ifdef DEBUG
+#if 1
     debug_enable = true;
     debug_keyboard = true;
+    debug_matrix = true;
 #endif
 
     KEY_INIT();
@@ -61,22 +61,23 @@ void matrix_init(void)
 
 uint8_t matrix_scan(void)
 {
-    uint8_t *tmp;
+    matrix_row_t *tmp;
 
     tmp = matrix_prev;
     matrix_prev = matrix;
     matrix = tmp;
 
-    // power on
-    if (!KEY_POWER_STATE()) KEY_POWER_ON();
-    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-            KEY_SELECT(row, col);
-            _delay_us(5);
+    uint8_t row, col;
+    for (col = 0; col < MATRIX_COLS; col++) {
+        SET_COL(col);
+        for (row = 0; row < MATRIX_ROWS; row++) {
+            //KEY_SELECT(row, col);
+            SET_ROW(row);
+            _delay_us(2);
 
             // Not sure this is needed. This just emulates HHKB controller's behaviour.
             if (matrix_prev[row] & (1<<col)) {
-                KEY_PREV_ON();
+                KEY_HYS_ON();
             }
             _delay_us(10);
 
@@ -88,18 +89,7 @@ uint8_t matrix_scan(void)
             KEY_ENABLE();
 
             // Wait for KEY_STATE outputs its value.
-            // 1us was ok on one HHKB, but not worked on another.
-            // no   wait doesn't work on Teensy++ with pro(1us works)
-            // no   wait does    work on tmk PCB(8MHz) with pro2
-            // 1us  wait does    work on both of above
-            // 1us  wait doesn't work on tmk(16MHz)
-            // 5us  wait does    work on tmk(16MHz)
-            // 5us  wait does    work on tmk(16MHz/2)
-            // 5us  wait does    work on tmk(8MHz)
-            // 10us wait does    work on Teensy++ with pro
-            // 10us wait does    work on 328p+iwrap with pro
-            // 10us wait doesn't work on tmk PCB(8MHz) with pro2(very lagged scan)
-            _delay_us(5);
+            _delay_us(2);
 
             if (KEY_STATE()) {
                 matrix[row] &= ~(1<<col);
@@ -115,28 +105,16 @@ uint8_t matrix_scan(void)
             }
 
             _delay_us(5);
-            KEY_PREV_OFF();
+            KEY_HYS_OFF();
             KEY_UNABLE();
 
             // NOTE: KEY_STATE keep its state in 20us after KEY_ENABLE.
             // This takes 25us or more to make sure KEY_STATE returns to idle state.
-#ifdef HHKB_JP
-            // Looks like JP needs faster scan due to its twice larger matrix
-            // or it can drop keys in fast key typing
-            _delay_us(30);
-#else
             _delay_us(75);
-#endif
         }
-        if (matrix[row] ^ matrix_prev[row]) matrix_last_modified = timer_read32();
-    }
-    // power off
-    if (KEY_POWER_STATE() &&
-            (USB_DeviceState == DEVICE_STATE_Suspended ||
-             USB_DeviceState == DEVICE_STATE_Unattached ) &&
-            timer_elapsed32(matrix_last_modified) > MATRIX_POWER_SAVE) {
-        KEY_POWER_OFF();
-        suspend_power_down();
+        if (matrix[row] ^ matrix_prev[row]) {
+            matrix_last_modified = timer_read32();
+        }
     }
     return 1;
 }
@@ -147,9 +125,9 @@ matrix_row_t matrix_get_row(uint8_t row)
     return matrix[row];
 }
 
-void matrix_power_up(void) {
-    KEY_POWER_ON();
-}
-void matrix_power_down(void) {
-    KEY_POWER_OFF();
+void led_set(uint8_t usb_led)
+{
+    if (usb_led & (1<<USB_LED_CAPS_LOCK)) {
+    } else {
+    }
 }

@@ -9,8 +9,7 @@ TARGET_DIR ?= .
 
 
 # List C source files
-SRC ?=	matrix.c \
-	led.c
+SRC ?=	fc660c.c
 
 # Configure file
 CONFIG_H ?= config.h
@@ -74,9 +73,8 @@ EXTRAKEY_ENABLE ?= yes		# Audio control and System control
 CONSOLE_ENABLE ?= yes		# Console for debug
 COMMAND_ENABLE ?= yes    	# Commands for debug and configuration
 NKRO_ENABLE ?= yes		# USB Nkey Rollover
-#HHKB_JP ?= yes			# HHKB JP support
 #UNIMAP_ENABLE ?= yes		# Universal keymap
-#ACTIONMAP_ENABLE ?= yes	# Use 16bit actionmap instead of 8bit keymap
+ACTIONMAP_ENABLE ?= yes		# Use 16bit actionmap instead of 8bit keymap
 #KEYMAP_SECTION_ENABLE ?= yes	# fixed address keymap for keymap editor
 
 #OPT_DEFS += -DNO_ACTION_TAPPING
@@ -107,10 +105,6 @@ endif
 VPATH += $(TARGET_DIR)
 VPATH += $(TMK_DIR)
 
-ifeq (yes,$(strip $(RN42_ENABLE)))
-include rn42.mk
-include $(TMK_DIR)/protocol.mk
-endif
 include $(TMK_DIR)/protocol/lufa.mk
 include $(TMK_DIR)/common.mk
 include $(TMK_DIR)/rules.mk
