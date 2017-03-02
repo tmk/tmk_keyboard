@@ -44,13 +44,17 @@ static matrix_row_t _matrix1[MATRIX_ROWS];
 
 void matrix_init(void)
 {
-#if 1
+#if 0
     debug_enable = true;
     debug_keyboard = true;
     debug_matrix = true;
 #endif
 
     KEY_INIT();
+
+    // LEDs on CapsLock and Insert
+    DDRB  |= (1<<6) | (1<<7);
+    PORTB |= (1<<6) | (1<<7);
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) _matrix0[i] = 0x00;
@@ -128,6 +132,8 @@ matrix_row_t matrix_get_row(uint8_t row)
 void led_set(uint8_t usb_led)
 {
     if (usb_led & (1<<USB_LED_CAPS_LOCK)) {
+        PORTB &= ~(1<<6);
     } else {
+        PORTB |=  (1<<6);
     }
 }
