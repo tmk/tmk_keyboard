@@ -8,11 +8,12 @@ Connector
 [datasheet](http://www.mouser.com/ds/2/185/DF14_catalog-939195.pdf)
 
 ### Pinouts
+LV07A and LVC138A are 5V-tolerant, the keyboard will work only with 5V power.
 
     |Controller |Switch  |Description                               |ATmega32u4
     |-----------|--------|------------------------------------------|--------------
-    | 1         |  20    |    +Z7-LV07A-13-~CapsLED                 |
-    | 2         |  19    |    +Z7-LV07A-11-~InsertLED               |
+    | 1         |  20    |    +Z7-LV07A-13-~CapsLED                 |PB6
+    | 2         |  19    |    +Z7-LV07A-11-~InsertLED               |PB7
     | 3         |  18    |    +Z3-LVC138A-4-~G2A  Z6-TP1684-5-~EN   |PD7
     | 4         |  17    |    +Z3-LVC138A-3-A                       |PD4
     | 5         |  16    |    +Z3-LVC138A-3-B                       |PD5
@@ -26,11 +27,11 @@ Connector
     |13         |   8    |    *Z2-AD5258-5-SDL(I2C)                 |PD0(TWI)
     |14         |   7    |    *Z6-TP1684-2-KEY(i)                   |PC6
     |15         |   6    |    *Z6-TP1684-4-HYS(o)                   |PC7
-    |16         |   5    |     5V                                   |
-    |17         |   4    |     3.3V                                 |
-    |18         |   3    |     GND                                  |
-    |19         |   2    |     GND                                  |
-    |20         |   1    |     FG                                   |
+    |16         |   5    |     5V                                   |5V
+    |17         |   4    |     3.3V                                 |5V
+    |18         |   3    |     GND                                  |GND
+    |19         |   2    |     GND                                  |GND
+    |20         |   1    |     FG                                   |GND
 
 ```
 * 5V intferface
@@ -39,6 +40,7 @@ Connector
 
 Key Matrix
 ----------
+Row5-7 has no key, you can omit scaning those. Topre original controller scans those rows for some reason.
 
     |    |0   |1   |2   |3   |4   |5   |6   |7   |8   |9   |A   |B   |C   |D   |E   |F   |
     |----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
@@ -56,3 +58,8 @@ Scan
 ----
 Row: Drive(LVC138A)
 Col: Sense(4051)
+
+
+Resources
+---------
+- Pics https://imgur.com/a/4UKkZ

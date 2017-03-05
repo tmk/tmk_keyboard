@@ -1,5 +1,7 @@
 #include "action.h"
 #include "actionmap.h"
+#include "hook.h"
+
 
 #define AMAP( \
     K13, K10, K11, K12, K14, K16, K17, K15, K1B, K18, K19, K1A, K1C, K1E,      K1F, \
@@ -26,21 +28,59 @@
       AC_NO,    AC_NO,    AC_NO,    AC_NO,    AC_NO,    AC_NO,    AC_NO,    AC_NO    }  \
 }
 
-#define AC_L1       ACTION_LAYER_MOMENTARY(1)
 
+#define AC_L3       ACTION_LAYER_MOMENTARY(3)
+#define AC_L4       ACTION_LAYER_MOMENTARY(4)
+#define AC_LS_2     ACTION_LAYER_MODS(2, MOD_LSFT)
+#define AC_RS_2     ACTION_LAYER_MODS(2, MOD_RSFT)
+#define AC_TGL1     ACTION_LAYER_TOGGLE(1)
+
+// emulates FC660C default keymap
 const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
     [0] = AMAP( \
         ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSPC,     INS,  \
         TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,BSLS,     DEL,  \
-        CAPS,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     ENT,            \
-        LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,          RSFT,UP,        \
-        LCTL,LGUI,LALT,          SPC,           RALT,RCTL,L1,            LEFT,DOWN,RGHT  \
+        LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     ENT,            \
+        LS_2,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,          RS_2,UP,        \
+        LCTL,LGUI,LALT,          SPC,           RALT,RCTL,L3,            LEFT,DOWN,RGHT  \
     ),
     [1] = AMAP( \
+        GRV, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSPC,     INS,  \
+        TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,BSLS,     DEL,  \
+        LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     ENT,            \
+        LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,          RSFT,UP,        \
+        LCTL,LGUI,LALT,          SPC,           RALT,RCTL,L4,            LEFT,DOWN,RGHT  \
+    ),
+    [2] = AMAP( \
+        GRV, TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS, \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS, \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS,           \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,          TRNS,TRNS,      \
+        TRNS,TRNS,TRNS,          TRNS,          TRNS,TRNS,TRNS,          TRNS,TRNS,TRNS  \
+    ),
+    [3] = AMAP( \
         GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, TRNS,     TRNS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,TRNS,TRNS,TRNS,     TRNS, \
+        CAPS,TGL1,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,TRNS,TRNS,TRNS,     TRNS, \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,HOME,PGUP,TRNS,TRNS,     TRNS,           \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,END, PGDN,TRNS,          TRNS,PGUP,      \
-        TRNS,TRNS,TRNS,          TRNS,          TRNS,APP, TRNS,          HOME,PGDN,END   \
-    )
+        TRNS,TRNS,TRNS,          TRNS,          TRNS,APP, L3,            HOME,PGDN,END   \
+    ),
+    [4] = AMAP( \
+        ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, TRNS,     TRNS, \
+        CAPS,TGL1,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,TRNS,TRNS,TRNS,     TRNS, \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,HOME,PGUP,TRNS,TRNS,     TRNS,           \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,END, PGDN,TRNS,          TRNS,PGUP,      \
+        TRNS,TRNS,TRNS,          TRNS,          TRNS,APP, L4,            HOME,PGDN,END   \
+    ),
 };
+
+
+void hook_layer_change(uint32_t layer_state)
+{
+    // lights LED on Insert when layer 1 is enabled
+    if (layer_state & (1L<<1)) {
+        PORTB &= ~(1<<7);
+    } else {
+        PORTB |=  (1<<7);
+    }
+} 
