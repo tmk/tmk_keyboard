@@ -66,7 +66,7 @@ void hook_default_layer_change(uint32_t default_layer_state);
 
 /* Called on layer state change event. */
 /* Default behaviour: do nothing. */
-void hook_layer_change(uint32_t layer_state);
+void hook_layer_change(uint32_t l_state);
 
 /* Called on indicator LED update event (when reported from host). */
 /* Default behaviour: calls keyboard_set_leds. */
