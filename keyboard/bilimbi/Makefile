@@ -50,7 +50,9 @@ TARGET_DIR = .
 # project specific files
 SRC =   matrix.c \
         led.c \
-        backlight.c
+        backlight.c \
+        rgblight.c \
+        light_ws2812.c
 
 ifdef KEYMAP
     SRC := keymap_$(KEYMAP).c $(SRC)

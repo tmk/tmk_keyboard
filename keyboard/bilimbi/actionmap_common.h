@@ -16,7 +16,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef ACTIONMAP_COMMON_H
 #define ACTIONMAP_COMMON_H
+#include "rgblight.h"
 
+enum function_id {
+    RGBLED_TOGGLE,
+    RGBLED_STEP_MODE,
+    RGBLED_INCREASE_HUE,
+    RGBLED_DECREASE_HUE,
+    RGBLED_INCREASE_SAT,
+    RGBLED_DECREASE_SAT,
+    RGBLED_INCREASE_VAL,
+    RGBLED_DECREASE_VAL,
+};
 
 /* keymap definition macro */
 
