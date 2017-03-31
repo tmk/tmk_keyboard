@@ -26,3 +26,5 @@ Needed if you want LEDs
     1	FDS6630A or DMN3018SSS-13 SOIC FET
     1	100ohm resistor
     1	100Kilo ohm resistor
+
+[How to order your own PCBs](http://www.40percent.club/2017/03/ordering-pcb.html)
