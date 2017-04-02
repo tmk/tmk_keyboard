@@ -37,7 +37,7 @@ Pinouts
     |16      | 5         |+Z3-LVC138A-2-B                       |COL3       |PD5
     |17      | 4         |+Z3-LVC138A-1-A                       |COL2       |PD4
     |18      | 3         |+Z3-LVC138A-4-~G2A  Z6-TP1684-5-~EN   |COL1       |PD7
-    |19      | 2         |+Z7-LV07A-11-~InsertLED               |LED1       |PB7
+    |19      | 2         |+Z7-LV07A-11-~InsertLED               |LED1       |PB5
     |20      | 1         |+Z7-LV07A-13-~CapsLED                 |LED2       |PB6
 
 ```
