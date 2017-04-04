@@ -65,7 +65,7 @@ Row5-7 have no key, you can omit scaning on those lines. Topre original controll
     |   7|    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
 
 Logic analyzer pics:
-- https://i.imgur.com/9SZUzYo.jpg
+- http://i.imgur.com/9XoNTev.png
 - https://i.imgur.com/5FCP1Ay.png
 
 This code emuluates what original cotnroller does for matrix scan.
@@ -129,11 +129,15 @@ Datasheets
 
 3.3V power supply
 -----------------
-LV07A and LVC138A are 5V-tolerant and can be powered with 5V, the keyboard will work only with 5V power supply.
-It may not be completely safe to operate LV138A with 5V Vcc, its datasheet says:
+LV07A and LVC138A are 5V-tolerant and can be powered with 5V, the keyboard will work only with 5V power supply. It may not be completely safe to operate LV138A with 5V Vcc, its datasheet says:
 
 > Exposure to absolute-maximum-rated conditions for extended periods may affect device reliability.
 
+Digipot AD5258
+--------------
+Controller can operate AD5258 via I2C to change actuation point of keys. This may make keyboard unusable accidentally and it will be difficult to recovery in some situation. For safety firmware doesn't support it at this point, though.
+
+Lower value of RDAC register causes shallower actuation point.
 
 Resources
 ---------

@@ -73,9 +73,9 @@ EXTRAKEY_ENABLE ?= yes		# Audio control and System control
 CONSOLE_ENABLE ?= yes		# Console for debug
 COMMAND_ENABLE ?= yes    	# Commands for debug and configuration
 NKRO_ENABLE ?= yes		# USB Nkey Rollover
-#UNIMAP_ENABLE ?= yes		# Universal keymap
-ACTIONMAP_ENABLE ?= yes		# Use 16bit actionmap instead of 8bit keymap
-#KEYMAP_SECTION_ENABLE ?= yes	# fixed address keymap for keymap editor
+#ACTIONMAP_ENABLE ?= yes		# Use 16bit actionmap instead of 8bit keymap
+UNIMAP_ENABLE ?= yes		# Universal keymap
+KEYMAP_SECTION_ENABLE ?= yes	# fixed address keymap for keymap editor
 
 #OPT_DEFS += -DNO_ACTION_TAPPING
 #OPT_DEFS += -DNO_ACTION_LAYER
@@ -87,6 +87,7 @@ ACTIONMAP_ENABLE ?= yes		# Use 16bit actionmap instead of 8bit keymap
 #
 ifeq (yes,$(strip $(UNIMAP_ENABLE)))
     KEYMAP_FILE = unimap
+    TARGET := $(TARGET)_unimap
 else
     ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
         KEYMAP_FILE = actionmap

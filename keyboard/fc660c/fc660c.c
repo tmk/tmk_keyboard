@@ -26,9 +26,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "util.h"
 #include "timer.h"
 #include "matrix.h"
-#include <avr/wdt.h>
-#include "suspend.h"
-#include "lufa.h"
 #include "led.h"
 #include "fc660c.h"
 
@@ -137,3 +134,28 @@ void led_set(uint8_t usb_led)
         PORTB |=  (1<<6);
     }
 }
+
+
+#ifdef UNIMAP_ENABLE
+#include <avr/pgmspace.h>
+#include "unimap.h"
+
+const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
+    { UNIMAP_Q,     UNIMAP_W,     UNIMAP_E,     UNIMAP_TAB,   UNIMAP_R,     UNIMAP_U,     UNIMAP_T,     UNIMAP_Y,
+      UNIMAP_O,     UNIMAP_P,     UNIMAP_LBRC,  UNIMAP_I,     UNIMAP_RBRC,  UNIMAP_NO,    UNIMAP_BSLS,  UNIMAP_DEL   },
+    { UNIMAP_1,     UNIMAP_2,     UNIMAP_3,     UNIMAP_GRV,   UNIMAP_4,     UNIMAP_7,     UNIMAP_5,     UNIMAP_6,
+      UNIMAP_9,     UNIMAP_0,     UNIMAP_MINS,  UNIMAP_8,     UNIMAP_EQL,   UNIMAP_NO,    UNIMAP_BSPC,  UNIMAP_INS   },
+    { UNIMAP_NO,    UNIMAP_LGUI,  UNIMAP_LALT,  UNIMAP_LCTL,  UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_SPC,
+      UNIMAP_RALT,  UNIMAP_NO,    UNIMAP_RCTL,  UNIMAP_NO,    UNIMAP_RGUI,  UNIMAP_DOWN,  UNIMAP_LEFT,  UNIMAP_RGHT  },
+    { UNIMAP_NO,    UNIMAP_Z,     UNIMAP_X,     UNIMAP_LSFT,  UNIMAP_C,     UNIMAP_N,     UNIMAP_V,     UNIMAP_B,
+      UNIMAP_COMM,  UNIMAP_DOT,   UNIMAP_SLSH,  UNIMAP_M,     UNIMAP_RSFT,  UNIMAP_UP,    UNIMAP_NO,    UNIMAP_NO    },
+    { UNIMAP_A,     UNIMAP_S,     UNIMAP_D,     UNIMAP_CAPS,  UNIMAP_F,     UNIMAP_J,     UNIMAP_G,     UNIMAP_H,
+      UNIMAP_L,     UNIMAP_SCLN,  UNIMAP_QUOT,  UNIMAP_K,     UNIMAP_NO,    UNIMAP_NO,    UNIMAP_ENT,   UNIMAP_NO    },
+    { UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,
+      UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    },
+    { UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,
+      UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    },
+    { UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,
+      UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    }
+};
+#endif
