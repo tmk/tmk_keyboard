@@ -115,5 +115,11 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-alps64.html",
         },
+        fc660c: {
+            desc: "FC660C Controller",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/keyboard/fc660c/binary/fc660c_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-fc660c.html",
+        },
     },
 };
