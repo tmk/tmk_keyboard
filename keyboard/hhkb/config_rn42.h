@@ -63,9 +63,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define RTSEN 0
     #define CTSEN 1
 
+#if (F_CPU == 8000000)
+#define USE_U2X
+#else
+#undef USE_U2X
+#endif
     #define SERIAL_UART_BAUD        115200
     #define SERIAL_UART_DATA        UDR1
+#ifdef USE_U2X
+    #define SERIAL_UART_UBRR        ((F_CPU/(8.0*SERIAL_UART_BAUD)-1+0.5))
+    #define SET_U2X1                ((UCSR1A |= (1<<U2X1)))
+#else
     #define SERIAL_UART_UBRR        ((F_CPU/(16.0*SERIAL_UART_BAUD)-1+0.5))
+    #define SET_U2X1
+#endif
     #define SERIAL_UART_RXD_VECT    USART1_RX_vect
     #define SERIAL_UART_TXD_READY   (UCSR1A&(1<<UDRE1))
     #define SERIAL_UART_INIT()      do { \
@@ -76,6 +87,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         UCSR1C |= (0<<UPM11) | (0<<UPM10);  /* parity: none(00), even(01), odd(11) */ \
         UCSR1D |= (0<<RTSEN) | (0<<CTSEN);  /* RTS, CTS(no flow control by hardware) */ \
         DDRD |= (1<<5); PORTD &= ~(1<<5);   /* RTS for flow control by firmware */ \
+        SET_U2X1; \
         sei(); \
     } while(0)
     #define SERIAL_UART_RTS_LO()    do { PORTD &= ~(1<<5); } while (0)
