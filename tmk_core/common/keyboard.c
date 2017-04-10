@@ -137,8 +137,10 @@ void keyboard_task(void)
                     hook_matrix_change(e);
                     // record a processed key
                     matrix_prev[r] ^= ((matrix_row_t)1<<c);
+
+                    // This can miss stroke when scan matrix takes long like Topre
                     // process a key per task call
-                    goto MATRIX_LOOP_END;
+                    //goto MATRIX_LOOP_END;
                 }
             }
         }
