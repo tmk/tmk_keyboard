@@ -140,7 +140,7 @@ You can find other keymap definitions in file `keymap.c` located on project dire
          * `-----------------------------------------------------------'
          *      |Gui |Alt  |Space                  |Alt  |Gui|
          *      `--------------------------------------------'
-         */ 
+         */
         KEYMAP(PWR, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
                CAPS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,UP,  TRNS,BSPC, \
                LCTL,VOLD,VOLU,MUTE,TRNS,TRNS,PAST,PSLS,HOME,PGUP,LEFT,RGHT,ENT, \
@@ -158,7 +158,7 @@ You can find other keymap definitions in file `keymap.c` located on project dire
          * `-----------------------------------------------------------'
          *      |Gui |Alt  |Mb1                    |Alt  |   |
          *      `--------------------------------------------'
-         * Mc: Mouse Cursor / Mb: Mouse Button / Mw: Mouse Wheel 
+         * Mc: Mouse Cursor / Mb: Mouse Button / Mw: Mouse Wheel
          */
         KEYMAP(ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
                TAB, TRNS,TRNS,TRNS,TRNS,TRNS,WH_L,WH_D,WH_U,WH_R,TRNS,TRNS,TRNS,BSPC, \
@@ -194,7 +194,7 @@ See [`common/keycode.h`](../common/keycode.h) or keycode table below for the det
 - `KC_P1` to `KC_P0`, `KC_PDOT`, `KC_PCMM`, `KC_PSLS`, `KC_PAST`, `KC_PMNS`, `KC_PPLS`, `KC_PEQL`, `KC_PENT` for keypad.
 
 ### 1.2 Modifier
-There are 8 modifiers which has discrimination between left and right. 
+There are 8 modifiers which has discrimination between left and right.
 
 - `KC_LCTL` and `KC_RCTL` for Control
 - `KC_LSFT` and `KC_RSFT` for Shift
@@ -250,21 +250,30 @@ You can define these actions on *'A'* key and *'left shift'* modifier with:
     ACTION_KEY(KC_LSFT)
 
 #### 2.1.2 Modified key
-This action is comprised of strokes of modifiers and a key. `Macro` action is needed if you want more complex key strokes.
+This action is comprised of modifiers and a key.
 
-Say you want to assign a key to `Shift + 1` to get character *'!'* or `Alt + Tab` to switch application windows.
+Modified keys can be defined as below. Say you want to assign a key to `Shift + 1` to get character *'!'* or `Alt + Tab` to switch application windows.
 
     ACTION_MODS_KEY(MOD_LSFT, KC_1)
     ACTION_MODS_KEY(MOD_LALT, KC_TAB)
-
-Or `Alt,Shift + Tab` can be defined. `ACTION_MODS_KEY(mods, key)` requires **4-bit modifier state** and a **keycode** as arguments. See `keycode.h` for `MOD_BIT()` macro.
-
     ACTION_MODS_KEY(MOD_LALT | MOD_LSFT, KC_TAB)
+
+These are identical to examples above.
+
+    ACTION_KEY(MOD_LSFT | KC_1)
+    ACTION_KEY(MOD_LALT | KC_TAB)
+    ACTION_KEY(MOD_LSFT | MOD_LALT | KC_TAB)
 
 #### 2.1.3 Multiple Modifiers
 Registers multiple modifiers with pressing a key. To specify multiple modifiers use `|`.
 
-    ACTION_MODS(MOD_ALT | MOD_LSFT)
+    ACTION_MODS(MOD_LALT | MOD_LSFT)
+    ACTION_MODS(MOD_LALT | MOD_LSFT | MOD_LCTL)
+
+These are identical to examples above.
+
+    ACTION_KEY(MOD_LALT | MOD_LSFT, KC_NO)
+    ACTION_KEY(MOD_LALT | MOD_LSFT | MOD_LCTL, KC_NO)
 
 #### 2.1.3 Modifier with Tap key([Dual role][dual_role])
 Works as a modifier key while holding, but registers a key on tap(press and release quickly).
@@ -294,7 +303,7 @@ This sets Default Layer to given parameter `layer` and activate it.
     ACTION_DEFAULT_LAYER_SET(layer)
 
 
-#### 2.2.2 Momentary 
+#### 2.2.2 Momentary
 Turns on `layer` momentarily while holding, in other words it activates when key is pressed and deactivate when released.
 
     ACTION_LAYER_MOMENTARY(layer)
@@ -389,22 +398,22 @@ Default Layer also has bitwise operations, they are executed when key is release
 
 
 #### 2.3.1 Implementing Macro getter function
-To implement `macro` functions, the macro lookup list must be implemented: 
+To implement `macro` functions, the macro lookup list must be implemented:
 
     const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt);
 
 The function must always return a valid macro, and default implementation of `action_get_macro` always returns `MACRO_NONE` which has no effect.
-  
+
 #### 2.3.1.1 Limitations
 Similar to the Function Action system, the selector functions is passed  a `keyrecord_t` object, so it can inspect the key state (e.g. different macros on key press or release), and key itself.
-  
-Unlike the Function Action system,`macros` are pre-recorded key sequences, so you can only select from a list. If you want to use dynamic macros then you should look at the more complex function action system. 
+
+Unlike the Function Action system,`macros` are pre-recorded key sequences, so you can only select from a list. If you want to use dynamic macros then you should look at the more complex function action system.
 
 #### 2.3.2 Implementing/Defining Macro sequences
 Macros are of the form (must be wrapped by the `MACRO` function, and end with an `END` mark)
 
     MACRO( ..., END )
-    
+
 Within each macro, the following commands can be used:
 
 - **I()**   change interval of stroke.
@@ -418,7 +427,7 @@ Within each macro, the following commands can be used:
 
 e.g.:
 
-    MACRO( D(LSHIFT), D(D), END )  // hold down LSHIFT and D - will print 'D'  
+    MACRO( D(LSHIFT), D(D), END )  // hold down LSHIFT and D - will print 'D'
     MACRO( U(D), U(LSHIFT), END )  // release U and LSHIFT keys (an event.pressed == False counterpart for the one above)
     MACRO( I(255), T(H), T(E), T(L), T(L), W(255), T(O), END ) // slowly print out h-e-l-l---o
 
@@ -442,7 +451,7 @@ in keymap.c, define `action_get_macro`
     }
 
 in keymap.c, bind items in `fn_actions` to the macro function
-  
+
     const action_t PROGMEM fn_actions[] = {
          [0] = ACTION_MACRO(0), // will print 'hello' for example
          [1] = ACTION_MACRO(1),

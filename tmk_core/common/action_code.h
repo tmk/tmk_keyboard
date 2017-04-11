@@ -200,26 +200,26 @@ typedef union {
  *   bit 4      +----- LR flag(Left:0, Right:1)
  */
 enum mods_bit {
-    MOD_NONE = 0x00,
-    MOD_LCTL = 0x01,
-    MOD_LSFT = 0x02,
-    MOD_LALT = 0x04,
-    MOD_LGUI = 0x08,
-    MOD_RCTL = 0x11,
-    MOD_RSFT = 0x12,
-    MOD_RALT = 0x14,
-    MOD_RGUI = 0x18,
+    MOD_NONE = 0x0000,
+    MOD_LCTL = 0x0100,
+    MOD_LSFT = 0x0200,
+    MOD_LALT = 0x0400,
+    MOD_LGUI = 0x0800,
+    MOD_RCTL = 0x1100,
+    MOD_RSFT = 0x1200,
+    MOD_RALT = 0x1400,
+    MOD_RGUI = 0x1800,
 };
 enum mods_codes {
     MODS_ONESHOT = 0x00,
     MODS_TAP_TOGGLE = 0x01,
 };
 #define ACTION_KEY(key)                 ACTION(ACT_MODS, (key))
-#define ACTION_MODS(mods)               ACTION(ACT_MODS, ((mods)&0x1f)<<8 | 0)
-#define ACTION_MODS_KEY(mods, key)      ACTION(ACT_MODS, ((mods)&0x1f)<<8 | (key))
-#define ACTION_MODS_TAP_KEY(mods, key)  ACTION(ACT_MODS_TAP, ((mods)&0x1f)<<8 | (key))
-#define ACTION_MODS_ONESHOT(mods)       ACTION(ACT_MODS_TAP, ((mods)&0x1f)<<8 | MODS_ONESHOT)
-#define ACTION_MODS_TAP_TOGGLE(mods)    ACTION(ACT_MODS_TAP, ((mods)&0x1f)<<8 | MODS_TAP_TOGGLE)
+#define ACTION_MODS(mods)               ACTION(ACT_MODS, ((mods)&0x1f00) | 0)
+#define ACTION_MODS_KEY(mods, key)      ACTION(ACT_MODS, ((mods)&0x1f00) | (key))
+#define ACTION_MODS_TAP_KEY(mods, key)  ACTION(ACT_MODS_TAP, ((mods)&0x1f00) | (key))
+#define ACTION_MODS_ONESHOT(mods)       ACTION(ACT_MODS_TAP, ((mods)&0x1f00) | MODS_ONESHOT)
+#define ACTION_MODS_TAP_TOGGLE(mods)    ACTION(ACT_MODS_TAP, ((mods)&0x1f00) | MODS_TAP_TOGGLE)
 
 
 /*
@@ -271,7 +271,7 @@ enum layer_pram_tap_op {
 #define ACTION_LAYER_ON_OFF(layer)                  ACTION_LAYER_TAP((layer), OP_ON_OFF)
 #define ACTION_LAYER_OFF_ON(layer)                  ACTION_LAYER_TAP((layer), OP_OFF_ON)
 #define ACTION_LAYER_SET_CLEAR(layer)               ACTION_LAYER_TAP((layer), OP_SET_CLEAR)
-#define ACTION_LAYER_MODS(layer, mods)              ACTION_LAYER_TAP((layer), 0xc0 | ((mods)&0x1f))
+#define ACTION_LAYER_MODS(layer, mods)              ACTION_LAYER_TAP((layer), 0xc0 | ((mods>>8)&0x1f))
 /* With Tapping */
 #define ACTION_LAYER_TAP_KEY(layer, key)            ACTION_LAYER_TAP((layer), (key))
 #define ACTION_LAYER_TAP_TOGGLE(layer)              ACTION_LAYER_TAP((layer), OP_TAP_TOGGLE)
