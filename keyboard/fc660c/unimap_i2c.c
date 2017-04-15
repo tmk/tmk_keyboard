@@ -189,6 +189,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
         case 3:
             xprintf("Restore RDAC from EEPROM\n");
             restore_from_eeprom();
+            _delay_ms(1);
             nop_for_idle();
             break;
         case 4:
