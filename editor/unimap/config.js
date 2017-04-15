@@ -25,6 +25,18 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-hhkb_jp.html",
         },
+        fc660c: {
+            desc: "FC660C Controller - Plain",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/keyboard/fc660c/binary/fc660c.hex",
+            firmware_format: "ihex",
+            layout: "layout-fc660c.html",
+        },
+        fc660c_emu: {
+            desc: "FC660C Controller - Origianl keymap emulation",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/keyboard/fc660c/binary/fc660c_emu.hex",
+            firmware_format: "ihex",
+            layout: "layout-fc660c.html",
+        },
         adb_usb: {
             desc: "ADB-USB Converter rev.2",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/adb_usb/binary/adb_usb_rev2_unimap.hex",
@@ -114,12 +126,6 @@ CONFIG = {
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/keyboard/alps64/binary/alps64_unimap.hex",
             firmware_format: "ihex",
             layout: "layout-alps64.html",
-        },
-        fc660c: {
-            desc: "FC660C Controller",
-            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/keyboard/fc660c/binary/fc660c_unimap.hex",
-            firmware_format: "ihex",
-            layout: "layout-fc660c.html",
         },
     },
 };
