@@ -343,8 +343,10 @@ $(function() {
             $("#firmware-dropdown").prop("disabled", false);
 
             if (CONFIG.keymap[v].layout) {
+                $("#keymap-desc").text(CONFIG.keymap[v].desc);
                 layout_load(CONFIG.keymap[v].layout);
             } else {
+                $("#keymap-desc").text("Unknown");
                 layout_load(CONFIG.layout_default);
             }
         });
@@ -602,9 +604,11 @@ $(function() {
             $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
         }).always(function() {
+            $("#keymap-desc").text(CONFIG.keymap[variant].desc);
             layout_load(layout);
         });
     } else {
+        $("#keymap-desc").text("Unknown");
         layout_load(layout);
     }
 });
