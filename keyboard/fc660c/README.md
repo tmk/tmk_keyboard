@@ -137,7 +137,8 @@ Digipot AD5258
 --------------
 Controller can operate AD5258 via I2C to change actuation point of keys. This may make keyboard unusable accidentally and it will be difficult to recovery in some situation. For safety firmware doesn't support it at this point, though.
 
-Lower value of RDAC register causes shallower actuation point.
+Lower value of RDAC register causes shallower actuation point. Mine retains 0x27 in EEPROM and restores it in RDAC, just for reference.
+
 
 Resources
 ---------

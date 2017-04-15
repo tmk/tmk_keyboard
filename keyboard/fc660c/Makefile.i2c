@@ -1,0 +1,11 @@
+# !!!!!!!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!!!!!!!!
+# Writing improper value to EEPROM may mess your keyboard and
+# it will require some hassles to recover it.
+#
+# CHECK DATASHEETS SCHEMATICS AND CODES BEFORE TRYING.
+# !!!!!!!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!!!!!!!!
+TARGET = fc660c_i2c
+KEYMAP = i2c
+SRC =	fc660c.c \
+	lib_i2c/i2c_master.c
+include Makefile

@@ -9,8 +9,7 @@ TARGET_DIR ?= .
 
 
 # List C source files
-SRC ?=	fc660c.c \
-	lib_i2c/i2c_master.c
+SRC ?=	fc660c.c
 
 # Configure file
 CONFIG_H ?= config.h
