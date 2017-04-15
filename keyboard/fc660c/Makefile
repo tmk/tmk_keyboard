@@ -87,7 +87,6 @@ KEYMAP_SECTION_ENABLE ?= yes	# fixed address keymap for keymap editor
 #
 ifeq (yes,$(strip $(UNIMAP_ENABLE)))
     KEYMAP_FILE = unimap
-    TARGET := $(TARGET)_unimap
 else
     ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
         KEYMAP_FILE = actionmap
