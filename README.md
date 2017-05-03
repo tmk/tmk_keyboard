@@ -201,6 +201,8 @@ Use PJRC's `hid_listen` to see debug messages. You can use xprintf() to display 
 
 - https://www.pjrc.com/teensy/hid_listen.html
 
+One source for `hid_listen` is https://www.pjrc.com/teensy/hid_listen.html
+
 
 
 Files and Directories
