@@ -1,0 +1,13 @@
+Qty	Component
+17	Cherry MX switches (or clones)
+17	SMD Diode - SOD123 package | Digikey # 497-7546-1-ND
+2	SMD 22Ω resistor - 0805 package | Digikey # P22ACT-ND
+2	SMD 10kΩ resistor - 0805 package | Digikey # P10KACT-ND
+2	SMD 1µF capacitor - 0805 package | Digikey # 1276-1246-1-ND
+2	SMD 20pF capacitor - 0805 package | Digikey # 1276-1829-1-ND
+1	16 MHz crystal | Digikey # 631-1108-ND
+1	Connector Receptacle mini B USB | Digikey # WM17115-ND
+1	SWITCH TACTILE SPST | Digikey # 679-2428-ND
+1	ATmega32U2-AU | Digikey # ATMEGA32U2-AU-ND
+
+All components but the switches must be soldered at the bottom side, even the through hole components.
