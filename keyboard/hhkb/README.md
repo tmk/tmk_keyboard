@@ -66,11 +66,11 @@ First, push reset button on board to start bootloader.
 
 This command programs the controller with [dfu-programmer] if the tool is installed and configured properly.
 
-    $ make -f Makefile.<variant> KEYMAP=<name> dfu
+    # make -f Makefile.<variant> KEYMAP=<name> dfu
 
 Or you can also use [FLIP] command to program. Also the tool should be installed and configured properly. FLIP GUI application is also available.
 
-    $ make -f Makefile.<variant> KEYMAP=<name> flip
+    # make -f Makefile.<variant> KEYMAP=<name> flip
 
 Use [Teensy Loader] if your controller is Teensy/Teensy++.
 
