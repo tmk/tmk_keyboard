@@ -127,5 +127,11 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-alps64.html",
         },
+        x68k_usb: {
+            desc: "X68000-USB Converter",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/x68k_usb/binary/x68k_usb_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-x68k_usb.html",
+        },
     },
 };
