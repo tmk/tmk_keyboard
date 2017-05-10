@@ -51,7 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * ACT_MOUSEKEY(0110): TODO: Not needed?
  * 0101|xxxx| keycode     Mouse key
  *
- * 011x|xxxx xxxx xxxx    (reseved)
+ * 011x|xxxx xxxx xxxx    (reserved)
  *
  *
  * Layer Actions(10xx)
@@ -311,7 +311,7 @@ enum backlight_opt {
 #define ACTION_COMMAND(id, opt)         ACTION(ACT_COMMAND,  (opt)<<8 | (addr))
 /* Function */
 enum function_opts {
-    FUNC_TAP = 0x8,     /* indciates function is tappable */
+    FUNC_TAP = 0x8,     /* indicates function is tappable */
 };
 #define ACTION_FUNCTION(id)             ACTION(ACT_FUNCTION, (id))
 #define ACTION_FUNCTION_TAP(id)         ACTION(ACT_FUNCTION, FUNC_TAP<<8 | (id))

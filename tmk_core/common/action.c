@@ -348,10 +348,23 @@ void process_action(keyrecord_t *record)
         default:
             break;
     }
+
+#ifndef NO_ACTION_LAYER
+    // if this event is a layer action, update the leds
+    switch (action.kind.id) {
+        case ACT_LAYER:
+        #ifndef NO_ACTION_TAPPING
+        case ACT_LAYER_TAP:
+        case ACT_LAYER_TAP_EXT:
+        #endif
+            led_set(host_keyboard_leds());
+            break;
+        default:
+            break;
+    }
+#endif
+
 }
-
-
-
 
 /*
  * Utilities for actions.
