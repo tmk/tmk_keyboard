@@ -42,7 +42,11 @@ static void LUFA_setup(void)
     wdt_disable();
 
     /* Disable clock division */
+#if (F_CPU == 8000000)
+    clock_prescale_set(clock_div_2);    // 16MHz crystal divided by 2
+#else
     clock_prescale_set(clock_div_1);
+#endif
 
     // Leonardo needs. Without this USB device is not recognized.
     USB_Disable();

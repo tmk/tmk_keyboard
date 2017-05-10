@@ -160,6 +160,7 @@ uint8_t matrix_scan(void) {
 
         // restore LED state when keyboard comes up
         if (usb_state == USB_STATE_RUNNING) {
+            dprintf("speed: %s\n", usb_host.getVbusState()==FSHOST ? "full" : "low");
             keyboard_set_leds(host_keyboard_leds());
         }
     }
