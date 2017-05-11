@@ -31,16 +31,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern keymap_config_t keymap_config;
 #endif
 
-static action_t keycode_to_action(uint8_t keycode);
+static action_t keycode_to_action(uint16_t keycode);
 
 
 /* converts key to action */
 __attribute__ ((weak))
 action_t action_for_key(uint8_t layer, keypos_t key)
 {
-    uint8_t keycode = keymap_key_to_keycode(layer, key);
+    uint16_t keycode = keymap_key_to_keycode(layer, key);
     switch (keycode) {
-        case KC_FN0 ... KC_FN31:
+        case KC_FN0 ... FN_MAX:
             return keymap_fn_to_action(keycode);
 #ifdef BOOTMAGIC_ENABLE
         case KC_CAPSLOCK:
@@ -135,7 +135,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 
 
 /* translates keycode to action */
-static action_t keycode_to_action(uint8_t keycode)
+static action_t keycode_to_action(uint16_t keycode)
 {
     switch (keycode) {
         case KC_A ... KC_EXSEL:
