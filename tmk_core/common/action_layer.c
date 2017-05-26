@@ -24,7 +24,9 @@ static void default_layer_state_set(uint32_t state)
     default_layer_state = state;
     hook_default_layer_change(default_layer_state);
     default_layer_debug(); debug("\n");
+#ifdef NO_TRACK_KEY_PRESS
     clear_keyboard_but_mods(); // To avoid stuck keys
+#endif
 }
 
 void default_layer_debug(void)
@@ -66,7 +68,9 @@ static void layer_state_set(uint32_t state)
     layer_state = state;
     hook_layer_change(layer_state);
     layer_debug(); dprintln();
+#ifdef NO_TRACK_KEY_PRESS
     clear_keyboard_but_mods(); // To avoid stuck keys
+#endif
 }
 
 void layer_clear(void)
@@ -115,7 +119,8 @@ void layer_debug(void)
 
 
 
-action_t layer_switch_get_action(keypos_t key)
+/* return layer effective for key at this time */
+static uint8_t current_layer_for_key(keypos_t key)
 {
     action_t action = ACTION_TRANSPARENT;
 
@@ -126,15 +131,34 @@ action_t layer_switch_get_action(keypos_t key)
         if (layers & (1UL<<i)) {
             action = action_for_key(i, key);
             if (action.code != (action_t)ACTION_TRANSPARENT.code) {
-                return action;
+                return i;
             }
         }
     }
     /* fall back to layer 0 */
-    action = action_for_key(0, key);
-    return action;
+    return 0;
 #else
-    action = action_for_key(biton32(default_layer_state), key);
-    return action;
+    return biton32(default_layer_state);
 #endif
+}
+
+
+#ifndef NO_TRACK_KEY_PRESS
+/* record layer on where key is pressed */
+static uint8_t layer_pressed[MATRIX_ROWS][MATRIX_COLS] = {};
+#endif
+action_t layer_switch_get_action(keyevent_t event)
+{
+    uint8_t layer = 0;
+#ifndef NO_TRACK_KEY_PRESS
+    if (event.pressed) {
+        layer = current_layer_for_key(event.key);
+        layer_pressed[event.key.row][event.key.col] = layer;
+    } else {
+        layer = layer_pressed[event.key.row][event.key.col];
+    }
+#else
+    layer = current_layer_for_key(event.key);
+#endif
+    return action_for_key(layer, event.key);
 }

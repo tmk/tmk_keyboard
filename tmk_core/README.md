@@ -7,6 +7,14 @@ Source code is available here: <https://github.com/tmk/tmk_keyboard/tree/core>
 
 Updates
 -------
+#### 2017/05/30
+Fixed **Modifier/Layer key stuck** problem. See this wiki entry. <https://github.com/tmk/tmk_keyboard/wiki/FAQ-Keymap#modifierlayer-stuck> If you need old keymap behaviour for some reason define `NO_TRACK_KEY_PRESS` in your `config.h`.
+
+This is virtually equivalent to QMK `PREVENT_STUCK_MODIFIERS`. <https://github.com/qmk/qmk_firmware/pull/182>
+
+#### 2017/01/11
+Changed action code for `ACTION_LAYER_MODS` and this may cause incompatibility with existent shared URL and downloaded firmwware of keymap editor. If you are using the action you just have to redefine it on keymap editor. Existent keymap code should not suffer.
+
 #### 2016/06/26
 Keymap framework was updated. `fn_actions[]` should be defined as `action_t` instead of `uint16_t`. And default code for keymap handling is now included in core you just need define `uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS]` and `action_t fn_actions[]`.
 

@@ -115,7 +115,7 @@ bool process_tapping(keyrecord_t *keyp)
                  */
                 else if (IS_RELEASED(event) && !waiting_buffer_typed(event)) {
                     // Modifier should be retained till end of this tapping.
-                    action_t action = layer_switch_get_action(event.key);
+                    action_t action = layer_switch_get_action(event);
                     switch (action.kind.id) {
                         case ACT_LMODS:
                         case ACT_RMODS:
@@ -152,7 +152,7 @@ bool process_tapping(keyrecord_t *keyp)
                     debug_tapping_key();
                     return true;
                 }
-                else if (is_tap_key(event.key) && event.pressed) {
+                else if (is_tap_key(event) && event.pressed) {
                     if (tapping_key.tap.count > 1) {
                         debug("Tapping: Start new tap with releasing last tap(>1).\n");
                         // unregister key
@@ -196,7 +196,7 @@ bool process_tapping(keyrecord_t *keyp)
                     tapping_key = (keyrecord_t){};
                     return true;
                 }
-                else if (is_tap_key(event.key) && event.pressed) {
+                else if (is_tap_key(event) && event.pressed) {
                     if (tapping_key.tap.count > 1) {
                         debug("Tapping: Start new tap with releasing last timeout tap(>1).\n");
                         // unregister key
@@ -241,7 +241,7 @@ bool process_tapping(keyrecord_t *keyp)
                         tapping_key = *keyp;
                         return true;
                     }
-                } else if (is_tap_key(event.key)) {
+                } else if (is_tap_key(event)) {
                     // Sequential tap can be interfered with other tap key.
                     debug("Tapping: Start with interfering other tap.\n");
                     tapping_key = *keyp;
@@ -272,7 +272,7 @@ bool process_tapping(keyrecord_t *keyp)
     }
     // not tapping state
     else {
-        if (event.pressed && is_tap_key(event.key)) {
+        if (event.pressed && is_tap_key(event)) {
             debug("Tapping: Start(Press tap key).\n");
             tapping_key = *keyp;
             waiting_buffer_scan_tap();
