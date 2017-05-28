@@ -62,6 +62,8 @@ static inline bool IS_RELEASED(keyevent_t event) { return (!IS_NOEVENT(event) &&
 void keyboard_setup(void);
 /* it runs once after initializing host side protocol, debug and MCU peripherals. */
 void keyboard_init(void);
+/* it runs once right before going into the main loop. The driver is set when this is called. */
+void keyboard_startup(void);
 /* it runs repeatedly in main loop */
 void keyboard_task(void);
 /* it runs when host LED status is updated */

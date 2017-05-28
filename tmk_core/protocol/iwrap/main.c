@@ -161,6 +161,8 @@ int main(void)
     iwrap_init();
     iwrap_call();
 
+    keyboard_startup();
+    
     last_timer = timer_read();
     while (true) {
 #ifdef PROTOCOL_VUSB

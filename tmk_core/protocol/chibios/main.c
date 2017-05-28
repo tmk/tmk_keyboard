@@ -136,6 +136,7 @@ int main(void) {
 #ifdef SLEEP_LED_ENABLE
   sleep_led_init();
 #endif
+  keyboard_startup();
 
   print("Keyboard start.\n");
 

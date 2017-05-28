@@ -82,6 +82,8 @@ int main(void)
         // to load drivers and do whatever it does to actually
         // be ready for input
         _delay_ms(1000);
+        keyboard_startup();
+        
         PORTD = ~_BV(PD5);
         dprintf("Starting main loop");
         while (1) {
@@ -100,6 +102,8 @@ int main(void)
         // to load drivers and do whatever it does to actually
         // be ready for input
         _delay_ms(1000);
+        keyboard_startup();
+        
         PORTB = ~_BV(PB0);
         dprintf("Starting main loop");
         while (1) {

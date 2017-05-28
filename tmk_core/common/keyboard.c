@@ -68,6 +68,12 @@ void keyboard_setup(void)
     matrix_setup();
 }
 
+__attribute__ ((weak)) void matrix_startup(void) {}
+void keyboard_startup(void)
+{
+    matrix_startup();
+}
+
 void keyboard_init(void)
 {
     timer_init();
