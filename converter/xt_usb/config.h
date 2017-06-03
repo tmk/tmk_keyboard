@@ -55,10 +55,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define XT_DATA_PIN    PIND
 #define XT_DATA_DDR    DDRD
 #define XT_DATA_BIT    0
+/* optional */
+#ifdef XT_ZENITH_BLACK
+#define XT_RST_PORT    PORTB
+#define XT_RST_PIN     PINB
+#define XT_RST_DDR     DDRB
+#define XT_RST_BIT     7
+#define XT_RST_INIT() do { \
+    /* set to low */                  \
+    XT_RST_PORT &= ~(1<<XT_RST_BIT);  \
+    XT_RST_DDR  |=  (1<<XT_RST_BIT);  \
+                                      \
+    /* wait 0.2s */                   \
+    _delay_ms(200);                   \
+                                      \
+    /* pull up */                     \
+    XT_RST_DDR  &= ~(1<<XT_RST_BIT);  \
+    XT_RST_PORT |=  (1<<XT_RST_BIT);  \
+} while (0)
+#endif /* XT_ZENITH_BLACK */
+#ifdef XT_ZENITH_BLACK
+#define XT_INT_INIT()  do {    \
+    EICRA |= (1<<ISC11);       \
+} while (0)
+#else
 #define XT_INT_INIT()  do {    \
     EICRA |= ((1<<ISC11) |      \
               (1<<ISC10));      \
 } while (0)
+#endif /* XT_ZENITH_BLACK */
 #define XT_INT_ON()  do {      \
     EIMSK |= (1<<INT1);         \
 } while (0)
