@@ -1,6 +1,8 @@
 ![nano top](pcb-top.png)
 ![nano bottom](pcb-bottom.png)
 
+[How to order PCBs from gerber files](http://www.40percent.club/2017/03/ordering-pcb.html)
+
 EasyEDA ordering info:
 
     34.3mm Max* 17.8mm Max;

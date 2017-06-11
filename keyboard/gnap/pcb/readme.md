@@ -1,3 +1,5 @@
+[How to order PCBs from gerber files](http://www.40percent.club/2017/03/ordering-pcb.html)
+
 More information in blog:
 
 http://www.40percent.club/search/label/gnap Scroll down and read the older posts first.

@@ -1,3 +1,5 @@
+[How to order PCBs from gerber files](http://www.40percent.club/2017/03/ordering-pcb.html)
+
 Info for ordering from EasyEDA.com
 
     226.3mm Max* 75mm Max;
