@@ -80,7 +80,8 @@ void matrix_init(void)
     print("IBM 4704 converter\n");
     matrix_clear();
     _delay_ms(2000);    // wait for keyboard starting up
-    xprintf("Keyboard ID: %02X\n", ibm4704_recv());
+    uint8_t keyboard_id = ibm4704_recv();
+    xprintf("Keyboard ID: %02X\n", keyboard_id);
     enable_break();
 }
 
