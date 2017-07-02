@@ -49,10 +49,10 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] __attribute__ ((section ("
 const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
 #endif
     [0] = UNIMAP_HHKB(
-    ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSLS,GRV,
+    ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSLS,GRV ,
     TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,     BSPC,
     LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,          ENT_,
-    LPRN,     Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLS2,     RSFT,L1,
+    LSFT,     Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLS2,     RSFT,L1,
          LGUI,LALT,               SPC4,                    RALT,RGUI),
 
     [1] = UNIMAP_HHKB(
@@ -71,14 +71,14 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
 
     [3] = UNIMAP_HHKB(
     GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,
-    APSW,NO,  NO,  NO,  NO,  NO,  WH_L,WH_D,MS_U,WH_U,WH_R,BACK,FRWD,     APSW,
+    TAB, NO,  NO,  NO,  NO,  NO,  WH_L,WH_D,MS_U,WH_U,WH_R,BACK,FRWD,     TAB,
     LCTL,ACL0,ACL1,ACL2,ACL2,NO,  NO,  MS_L,MS_D,MS_R,TRNS,NO,            ENT,
     LSFT,     NO,  NO,  NO,  NO,  BTN3,BTN2,BTN1,BACK,FRWD,NO,       RSFT,TRNS,
          LGUI,LALT,               BTN1,                    TRNS,TRNS),
 
     [4] = UNIMAP_HHKB(
     GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,
-    APSW,NO,  NO,  NO,  NO,  NO,  WH_L,WH_D,MS_U,WH_U,WH_R,BTN4,BTN5,     APSW,
+    TAB, NO,  NO,  NO,  NO,  NO,  WH_L,WH_D,MS_U,WH_U,WH_R,BTN4,BTN5,     TAB,
     LCTL,VOLD,VOLU,MUTE,NO,  NO,  NO,  MS_L,MS_D,MS_R,BTN1,NO,            ENT,
     LSFT,     NO,  NO,  NO,  NO,  BTN3,BTN2,BTN1,BACK,FRWD,NO,       RSFT,TRNS,
          TRNS,TRNS,               TRNS,                    TRNS,TRNS),
@@ -101,6 +101,7 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
                     MACRO( D(VOLU), U(VOLU), END ) :
                     MACRO_NONE );
         case ALT_TAB:
+            // XXX: doesn't work after stuck key fix
             return (record->event.pressed ?
                     MACRO( D(LALT), D(TAB), END ) :
                     MACRO( U(TAB), END ));
@@ -122,6 +123,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 
     switch (id) {
         case LSHIFT_LPAREN:
+            // XXX: doesn't work with other tap key. iffy at least
             // Shift parentheses example: LShft + tap '('
             // http://stevelosh.com/blog/2012/10/a-modern-space-cadet/#shift-parentheses
             // http://geekhack.org/index.php?topic=41989.msg1304899#msg1304899
