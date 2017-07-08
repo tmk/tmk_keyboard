@@ -56,20 +56,5 @@ static inline uint16_t wait_clock_lo(uint16_t us)
     while (clock_in()  && us) { asm(""); wait_us(1); us--; }
     return us;
 }
-static inline uint16_t wait_clock_hi(uint16_t us)
-{
-    while (!clock_in() && us) { asm(""); wait_us(1); us--; }
-    return us;
-}
-static inline uint16_t wait_data_lo(uint16_t us)
-{
-    while (data_in() && us)  { asm(""); wait_us(1); us--; }
-    return us;
-}
-static inline uint16_t wait_data_hi(uint16_t us)
-{
-    while (!data_in() && us)  { asm(""); wait_us(1); us--; }
-    return us;
-}
 
 #endif

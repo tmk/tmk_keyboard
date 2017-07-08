@@ -137,4 +137,28 @@ KEYMAP_ALL( \
     WWW_STOP, WWW_REFRESH, WWW_FAVORITES                                                    \
 )
 
+/* XT layout */
+#define KEYMAP_XT( \
+    K05,K06,    K76, K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45, K4E,K55,K66,   K77,K7E, \
+    K04,K0C,    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,  K5A,   K6C,K75,K7D,K7B,     \
+    K03,K0B,    K14,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,K0E,         K6B,K73,K74,K79,\
+    K83,K0A,    K12,K5D,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,K59,   K7C,  K69,K72,K7A, \
+    K01,K09,    K11,                K29,                   K58,              K70,   K71\
+) \
+KEYMAP_ALL( \
+    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,F11,F12,     PSCR,K7E,BRK,                         \
+    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,K66, INS,HOME,PGUP,    K77,PSLS,K7C,K7B,   \
+    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,K5D, DEL,END,PGDN,     K6C,K75,K7D,        \
+    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,    K5A,                   K6B,K73,K74,K79,    \
+    K12,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,        K59,     UP,           K69,K72,K7A,        \
+    K14,LGUI,K11,        K29,          RALT,RGUI,APP,RCTL,  LEFT,DOWN,RGHT,    K70,K71,PENT,       \
+                                                                                            \
+    SYSTEM_POWER, SYSTEM_SLEEP, SYSTEM_WAKE,                                                \
+    AUDIO_MUTE, AUDIO_VOL_UP, AUDIO_VOL_DOWN,                                               \
+    MEDIA_NEXT_TRACK, MEDIA_PREV_TRACK, MEDIA_STOP, MEDIA_PLAY_PAUSE, MEDIA_SELECT,         \
+    MAIL, CALCULATOR, MY_COMPUTER,                                                          \
+    WWW_SEARCH, WWW_HOME, WWW_BACK, WWW_FORWARD,                                            \
+    WWW_STOP, WWW_REFRESH, WWW_FAVORITES                                                    \
+)
+
 #endif
