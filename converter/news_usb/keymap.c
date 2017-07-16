@@ -103,6 +103,6 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,DEL,         INS,    P4,  P5,  P6,  PCMM,
     LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,GRV,      ENT,    CLR,    P1,  P2,  P3,  PENT,
     LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,RO,            RSFT,   PGUP,   P0,  PDOT,UP,
-    LALT,CAPS,LALT,          SPC,      ERAS,                    RALT,RGUI,RCTL,   PGDN,   TAB, LEFT,DOWN,RGHT
+    LALT,CAPS,LALT,          SPC,      RALT,                    RGUI,APP, RCTL,   PGDN,   TAB, LEFT,DOWN,RGHT
     ),
 };
