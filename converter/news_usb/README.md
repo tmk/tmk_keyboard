@@ -35,7 +35,7 @@ NEWS keyboard protocol is a usual asynchronous serial communication. You can rec
 Its scan code is one byte consists of 1-bit release(break) flag at MSB and 7-bit code.
 For example 0x29 is sent when 'a' key is pressed and 0xA9 when released.
 
-   MSB         LSB
+    MSB         LSB
     7 6 5 4 3 2 1 0   bit
     | | | | | | | |
     | +-+-+-+-+-+-+-- scan code(00-7F)
