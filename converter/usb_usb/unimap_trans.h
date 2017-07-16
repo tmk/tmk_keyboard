@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * `-----------------------------------------------------------' `-----------' `---------------'
  */
 const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
-    { UNIMAP_KANA,  UNIMAP_VOLUME_DOWN, UNIMAP_VOLUME_UP, UNIMAP_VOLUME_MUTE, UNIMAP_A, UNIMAP_B, UNIMAP_C, UNIMAP_D,
+    { UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_A,     UNIMAP_B,     UNIMAP_C,     UNIMAP_D,
       UNIMAP_E,     UNIMAP_F,     UNIMAP_G,     UNIMAP_H,     UNIMAP_I,     UNIMAP_J,     UNIMAP_K,     UNIMAP_L },
     { UNIMAP_M,     UNIMAP_N,     UNIMAP_O,     UNIMAP_P,     UNIMAP_Q,     UNIMAP_R,     UNIMAP_S,     UNIMAP_T,
       UNIMAP_U,     UNIMAP_V,     UNIMAP_W,     UNIMAP_X,     UNIMAP_Y,     UNIMAP_Z,     UNIMAP_1,     UNIMAP_2 },
@@ -58,9 +58,9 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
     { UNIMAP_KP_8,  UNIMAP_KP_9,  UNIMAP_KP_0,  UNIMAP_KP_DOT,UNIMAP_NONUS_BSLASH,UNIMAP_APPLICATION,UNIMAP_KP_COMMA,UNIMAP_KP_EQUAL,
       UNIMAP_F13,   UNIMAP_F14,   UNIMAP_F15,   UNIMAP_F16,   UNIMAP_F17,   UNIMAP_F18,   UNIMAP_F19,   UNIMAP_F20 },
     { UNIMAP_F21,   UNIMAP_F22,   UNIMAP_F23,   UNIMAP_F24,   UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,
-      UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    }, /* 78-7F */ \
-    { UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_RO,      /* 80-87 */ \
-      UNIMAP_NO,    UNIMAP_JYEN,  UNIMAP_HENK,  UNIMAP_MHEN,  UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    }, /* 88-8F */ \
+      UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_MUTE  }, /* 78-7F */ \
+    { UNIMAP_VOLU,  UNIMAP_VOLD,  UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_RO,      /* 80-87 */ \
+      UNIMAP_KANA,  UNIMAP_JYEN,  UNIMAP_HENK,  UNIMAP_MHEN,  UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    }, /* 88-8F */ \
     { UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,      /* 90-97 */ \
       UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO    }, /* 98-9F */ \
     { UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,    UNIMAP_NO,      /* A0-A7 */ \
