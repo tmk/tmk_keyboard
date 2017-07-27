@@ -37,6 +37,12 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-fc660c.html",
         },
+        fc980c: {
+            desc: "FC980C Controller - Plain",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/keyboard/fc980c/binary/fc980c.hex",
+            firmware_format: "ihex",
+            layout: "layout-fc980c.html",
+        },
         adb_usb: {
             desc: "ADB-USB Converter rev.2",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/adb_usb/binary/adb_usb_rev2_unimap.hex",
