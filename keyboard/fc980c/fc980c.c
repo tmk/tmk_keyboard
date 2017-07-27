@@ -51,11 +51,9 @@ void matrix_init(void)
 
     KEY_INIT();
 
-    // LEDs on NumLock, CapsLock and ScrollLock(PD7, PB5, PB6)
-    DDRD  |= (1<<7);
-    PORTD |= (1<<7);
-    DDRB  |= (1<<5) | (1<<6);
-    PORTB |= (1<<5) | (1<<6);
+    // LEDs on NumLock, CapsLock and ScrollLock(PB4, PB5, PB6)
+    DDRB  |= (1<<4) | (1<<5) | (1<<6);
+    PORTB |= (1<<4) | (1<<5) | (1<<6);
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) _matrix0[i] = 0x00;
@@ -133,9 +131,9 @@ matrix_row_t matrix_get_row(uint8_t row)
 void led_set(uint8_t usb_led)
 {
     if (usb_led & (1<<USB_LED_NUM_LOCK)) {
-        PORTD |=  (1<<7);
+        PORTB |=  (1<<4);
     } else {
-        PORTD &= ~(1<<7);
+        PORTB &= ~(1<<4);
     }
     if (usb_led & (1<<USB_LED_CAPS_LOCK)) {
         PORTB |=  (1<<5);

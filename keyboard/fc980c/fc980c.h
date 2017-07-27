@@ -19,42 +19,40 @@
 /*
  * Pin configuration for ATMega32U4
  *
- * Row:     PD5,6,PB0, PD4(~EN)
- * Col:     PB1-3, 4
+ * Row:     PD4-6, PD7(~EN)
+ * Col:     PB0-3
  * Key:     PC6(pull-uped)
  * Hys:     PC7
  */
-static inline void KEY_ENABLE(void) { (PORTD &= ~(1<<4)); }
-static inline void KEY_UNABLE(void) { (PORTD |=  (1<<4)); }
+static inline void KEY_ENABLE(void) { (PORTD &= ~(1<<7)); }
+static inline void KEY_UNABLE(void) { (PORTD |=  (1<<7)); }
 static inline bool KEY_STATE(void) { return (PINC & (1<<6)); }
 static inline void KEY_HYS_ON(void) { (PORTC |=  (1<<7)); }
 static inline void KEY_HYS_OFF(void) { (PORTC &= ~(1<<7)); }
 static inline void KEY_INIT(void)
 {
     /* Col */
-    DDRB  |=  0x1F;
+    DDRB  |=  0x0F;
     /* Key: input with pull-up */
     DDRC  &= ~(1<<6);
     PORTC |=  (1<<6);
     /* Hys */
     DDRC  |=  (1<<7);
     /* Row */
-    DDRD  |=  0x70;
+    DDRD  |=  0xF0;
 
     KEY_UNABLE();
     KEY_HYS_OFF();
 }
 static inline void SET_ROW(uint8_t ROW)
 {
-    // set row with unabling key
-    PORTB = (PORTB & 0xFE) | ((ROW & 0x04) >> 2); // PB0
-    PORTD = (PORTD & 0x9F) | ((ROW & 0x03) << 5); // PD5,6
+    // PD4-6
+    PORTD = (PORTD & 0x8F) | ((ROW & 0x07) << 4);
 }
 static inline void SET_COL(uint8_t COL)
 {
-    // PB4(Lo:Z5, Hi:Z4)
-    // PB1-3
-    PORTB = (PORTB & 0xE1) | ((COL & 0x0F) << 1);
+    // PB0-3
+    PORTB = (PORTB & 0xF0) | (COL & 0x0F);
 }
 
 
