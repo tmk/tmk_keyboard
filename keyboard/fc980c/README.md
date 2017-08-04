@@ -58,7 +58,7 @@ Switch matrix
     |    |0   |1   |2   |3   |4   |5   |6   |7   |8   |9   |A   |B   |C   |D   |E   |F   |
     |----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
     |   0|Left|RCtl|RAlt|    |Down|P.  |Righ|P0  |X   |LGui|`   |V   |    |Esc |M   |Spc |
-    |   1|Fn  |.   |    |    |P1  |PEnt|P2  |P3  |Z   |LAlt|RCtl|C   |K   |    |N   |B   |
+    |   1|Fn  |.   |    |    |P1  |PEnt|P2  |P3  |Z   |LAlt|LCtl|C   |K   |    |N   |B   |
     |   2|'   |/   |,   |    |P4  |P+  |P5  |P6  |D   |A   |LSft|F   |J   |F1  |H   |G   |
     |   3|RSft|;   |L   |]   |Up  |    |    |    |S   |Q   |Caps|R   |I   |F3  |U   |T   |
     |   4|    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
