@@ -1,10 +1,13 @@
 Panasonic VP-0187A
 ==================
-It is unknown keyboard from Panasonic
+2017/08/06
 
-6P6C connector
+It is unknown keyboard from Panasonic with Hirose Cherry M8 and 6P6C connector.
 
-Hirose Cheery M8 switches
+Pictures:
+http://imgur.com/a/GAZE7
+
+Hirose Cheery M8 switches:
 https://deskthority.net/wiki/Cherry_M8
 
 
@@ -28,16 +31,25 @@ The keyboard is comprised of some of 4000 series IC without microcontroller.
               |||           |decoder|
               |||           ---------
               |||            |||||| col[0..7]
-              ABC            vvvvvvv   pull down
+              ABC TC4512     vvvvvvv   pull down
             ---------- <----|+++++++|--100K--+
             |data    | <----|+++++++|--100K--+
     STATE<--|selector| <----|+++++++|--100K--+
             | 7 to 1 | <----|+++++++|--100K--+
             ---------- <----|+++++++|--100K--+
-                  row[0..7]                  |
-                             8x8 matrix      -
-                                            GND
+                row[0..7]   | 8x8 matrix     |
+                            |                -
+              TC4078        |               GND
+              ------        |
+    SENSE<----| OR |========+ OR'd row[0..7]
+              ------
 
+- TC4520BP - Dual Binary Up Counter 
+- TC4028B  - BCD-to-Decimal Decoder
+- TC4512BP - 8-Channel Data Selector
+- TC4081BP - Quad 2-Input AND Gate
+- TC4071BP - Quad 2-Input OR Gate
+- TC4078BP - 8-Input NOR/OR Gate
 
 
 Matrix
@@ -60,14 +72,23 @@ Matrix
 1. VCC
 2. Clock     - sends clock to binary counter TC4520
 3. Key State - indicates hi if key selected by counter is active
-4. Sense     - indicates hi if any key is active while Reset is hi.
+4. Sense     - indicates lo if any key is active while Reset is hi.
 5. Reset     - resets counter and drives all column
 6. GND
 
       123456
     ,--------.
-    |        |
+    | |||||| |
     |        |
     `--____--'
        plug
 
+
+Ping configuration
+------------------
+AVR ATmega32u4 is used as protocol converter.
+
+    PD0: Clock. Counter couts up at falling edge.
+    PD1: Key State. Hi if selected key is activated.
+    PD2: Sense. Lo if any key is activated while Reset is Hi.
+    PD3: Reset. Resets counters at riging edge.

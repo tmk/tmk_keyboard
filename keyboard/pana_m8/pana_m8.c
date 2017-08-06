@@ -21,25 +21,26 @@ void matrix_init(void)
     debug_keyboard = true;
     debug_matrix = true;
 
-    // PD0:Clock PD1:State PD2:Sense_All PD3:Reset(Scan_All)
-    DDRD  = (1<<3) | (1<<0);
-    PORTD = (1<<2) | (1<<1);
+    // PD0: Clock. Counter couts up at falling edge.
+    // PD1: Key State. Hi if selected key is activated.
+    // PD2: Sense. Lo if any key is activated while Reset is Hi.
+    // PD3: Reset. Resets counters at riging edge.
+    DDRD  |=   (1<<3) | (1<<0);     // output
+    DDRD  &= ~((1<<2) | (1<<1));    // input
+    PORTD &= ~((1<<3) | (1<<0));    // low
+    PORTD |=   (1<<2) | (1<<1);     // pull-up
 
     dprintf("init\n");
 }
 
 uint8_t matrix_scan(void)
 {
-
-    // Scan_all resets counter
+    // TODO: debouce & unplug detect
+    // Reset counters
     RST_HI();
     wait_us(10);
-    // TODO: cannot get reliable value from SENSE()
-    //uint8_t s = SENSE() | STATE();
-    //if (!SENSE()) return 0; // no activated key
     RST_LO();
     wait_us(10);
-    //if (!s) return 0;
 
     // 8x8 matrix:  row:sense, col:drive, key_on:hi
     for (uint8_t col = 0; col < 8; col++) {
@@ -53,7 +54,7 @@ uint8_t matrix_scan(void)
                 matrix[row] &= ~(1<<col);
             }
             
-            // clock lo - next row
+            // proceed counter - next row
             CLK_LO();
             wait_us(10);
         }

@@ -21,6 +21,8 @@
 )
 
 #define AC_L1       ACTION_LAYER_MOMENTARY(1)
+#define AC_SPC1     ACTION_LAYER_TAP_KEY(1, KC_SPC)
+#define AC_AENT     ACTION_MODS_TAP_KEY(MOD_LALT, KC_ENT)
 
 #ifdef KEYMAP_SECTION_ENABLE
 const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] __attribute__ ((section (".keymap.keymaps"))) = {
@@ -30,10 +32,26 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
     [0] = UMAP(
     ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSPC,     INS, DEL,    F1,
     TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   GRV, LBRC,RBRC,                  F2,
-    LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     ENT,         UP,       F3,
+    LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     AENT,        UP,       F3,
     LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,                    LEFT,RGHT,   F4,
-                             SPC,                                                 DOWN,     HOME
+                             SPC1,                                                DOWN,     HOME
     ),
+    [1] = UMAP(
+    GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, BSLS,     PSCR,PAUS,   F5,
+    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PGDN,UP,  PGUP,TRNS,BSLS,TRNS,TRNS,                  F6,
+    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,HOME,LEFT,DOWN,RGHT,END, TRNS,     LGUI,        PGUP,     F7,
+    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,                    HOME,END,    F8,
+                             TRNS,                                                PGDN,     END
+    ),
+/*
+    [2] = UMAP(
+    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS,TRNS,   TRNS,
+    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,                  TRNS,
+    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS,        TRNS,     TRNS,
+    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,                    TRNS,TRNS,   TRNS,
+                             TRNS,                                                TRNS,     TRNS 
+    ),
+*/
 };
 
 
