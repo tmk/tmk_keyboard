@@ -14,6 +14,9 @@
 #define MATRIX_ROWS 8
 #define MATRIX_COLS 8
 
+/* matrix debounce time in ms */
+#define DEBOUNCE 10
+
 
 /* key combination for command */
 #define IS_COMMAND() (keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT))) 

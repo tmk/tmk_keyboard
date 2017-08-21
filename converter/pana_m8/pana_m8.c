@@ -3,16 +3,19 @@
 #include "matrix.h"
 #include "led.h"
 #include "wait.h"
+#include "timer.h"
 #include "debug.h"
 
 #define CLK_HI() (PORTD |=  (1<<0))
 #define CLK_LO() (PORTD &= ~(1<<0))
-#define STATE()  (PIND & (1<<1))
+#define STATE()  (!!(PIND & (1<<1)))
 #define RST_HI() (PORTD |=  (1<<3))
 #define RST_LO() (PORTD &= ~(1<<3))
 #define SENSE()  (PIND & (1<<2))
 
 static matrix_row_t matrix[8] = {};
+static matrix_row_t matrix_debouncing[8] = {};
+static uint16_t debouncing_time = 0;
 
 
 void matrix_init(void)
@@ -48,16 +51,24 @@ uint8_t matrix_scan(void)
             CLK_HI();
             wait_us(10);
 
-            if (STATE()) {
-                matrix[row] |=  (1<<col);
-            } else {
-                matrix[row] &= ~(1<<col);
+            // detect state change and start debounce
+            if ((matrix_debouncing[row] & (1<<col)) ^ (STATE()<<col)) {
+                matrix_debouncing[row] ^= (1<<col);
+                debouncing_time = timer_read() || 1;
             }
             
             // proceed counter - next row
             CLK_LO();
             wait_us(10);
         }
+    }
+
+    // debounced
+    if (debouncing_time && timer_elapsed(debouncing_time) > DEBOUNCE) {
+        for (int row = 0; row < MATRIX_ROWS; row++) {
+            matrix[row] = matrix_debouncing[row];
+        }
+        debouncing_time = 0;
     }
     return 1;
 }
