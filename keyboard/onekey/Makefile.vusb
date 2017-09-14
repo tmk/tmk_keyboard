@@ -9,7 +9,7 @@ TARGET_DIR = .
 
 # keyboard dependent files
 SRC = 	keymap.c \
-    	matrix.c \
+	onekey.c \
 	led.c
 
 CONFIG_H = config.h
@@ -18,7 +18,8 @@ CONFIG_H = config.h
 # MCU name, you MUST set this to match the board you are using
 # type "make clean" after changing this, so all files will be rebuilt
 #MCU = atmega168p
-MCU = atmega328p
+#MCU = atmega328p
+MCU = attiny85
 
 
 # Processor frequency.
@@ -35,6 +36,11 @@ F_CPU = 12000000
 #MOUSEKEY_ENABLE = yes	# Mouse keys
 #EXTRAKEY_ENABLE = yes	# Audio control and System control
 #NKRO_ENABLE = yes	# USB Nkey Rollover
+NO_UART = yes		# No UART debug(V-USB)
+
+OPT_DEFS += -DNO_ACTION_TAPPING
+OPT_DEFS += -DNO_ACTION_LAYER
+OPT_DEFS += -DNO_ACTION_MACRO
 
 
 

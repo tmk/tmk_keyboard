@@ -49,7 +49,7 @@ TARGET_DIR = .
 
 # project specific files
 SRC =	keymap.c \
-	matrix.c \
+	onekey.c \
 	led.c
 
 CONFIG_H = config.h
