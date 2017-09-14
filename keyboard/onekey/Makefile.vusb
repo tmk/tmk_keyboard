@@ -10,6 +10,7 @@ TARGET_DIR = .
 # keyboard dependent files
 SRC = 	keymap.c \
 	onekey.c \
+	vusb_osccal.c \
 	led.c
 
 CONFIG_H = config.h
@@ -27,7 +28,9 @@ MCU = attiny85
 #   so your program will run at the correct speed.  You should also set this
 #   variable to same clock speed.  The _delay_ms() macro uses this, and many
 #   examples use this variable to calculate timings.  Do not add a "UL" here.
-F_CPU = 12000000
+#F_CPU = 12000000
+# Xtal-less internal RC oscillator
+F_CPU = 16500000
 
 
 # Build Options
@@ -47,7 +50,8 @@ OPT_DEFS += -DNO_ACTION_MACRO
 #---------------- Programming Options --------------------------
 AVRDUDE = avrdude
 # Type: avrdude -c ? to get a full listing.
-AVRDUDE_PROGRAMMER = usbasp
+#AVRDUDE_PROGRAMMER = usbasp
+AVRDUDE_PROGRAMMER = avrispmkii
 AVRDUDE_PORT =
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 #AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
