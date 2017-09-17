@@ -34,7 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "split-util.h"
 #include "pro-micro.h"
 #include "config.h"
-#include "rgblight.h"
 
 #include "pin_defs.h"
 
@@ -91,8 +90,6 @@ void matrix_init(void)
     //Turn LEDs off by default
     RXLED0;
     TXLED0;
-
-    rgblight_init();
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) {
