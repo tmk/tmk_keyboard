@@ -61,3 +61,8 @@ Add settings for calibration in usbconfig.h
       */
     -#define USB_CFG_HAVE_MEASURE_FRAME_LENGTH   0
     +#define USB_CFG_HAVE_MEASURE_FRAME_LENGTH   1
+
+
+Another calibration code
+========================
+https://github.com/obdev/v-usb/tree/master/libs-device
