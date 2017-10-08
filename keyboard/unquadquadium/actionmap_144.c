@@ -5,21 +5,54 @@
 /*
  * Actions
  */
+ 
+#define AC_LM1    ACTION_LAYER_MOMENTARY(1)
+#define AC_LM2    ACTION_LAYER_MOMENTARY(2)
+#define AC_TL1    ACTION_LAYER_TAP_KEY(1, KC_SPACE)
+#define AC_TL2    ACTION_LAYER_TAP_KEY(2, KC_BSPACE)
+#define AC_TL3    ACTION_LAYER_TAP_KEY(3, KC_C)
+#define AC_TL4    ACTION_LAYER_TAP_KEY(4, KC_V)
+#define AC_TL5    ACTION_LAYER_TAP_KEY(5, KC_B)
+#define AC_TM1    ACTION_MODS_TAP_KEY(MOD_RSFT, KC_ENT)
+#define AC_TM2    ACTION_MODS_TAP_KEY(MOD_LCTL, KC_Z)
+#define AC_TM3    ACTION_MODS_TAP_KEY(MOD_LALT, KC_X)
+#define AC_TM4    ACTION_MODS_TAP_KEY(MOD_RALT, KC_N)
+#define AC_TM5    ACTION_MODS_TAP_KEY(MOD_RCTL, KC_M)
+#define AC_S01    ACTION_MODS_KEY(MOD_LSFT, KC_1)
+#define AC_S02    ACTION_MODS_KEY(MOD_LSFT, KC_2)
+#define AC_S03    ACTION_MODS_KEY(MOD_LSFT, KC_3)
+#define AC_S04    ACTION_MODS_KEY(MOD_LSFT, KC_4)
+#define AC_S05    ACTION_MODS_KEY(MOD_LSFT, KC_5)
+#define AC_S06    ACTION_MODS_KEY(MOD_LSFT, KC_6)
+#define AC_S07    ACTION_MODS_KEY(MOD_LSFT, KC_7)
+#define AC_S08    ACTION_MODS_KEY(MOD_LSFT, KC_8)
+#define AC_S09    ACTION_MODS_KEY(MOD_LSFT, KC_9)
+#define AC_S10    ACTION_MODS_KEY(MOD_LSFT, KC_0)
+#define AC_S11    ACTION_MODS_KEY(MOD_LSFT, KC_MINS)
+#define AC_S12    ACTION_MODS_KEY(MOD_LSFT, KC_EQL)
+#define AC_S13    ACTION_MODS_KEY(MOD_LSFT, KC_LBRC)
+#define AC_S14    ACTION_MODS_KEY(MOD_LSFT, KC_RBRC)
+#define AC_S15    ACTION_MODS_KEY(MOD_LSFT, KC_BSLS)
+#define AC_S16    ACTION_MODS_KEY(MOD_LSFT, KC_COMM)
+#define AC_S17    ACTION_MODS_KEY(MOD_LSFT, KC_DOT)
+#define AC_S18    ACTION_MODS_KEY(MOD_LSFT, KC_SLSH)
+#define AC_S19    ACTION_MODS_KEY(MOD_LSFT, KC_SCLN)
+#define AC_S20    ACTION_MODS_KEY(MOD_LSFT, KC_QUOT)
 
 const action_t PROGMEM actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = ACTIONMAP( \
-    EQL,  BSPC, BSPC, 3,    BSLS, GRV,  ENT,  ENT,  PGUP, RSFT, UP,   PGDN,
-    ESC,  1,    2,    3,    4,    5,    6,    7,    8,    9,    0,    MINS,
-    TAB,  Q,    W,    E,    R,    T,    Y,    U,    I,    O,    P,    LBRC,
-    CAPS, A,    S,    D,    F,    G,    H,    J,    K,    L,    SCLN, QUOT,
+    EJCT, WHOM, MAIL, CALC, MYCM, PWR,  SLEP, WAKE, ESC,  TAB,  PEQL, BSPC,
+    MUTE, VOLU, VOLD, MPRV, MNXT, ACL0, WH_U, ACL1, NLCK, PSLS, PAST, PMNS,
+    MRWD, MPLY, MSTP, MFFD, MSEL, WH_L, WH_D, WH_R, P7,   P8,   P9,   PPLS,
+    WSCH, WBAK, WFWD, WSTP, WFAV, BTN4, MS_U, BTN5, P4,   P5,   P6,   PPLS,
+    A,    B,    C,    D,    E,    MS_L, MS_D, MS_R, P1,   P2,   P3,   PENT,
+    F,    G,    H,    I,    J,    BTN1, BTN2, BTN3, P0,   P0,   PDOT, PENT,
     F1,   F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,   F10,  F11,  F12,
-    LCTL, LGUI, LALT, APP,  SPC,  SPC,  SPC,  SPC,  X,    RALT, RGUI, RCTL,
-    EQL,  BSPC, BSPC, 3,    BSLS, GRV,  ENT,  ENT,  PGUP, RSFT, UP,   PGDN,
-    ESC,  1,    2,    3,    4,    5,    6,    7,    8,    9,    0,    MINS,
-    TAB,  Q,    W,    E,    R,    T,    Y,    U,    I,    O,    P,    LBRC,
-    CAPS, A,    S,    D,    F,    G,    H,    J,    K,    L,    SCLN, QUOT,
-    LSFT, Z,    X,    C,    V,    B,    N,    M,    COMM, DOT,  SLSH, RSFT,
-    LCTL, LGUI, LALT, APP,  SPC,  SPC,  SPC,  SPC,  X,    RALT, RGUI, RCTL),
+    1,    2,    3,    4,    5,    6,    7,    8,    9,    0,    MINS, EQL,
+    ESC,  Q,    W,    E,    R,    T,    Y,    U,    I,    O,    P,    BSPC,
+    TAB,  A,    S,    D,    F,    G,    H,    J,    K,    L,    SCLN, QUOT,
+    LSFT, Z,    X,    C,    V,    B,    N,    M,    COMM, DOT,  SLSH, TM1,
+    LCTL, LALT, LGUI, APP,  LM2,  SPC,  SPC,  LM1,  LEFT, DOWN, UP,   RGHT),
     [1] = ACTIONMAP( \
     TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
     TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
@@ -29,8 +62,21 @@ const action_t PROGMEM actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
     TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
     TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
     TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+    GRV,  1,    2,    3,    4,    5,    6,    7,    8,    9,    0,    DELETE,
+    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, MINS, EQL,  LBRC, RBRC, BSLS,
+    TRNS, F11,  F12,  F13,  F14,  F15,  F16,  F17,  F18,  F19,  F20,  TRNS,
+    TRNS, TRNS, TRNS, CAPS, TRNS, TRNS, TRNS, TRNS, HOME, PGDN, PGUP, END),
+    [2] = ACTIONMAP( \
     TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
     TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
     TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
-    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS),
+    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+    TRNS, F1,   F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,   F10,  TRNS,
+    TRNS, TRNS, TRNS, CAPS, TRNS, TRNS, TRNS, TRNS, HOME, PGDN, PGUP, END),
 };
