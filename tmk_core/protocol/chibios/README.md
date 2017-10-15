@@ -4,9 +4,15 @@ This code can be used to run TMK keyboard logic on top of [ChibiOS], meaning tha
 
 ### Usage
 
-- To use, get a [zip file](https://github.com/ChibiOS/ChibiOS/archive/a7df9a891067621e8e1a5c2a2c0ceada82403afe.zip) of ChibiOS and unpack/rename it to `tmk_core/tool/chibios/ChibiOS`; or you can just clone [ChibiOS repo](https://github.com/ChibiOS/ChibiOS) there. For Freescale/NXP Kinetis support (meaning Teensies 3.x/LC and the Infinity keyboard), you'll also need a [zip](https://github.com/ChibiOS/ChibiOS-Contrib/archive/e1311c4db6cd366cf760673f769e925741ac0ad3.zip) of ChibiOS-Contrib, unpacked/renamed to `tmk_core/tool/chibios/ChibiOS-Contrib`. Likewise, for git-savvy people, just clone [ChibiOS-Contrib repo](https://github.com/ChibiOS/ChibiOS-Contrib) there.
-- Note: the above mentioned directories are the defaults. You can have the two ChibiOS repositories wherever you want, just define their location in `CHIBIOS` and `CHIBIOS_CONTRIB` variables in your `Makefile`.
-- You will also need to install an ARM toolchain, for instance from [here](https://launchpad.net/gcc-arm-embedded). On linux, this is usually also present as a package for your distribution (as `gcc-arm` or something similar). On OS X, you can use [homebrew](http://brew.sh/) with an appropriate tap.
+- To use, get a [zip file](https://github.com/ChibiOS/ChibiOS/archive/stable_17.6.x.zip) of ChibiOS and unpack/rename it to `tmk_core/tool/chibios/ChibiOS`; or you can just clone [ChibiOS/ChibiOS](https://github.com/ChibiOS/ChibiOS) there.
+If you use git, make sure to check out the most recent stable branch such as `stable_17.6.x`
+For Freescale/NXP Kinetis support (meaning Teensies 3.x/LC and the Infinity keyboard), you'll also need a [zip](https://github.com/ChibiOS/ChibiOS-Contrib/archive/master.zip) of ChibiOS-Contrib, unpacked/renamed to `tmk_core/tool/chibios/ChibiOS-Contrib`.
+Likewise, for git-savvy people, just clone [ChibiOS/ChibiOS-Contrib](https://github.com/ChibiOS/ChibiOS-Contrib) there.
+- Note: the above mentioned directories are the defaults.
+You can have the two ChibiOS repositories wherever you want, just define their location in `CHIBIOS` and `CHIBIOS_CONTRIB` variables in your `Makefile`.
+- You will also need to install an ARM toolchain, for instance from [here](https://launchpad.net/gcc-arm-embedded).
+On linux, this is usually also present as a package for your distribution (as `gcc-arm` or something similar).
+On OS X, you can use [homebrew](http://brew.sh/) with an appropriate tap.
 
 ### Notes
 

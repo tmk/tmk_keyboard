@@ -5,18 +5,7 @@ flabbergast's TMK/ChibiOS port
 
 Build
 -----
-$ git clone -b chibios https://github.com/flabbergast/tmk_keyboard.git
-
-$ cd tmk_keyboard
-$ git submodule add -f -b kinetis https://github.com/flabbergast/ChibiOS.git tmk_core/tool/chibios/chibios
-or
-$ cd tmk_keyboard/tmk_core/tool/chibios
-$ git clone -b kinetis https://github.com/flabbergast/ChibiOS.git tmk_core/tool/chibios/chibios
-
-$ cd tmk_keyboard/keyboard/infinity_chibios
-$ make
-
-
+Set up ChibiOS according to tmk_core/protocol/chibios/README.md
 
 
 Chibios Configuration
