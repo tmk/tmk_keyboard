@@ -148,6 +148,8 @@ static uint8_t layer_pressed[MATRIX_ROWS][MATRIX_COLS] = {};
 #endif
 action_t layer_switch_get_action(keyevent_t event)
 {
+    if (IS_NOEVENT(event)) return (action_t)ACTION_NO;
+
     uint8_t layer = 0;
 #ifndef NO_TRACK_KEY_PRESS
     if (event.pressed) {

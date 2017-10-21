@@ -531,6 +531,8 @@ void clear_keyboard_but_mods(void)
 
 bool is_tap_key(keyevent_t event)
 {
+    if (IS_NOEVENT(event)) { return false; }
+
     action_t action = layer_switch_get_action(event);
 
     switch (action.kind.id) {
