@@ -292,7 +292,7 @@ You can specify a **target layer** of action and **when the action is executed**
 
 + **layer**: `0`-`31`
 + **on**: { `ON_PRESS` | `ON_RELEASE` | `ON_BOTH` }
-+ **bits**: 4-bit value and 1-bit mask bit
++ **bits**: 5-bit: 1-bit for mask and 4-bit for operand
 
 
 #### 2.2.1 Default Layer
@@ -365,20 +365,44 @@ Turns on layer only and clear all layer on release..
 
 
 #### 2.2.10 Bitwise operation
-
-**part** indicates which part of 32bit layer state(0-7). **bits** is 5-bit value. **on** indicates when the action is executed.
+Performs bitwise operaiton(AND, OR, XOR, SET) against layer state.
 
     ACTION_LAYER_BIT_AND(part, bits, on)
     ACTION_LAYER_BIT_OR(part, bits, on)
     ACTION_LAYER_BIT_XOR(part, bits, on)
     ACTION_LAYER_BIT_SET(part, bits, on)
 
-These actions works with parameters as following code.
+`part` paramter indicates 0-based index(0-7) of where breaking 32-bit `layer_state` into eight nibbles(4-bit unit).
 
+bs
+
+    part            7    6    5    4    3    2    1    0
+    layer_state     0000 0000 0000 0000 0000 0000 0000 0000
+                    msb                                 lsb
+
+`bits` parameter is 5-bit value and consists of two portions, most significant bit(m) controls mask and other 4 bits(abcd) are operand of bit operation.
+
+                    43210
+    bits            mdcba
+
+These parameters works as following code.
+
+    uint32_t layer_state;
     uint8_t shift = part*4;
-    uint32_t mask = (bits&0x10) ? ~(0xf<<shift) : 0;
-    uint32_t layer_state = layer_state <bitop> ((bits<<shift)|mask);
-
+    uint32_t mask = (bits&0x10) ? ~((uint32_t)0xf<<shift) : 0;
+    switch (<bitop>) {
+    case BIT_AND:
+        layer_state = layer_state & (((bits&0xf)<<shift)|mask);
+        break;
+    case BIT_OR:
+        layer_state = layer_state | (((bits&0xf)<<shift)|mask);
+        break;
+    case BIT_XOR:
+        layer_state = layer_state ^ (((bits&0xf)<<shift)|mask);
+        break;
+    case BIT_SET:
+        layer_state = layer_state <bitop> (((bits&0xf)<<shift)|mask);
+        break;
 
 Default Layer also has bitwise operations, they are executed when key is released.
 
