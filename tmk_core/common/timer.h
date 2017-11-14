@@ -25,11 +25,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 
-#define TIMER_DIFF(a, b, max)   ((a) >= (b) ?  (a) - (b) : (max) - (b) + (a))
-#define TIMER_DIFF_8(a, b)      TIMER_DIFF(a, b, UINT8_MAX)
-#define TIMER_DIFF_16(a, b)     TIMER_DIFF(a, b, UINT16_MAX)
-#define TIMER_DIFF_32(a, b)     TIMER_DIFF(a, b, UINT32_MAX)
-#define TIMER_DIFF_RAW(a, b)    TIMER_DIFF_8(a, b)
+static inline uint8_t TIMER_DIFF_8(uint8_t a, uint8_t b)
+{
+    return (a >= b) ?  (a - b) : (UINT8_MAX - b + a);
+}
+static inline uint16_t TIMER_DIFF_16(uint16_t a, uint16_t b)
+{
+    return (a >= b) ?  (a - b) : (UINT16_MAX - b + a);
+}
+static inline uint32_t TIMER_DIFF_32(uint32_t a, uint32_t b)
+{
+    return (a >= b) ?  (a - b) : (UINT32_MAX - b + a);
+}
 
 
 #ifdef __cplusplus

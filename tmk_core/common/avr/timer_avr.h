@@ -39,4 +39,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   error "Timer0 can't count 1ms at this clock freq. Use larger prescaler."
 #endif
 
+static inline uint8_t TIMER_DIFF_RAW(uint8_t a, uint8_t b)
+{
+    return (a >= b) ?  (a - b) : (UINT8_MAX - b + a);
+}
+
 #endif
