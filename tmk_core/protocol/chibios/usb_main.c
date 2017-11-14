@@ -402,7 +402,7 @@ static const uint8_t hid_configuration_descriptor_data[] = {
   USB_DESC_ENDPOINT(KBD_ENDPOINT | 0x80,  // bEndpointAddress
                     0x03,      // bmAttributes (Interrupt)
                     KBD_EPSIZE,// wMaxPacketSize
-                    10),       // bInterval
+                    1),        // bInterval
 
   #ifdef MOUSE_ENABLE
   /* Interface Descriptor (9 bytes) USB spec 9.6.5, page 267-269, Table 9-12 */
