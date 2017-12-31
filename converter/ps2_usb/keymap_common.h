@@ -80,20 +80,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     KCD, K95, KBB, KB4, KD0, /* Next, Previous, Stop, Pause, Media Select */                \
     KC8, KAB, KC0,           /* Mail, Calculator, My Computer */                            \
     K90, KBA, KB8, KB0,      /* WWW Search, Home, Back, Forward */                          \
-    KA8, KA0, K98            /* WWW Stop, Refresh, Favorites */                             \
+    KA8, KA0, K98,           /* WWW Stop, Refresh, Favorites */                             \
+    K19, K39, K53, K5C       /* Unassigned Set 2 codes on "hidden" Model F AT keys */       \
 ) { \
     { KC_NO,    KC_##K01, KC_NO,    KC_##K03, KC_##K04, KC_##K05, KC_##K06, KC_##K07 }, \
     { KC_##K08, KC_##K09, KC_##K0A, KC_##K0B, KC_##K0C, KC_##K0D, KC_##K0E, KC_NO    }, \
     { KC_##K10, KC_##K11, KC_##K12, KC_##K13, KC_##K14, KC_##K15, KC_##K16, KC_NO    }, \
-    { KC_##K18, KC_NO,    KC_##K1A, KC_##K1B, KC_##K1C, KC_##K1D, KC_##K1E, KC_NO    }, \
+    { KC_##K18, KC_##K19, KC_##K1A, KC_##K1B, KC_##K1C, KC_##K1D, KC_##K1E, KC_NO    }, \
     { KC_##K20, KC_##K21, KC_##K22, KC_##K23, KC_##K24, KC_##K25, KC_##K26, KC_NO    }, \
     { KC_##K28, KC_##K29, KC_##K2A, KC_##K2B, KC_##K2C, KC_##K2D, KC_##K2E, KC_NO    }, \
     { KC_##K30, KC_##K31, KC_##K32, KC_##K33, KC_##K34, KC_##K35, KC_##K36, KC_NO    }, \
-    { KC_##K38, KC_NO,    KC_##K3A, KC_##K3B, KC_##K3C, KC_##K3D, KC_##K3E, KC_NO    }, \
+    { KC_##K38, KC_##K39, KC_##K3A, KC_##K3B, KC_##K3C, KC_##K3D, KC_##K3E, KC_NO    }, \
     { KC_##K40, KC_##K41, KC_##K42, KC_##K43, KC_##K44, KC_##K45, KC_##K46, KC_NO    }, \
     { KC_##K48, KC_##K49, KC_##K4A, KC_##K4B, KC_##K4C, KC_##K4D, KC_##K4E, KC_NO    }, \
-    { KC_##K50, KC_##K51, KC_##K52, KC_NO,    KC_##K54, KC_##K55, KC_NO,    KC_##K57 }, \
-    { KC_##K58, KC_##K59, KC_##K5A, KC_##K5B, KC_NO,    KC_##K5D, KC_NO,    KC_##K5F }, \
+    { KC_##K50, KC_##K51, KC_##K52, KC_##K53, KC_##K54, KC_##K55, KC_NO,    KC_##K57 }, \
+    { KC_##K58, KC_##K59, KC_##K5A, KC_##K5B, KC_##K5C, KC_##K5D, KC_NO,    KC_##K5F }, \
     { KC_NO,    KC_##K61, KC_NO,    KC_##K63, KC_##K64, KC_NO,    KC_##K66, KC_##K67 }, \
     { KC_##K68, KC_##K69, KC_##K6A, KC_##K6B, KC_##K6C, KC_##K6D, KC_NO,    KC_NO    }, \
     { KC_##K70, KC_##K71, KC_##K72, KC_##K73, KC_##K74, KC_##K75, KC_##K76, KC_##K77 }, \
@@ -138,7 +139,8 @@ KEYMAP_ALL( \
     MEDIA_NEXT_TRACK, MEDIA_PREV_TRACK, MEDIA_STOP, MEDIA_PLAY_PAUSE, MEDIA_SELECT,             \
     MAIL, CALCULATOR, MY_COMPUTER,                                                              \
     WWW_SEARCH, WWW_HOME, WWW_BACK, WWW_FORWARD,                                                \
-    WWW_STOP, WWW_REFRESH, WWW_FAVORITES                                                        \
+    WWW_STOP, WWW_REFRESH, WWW_FAVORITES,                                                       \
+    NO, NO, NO, NO                                                                              \
 )
 
 /* US layout */
