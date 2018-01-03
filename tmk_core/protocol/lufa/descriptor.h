@@ -145,9 +145,10 @@ typedef struct
 
 #ifdef NKRO_ENABLE
 #   define NKRO_IN_EPNUM            (CONSOLE_OUT_EPNUM + 1)
-#   if defined(__AVR_ATmega32U2__) && NKRO_IN_EPNUM > 4
-#       error "Endpoints are not available enough to support all functions. Remove some in Makefile.(MOUSEKEY, EXTRAKEY, CONSOLE, NKRO)"
-#   endif
+#endif
+
+#if defined(__AVR_ATmega32U2__) && NKRO_IN_EPNUM > 4
+#   error "Endpoints are not available enough to support all functions. Remove some in Makefile.(MOUSEKEY, EXTRAKEY, CONSOLE, NKRO)"
 #endif
 
 
