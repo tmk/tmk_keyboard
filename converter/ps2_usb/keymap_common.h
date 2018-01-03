@@ -200,4 +200,67 @@ KEYMAP_FULL( \
     K14,K9F,K11,K67,    K29,            K64,K13,K91,KA7,KAF,K94, KEB,KF2,KF4,  PWR,K70,K71,PEQL \
 )
 
+/*
+* AT layout
+*
+* ,-------. ,-----------------------------------------------------------. ,---------------.
+* | F1| F2| |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =| \ |Bsp| |Esc|NmL|ScL|SRq|
+* |---|---| |-----------------------------------------------------------| |---------------|
+* | F3| F4| |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|     | |  7|  8|  9|  *|
+* |---|---| |------------------------------------------------------     | |---------------|
+* | F5| F6| |Ctrl  |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|   Enter| |  4|  5|  6|  -|
+* |---|---| |-----------------------------------------------------------| |---------------|
+* | F7| F8| |Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|    Shift | |  1|  2|  3|   |
+* |---|---| |-----------------------------------------------------------| |------------  +|
+* | F9|F10| |Alt|    |             Space                     |    |CapsL| |      0|  .|   |
+* `-------' `---'    `---------------------------------------'    `-----' `---------------'
+*
+* Model F AT scan codes
+* http://www.seasip.info/VintagePC/ibm_6450225.html
+*
+* ,-------. ,-----------------------------------------------------------. ,---------------.
+* | 05| 06| | 0E| 16| 1E| 26| 25| 2E| 36| 3D| 3E| 46| 45| 4E| 55| 5D| 66| | 76| 77| 7E| 84|
+* |---|---| |-----------------------------------------------------------| |---------------|
+* | 04| 0C| | 0D  | 15| 1D| 24| 2D| 2C| 35| 3C| 43| 44| 4D| 54| 5B|  5C | | 6C| 75| 7D| 7C|
+* |---|---| |-----------------------------------------------------------| |---------------|
+* | 03| 0B| | 14   | 1C| 1B| 23| 2B| 34| 33| 3B| 42| 4B| 4C| 52| 53| 5A | | 6B| 73| 74| 7B|
+* |---|---| |-----------------------------------------------------------| |---------------|
+* | 83| 0A| | 12 | 13| 1A| 22| 21| 2A| 32| 31| 3A| 41| 49| 4A| 51|  59  | | 69| 72| 7A| 79|
+* |---|---| |-----------------------------------------------------------| |---------------|
+* | 01| 09| | 11|   | 19|          29                   | 39|       | 58| | 68| 70| 71| 78|
+* `-------' `-----------------------------------------------------------' `---------------'
+*
+* On "hidden" positions, the IBM Model F AT sends:
+*   -KANA for the position hidden between left shift and Z
+*   -SYSTEM_POWER on the left half of the numpad 0
+*   -F11 on the lower half of the numpad +
+*   -The other codes, 19, 39, 53 and 5C are unassigned as part of Set 2.
+*
+* Scancode 84 (SysRq) is handled as PrintScreen
+*/
+
+#define KEYMAP_AT( \
+    K05,K06,   K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,K5D,K66,  K76,K77,K7E,KFC, \
+    K04,K0C,   K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,    K5C,  K6C,K75,K7D,K7C, \
+    K03,K0B,   K14,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,    K53,K5A,  K6B,K73,K74,K7B, \
+    K83,K0A,   K12,K13,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,    K51,K59,  K69,K72,K7A,K79, \
+    K01,K09,   K11,    K19,            K29,                    K39,    K58,  K68,K70,K71,K78  \
+) \
+KEYMAP_ALL( \
+        F13,F14,F15,F16,F17,F18,F19,F20,F21,F22,F23,F24,                                              \
+    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,F12,            KFC, K7E, BRK,  VOLD,VOLU,MUTE,   \
+    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,  JPY,K66,  INS, HOME,PGUP, K77,PSLS,K7C,K7B, \
+    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,      K5D,  DEL, END, PGDN, K6C,K75,K7D,K79,  \
+    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,          K5A,                  K6B,K73,K74,PCMM, \
+    K12,NUBS,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,      K51,K59,       UP,       K69,K72,K7A,PENT, \
+    K14,LGUI,K11,MHEN,        K29,     HENK,K13,RALT,RGUI,APP,RCTL, LEFT,DOWN,RGHT, K68,K70,K71,PEQL, \
+                                                                                                      \
+    SYSTEM_POWER, SYSTEM_SLEEP, SYSTEM_WAKE,                                                          \
+    MEDIA_NEXT_TRACK, MEDIA_PREV_TRACK, MEDIA_STOP, MEDIA_PLAY_PAUSE, MEDIA_SELECT,                   \
+    MAIL, CALCULATOR, MY_COMPUTER,                                                                    \
+    WWW_SEARCH, WWW_HOME, WWW_BACK, WWW_FORWARD,                                                      \
+    WWW_STOP, WWW_REFRESH, WWW_FAVORITES,                                                             \
+    K19, K39, K53, K5C                                                                                \
+)
+
 #endif
