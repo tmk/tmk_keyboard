@@ -121,34 +121,33 @@ typedef struct
 
 
 // Endopoint number and size
-#define KEYBOARD_IN_EPNUM           1
+#define CUR_EPNUM                   1
+#define KEYBOARD_IN_EPNUM           CUR_EPNUM
 
 #ifdef MOUSE_ENABLE
-#   define MOUSE_IN_EPNUM           (KEYBOARD_IN_EPNUM + 1) 
-#else
-#   define MOUSE_IN_EPNUM           KEYBOARD_IN_EPNUM
+#   define CUR_EPNUM                (CUR_EPNUM + 1)
+#   define MOUSE_IN_EPNUM           CUR_EPNUM
 #endif
 
 #ifdef EXTRAKEY_ENABLE
-#   define EXTRAKEY_IN_EPNUM        (MOUSE_IN_EPNUM + 1)
-#else
-#   define EXTRAKEY_IN_EPNUM        MOUSE_IN_EPNUM 
+#   define CUR_EPNUM                (CUR_EPNUM + 1)
+#   define EXTRAKEY_IN_EPNUM        CUR_EPNUM
 #endif
 
 #ifdef CONSOLE_ENABLE
-#   define CONSOLE_IN_EPNUM         (EXTRAKEY_IN_EPNUM + 1)
-#   define CONSOLE_OUT_EPNUM        (EXTRAKEY_IN_EPNUM + 1)
-//#   define CONSOLE_OUT_EPNUM        (EXTRAKEY_IN_EPNUM + 2)
-#else
-#   define CONSOLE_OUT_EPNUM        EXTRAKEY_IN_EPNUM
+#   define CUR_EPNUM                (CUR_EPNUM + 1)
+#   define CONSOLE_IN_EPNUM         CUR_EPNUM
+#   define CONSOLE_OUT_EPNUM        CUR_EPNUM
 #endif
 
 #ifdef NKRO_ENABLE
-#   define NKRO_IN_EPNUM            (CONSOLE_OUT_EPNUM + 1)
+#   define CUR_EPNUM                (CUR_EPNUM + 1)
+#   define NKRO_IN_EPNUM            CUR_EPNUM
 #endif
 
-#if defined(__AVR_ATmega32U2__) && NKRO_IN_EPNUM > 4
-#   error "Endpoints are not available enough to support all functions. Remove some in Makefile.(MOUSEKEY, EXTRAKEY, CONSOLE, NKRO)"
+/* Check number of endpoints. ATmega32u2 has only four except for control endpoint. */
+#if defined(__AVR_ATmega32U2__) && CUR_EPNUM > 4
+#   error "Endpoints are not available enough to support all functions. Disable some of build options in Makefile.(MOUSEKEY, EXTRAKEY, CONSOLE, NKRO)"
 #endif
 
 
