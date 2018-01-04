@@ -482,6 +482,7 @@ static void send_mouse(report_mouse_t *report)
 
 static void send_system(uint16_t data)
 {
+#ifdef EXTRAKEY_ENABLE
     uint8_t timeout = 255;
 
     if (USB_DeviceState != DEVICE_STATE_Configured)
@@ -499,10 +500,12 @@ static void send_system(uint16_t data)
 
     Endpoint_Write_Stream_LE(&r, sizeof(report_extra_t), NULL);
     Endpoint_ClearIN();
+#endif
 }
 
 static void send_consumer(uint16_t data)
 {
+#ifdef EXTRAKEY_ENABLE
     uint8_t timeout = 255;
 
     if (USB_DeviceState != DEVICE_STATE_Configured)
@@ -520,6 +523,7 @@ static void send_consumer(uint16_t data)
 
     Endpoint_Write_Stream_LE(&r, sizeof(report_extra_t), NULL);
     Endpoint_ClearIN();
+#endif
 }
 
 
