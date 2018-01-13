@@ -148,7 +148,7 @@ void keyboard_task(void)
     // call with pseudo tick event when no real key event.
     action_exec(TICK);
 
-MATRIX_LOOP_END:
+//MATRIX_LOOP_END:
 
     hook_keyboard_loop();
 
