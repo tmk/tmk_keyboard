@@ -70,6 +70,7 @@ static void power_down(uint8_t wdto)
     wdt_disable();
 }
 
+#ifdef SUSPEND_MODE_STANDBY
 static void standby(void)
 {
 #ifdef SLEEP_MODE_STANDBY
@@ -80,6 +81,7 @@ static void standby(void)
     sleep_disable();
 #endif
 }
+#endif
 
 static void idle(void)
 {
