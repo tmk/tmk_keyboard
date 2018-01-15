@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define FACTORYRESET_ENABLE 0
-#define BLUEFRUITLE_TRACE_SERIAL 1
+#undef BLUEFRUITLE_TRACE_SERIAL 
 
 
 
@@ -170,6 +170,7 @@ static void send_keyboard(report_keyboard_t *report)
             ble.print("-");
     }
     ble.println(""); 
+#ifdef BLUEFRUITLE_TRACE_SERIAL   
     ble.print("AT+BLEUARTTX=");
     for (uint8_t i = 0; i < KEYBOARD_REPORT_SIZE; i++) {
         snprintf(hexbuf, sizeof(hexbuf), "%02X", report->raw[i]);
@@ -178,6 +179,7 @@ static void send_keyboard(report_keyboard_t *report)
             ble.print("-");
     }
     ble.println(""); 
+#endif
     
 #ifdef BLUEFRUITLE_TRACE_SERIAL   
     bluefruitle_trace_footer();   
