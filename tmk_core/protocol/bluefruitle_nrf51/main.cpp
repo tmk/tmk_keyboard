@@ -42,13 +42,14 @@ void __cxa_pure_virtual(void) {};
 
 int main(void)
 {   
+    _delay_ms(1000);
     ble_init();
 
     dprintf("Initializing keyboard...");
+    timer_init();
     keyboard_init();
     
     dprintf("Setting host driver to bluefruit...");
-    _delay_ms(1000);
     host_set_driver(bluefruitle_driver());
 
     // wait an extra second for the PC's operating system

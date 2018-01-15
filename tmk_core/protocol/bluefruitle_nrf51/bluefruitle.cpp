@@ -118,6 +118,9 @@ void ble_task(void) {
         ble.read();
 }
 
+#define _STR(x) #x
+#define STR(x) _STR(x)
+
 void ble_init(void) {
       if (!ble.begin(VERBOSE_MODE)) {
         dprintf( "Couldn't find Bluefruit, make sure it's in CoMmanD mode & check wiring?");
@@ -134,7 +137,7 @@ void ble_init(void) {
       ble.setConnectCallback(connectedCB);
       ble.setDisconnectCallback(disconnectedCB);
       ble.print("AT+GAPDEVNAME=");
-      ble.println("PRODUCT2");
+      ble.println(STR(PRODUCT));
       ble.println("AT+BAUDRATE=9600");
       ble.println("AT+BLEHIDEN=1");
       ble.println("AT+BLEKEYBOARDEN=1");
