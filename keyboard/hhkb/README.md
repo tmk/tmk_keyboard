@@ -15,7 +15,7 @@ See [this thread][AltController] in geekhack.org.
 * V-USB and iWRAP are no longer supported now, but still it'll works with a little fix. See not_supported directory.(2015/01)
 
 
-##Features
+## Features
 * Customizable keymap
 * More keymap layers(more Fn keys)
 * Mouse keys
@@ -26,26 +26,26 @@ See README of [tmk_keyboard] for more.
 
 [tmk_keyboard]: http://github.com/tmk/tmk_keyboard
  
-###Pros
+### Pros
 * No risks: Everything is all reversible
 * No need for PCB trace patching, case cutting or any other destructive mod
 * Can keep original controller intact
 * Can change all HHKB behavior as you like
 
-###Cons
+### Cons
 * Void your warranty
 * Lose USB hub function of Pro2
 
-##DISCLAIMER
+## DISCLAIMER
 I'm not a professional of electronics nor MCU programming. This may damage your HHKB.
 And my English writing is poor, I'm not sure I can convey my notions accurately.
 
 
-##Documents
+## Documents
 See [doc/HHKB.txt](doc/HHKB.txt) and files under [doc/](doc/) for internal of HHKB and this controller.
 
 
-##Build Firmware & Program
+## Build Firmware & Program
 See [this document](../../tmk_core/doc/build.md) first.
 
 ### Configuration
@@ -75,22 +75,22 @@ Or you can also use [FLIP] command to program. Also the tool should be installed
 Use [Teensy Loader] if your controller is Teensy/Teensy++.
 
 
-##Keymap
+## Keymap
 To define your own keymap create file named `keymap_<name>.c` and see [keymap document](../../tmk_core/doc/keymap.md) and existent keymap files.
 
 
-##Hardware
+## Hardware
 You have some options for hardware. Development boards with USB AVR family(ATMega32U4, AT90USB1286) like Teensy will work while MegaAVR with [V-USB] library is also cheaper option for DIY.
 
-###1. TMK Alt Controller Board
+### 1. TMK Alt Controller Board
 Design files are available at [Keyboard Controller Board for HHKB(KiCad project)](https://github.com/tmk/HHKB_controller) and see [Controller Distribution thread](http://geekhack.org/index.php?topic=56494.0) if you get an assembled one.
 
 
-###2. PJRC Teensy
+### 2. PJRC Teensy
 See [this thread](http://geekhack.org/index.php?topic=57008.0).
 
 
-###3. V-USB version
+### 3. V-USB version
 See [V-USB controller for HHKB](doc/V-USB.md).
 
 
