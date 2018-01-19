@@ -30,13 +30,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "report.h"
 #include "host.h"
 #include "led.h"
+#include "timer.h"
 
 
 
 
 static bool has_media_keys = false;
 static bool is_iso_layout = false;
-static report_mouse_t mouse_report = {};
 
 // matrix state buffer(1:on, 0:off)
 static matrix_row_t matrix[MATRIX_ROWS];
@@ -122,12 +122,21 @@ void matrix_init(void)
 #endif
 #define MAX(X, Y) ((X) > (Y) ? (X) : (Y))
 
+static report_mouse_t mouse_report = {};
+
 void adb_mouse_task(void)
 {
     uint16_t codes;
     int16_t x, y;
     static int8_t mouseacc;
-    _delay_ms(12);  // delay for preventing overload of poor ADB keyboard controller
+
+    /* tick of last polling */
+    static uint16_t tick_ms;
+
+    // polling with 12ms interval
+    if (timer_elapsed(tick_ms) < 12) return;
+    tick_ms = timer_read();
+
     codes = adb_host_mouse_recv();
     // If nothing received reset mouse acceleration, and quit.
     if (!codes) {
@@ -185,12 +194,18 @@ uint8_t matrix_scan(void)
     uint16_t codes;
     uint8_t key0, key1;
 
+    /* tick of last polling */
+    static uint16_t tick_ms;
+
     codes = extra_key;
     extra_key = 0xFFFF;
 
     if ( codes == 0xFFFF )
     {
-        _delay_ms(12);  // delay for preventing overload of poor ADB keyboard controller
+        // polling with 12ms interval
+        if (timer_elapsed(tick_ms) < 12) return 0;
+        tick_ms = timer_read();
+
         codes = adb_host_kbd_recv(ADB_ADDR_KEYBOARD);
 
         // Adjustable keybaord media keys
