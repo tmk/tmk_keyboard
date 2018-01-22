@@ -629,6 +629,7 @@ static bool mousekey_console(uint8_t code)
 /***********************************************************
  * Utilities
  ***********************************************************/
+#if MOUSEKEY_ENABLE
 static uint8_t numkey2num(uint8_t code)
 {
     switch (code) {
@@ -645,6 +646,7 @@ static uint8_t numkey2num(uint8_t code)
     }
     return 0;
 }
+#endif
 
 static void switch_default_layer(uint8_t layer)
 {
