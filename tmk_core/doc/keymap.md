@@ -68,7 +68,7 @@ The **default layer** is the base keymap layer (0-31) which is always active and
 
 Note that the `default_layer_state` variable only determines the lowest value to which `layer_state` may be set, and that `default_layer_state` is used by the core firmware when determining the starting value of `layer_state` before applying changes. In other words, the default layer will *always* be set to *on* in `layer_state`.
 
-The default layer is defined in the firmware by the `default_layer_state` variable, which is identical in format to the `layer_state` variable exlpained above. The value may be changed using the following functions:
+The default layer is defined in the firmware by the `default_layer_state` variable, which is identical in format to the `layer_state` variable explained above. The value may be changed using the following functions:
 
 - `default_layer_state_set(state)` sets the state to the specified 32-bit integer value.
 - AND/OR/XOR functions set the state based on a boolean logic comparison between the current state and the specified 32-bit integer value:
@@ -86,7 +86,7 @@ default_layer_state_set(1UL<<3);
 
 
 ### 0.2 Layer Precedence and Transparency
-Note that ***higher layers have priority in the layer stack***. The firmware starts at the topmost active layer, and works down to the bottom to find the an active keycode. Once the search encounters any keycode other than **`KC_TRNS`** (transparent) on an active layer, the search is halted and the remaining lower layers aren't examined, even if they are active.
+Note that ***higher layers have priority in the layer stack***. The firmware starts at the topmost active layer, and works down to the bottom to find an active keycode. Once the search encounters any keycode other than **`KC_TRNS`** (transparent) on an active layer, the search is halted and the remaining lower layers aren't examined, even if they are active.
 
 **Note:** a layer must be activated before it may be included in the stack search.
 
@@ -365,14 +365,14 @@ Turns on layer only and clear all layer on release..
 
 
 #### 2.2.10 Bitwise operation
-Performs bitwise operaiton(AND, OR, XOR, SET) against layer state.
+Performs bitwise operation(AND, OR, XOR, SET) against layer state.
 
     ACTION_LAYER_BIT_AND(part, bits, on)
     ACTION_LAYER_BIT_OR(part, bits, on)
     ACTION_LAYER_BIT_XOR(part, bits, on)
     ACTION_LAYER_BIT_SET(part, bits, on)
 
-`part` paramter indicates 0-based index(0-7) of where breaking 32-bit `layer_state` into eight nibbles(4-bit unit).
+`part` parameter indicates 0-based index(0-7) of where breaking 32-bit `layer_state` into eight nibbles(4-bit unit).
 
 bs
 
@@ -602,7 +602,7 @@ This registers modifier key(s) simultaneously with layer switching.
 
     ACTION_LAYER_MODS(2, MOD_LSFT | MOD_LALT)
 
-You can combine four modifiers at most but cannot use both left and right modifiers at a time, either left or right modiiers only can be allowed.
+You can combine four modifiers at most but cannot use both left and right modifiers at a time, either left or right modifiers only can be allowed.
 
 
 ## 4. Tapping
