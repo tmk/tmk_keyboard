@@ -51,10 +51,10 @@ static inline bool IS_PRESSED(keyevent_t event) { return (!IS_NOEVENT(event) && 
 static inline bool IS_RELEASED(keyevent_t event) { return (!IS_NOEVENT(event) && !event.pressed); }
 
 /* Tick event */
-#define TICK                    (keyevent_t){           \
-    .key = (keypos_t){ .row = 255, .col = 255 },           \
-    .pressed = false,                                   \
-    .time = (timer_read() | 1)                          \
+#define TICK(current_time)                    (keyevent_t){ \
+    .key = (keypos_t){ .row = 255, .col = 255 },            \
+    .pressed = false,                                       \
+    .time = (current_time)                                  \
 }
 
 
