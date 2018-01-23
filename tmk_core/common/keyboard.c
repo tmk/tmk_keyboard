@@ -107,6 +107,7 @@ void keyboard_task(void)
     matrix_row_t matrix_change = 0;
 
     matrix_scan();
+    bool key_changed = false;
     for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
         matrix_row = matrix_get_row(r);
         matrix_change = matrix_row ^ matrix_prev[r];
@@ -137,7 +138,7 @@ void keyboard_task(void)
                     hook_matrix_change(e);
                     // record a processed key
                     matrix_prev[r] ^= ((matrix_row_t)1<<c);
-
+                    key_changed = true;
                     // This can miss stroke when scan matrix takes long like Topre
                     // process a key per task call
                     //goto MATRIX_LOOP_END;
@@ -146,7 +147,9 @@ void keyboard_task(void)
         }
     }
     // call with pseudo tick event when no real key event.
-    action_exec(TICK);
+    if (!key_changed) {
+        action_exec(TICK);
+    }
 
 //MATRIX_LOOP_END:
 
