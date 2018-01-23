@@ -365,7 +365,7 @@ Turns on layer only and clear all layer on release..
 
 
 #### 2.2.10 Bitwise operation
-Performs bitwise operaiton(AND, OR, XOR, SET) against layer state.
+Performs bitwise operation(AND, OR, XOR, SET) against layer state.
 
     ACTION_LAYER_BIT_AND(part, bits, on)
     ACTION_LAYER_BIT_OR(part, bits, on)
