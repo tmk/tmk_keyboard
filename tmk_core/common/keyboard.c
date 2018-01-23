@@ -108,6 +108,8 @@ void keyboard_task(void)
 
     matrix_scan();
     bool key_changed = false;
+    uint16_t current_time = timer_read() | 1; /* time should not be 0 */
+
     for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
         matrix_row = matrix_get_row(r);
         matrix_change = matrix_row ^ matrix_prev[r];
@@ -127,28 +129,30 @@ void keyboard_task(void)
             matrix_ghost[r] = matrix_row;
 #endif
             if (debug_matrix) matrix_print();
+            matrix_row_t colmask = 1;
             for (uint8_t c = 0; c < MATRIX_COLS; c++) {
-                if (matrix_change & ((matrix_row_t)1<<c)) {
+                if (matrix_change & colmask) {
                     keyevent_t e = (keyevent_t){
                         .key = (keypos_t){ .row = r, .col = c },
-                        .pressed = (matrix_row & ((matrix_row_t)1<<c)),
-                        .time = (timer_read() | 1) /* time should not be 0 */
+                        .pressed = (matrix_row & colmask),
+                        .time = current_time 
                     };
                     action_exec(e);
                     hook_matrix_change(e);
                     // record a processed key
-                    matrix_prev[r] ^= ((matrix_row_t)1<<c);
+                    matrix_prev[r] ^= colmask;
                     key_changed = true;
                     // This can miss stroke when scan matrix takes long like Topre
                     // process a key per task call
                     //goto MATRIX_LOOP_END;
                 }
+                colmask <<= 1;
             }
         }
     }
     // call with pseudo tick event when no real key event.
     if (!key_changed) {
-        action_exec(TICK);
+        action_exec(TICK(current_time));
     }
 
 //MATRIX_LOOP_END:
