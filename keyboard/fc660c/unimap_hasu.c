@@ -73,7 +73,7 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
 };
 
 
-void hook_layer_change(uint32_t layer_state)
+void hook_layer_change(layer_state_t layer_state)
 {
     // lights LED on Insert when layer 1 is enabled
     if (layer_state & (1L<<1)) {
