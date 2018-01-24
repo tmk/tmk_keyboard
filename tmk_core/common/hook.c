@@ -31,12 +31,12 @@ void hook_matrix_change(keyevent_t event) {
 }
 
 __attribute__((weak))
-void hook_default_layer_change(uint32_t default_layer_state) {
+void hook_default_layer_change(layer_state_t default_layer_state) {
     (void)default_layer_state;
 }
 
 __attribute__((weak))
-void hook_layer_change(uint32_t layer_state) {
+void hook_layer_change(layer_state_t layer_state) {
     (void)layer_state;
 }
 

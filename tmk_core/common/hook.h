@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define _HOOKS_H_
 
 #include "keyboard.h"
+#include "action_layer.h"
 #include "led.h"
 
 /* -------------------------------------
@@ -62,11 +63,11 @@ void hook_matrix_change(keyevent_t event);
 
 /* Called on default layer state change event. */
 /* Default behaviour: do nothing. */
-void hook_default_layer_change(uint32_t default_layer_state);
+void hook_default_layer_change(layer_state_t default_layer_state);
 
 /* Called on layer state change event. */
 /* Default behaviour: do nothing. */
-void hook_layer_change(uint32_t layer_state);
+void hook_layer_change(layer_state_t layer_state);
 
 /* Called on indicator LED update event (when reported from host). */
 /* Default behaviour: calls keyboard_set_leds. */

@@ -15,9 +15,9 @@
 /* 
  * Default Layer State
  */
-uint32_t default_layer_state = 0;
+layer_state_t default_layer_state = 0;
 
-static void default_layer_state_set(uint32_t state)
+static void default_layer_state_set(layer_state_t state)
 {
     debug("default_layer_state: ");
     default_layer_debug(); debug(" to ");
@@ -34,21 +34,21 @@ void default_layer_debug(void)
     dprintf("%08lX(%u)", default_layer_state, biton32(default_layer_state));
 }
 
-void default_layer_set(uint32_t state)
+void default_layer_set(layer_state_t state)
 {
     default_layer_state_set(state);
 }
 
 #ifndef NO_ACTION_LAYER
-void default_layer_or(uint32_t state)
+void default_layer_or(layer_state_t state)
 {
     default_layer_state_set(default_layer_state | state);
 }
-void default_layer_and(uint32_t state)
+void default_layer_and(layer_state_t state)
 {
     default_layer_state_set(default_layer_state & state);
 }
-void default_layer_xor(uint32_t state)
+void default_layer_xor(layer_state_t state)
 {
     default_layer_state_set(default_layer_state ^ state);
 }
@@ -59,9 +59,9 @@ void default_layer_xor(uint32_t state)
 /* 
  * Keymap Layer State
  */
-uint32_t layer_state = 0;
+layer_state_t layer_state = 0;
 
-static void layer_state_set(uint32_t state)
+static void layer_state_set(layer_state_t state)
 {
     dprint("layer_state: ");
     layer_debug(); dprint(" to ");
@@ -98,15 +98,15 @@ void layer_invert(uint8_t layer)
     layer_state_set(layer_state ^ (1UL<<layer));
 }
 
-void layer_or(uint32_t state)
+void layer_or(layer_state_t state)
 {
     layer_state_set(layer_state | state);
 }
-void layer_and(uint32_t state)
+void layer_and(layer_state_t state)
 {
     layer_state_set(layer_state & state);
 }
-void layer_xor(uint32_t state)
+void layer_xor(layer_state_t state)
 {
     layer_state_set(layer_state ^ state);
 }
@@ -124,7 +124,7 @@ static uint8_t current_layer_for_key(keypos_t key)
 {
 #ifndef NO_ACTION_LAYER
     action_t action = ACTION_TRANSPARENT;
-    uint32_t layers = layer_state | default_layer_state;
+    layer_state_t layers = layer_state | default_layer_state;
     /* check top layer first */
     for (int8_t i = 31; i >= 0; i--) {
         if (layers & (1UL<<i)) {
