@@ -5,7 +5,6 @@
 #include "action_layer.h"
 #include "hook.h"
 
-#include "action_layer.h"
 #ifdef DEBUG_ACTION
 #include "debug.h"
 #else
@@ -61,6 +60,7 @@ void default_layer_xor(layer_state_t state)
  * Keymap Layer State
  */
 layer_state_t layer_state = 0;
+static const layer_state_t ONE = ((layer_state_t)1);
 
 static void layer_state_set(layer_state_t state)
 {
@@ -81,22 +81,22 @@ void layer_clear(void)
 
 void layer_move(uint8_t layer)
 {
-    layer_state_set(1UL<<layer);
+    layer_state_set(ONE<<layer);
 }
 
 void layer_on(uint8_t layer)
 {
-    layer_state_set(layer_state | (1UL<<layer));
+    layer_state_set(layer_state | (ONE<<layer));
 }
 
 void layer_off(uint8_t layer)
 {
-    layer_state_set(layer_state & ~(1UL<<layer));
+    layer_state_set(layer_state & ~(ONE<<layer));
 }
 
 void layer_invert(uint8_t layer)
 {
-    layer_state_set(layer_state ^ (1UL<<layer));
+    layer_state_set(layer_state ^ (ONE<<layer));
 }
 
 void layer_or(layer_state_t state)
@@ -123,12 +123,12 @@ void layer_debug(void)
 /* return layer effective for key at this time */
 static uint8_t current_layer_for_key(keypos_t key)
 {
-#ifndef NO_ACTION_LAYER
+#ifndef NO_ACTION_LAYER    
     action_t action = ACTION_TRANSPARENT;
     layer_state_t layers = layer_state | default_layer_state;
     /* check top layer first */
     for (int8_t i = NUM_LAYERS-1; i >= 0; i--) {
-        if (layers & (1UL<<i)) {
+        if (layers & (ONE<<i)) {
             action = action_for_key(i, key);
             if (action.code != (action_t)ACTION_TRANSPARENT.code) {
                 return i;
