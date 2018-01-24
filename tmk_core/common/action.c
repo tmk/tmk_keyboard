@@ -35,6 +35,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "nodebug.h"
 #endif
 
+#ifndef NO_ACTION_LAYER
+void action_layer_bitop(action_t action, bool pressed);
+void action_layer_bitop(action_t action, bool pressed);
+void action_layer_calc_bits_mask(action_t action, layer_state_t *bits, layer_state_t *mask);
+#endif
 
 void action_exec(keyevent_t event)
 {
@@ -214,34 +219,7 @@ void process_action(keyrecord_t *record)
 #endif
 #ifndef NO_ACTION_LAYER
         case ACT_LAYER:
-            if (action.layer_bitop.on == 0) {
-                /* Default Layer Bitwise Operation */
-                if (!event.pressed) {
-                    uint8_t shift = action.layer_bitop.part*4;
-                    layer_state_t bits = ((layer_state_t)action.layer_bitop.bits)<<shift;
-                    layer_state_t mask = (action.layer_bitop.xbit) ? ~(((layer_state_t)0xf)<<shift) : 0;
-                    switch (action.layer_bitop.op) {
-                        case OP_BIT_AND: default_layer_and(bits | mask); break;
-                        case OP_BIT_OR:  default_layer_or(bits | mask);  break;
-                        case OP_BIT_XOR: default_layer_xor(bits | mask); break;
-                        case OP_BIT_SET: default_layer_and(mask); default_layer_or(bits); break;
-                    }
-                }
-            } else {
-                /* Layer Bitwise Operation */
-                if (event.pressed ? (action.layer_bitop.on & ON_PRESS) :
-                                    (action.layer_bitop.on & ON_RELEASE)) {
-                    uint8_t shift = action.layer_bitop.part*4;
-                    layer_state_t bits = ((layer_state_t)action.layer_bitop.bits)<<shift;
-                    layer_state_t mask = (action.layer_bitop.xbit) ? ~(((layer_state_t)0xf)<<shift) : 0;
-                    switch (action.layer_bitop.op) {
-                        case OP_BIT_AND: layer_and(bits | mask); break;
-                        case OP_BIT_OR:  layer_or(bits | mask);  break;
-                        case OP_BIT_XOR: layer_xor(bits | mask); break;
-                        case OP_BIT_SET: layer_and(mask); layer_or(bits); break;
-                    }
-                }
-            }
+            action_layer_bitop(action, event.pressed);
             break;
     #ifndef NO_ACTION_TAPPING
         case ACT_LAYER_TAP:
@@ -580,6 +558,57 @@ void debug_record(keyrecord_t record)
     dprintf(":%u%c", record.tap.count, (record.tap.interrupted ? '-' : ' '));
 #endif
 }
+
+#ifndef NO_ACTION_LAYER
+//If layer_state_t isn't uint32_t, we have to make sure bitshifting doesn't overshoot
+inline uint8_t action_layer_shift(action_t action)
+{
+#if NUM_LAYERS > 16   // layer_state is uint32_t
+    return action.layer_bitop.part*4;
+#elif NUM_LAYERS > 8   // unit16_t
+    return (action.layer_bitop.part & 3)*4;
+#else  // uint8_t
+    return (action.layer_bitop.part & 1)*4;
+#endif
+}
+
+//outputs bits and mask.
+inline void action_layer_calc_bits_mask(action_t action, layer_state_t *bits, layer_state_t *mask)
+{
+    uint8_t shift = action_layer_shift(action);
+    *bits = ((layer_state_t)action.layer_bitop.bits) << shift;
+    *mask = (action.layer_bitop.xbit) ? ~(((layer_state_t)0xf)<<shift) : 0;
+}
+
+void action_layer_bitop(action_t action, bool pressed) 
+{
+    if (action.layer_bitop.on == 0) {
+        /* Default Layer Bitwise Operation */
+        if (!pressed) {
+            layer_state_t bits, mask;
+            action_layer_calc_bits_mask(action, &bits, &mask);
+            switch (action.layer_bitop.op) {
+                case OP_BIT_AND: default_layer_and(bits | mask); break;
+                case OP_BIT_OR:  default_layer_or(bits | mask);  break;
+                case OP_BIT_XOR: default_layer_xor(bits | mask); break;
+                case OP_BIT_SET: default_layer_and(mask); default_layer_or(bits); break;
+            }
+        }
+    } else {
+        /* Layer Bitwise Operation */
+        if (pressed ? (action.layer_bitop.on & ON_PRESS) : (action.layer_bitop.on & ON_RELEASE)) {
+            layer_state_t bits, mask;
+            action_layer_calc_bits_mask(action, &bits, &mask);
+            switch (action.layer_bitop.op) {
+                case OP_BIT_AND: layer_and(bits | mask); break;
+                case OP_BIT_OR:  layer_or(bits | mask);  break;
+                case OP_BIT_XOR: layer_xor(bits | mask); break;
+                case OP_BIT_SET: layer_and(mask); layer_or(bits); break;
+            }
+        }
+    }
+}
+#endif
 
 void debug_action(action_t action)
 {

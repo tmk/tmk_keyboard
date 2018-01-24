@@ -21,7 +21,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keyboard.h"
 #include "action.h"
 
-typedef uint32_t layer_state_t;
+#ifndef NUM_LAYERS //You can redefine NUM_LAYERS in config.h to improve performance.
+    #define NUM_LAYERS 32
+#endif
+
+#if (NUM_LAYERS <= 8)
+typedef  uint8_t    layer_state_t;
+#elif (NUM_LAYERS <= 16)
+typedef  uint16_t   layer_state_t;
+#elif (NUM_LAYERS <= 32)
+typedef  uint32_t   layer_state_t;
+#else 
+//Note we can't have more than 32 layers due to implementation of action_code.action_layer.bitop
+#error "NUM_LAYERS: invalid value"
+#endif
 
 /*
  * Default Layer

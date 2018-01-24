@@ -5,6 +5,7 @@
 #include "action_layer.h"
 #include "hook.h"
 
+#include "action_layer.h"
 #ifdef DEBUG_ACTION
 #include "debug.h"
 #else
@@ -126,7 +127,7 @@ static uint8_t current_layer_for_key(keypos_t key)
     action_t action = ACTION_TRANSPARENT;
     layer_state_t layers = layer_state | default_layer_state;
     /* check top layer first */
-    for (int8_t i = 31; i >= 0; i--) {
+    for (int8_t i = NUM_LAYERS-1; i >= 0; i--) {
         if (layers & (1UL<<i)) {
             action = action_for_key(i, key);
             if (action.code != (action_t)ACTION_TRANSPARENT.code) {
