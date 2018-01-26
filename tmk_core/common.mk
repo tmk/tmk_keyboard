@@ -1,4 +1,6 @@
 COMMON_DIR = common
+DEBOUNCE = $(COMMON_DIR)/debounce
+
 SRC +=	$(COMMON_DIR)/host.c \
 	$(COMMON_DIR)/debounce.c \
 	$(COMMON_DIR)/keyboard.c \
@@ -19,6 +21,12 @@ SRC +=	$(COMMON_DIR)/host.c \
 
 
 # Option modules
+
+# Debounce - if it's implemented in matrix.c, choose debounce_none
+ifeq (yes,$(strip $(DEBOUNCE_HASU)))
+    SRC += $(DEBOUNCE)/debounce_hasu.c
+endif
+
 ifeq (yes,$(strip $(UNIMAP_ENABLE)))
     SRC += $(COMMON_DIR)/unimap.c
     OPT_DEFS += -DUNIMAP_ENABLE
@@ -94,6 +102,7 @@ ifeq (yes,$(strip $(KEYMAP_SECTION_ENABLE)))
 	EXTRALDFLAGS = $(error no ldscript for keymap section)
     endif
 endif
+
 
 # Version string
 VERSION := $(shell (git describe --always --dirty || echo 'unknown') 2> /dev/null)
