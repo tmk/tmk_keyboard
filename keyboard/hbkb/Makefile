@@ -102,7 +102,7 @@ MOUSEKEY_ENABLE = yes	# Mouse keys
 EXTRAKEY_ENABLE = yes	# Audio control and System control
 CONSOLE_ENABLE = yes	# Console for debug
 COMMAND_ENABLE = yes    # Commands for debug and configuration
-
+DEBOUNCE_HASU = yes     # default debounce algorithm
 
 # Boot Section Size in bytes
 #   Teensy halfKay   512

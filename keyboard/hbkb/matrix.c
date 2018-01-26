@@ -32,14 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *   COL: PD0-7
  *   ROW: PB0-7, PF4-7
  */
-#ifndef DEBOUNCE
-#   define DEBOUNCE	10
-#endif
-static uint8_t debouncing = DEBOUNCE;
 
 /* matrix state(1:on, 0:off) */
 static matrix_row_t matrix[MATRIX_ROWS];
-static matrix_row_t matrix_debouncing[MATRIX_ROWS];
 
 static matrix_row_t read_cols(void);
 static void unselect_rows(void);
@@ -62,7 +57,6 @@ void matrix_init(void)
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) {
         matrix[i] = 0;
-        matrix_debouncing[i] = 0;
     }
 }
 
@@ -71,25 +65,8 @@ uint8_t matrix_scan(void)
     for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
         select_row(i);
         _delay_us(30);  // without this wait read unstable value.
-        matrix_row_t cols = read_cols();
-        if (matrix_debouncing[i] != cols) {
-            matrix_debouncing[i] = cols;
-            if (debouncing) {
-                debug("bounce!: "); debug_hex(debouncing); debug("\n");
-            }
-            debouncing = DEBOUNCE;
-        }
+        matrix[i] = read_cols();        
         unselect_rows();
-    }
-
-    if (debouncing) {
-        if (--debouncing) {
-            _delay_ms(1);
-        } else {
-            for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-                matrix[i] = matrix_debouncing[i];
-            }
-        }
     }
 
     return 1;
