@@ -61,21 +61,15 @@ static bool has_ghost_in_row(uint8_t row)
     return false;
 }
 
-//Returns whether there was a ghost in the row.
+//Returns whether there was a ghost in the row, then copies new contents 
+//into matrix_ghost
 static bool matrix_deghost(uint8_t row, matrix_row_t matrix_row, matrix_row_t* matrix_ghost)
-{
-    bool result = false;
-    if (has_ghost_in_row(row)) {
-        /* Keep track of whether ghosted status has changed for
-        * debugging. But don't update matrix_prev until un-ghosted, or
-        * the last key would be lost.
-        */
-        if (debug_matrix && matrix_ghost[row] != matrix_row) {
-            matrix_print();
-        }        
-        result = true;
+{    
+    bool result = has_ghost_in_row(row);
+    if (debug_matrix && result && matrix_ghost[row] != matrix_row)
+    {
+        matrix_print();
     }
-
     matrix_ghost[row] = matrix_row;
     return result;
 }
