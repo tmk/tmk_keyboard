@@ -93,7 +93,7 @@ void keyboard_init(void)
 }
 
 /*
- * Do keyboard routine jobs: scan mantrix, light LEDs, ...
+ * Do keyboard routine jobs: scan matrix, light LEDs, ...
  * This is repeatedly called as fast as possible.
  */
 void keyboard_task(void)
