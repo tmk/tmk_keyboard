@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include "keyboard.h"
 #include "matrix.h"
+#include "debounce.h"
 #include "keymap.h"
 #include "host.h"
 #include "led.h"
@@ -106,9 +107,10 @@ void keyboard_init(void)
 }
 
 /*
- * Do keyboard routine jobs: scan mantrix, light LEDs, ...
+ * Do keyboard routine jobs: scan matrix, light LEDs, ...
  * This is repeatedly called as fast as possible.
  */
+
 void keyboard_task(void)
 {
     static matrix_row_t matrix_prev[MATRIX_ROWS];
@@ -120,9 +122,10 @@ void keyboard_task(void)
     matrix_row_t matrix_change = 0;
 
     matrix_scan();
+    matrix_debounce();
 
     for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
-        matrix_row = matrix_get_row(r);
+        matrix_row = matrix_debounce_get_row(r);
         matrix_change = matrix_row ^ matrix_prev[r];
         if (matrix_change) {            
 #ifdef MATRIX_HAS_GHOST

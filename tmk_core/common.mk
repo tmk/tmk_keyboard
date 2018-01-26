@@ -1,5 +1,6 @@
 COMMON_DIR = common
 SRC +=	$(COMMON_DIR)/host.c \
+	$(COMMON_DIR)/debounce.c \
 	$(COMMON_DIR)/keyboard.c \
 	$(COMMON_DIR)/matrix.c \
 	$(COMMON_DIR)/action.c \
