@@ -492,6 +492,12 @@ void unregister_code(uint8_t code)
     }
 }
 
+void type_code(uint8_t code)
+{
+    register_code(code);
+    unregister_code(code);
+}
+
 void register_mods(uint8_t mods)
 {
     if (mods) {
