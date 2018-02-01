@@ -4,10 +4,11 @@ Not supported actively any more.
 
 ## Build
 Use `Makefile.vusb` for [V-USB] controller.
+
     $ make -f Makefile.vusb
 
-##Hardware
-###3. V-USB connection
+## Hardware
+
                     +---+   +---------------+
     USB            GND  |   |   ATmega328p  |
     ~~~                 C3  |               |
