@@ -15,6 +15,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-void led_set(uint8_t usb_led) {
-  //XT Keyboards do not have LEDs, nothing to do.
+#include <avr/io.h>
+#include "stdint.h"
+#include "led.h"
+
+
+void led_set(uint8_t usb_led)
+{
+    if (usb_led & (1<<USB_LED_CAPS_LOCK)) {
+        // output high
+        DDRF |= (1<<5);
+        PORTF |= (1<<5);
+    } else {
+        // Hi-Z
+        DDRF &= ~(1<<5);
+        PORTF &= ~(1<<5);
+    }
+	if (usb_led & (1<<USB_LED_NUM_LOCK)) {
+        // output high
+        DDRF |= (1<<6);
+        PORTF |= (1<<6);
+    } else {
+        // Hi-Z
+        DDRF &= ~(1<<6);
+        PORTF &= ~(1<<6);
+    }
+	if (usb_led & (1<<USB_LED_SCROLL_LOCK)) {
+        // output high
+        DDRF |= (1<<7);
+        PORTF |= (1<<7);
+    } else {
+        // Hi-Z
+        DDRF &= ~(1<<7);
+        PORTF &= ~(1<<7);
+    }
 }
