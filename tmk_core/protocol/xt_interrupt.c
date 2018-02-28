@@ -51,6 +51,17 @@ POSSIBILITY OF SUCH DAMAGE.
 void xt_host_init(void)
 {
     XT_INT_INIT();
+
+    /* hard reset */
+#ifdef XT_RESET
+    XT_RESET();
+#endif
+
+    /* soft reset: pull clock line down for 20ms */
+    XT_INT_OFF();
+    data_lo(); clock_lo();
+    _delay_ms(20);
+    data_in(); clock_in();
     XT_INT_ON();
 }
 
@@ -66,29 +77,40 @@ uint8_t xt_host_recv(void)
 
 ISR(XT_INT_VECT)
 {
-    static uint8_t state = 0;
+    /*
+     * XT signal format consits of 10 or 9 clocks and sends start bits and 8-bit data,
+     * which should be read on falling edge of clock.
+     *
+     *  start(0), start(1), bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7
+     *
+     * Original IBM XT keyboard sends start(0) bit while some of clones don't.
+     * Start(0) bit is read as low on data line while start(1) as high.
+     *
+     * https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-XT-Keyboard-Protocol
+     */
+    static enum {
+        START, BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7, END
+    } state = START;
     static uint8_t data = 0;
 
-    if (state == 0) {
-        if (data_in())
-            state++;
-    } else if (state >= 1 && state <= 8) {
-        wait_clock_lo(20);
-        data >>= 1;
-        if (data_in())
-            data |= 0x80;
-        if (state == 8)
-            goto END;
-        state++;
-    } else {
-        goto DONE;
+    // This is needed if using PCINT which can be called on both falling and rising edge
+    if (clock_in()) return;
+
+    switch (state) {
+        case START:
+            // ignore start(0) bit
+            if (!data_in()) return;
+            break;
+        case BIT0 ... BIT7:
+            data >>= 1;
+            if (data_in())
+                data |= 0x80;
+            break;
     }
-    goto RETURN;
-END:
-    pbuf_enqueue(data);
-DONE:
-    state = 0;
-    data = 0;
-RETURN:
+    if (++state == END) {
+        pbuf_enqueue(data);
+        state = START;
+        data = 0;
+    }
     return;
 }

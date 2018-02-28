@@ -4,4 +4,7 @@
 bool clock_in(void);
 bool data_in(void);
 
+void clock_lo(void);
+void data_lo(void);
+
 #endif

@@ -32,3 +32,15 @@ bool data_in(void)
     _delay_us(1);
     return XT_DATA_PIN&(1<<XT_DATA_BIT);
 }
+
+void clock_lo(void)
+{
+    XT_CLOCK_PORT &= ~(1<<XT_CLOCK_BIT);
+    XT_CLOCK_DDR  |=  (1<<XT_CLOCK_BIT);
+}
+
+void data_lo(void)
+{
+    XT_DATA_PORT &= ~(1<<XT_DATA_BIT);
+    XT_DATA_DDR  |=  (1<<XT_DATA_BIT);
+}
