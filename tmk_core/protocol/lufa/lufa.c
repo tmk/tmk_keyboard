@@ -651,6 +651,17 @@ int main(void)
         USB_USBTask();
 #endif
     }
+
+    /* wait for Console startup */
+    // TODO: long delay often works anyhoo but proper startup would be better
+    uint16_t delay = 2000;
+    while (delay--) {
+#ifndef INTERRUPT_CONTROL_ENDPOINT
+        USB_USBTask();
+#endif
+        _delay_ms(1);
+    }
+
     print("USB configured.\n");
 
     /* init modules */
