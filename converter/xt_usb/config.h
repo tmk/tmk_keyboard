@@ -71,7 +71,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     EICRA |= ((1<<ISC11) |      \
               (0<<ISC10));      \
 } while (0)
+/* clears flag and enables interrupt */
 #define XT_INT_ON()  do {      \
+    EIFR  |= (1<<INTF1);        \
     EIMSK |= (1<<INT1);         \
 } while (0)
 #define XT_INT_OFF() do {      \
