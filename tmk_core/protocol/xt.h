@@ -39,22 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef XT_H
 #define XT_H
 
-#include <stdbool.h>
-#include "wait.h"
-#include "xt_io.h"
-#include "print.h"
-
 void xt_host_init(void);
 uint8_t xt_host_recv(void);
-
-
-/*--------------------------------------------------------------------
- * static functions
- *------------------------------------------------------------------*/
-static inline uint16_t wait_clock_lo(uint16_t us)
-{
-    while (clock_in()  && us) { asm(""); wait_us(1); us--; }
-    return us;
-}
 
 #endif

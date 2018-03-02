@@ -12,7 +12,6 @@ TARGET_DIR = .
 
 # project specific files
 SRC =	protocol/xt_interrupt.c \
-	protocol/xt_io_avr.c \
 	matrix.c \
 	led.c
 

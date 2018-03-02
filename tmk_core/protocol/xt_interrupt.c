@@ -51,6 +51,7 @@ POSSIBILITY OF SUCH DAMAGE.
 void xt_host_init(void)
 {
     XT_INT_INIT();
+    XT_INT_OFF();
 
     /* hard reset */
 #ifdef XT_RESET
@@ -58,10 +59,14 @@ void xt_host_init(void)
 #endif
 
     /* soft reset: pull clock line down for 20ms */
-    XT_INT_OFF();
-    data_lo(); clock_lo();
+    XT_DATA_LO();
+    XT_CLOCK_LO();
     _delay_ms(20);
-    data_in(); clock_in();
+
+    /* input mode with pullup */
+    XT_CLOCK_IN();
+    XT_DATA_IN();
+
     XT_INT_ON();
 }
 
@@ -93,7 +98,7 @@ ISR(XT_INT_VECT)
     } state = START;
     static uint8_t data = 0;
 
-    uint8_t dbit = data_in();
+    uint8_t dbit = XT_DATA_READ();
 
     // This is needed if using PCINT which can be called on both falling and rising edge
     //if (clock_in()) return;
