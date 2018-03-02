@@ -94,7 +94,7 @@ ISR(XT_INT_VECT)
      * https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-XT-Keyboard-Protocol
      */
     static enum {
-        START, BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7, END
+        START, BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7
     } state = START;
     static uint8_t data = 0;
 
@@ -114,7 +114,7 @@ ISR(XT_INT_VECT)
                 data |= 0x80;
             break;
     }
-    if (++state == END) {
+    if (state++ == BIT7) {
         pbuf_enqueue(data);
         state = START;
         data = 0;
