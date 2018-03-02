@@ -1,5 +1,6 @@
 /*
-Copyright 2010,2011,2012,2013 Jun WAKO <wakojun@gmail.com>
+Copyright 2018 Jun WAKO <wakojun@gmail.com>
+Copyright 2016 Ethan Apodaca <papodaca@gmail.com>
 
 This software is licensed with a Modified BSD License.
 All of this is supposed to be Free Software, Open Source, DFSG-free,
@@ -35,16 +36,11 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*
- * PS/2 protocol Pin interrupt version
- */
-
 #include <stdbool.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "pbuff.h"
 #include "xt.h"
-#include "xt_io.h"
 #include "wait.h"
 #include "print.h"
 
