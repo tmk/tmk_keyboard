@@ -120,6 +120,7 @@ uint8_t matrix_scan(void)
     }
 
     uint8_t code = xt_host_recv();
+    if (code) xprintf("%02X ", code);
     switch (state) {
         case INIT:
             switch (code) {
@@ -131,10 +132,8 @@ uint8_t matrix_scan(void)
                     break;
                 default:    // normal key make
                     if (code < 0x80 && code != 0x00) {
-                        xprintf("make: %X\r\n", code);
                         matrix_make(code);
                     } else if (code > 0x80 && code < 0xFF && code != 0x00) {
-                        xprintf("break %X\r\n", code);
                         matrix_break(code - 0x80);
                     }
                     state = INIT;
