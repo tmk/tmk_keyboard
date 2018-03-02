@@ -94,8 +94,9 @@ ISR(XT_INT_VECT)
     static uint8_t data = 0;
 
     uint8_t dbit = data_in();
+
     // This is needed if using PCINT which can be called on both falling and rising edge
-    if (clock_in()) return;
+    //if (clock_in()) return;
 
     switch (state) {
         case START:
