@@ -56,6 +56,10 @@ uint8_t matrix_cols(void)
 
 void matrix_init(void)
 {
+    // To use PORTF disable JTAG with writing JTD bit twice within four cycles.
+    MCUCR |= (1<<JTD);
+    MCUCR |= (1<<JTD);
+    
     // initialize row and col
     unselect_rows();
     init_cols();
