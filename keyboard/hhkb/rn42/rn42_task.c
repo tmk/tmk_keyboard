@@ -33,6 +33,9 @@ static void status_led(bool on)
 void rn42_task_init(void)
 {
     battery_init();
+#ifdef NKRO_ENABLE
+    rn42_nkro_last = keyboard_nkro;
+#endif
 }
 
 void rn42_task(void)
@@ -69,14 +72,25 @@ void rn42_task(void)
         }
     }
 
-    /* Bluetooth mode when ready */
-    if (!config_mode && !force_usb) {
-        if (!rn42_rts() && host_get_driver() != &rn42_driver) {
-            clear_keyboard();
-            host_set_driver(&rn42_driver);
-        } else if (rn42_rts() && host_get_driver() != &lufa_driver) {
-            clear_keyboard();
-            host_set_driver(&lufa_driver);
+    /* Switch between USB and Bluetooth */
+    if (!config_mode) { // not switch while config mode
+        if (!force_usb && !rn42_rts()) {
+            if (host_get_driver() != &rn42_driver) {
+                clear_keyboard();
+#ifdef NKRO_ENABLE
+                rn42_nkro_last = keyboard_nkro;
+                keyboard_nkro = false;
+#endif
+                host_set_driver(&rn42_driver);
+            }
+        } else {
+            if (host_get_driver() != &lufa_driver) {
+                clear_keyboard();
+#ifdef NKRO_ENABLE
+                keyboard_nkro = rn42_nkro_last;
+#endif
+                host_set_driver(&lufa_driver);
+            }
         }
     }
 
@@ -339,8 +353,6 @@ bool command_extra(uint8_t code)
             } else {
                 print("USB mode\n");
                 force_usb = true;
-                clear_keyboard();
-                host_set_driver(&lufa_driver);
             }
             return true;
         case KC_DELETE:
@@ -360,6 +372,14 @@ bool command_extra(uint8_t code)
         case KC_SCROLLLOCK:
             init_rn42();
             return true;
+#ifdef NKRO_ENABLE
+        case KC_N:
+            if (host_get_driver() != &lufa_driver) {
+                // ignored unless USB mode
+                return true;
+            }
+            return false;
+#endif
         default:
             if (config_mode)
                 return true;

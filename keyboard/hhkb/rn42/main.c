@@ -72,12 +72,6 @@ int main(void)
     /* init modules */
     keyboard_init();
 
-    if (!rn42_rts()) {
-        host_set_driver(&rn42_driver);
-    } else {
-        host_set_driver(&lufa_driver);
-    }
-
 #ifdef SLEEP_LED_ENABLE
     sleep_led_init();
 #endif
