@@ -120,19 +120,19 @@ uint8_t matrix_scan(void)
     code = serial_recv2();
     PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
     if (code == -1) return 0;
-
-if (code == 0x60) {
-    pc98_inhibit_repeat();
-
-/*
-    PC98_RDY_PORT |= (1<<PC98_RDY_BIT);
-    _delay_ms(100);
-    serial_send(0x96);
-    PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
-*/
-
-    return 0;
-}
+    
+    if (code == 0x60) {
+        pc98_inhibit_repeat();
+       
+        /*
+        PC98_RDY_PORT |= (1<<PC98_RDY_BIT);
+        _delay_ms(100);
+        serial_send(0x96);
+        PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
+        */
+        
+        return 0;
+    }
 
     print_hex8(code); print(" ");
 
