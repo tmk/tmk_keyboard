@@ -1,3 +1,6 @@
+Updated instruction here https://github.com/tmk/tmk_keyboard/blob/master/tmk_core/protocol/chibios/README.md
+
+
 # Teensy LC, 3.0, 3.1, 3.2 support
 
 These ARM Teensies are now supported through [ChibiOS](http://chibios.org).
