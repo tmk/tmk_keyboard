@@ -152,8 +152,8 @@ static void  init_cols(void)
 	palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_PULLUP);
 	palSetPadMode(GPIOA, 3, PAL_MODE_INPUT_PULLUP);
 	palSetPadMode(GPIOA, 2, PAL_MODE_INPUT_PULLUP);
-	palSetPadMode(GPIOB, 1, PAL_MODE_INPUT_PULLUP);
-	palSetPadMode(GPIOB, 0, PAL_MODE_INPUT_PULLUP);
+	palSetPadMode(GPIOA, 1, PAL_MODE_INPUT_PULLUP);
+	palSetPadMode(GPIOA, 0, PAL_MODE_INPUT_PULLUP);
 	palSetPadMode(GPIOC, 15, PAL_MODE_INPUT_PULLUP);
 	palSetPadMode(GPIOC, 14, PAL_MODE_INPUT_PULLUP);
 	palSetPadMode(GPIOC, 13, PAL_MODE_INPUT_PULLUP);
@@ -218,12 +218,12 @@ static void select_row(uint8_t row)
             palClearPad(GPIOB, 5);
             break;
         case 3:
-            palSetPadMode(GPIOB,  4, PAL_MODE_OUTPUT_PUSHPULL);
-            palClearPad(GPIOB,  4);
+            palSetPadMode(GPIOB, 4, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOB, 4);
             break;
         case 4:
-            palSetPadMode(GPIOB,  3, PAL_MODE_OUTPUT_PUSHPULL);
-            palClearPad(GPIOB,  3);
+            palSetPadMode(GPIOB, 3, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOB, 3);
             break;
         case 5:
             palSetPadMode(GPIOA, 15, PAL_MODE_OUTPUT_PUSHPULL);
@@ -242,12 +242,12 @@ static void select_row(uint8_t row)
             palClearPad(GPIOA, 10);
             break;
         case 9:
-            palSetPadMode(GPIOA,  9, PAL_MODE_OUTPUT_PUSHPULL);
-            palClearPad(GPIOA,  9);
+            palSetPadMode(GPIOA, 9, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOA, 9);
             break;
         case 10:
-            palSetPadMode(GPIOA,  8, PAL_MODE_OUTPUT_PUSHPULL);
-            palClearPad(GPIOA,  8);
+            palSetPadMode(GPIOA, 8, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOA, 8);
             break;
         case 11:
             palSetPadMode(GPIOB, 15, PAL_MODE_OUTPUT_PUSHPULL);
