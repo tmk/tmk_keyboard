@@ -45,8 +45,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
  * XT Pin interrupt
  */
-#ifdef XT_USE_INT
-/* uses INT1 for clock line(ATMega32U4) */
 #define XT_CLOCK_PORT  PORTD
 #define XT_CLOCK_PIN   PIND
 #define XT_CLOCK_DDR   DDRD
@@ -55,17 +53,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define XT_DATA_PIN    PIND
 #define XT_DATA_DDR    DDRD
 #define XT_DATA_BIT    0
+#define XT_RST_PORT    PORTB
+#define XT_RST_PIN     PINB
+#define XT_RST_DDR     DDRB
+#define XT_RST_BIT     7
+
+/* hard reset: low pulse for 500ms and after that HiZ for safety */
+#define XT_RESET() do { \
+    XT_RST_PORT &= ~(1<<XT_RST_BIT);  \
+    XT_RST_DDR  |=  (1<<XT_RST_BIT);  \
+    _delay_ms(500);                   \
+    XT_RST_DDR  &= ~(1<<XT_RST_BIT);  \
+} while (0)
+
+/* INT1 for falling edge of clock line */
 #define XT_INT_INIT()  do {    \
     EICRA |= ((1<<ISC11) |      \
-              (1<<ISC10));      \
+              (0<<ISC10));      \
 } while (0)
+/* clears flag and enables interrupt */
 #define XT_INT_ON()  do {      \
+    EIFR  |= (1<<INTF1);        \
     EIMSK |= (1<<INT1);         \
 } while (0)
 #define XT_INT_OFF() do {      \
     EIMSK &= ~(1<<INT1);        \
 } while (0)
 #define XT_INT_VECT    INT1_vect
-#endif
 
 #endif

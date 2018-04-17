@@ -1,5 +1,6 @@
 /*
-Copyright 2010,2011,2012,2013 Jun WAKO <wakojun@gmail.com>
+Copyright 2018 Jun WAKO <wakojun@gmail.com>
+Copyright 2016 Ethan Apodaca <papodaca@gmail.com>
 
 This software is licensed with a Modified BSD License.
 All of this is supposed to be Free Software, Open Source, DFSG-free,
@@ -35,22 +36,33 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*
- * PS/2 protocol Pin interrupt version
- */
-
 #include <stdbool.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "pbuff.h"
 #include "xt.h"
-#include "xt_io.h"
 #include "wait.h"
 #include "print.h"
 
 void xt_host_init(void)
 {
     XT_INT_INIT();
+    XT_INT_OFF();
+
+    /* hard reset */
+#ifdef XT_RESET
+    XT_RESET();
+#endif
+
+    /* soft reset: pull clock line down for 20ms */
+    XT_DATA_LO();
+    XT_CLOCK_LO();
+    _delay_ms(20);
+
+    /* input mode with pullup */
+    XT_CLOCK_IN();
+    XT_DATA_IN();
+
     XT_INT_ON();
 }
 
@@ -66,29 +78,42 @@ uint8_t xt_host_recv(void)
 
 ISR(XT_INT_VECT)
 {
-    static uint8_t state = 0;
+    /*
+     * XT signal format consits of 10 or 9 clocks and sends start bits and 8-bit data,
+     * which should be read on falling edge of clock.
+     *
+     *  start(0), start(1), bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7
+     *
+     * Original IBM XT keyboard sends start(0) bit while some of clones don't.
+     * Start(0) bit is read as low on data line while start(1) as high.
+     *
+     * https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-XT-Keyboard-Protocol
+     */
+    static enum {
+        START, BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7
+    } state = START;
     static uint8_t data = 0;
 
-    if (state == 0) {
-        if (data_in())
-            state++;
-    } else if (state >= 1 && state <= 8) {
-        wait_clock_lo(20);
-        data >>= 1;
-        if (data_in())
-            data |= 0x80;
-        if (state == 8)
-            goto END;
-        state++;
-    } else {
-        goto DONE;
+    uint8_t dbit = XT_DATA_READ();
+
+    // This is needed if using PCINT which can be called on both falling and rising edge
+    //if (XT_CLOCK_READ()) return;
+
+    switch (state) {
+        case START:
+            // ignore start(0) bit
+            if (!dbit) return;
+            break;
+        case BIT0 ... BIT7:
+            data >>= 1;
+            if (dbit)
+                data |= 0x80;
+            break;
     }
-    goto RETURN;
-END:
-    pbuf_enqueue(data);
-DONE:
-    state = 0;
-    data = 0;
-RETURN:
+    if (state++ == BIT7) {
+        pbuf_enqueue(data);
+        state = START;
+        data = 0;
+    }
     return;
 }

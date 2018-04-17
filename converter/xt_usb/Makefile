@@ -11,7 +11,8 @@ TMK_DIR = ../../tmk_core
 TARGET_DIR = .
 
 # project specific files
-SRC =	matrix.c \
+SRC =	protocol/xt_interrupt.c \
+	matrix.c \
 	led.c
 
 ifdef KEYMAP
@@ -61,7 +62,7 @@ ARCH = AVR8
 F_USB = $(F_CPU)
 
 # Interrupt driven control endpoint task(+60)
-#OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
+OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 
 
 # Boot Section Size in *bytes*
@@ -71,6 +72,7 @@ F_USB = $(F_CPU)
 #   LUFA bootloader  4096
 #   USBaspLoader     2048
 OPT_DEFS += -DBOOTLOADER_SIZE=512
+#OPT_DEFS += -DBOOTLOADER_SIZE=4096
 
 
 # Build Options
@@ -82,11 +84,6 @@ EXTRAKEY_ENABLE = yes	# Audio control and System control(+450)
 CONSOLE_ENABLE = yes	# Console for debug(+400)
 COMMAND_ENABLE = yes    # Commands for debug and configuration
 NKRO_ENABLE = yes	# USB Nkey Rollover
-
-
-# XT/2 Options
-#
-XT_USE_INT = yes	# uses external interrupt for falling edge of PS/2 clock pin
 
 
 # Optimize size but this may cause error "relocation truncated to fit"
