@@ -76,6 +76,7 @@ void matrix_init(void)
         is_iso_layout = false;
         break;
     }
+    xprintf("hadler_id: %02X, is_iso_layout: %s\n", handler_id, (is_iso_layout ? "yes" : "no"));
 
     // Adjustable keyboard media keys: address=0x07 and handlerID=0x02
     has_media_keys = (0x02 == (adb_host_talk(ADB_ADDR_APPLIANCE, ADB_REG_3) & 0xff));
