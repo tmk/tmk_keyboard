@@ -18,7 +18,7 @@ SRC =	protocol/xt_interrupt.c \
 ifdef KEYMAP
     SRC := keymap_$(KEYMAP).c $(SRC)
 else
-    SRC := keymap_plain.c $(SRC)
+    SRC := keymap.c $(SRC)
 endif
 
 CONFIG_H = config.h
