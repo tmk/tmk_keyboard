@@ -33,10 +33,6 @@ static uint8_t matrix[MATRIX_ROWS];
 #define ROW(code)      (code>>3)
 #define COL(code)      (code&0x07)
 
-// matrix positions for exceptional keys
-#define PRINT_SCREEN   (0x7C)
-#define PAUSE          (0x7D)
-
 
 void matrix_init(void)
 {
@@ -49,78 +45,54 @@ void matrix_init(void)
     return;
 }
 
-static uint8_t move_codes(uint8_t code) {
+// convert E0-escaped codes into unused area
+static uint8_t move_e0code(uint8_t code) {
     switch(code) {
-        case 0x10:
-            code += 0x5E;
-            break;
-        case 0x19:
-            code += 0x41;
-            break;
-        case 0x1C:
-        case 0x1D:
-            code += 0x38;
-            break;
-        case 0x20:
-        case 0x21:
-        case 0x22:
-        case 0x24:
-            code += 0x40;
-            break;
-        case 0x2E:
-        case 0x30:
-        case 0x32:
-            code += 0x44;
-            break;
-        case 0x35:
-        case 0x38:
-            code += 0x21;
-            break;
-        case 0x47:
-        case 0x48:
-        case 0x49:
-        case 0x4B:
-        case 0x4D:
-        case 0x4F:
-        case 0x50:
-        case 0x51:
-        case 0x52:
-        case 0x53:
-            code += 0x28;
-            break;
+        // Original IBM XT keyboard has these keys
+        case 0x37: return 0x54; // Print Screen
+        case 0x46: return 0x55; // Ctrl + Pause
+        case 0x1C: return 0x6F; // Keypad Enter
+        case 0x35: return 0x7F; // Keypad /
+
+        // Any XT keyobard with these keys?
+        // http://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/translate.pdf
+        // https://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/scancode.doc
+        case 0x5B: return 0x5A; // Left  GUI
+        case 0x5C: return 0x5B; // Right GUI
+        case 0x5D: return 0x5C; // Application
+        case 0x5E: return 0x5D; // Power(not used)
+        case 0x5F: return 0x5E; // Sleep(not used)
+        case 0x63: return 0x5F; // Wake (not used)
+        case 0x48: return 0x60; // Up
+        case 0x4B: return 0x61; // Left
+        case 0x50: return 0x62; // Down
+        case 0x4D: return 0x63; // Right
+        case 0x52: return 0x71; // Insert
+        case 0x53: return 0x72; // Delete
+        case 0x47: return 0x74; // Home
+        case 0x4F: return 0x75; // End
+        case 0x49: return 0x77; // Home
+        case 0x51: return 0x78; // End
+        case 0x1D: return 0x7A; // Right Ctrl
+        case 0x38: return 0x7C; // Right Alt
     }
     return code;
 }
 
 uint8_t matrix_scan(void)
 {
-
-    // scan code reading states
     static enum {
         INIT,
         E0,
-        E0_2A,
-        E0_2A_E0,
-        E0_B7,
-        E0_B7_E0,
-
-        // print screen
+        // Pause: E1 1D 45, E1 9D C5
         E1,
         E1_1D,
-        E1_1D_45,
-        E1_1D_45_E1,
-        E1_1D_45_E1_9D,
-        // pause
+        E1_9D,
     } state = INIT;
 
-
-    // 'pseudo break code' hack
-    if (matrix_is_on(ROW(PAUSE), COL(PAUSE))) {
-        matrix_break(PAUSE);
-    }
-
     uint8_t code = xt_host_recv();
-    if (code) xprintf("%02X ", code);
+    if (!code) return 0;
+    xprintf("%02X ", code);
     switch (state) {
         case INIT:
             switch (code) {
@@ -130,85 +102,64 @@ uint8_t matrix_scan(void)
                 case 0xE1:
                     state = E1;
                     break;
-                default:    // normal key make
-                    if (code < 0x80 && code != 0x00) {
+                default:
+                    if (code < 0x80)
                         matrix_make(code);
-                    } else if (code > 0x80 && code < 0xFF && code != 0x00) {
-                        matrix_break(code - 0x80);
-                    }
-                    state = INIT;
+                    else
+                        matrix_break(code & 0x7F);
+                    break;
             }
             break;
-        case E0:    // E0-Prefixed
-            switch (code) { //move these codes to unused places on the matrix
+        case E0:
+            switch (code) {
                 case 0x2A:
-                    state = E0_2A;
-                    break;
-                case 0xB7:
-                    state = E0_B7;
+                case 0xAA:
+                case 0x36:
+                case 0xB6:
+                    //ignore fake shift
+                    state = INIT;
                     break;
                 default:
-                    if (code < 0x80 && code != 0x00) {
-                        matrix_make(move_codes(code));
-                    } else if (code > 0x80 && code < 0xFF && code != 0x00) {
-                        matrix_break(move_codes(code - 0x80));
-                    }
+                    if (code < 0x80)
+                        matrix_make(move_e0code(code));
+                    else
+                        matrix_break(move_e0code(code & 0x7F));
                     state = INIT;
+                    break;
             }
             break;
-        case E0_2A:
-            if(code == 0xE0)
-                state = E0_2A_E0;
-            else
-                state = INIT;
-            break;
-        case E0_2A_E0:
-            if(code == 0x37)
-                matrix_make(PRINT_SCREEN);
-            else
-                state = INIT;
-            break;
-        case E0_B7:
-            if(code == 0xE0)
-                state = E0_B7;
-            else
-                state = INIT;
-            break;
-        case E0_B7_E0:
-          if(code == 0xAA)
-              matrix_break(PRINT_SCREEN);
-          else
-              state = INIT;
-          break;
         case E1:
-            if (code == 0x1D)
-                state = E1_1D;
-            else
-                state = INIT;
+            switch (code) {
+                case 0x1D:
+                    state = E1_1D;
+                    break;
+                case 0x9D:
+                    state = E1_9D;
+                    break;
+                default:
+                    state = INIT;
+                    break;
+            }
             break;
         case E1_1D:
-            if(code == 0x45)
-                state = E1_1D_45;
-            else
-                state = INIT;
+            switch (code) {
+                case 0x45:
+                    matrix_make(0x55);
+                    break;
+                default:
+                    state = INIT;
+                    break;
+            }
             break;
-        case E1_1D_45:
-            if(code == 0xE1)
-                state = E1_1D_45_E1;
-            else
-                state = INIT;
-            break;
-        case E1_1D_45_E1:
-            if(code == 0x9D)
-                state = E1_1D_45_E1_9D;
-            else
-                state = INIT;
-            break;
-        case E1_1D_45_E1_9D:
-            if(code == 0xC5)
-                matrix_make(PAUSE);
-            else
-                state = INIT;
+        case E1_9D:
+            switch (code) {
+                case 0x45:
+                    matrix_break(0x55);
+                    break;
+                default:
+                    state = INIT;
+                    break;
+            }
             break;
         default:
             state = INIT;
@@ -242,3 +193,71 @@ void matrix_clear(void)
 {
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
 }
+
+/*
+XT Scancodes
+============
+- http://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/translate.pdf
+- https://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/scancode.doc
+
+01-53: Normal codes used in original XT keyboard
+54-7F: Not used in original XT keyboard
+
+	0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
+    50  -   -   -   -   *   *   x   x   x   x   *   *   *   *   *   *
+    60  *   *   *   *   x   x   x   x   x   x   x   x   x   x   x   *
+    70  x   *   *   x   *   *   x   *   *   x   *   x   *   x   x   *
+
+-: codes existed in original XT keyboard
+*: E0-escaped codes converted into unused code area(internal use in TMK)
+x: Non-espcaped codes(not used in real keyboards probably, for CodeSet2-CodeSet1 translation purpose)
+
+Usage in TMK:
+
+    00  reserved*
+    54  PrintScr*
+    55  Pause*
+    56  Euro2
+    57  F11
+    58  F12
+    59  Keypad =
+    5A  LGUI*
+    5B  RGUI*
+    5C  APP*
+    5D  reserved*
+    5E  reserved*
+    5F  reserved*
+    60  cursor*
+    61  cursor*
+    62  cursor*
+    63  cursor*
+    64  F13
+    65  F14
+    66  F15
+    67  F16
+    68  F17
+    69  F18
+    6A  F19
+    6B  F20
+    6C  F21
+    6D  F22
+    6E  F23
+    6F  Keypad Enter*
+    70  KANA
+    71  nav*
+    72  nav*
+    73  RO
+    74  nav*
+    75  nav*
+    76  F24
+    77  nav*
+    78  nav*
+    79  HENKAN
+    7A  RCTL*
+    7B  MUHENKAN
+    7C  RALT*
+    7D  JPY
+    7E  Keypad ,
+    7F  Keypad / *
+
+*/
