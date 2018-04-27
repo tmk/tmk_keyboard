@@ -109,6 +109,12 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-ibm4704_usb_107key.html",
         },
+        ibm4704_usb_50key: {
+            desc: "IBM4704-USB Converter rev.2 for 50-key",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibm4704_usb/binary/ibm4704_usb_rev2_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-ibm4704_usb_50key.html",
+        },
         ibm4704_usb_alps: {
             desc: "IBM4704-USB Converter rev.2 for Alps 102-key",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibm4704_usb/binary/ibm4704_usb_rev2_alps_unimap.hex",
