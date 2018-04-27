@@ -46,8 +46,6 @@ void matrix_init(void)
     debug_keyboard = true;
     debug_matrix = true;
 #endif
-    debug_enable = true;
-    debug_matrix = true;
 
     KEY_INIT();
 
@@ -113,7 +111,7 @@ uint8_t matrix_scan(void)
 
             // NOTE: KEY_STATE keep its state in 20us after KEY_ENABLE.
             // This takes 25us or more to make sure KEY_STATE returns to idle state.
-            _delay_us(75);
+            _delay_us(30);
         }
         if (matrix[row] ^ matrix_prev[row]) {
             matrix_last_modified = timer_read32();
