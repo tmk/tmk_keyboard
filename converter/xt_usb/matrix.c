@@ -76,7 +76,7 @@ static uint8_t move_e0code(uint8_t code) {
         case 0x1D: return 0x7A; // Right Ctrl
         case 0x38: return 0x7C; // Right Alt
     }
-    return code;
+    return 0x00;
 }
 
 uint8_t matrix_scan(void)
@@ -204,17 +204,18 @@ XT Scancodes
 54-7F: Not used in original XT keyboard
 
 	0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
-    50  -   -   -   -   *   *   x   x   x   x   *   *   *   *   *   *
+    50  -   -   -   -   *   *   x   x   x   x   *   *   *   o   o   o
     60  *   *   *   *   x   x   x   x   x   x   x   x   x   x   x   *
     70  x   *   *   x   *   *   x   *   *   x   *   x   *   x   x   *
 
 -: codes existed in original XT keyboard
 *: E0-escaped codes converted into unused code area(internal use in TMK)
 x: Non-espcaped codes(not used in real keyboards probably, for CodeSet2-CodeSet1 translation purpose)
+o: reserved
 
 Usage in TMK:
 
-    00  reserved*
+    00  (reserved) DO NOT USE
     54  PrintScr*
     55  Pause*
     56  Euro2
@@ -224,9 +225,9 @@ Usage in TMK:
     5A  LGUI*
     5B  RGUI*
     5C  APP*
-    5D  reserved*
-    5E  reserved*
-    5F  reserved*
+    5D  (reserved)
+    5E  (reserved)
+    5F  (reserved)
     60  cursor*
     61  cursor*
     62  cursor*
