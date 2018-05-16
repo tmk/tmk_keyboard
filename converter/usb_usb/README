@@ -36,7 +36,7 @@ Build firmware
 --------------
 Build.
 
-    $ git clone git://github.com/tmk/tmk_keyboard.git
+    $ git clone https://github.com/tmk/tmk_keyboard.git
     $ cd tmk_keyboard
     $ git submodule init
     $ git submodule update
