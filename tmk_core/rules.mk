@@ -427,11 +427,7 @@ dfu: $(TARGET).hex
 	done
 	@echo
 
-ifneq (, $(findstring 0.7, $(shell dfu-programmer 2>/dev/null && dfu-programmer --version 2>&1)))
 	dfu-programmer $(MCU) erase --force
-else
-	dfu-programmer $(MCU) erase
-endif
 	dfu-programmer $(MCU) flash $(TARGET).hex
 	dfu-programmer $(MCU) reset
 	
@@ -447,11 +443,7 @@ flip-ee: $(TARGET).hex $(TARGET).eep
 	$(REMOVE) $(TARGET)eep.hex
 
 dfu-ee: $(TARGET).hex $(TARGET).eep
-ifneq (, $(findstring 0.7, $(shell dfu-programmer 2>/dev/null && dfu-programmer --version 2>&1)))
 	dfu-programmer $(MCU) flash --eeprom $(TARGET).eep
-else
-	dfu-programmer $(MCU) flash-eeprom $(TARGET).eep
-endif
 	dfu-programmer $(MCU) reset
 
 
