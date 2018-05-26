@@ -39,17 +39,17 @@ See README of [tmk_keyboard] for more.
 I'm not a professional of electronics nor MCU programming. This may damage your HHKB.
 And my English writing is poor, I'm not sure I can convey my notions accurately.
 
-## Quick-start guide for the pre-assembled hhkb controller
+## Quick-Start Guide for TMK Alt Controller
 1. Build a custom keyboard layout using the online tool
    * Use Chrome if the site does not behave as expected
    * Make sure to generate the file using the right template
-      *  English
-         * [hhkb with blue-tooth](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb_rn42)
-         * [hhkb with USB-only](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb)
+      *  Pro2/Pro
+         * [Bluetooth](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb_rn42)
+         * [USB-only](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb)
 
       *  JP
-         * [hhkb with blue-tooth](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb_jp_rn42)
-         * [hhkb with USB-only](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb_jp)
+         * [Bluetooth](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb_jp_rn42)
+         * [USB-only](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb_jp)
 
 1. Save the `.hex` file to your computer; note this is all you need to generate
    a custom layout with most of the available features (including mouse control)
@@ -64,30 +64,34 @@ And my English writing is poor, I'm not sure I can convey my notions accurately.
    because you created the required `.hex` file using the online tool instead._
 
 1. Please read and understand this next step in full before running the
-   following concatenated sequence of commands <P>
+   following three commands
+
    ```
-   $ sleep 20 && dfu-programmer atmega32u4 erase --force && dfu-programmer atmega32u4 flash <your_downloaded_file>.hex  && dfu-programmer atmega32u4 reset
+   dfu-programmer atmega32u4 erase --force
+   dfu-programmer atmega32u4 flash <your_downloaded_file>.hex
+   dfu-programmer atmega32u4 launch
    ```
-   * Run this command from the directory where you saved your `.hex` file
+
+   Or if your are on Unix-like shell you can use command sequence concatinated with `&&`
+
+   ```
+   sleep 20 && \
+   dfu-programmer atmega32u4 erase --force && \
+   dfu-programmer atmega32u4 flash <your_downloaded_file>.hex && \
+   dfu-programmer atmega32u4 launch
+   ```
+
+   * Run commands from the directory where you saved your `.hex` file
+   * Put controller into programmable mode(bootloader) by hitting the red button located on your controller
+   * Once in this mode, you will no longer have access to your HHKB, you need other keyboard to input the commands or mouse to copy and paste.
+   * `erase` clears existent firmware on flash memory
+   * `flash` loads new firmware you downloaded
+   * `launch` restarts keyboard
+   * See `man dfu-programmer` for details
+   * Replug controller and redo the process when you are in trouble
+
    * `sleep 20` gives you time to switch your controller to a programmable mode
-     by hitting the red button located on your controller
-   * Once in this mode, you will no longer have access to your keyboard; that's
-     ok because the rest of the commands are concatenated together to run without
-     needing further input from the keyboard
-   * Once you switch the controller to the programmable state (by hitting the
-     red button), the `dfu-programmer` will automatically detect your controller (`man
-     dfu-controller` for details)
-   * `&& dfu-programmer...` are the concatenated commands that clear
-     the old, load the new and restart your controller with the new firmware.
      These commands execute automatically once the ~ 20 seconds have passed.
-
-   * While this is not expected, in the event the bootloader fails to load
-     your `.hex` file, disconnect and reconnect your keyboard's USB to
-     re-establish the normal mode of operation required to troubleshoot.
-
-   * In the event of an issue, please submit an issue on github to help us
-     improve the documentation.
-
 
 
 ## HHKB Internals
