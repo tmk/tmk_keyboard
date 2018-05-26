@@ -24,7 +24,7 @@ See [this thread][AltController] in geekhack.org for details.
 See README of [tmk_keyboard] for more.
 
 [tmk_keyboard]: http://github.com/tmk/tmk_keyboard
- 
+
 ### Pros
 * No risks: Everything is all reversible
 * No need for PCB trace patching, case cutting or any other destructive mod
@@ -38,6 +38,60 @@ See README of [tmk_keyboard] for more.
 ## DISCLAIMER
 I'm not a professional of electronics nor MCU programming. This may damage your HHKB.
 And my English writing is poor, I'm not sure I can convey my notions accurately.
+
+## Quick-Start Guide for TMK Alt Controller
+1. Build a custom keyboard layout using the online tool
+   * Use Chrome if the site does not behave as expected
+   * Make sure to generate the file using the right template
+      *  Pro2/Pro
+         * [Bluetooth](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb_rn42)
+         * [USB-only](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb)
+
+      *  JP
+         * [Bluetooth](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb_jp_rn42)
+         * [USB-only](http://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?hhkb_jp)
+
+1. Save the `.hex` file to your computer; note this is all you need to generate
+   a custom layout with most of the available features (including mouse control)
+    *  Check-out [the last third of this video](https://www.youtube.com/watch?v=TYmAb8zOPWU&t=561s)
+       to get an idea of how to build your own layout; it includes how to load to the firmware using FLIP<P>
+
+
+1. Download and install the `dfu-programmer` (the alternative to FLIP), open-source available
+   for Windows, Linux, and Mac OS.  e.g., for Mac OS: `brew install dfu-programmer` <P>
+   _Note: This bootloader is all that is required to load/flash the firmware created
+   using the online tool. You do not need the full `avr-gcc` development stack
+   because you created the required `.hex` file using the online tool instead._
+
+1. Please read and understand this next step in full before running the
+   following three commands
+
+   ```
+   dfu-programmer atmega32u4 erase --force
+   dfu-programmer atmega32u4 flash <your_downloaded_file>.hex
+   dfu-programmer atmega32u4 launch
+   ```
+
+   Or if your are on Unix-like shell you can use command sequence concatinated with `&&`
+
+   ```
+   sleep 20 && \
+   dfu-programmer atmega32u4 erase --force && \
+   dfu-programmer atmega32u4 flash <your_downloaded_file>.hex && \
+   dfu-programmer atmega32u4 launch
+   ```
+
+   * Run commands from the directory where you saved your `.hex` file
+   * Put controller into programmable mode(bootloader) by hitting the red button located on your controller
+   * Once in this mode, you will no longer have access to your HHKB, you need other keyboard to input the commands or mouse to copy and paste.
+   * `erase` clears existent firmware on flash memory
+   * `flash` loads new firmware you downloaded
+   * `launch` restarts keyboard
+   * See `man dfu-programmer` for details
+   * Replug controller and redo the process when you are in trouble
+
+   * `sleep 20` gives you time to switch your controller to a programmable mode
+     These commands execute automatically once the ~ 20 seconds have passed.
 
 
 ## HHKB Internals
@@ -55,7 +109,7 @@ Build options and firmware settings are available in `Makefile` and `config.h` o
 To define your own keymap create file named `keymap_<name>.c` and see [keymap document](../../tmk_core/doc/keymap.md) and existent keymap files.
 
 
-### Build 
+### Build
 Several version of keymap are available in advance but you are recommended to define your favorite layout yourself. Just `make` with `KEYMAP` option like:
 
     $ make -f Makefile.<variant> KEYMAP=<name> clean
