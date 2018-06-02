@@ -123,6 +123,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         UCSR1B |= (1<<RXCIE1) | (1<<RXEN1); /* RX interrupt, RX: enable */ \
         UCSR1B |= (0<<TXCIE1) | (1<<TXEN1); /* TX interrupt, TX: enable */ \
         UCSR1C |= (1<<UPM11) | (1<<UPM10);  /* parity: none(00), even(01), odd(11) */ \
+        DDRD  &= ~(1<<2); PORTD |=  (1<<2); /* Pull-up RXD pin */ \
         sei(); \
     } while(0)
 #else
