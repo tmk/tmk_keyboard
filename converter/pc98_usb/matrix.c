@@ -155,3 +155,18 @@ uint8_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
 }
+
+void led_set(uint8_t usb_led)
+{
+#ifdef PC98_LED_CONTROL
+    uint8_t led_state = 0x70;
+    if (usb_led & (1<<USB_LED_NUM_LOCK))    led_state |= (1<<0);
+    if (usb_led & (1<<USB_LED_CAPS_LOCK))   led_state |= (1<<2);
+    xprintf("led_set: %02X\n", led_state);
+
+    pc98_send(0x9D);
+    _delay_ms(100);
+    pc98_send(led_state);
+    // responses(FA or FC) will be ignored in matrix_scan()
+#endif
+}

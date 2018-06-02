@@ -36,6 +36,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 )
 
 
+/* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
+#define LOCKING_SUPPORT_ENABLE
+/* Locking resynchronize hack */
+#define LOCKING_RESYNC_ENABLE
+
+/* Control LED indicatiors, which doesn't work well with locking support */
+//#define PC98_LED_CONTROL
+
+
 /* PC98 Reset Port shared with TXD */
 #define PC98_RST_DDR    DDRD
 #define PC98_RST_PORT   PORTD

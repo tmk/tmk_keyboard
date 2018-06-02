@@ -10,7 +10,6 @@ TARGET_DIR = .
 # keyboard dependent files
 SRC =	keymap.c \
 	matrix.c \
-	led.c \
 	protocol/serial_uart.c
 #	protocol/serial_soft.c
 
