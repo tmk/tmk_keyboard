@@ -1,6 +1,6 @@
 PC98 to USB keyboard protocol converter
 =======================================
-Target MCU is ATMega32u4 but other USB capable AVR will also work.
+Target MCU is ATMega32u2 but other USB capable AVR will also work.
 
 
 Connector
@@ -12,7 +12,7 @@ Connector
      / 8  7  6 \
     | 5    4  3 |
      \_ 2   1 _/
-       \_____/  
+       \_____/
      (receptacle)
 
 
@@ -25,8 +25,8 @@ Wiring: You can change this with editing config.h.
     3  ~RDY             PD4
     4   RXD             PD2
     5  ~RTY             PD5
-    6   NC                 
-    7   NC                 
+    6   NC
+    7   NC
     8   5V              VCC
 
 
@@ -59,9 +59,31 @@ PC98 to PS/2
 http://www.tsp.ne.jp/~sawada/mago/c_gka98at.htm
 http://www.tsp.ne.jp/~sawada/mago/src/gka98at.asm
 
+scan code:
+http://ixsvr.dyndns.org/usb2pc98
+
+NEC PC-9801-98-S02 - raku raku keyboard:
+https://deskthority.net/photos-f62/nec-pc-9801-98-s02-t5212.html
+
+
+
 PC98 keyboard commands
+----------------------
 http://www.webtech.co.jp/company/doc/undocumented_mem/io_kb.txt
 
+response from keyboard:
+    FAh: ACK
+    FCh: NACK
 
 Inhibit repeating key:
-0x9C, 0x70
+    0x9C, 0x70
+
+LED control:
+    9Dh 7xh
+
+    second byte:
+    0111 xxxx
+         |||`- NumLock
+         ||`-- ?
+         |`--- CapsLock
+         `---- Kana
