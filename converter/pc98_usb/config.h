@@ -32,8 +32,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* key combination for command */
 #define IS_COMMAND()    ( \
-    host_get_first_key() == KC_CANCEL \
+    keyboard_report->keys[0] == KC_STOP || \
+    keyboard_report->mods == (MOD_BIT(KC_LALT) | MOD_BIT(KC_RALT)) \
 )
+
+
+/* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
+#define LOCKING_SUPPORT_ENABLE
+/* Locking resynchronize hack */
+#define LOCKING_RESYNC_ENABLE
+
+/* Control LED indicatiors, which doesn't work well with locking support */
+//#define PC98_LED_CONTROL
 
 
 /* PC98 Reset Port shared with TXD */
@@ -47,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* PC98 Retry Port */
 #define PC98_RTY_DDR    DDRD
 #define PC98_RTY_PORT   PORTD
-#define PC98_RTY_BIT    5
+#define PC98_RTY_BIT    1
 
 /*
  * PC98 Serial(USART) configuration
@@ -101,7 +111,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
  * Hardware Serial(UART)
  */
-#ifdef __AVR_ATmega32U4__
+#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega32U2__)
     #define SERIAL_UART_BAUD       19200
     #define SERIAL_UART_DATA       UDR1
     #define SERIAL_UART_UBRR       ((F_CPU/(16UL*SERIAL_UART_BAUD))-1)
@@ -113,6 +123,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         UCSR1B |= (1<<RXCIE1) | (1<<RXEN1); /* RX interrupt, RX: enable */ \
         UCSR1B |= (0<<TXCIE1) | (1<<TXEN1); /* TX interrupt, TX: enable */ \
         UCSR1C |= (1<<UPM11) | (1<<UPM10);  /* parity: none(00), even(01), odd(11) */ \
+        DDRD  &= ~(1<<2); PORTD |=  (1<<2); /* Pull-up RXD pin */ \
         sei(); \
     } while(0)
 #else

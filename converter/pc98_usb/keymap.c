@@ -89,28 +89,20 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
           `-----------------------------------------------'
     */
     KEYMAP(
-  CANCEL,COPY,  F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12, F13, FN6,
-      ESC,    1,   2,   3,   4,   5,   FN4, FN5,    6,   7,   8,   9,   0,   BSPC,
-      TAB,    Q,   W,   E,   R,   T,      UP,       Y,   U,   I,   O,   P,   ENT,
-      LCTL,  A,   S,   D,   F,   G,  MINS,  EQL,     H,   J,   K,   L, FN2,
-      LSFT, Z,   X,   C,   V,   B, GRV, BSLS, QUOT,   N,   M,COMM, DOT, FN1,
-              LGUI, LALT, LCTL, LSFT,      SPC,      SPC,   RALT
+    STOP,PSCR,  F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12, F13, F14,
+     ESC,     1,   2,   3,   4,   5,  LNUM,LCAP,    6,   7,   8,   9,   0,     BSPC,
+     TAB,     Q,   W,   E,   R,   T,      UP,       Y,   U,   I,   O,   P,      ENT,
+    LCTL,    A,   S,   D,   F,   G,  LEFT,  RGHT,    H,   J,   K,   L,SCLN,
+    LSFT,   Z,   X,   C,   V,   B, INS, DOWN, DEL,    N,   M,COMM, DOT,SLSH,
+              LGUI, LALT, LCTL, FN0,       SPC,      FN0,   RALT
     ),
     KEYMAP(
-    PAUS,COPY,  F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12, F13, F14,
-      GRV,   F1,  F2,  F3,  F4,  F5,    NO, NO,    F6,  F7,  F8,  F9, F10,    DEL,
-      TAB,    Q,   W,   E,   R,   T,      UP,    HOME,PGDN,PGUP, END,   P,   ENT,
-      LCTL,  A,   S,   D,   F,   G,  MINS,  EQL,  LEFT,DOWN,  UP,RGHT,SCLN,
-      LSFT, Z,   X,   C,   V,   B, INS, DOWN,  DEL,HOME,PGDN,PGUP, END,TRNS,
-              LGUI, LALT, LCTL, LSFT,      SPC,      SPC,   RALT
-    ),
-    KEYMAP(
-    PAUS,COPY,  F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12, F13, F14,
-      GRV,   F1,  F2,  F3,  F4,  F5,    NO, NO,    F6,  F7,  F8,  F9, F10,    DEL,
-      TAB,    Q,   W,   E,   R,   T,      UP,    WH_L,WH_D,WH_U,WH_R,   P,   ENT,
-      LCTL,  A,   S,   D,   F,   G,  MINS,  EQL,  MS_L,MS_D,MS_U,MS_R,TRNS,
-      LSFT, Z,   X,   C,   V,   B, INS, DOWN, BTN3,BTN2,BTN1,BTN4,BTN5,TRNS,
-              LGUI, LALT, LCTL, LSFT,      SPC,      SPC,   RALT
+    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,SLCK,PAUS,
+     GRV,  TRNS,TRNS,TRNS,TRNS,TRNS,  TRNS,TRNS, TRNS,TRNS,TRNS,MINS, EQL,     BSLS,
+    TRNS,  TRNS,TRNS,TRNS,TRNS,TRNS,    PGUP,    TRNS,TRNS,TRNS,LBRC,RBRC,     TRNS,
+    TRNS, TRNS,TRNS,TRNS,TRNS,TRNS,  HOME,   END, TRNS,TRNS,TRNS,TRNS,QUOT,
+    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS, PGDN, TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,
+              TRNS, TRNS, TRNS, TRNS,     TRNS,     TRNS,   TRNS
     ),
 };
 
@@ -162,11 +154,5 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
  * Fn actions
  */
 const action_t PROGMEM fn_actions[] = {
-    ACTION_LAYER_TAP_TOGGLE(0),                  // FN0
-    ACTION_LAYER_TAP_KEY(1, KC_SLASH),           // FN1
-    ACTION_LAYER_TAP_KEY(2, KC_SCLN),            // FN2
-    ACTION_LAYER_MOMENTARY(2),                   // FN3
-    ACTION_MACRO(LBRACKET),                      // FN4
-    ACTION_MACRO(RBRACKET),                      // FN5
-    ACTION_MACRO(DUMMY),                         // FN6
+    ACTION_LAYER_MOMENTARY(1),                   // FN0
 };

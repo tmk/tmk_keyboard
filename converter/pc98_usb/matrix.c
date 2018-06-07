@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "print.h"
 #include "util.h"
 #include "matrix.h"
+#include "led.h"
 #include "debug.h"
 #include "protocol/serial.h"
 
@@ -47,38 +48,46 @@ static uint8_t matrix[MATRIX_ROWS];
 #define COL(code)      (code&0x07)
 
 
+static void pc98_send(uint8_t data)
+{
+    PC98_RDY_PORT |= (1<<PC98_RDY_BIT);
+    _delay_ms(1);
+    serial_send(data);
+    _delay_ms(1);
+    PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
+}
+
+static int16_t pc98_wait_response(void)
+{
+    int16_t code = -1;
+    uint8_t timeout = 255;
+    while (timeout-- && (code = serial_recv2()) == -1) _delay_ms(1);
+    return code;
+}
+
 static void pc98_inhibit_repeat(void)
 {
-    uint8_t code;
+    uint16_t code;
 
+    // clear recv buffer
     while (serial_recv()) ;
 RETRY:
-    PC98_RDY_PORT |= (1<<PC98_RDY_BIT);
-    _delay_ms(500);
-    serial_send(0x9C);
-
-    PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
     _delay_ms(100);
-    while (!(code = serial_recv())) ;
-    print("PC98: send 9C: "); print_hex8(code); print("\n");
+    pc98_send(0x9C);
+    code = pc98_wait_response();
+    if (code != -1) xprintf("PC98: send 9C: %02X\n", code);
     if (code != 0xFA) goto RETRY;
 
-
-
-    PC98_RDY_PORT |= (1<<PC98_RDY_BIT);
     _delay_ms(100);
-    serial_send(0x70);
-
-    PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
-    _delay_ms(100);
-    //code = serial_recv();
-    while (!(code = serial_recv())) ;
-    print("PC98: send 70: "); print_hex8(code); print("\n");
+    pc98_send(0x70);
+    code = pc98_wait_response();
+    if (code != -1) xprintf("PC98: send 70: %02X\n", code);
     if (code != 0xFA) goto RETRY;
 }
 
 void matrix_init(void)
 {
+    debug_keyboard = true;
     PC98_RST_DDR |= (1<<PC98_RST_BIT);
     PC98_RDY_DDR |= (1<<PC98_RDY_BIT);
     PC98_RTY_DDR |= (1<<PC98_RTY_BIT);
@@ -116,23 +125,10 @@ uint8_t matrix_scan(void)
 {
     uint16_t code;
     PC98_RDY_PORT |= (1<<PC98_RDY_BIT);
-    _delay_us(30);
+    //_delay_us(30);
     code = serial_recv2();
     PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
     if (code == -1) return 0;
-
-if (code == 0x60) {
-    pc98_inhibit_repeat();
-
-/*
-    PC98_RDY_PORT |= (1<<PC98_RDY_BIT);
-    _delay_ms(100);
-    serial_send(0x96);
-    PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
-*/
-
-    return 0;
-}
 
     print_hex8(code); print(" ");
 
@@ -154,4 +150,19 @@ inline
 uint8_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
+}
+
+void led_set(uint8_t usb_led)
+{
+#ifdef PC98_LED_CONTROL
+    uint8_t led_state = 0x70;
+    if (usb_led & (1<<USB_LED_NUM_LOCK))    led_state |= (1<<0);
+    if (usb_led & (1<<USB_LED_CAPS_LOCK))   led_state |= (1<<2);
+    xprintf("led_set: %02X\n", led_state);
+
+    pc98_send(0x9D);
+    _delay_ms(100);
+    pc98_send(led_state);
+    // responses(FA or FC) will be ignored in matrix_scan()
+#endif
 }
