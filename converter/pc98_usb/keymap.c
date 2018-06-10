@@ -106,49 +106,6 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 
-/*
- * Macro definition
- */
-enum macro_id {
-    LBRACKET,
-    RBRACKET,
-    DUMMY,
-};
-
-const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
-{
-    keyevent_t event = record->event;
-    //uint8_t tap_count = record->tap_count;
-
-    switch (id) {
-        case LBRACKET:
-            return (event.pressed ?
-                    MACRO( T(LBRC), END ) :
-                    MACRO( T(LBRC), END ) );
-        case RBRACKET:
-            return (event.pressed ?
-                    MACRO( T(RBRC), END ) :
-                    MACRO( T(RBRC), END ) );
-    }
-    return MACRO_NONE;
-}
-
-/*
- * Action function
- */
-void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
-{
-/*
-    keyevent_t event = record->event;
-    uint8_t tap_count = record->tap_count;
-    switch (id) {
-        case 0xFF:
-            action_macro_play(get_macro(opt, event.pressed));
-            break;
-    }
-*/
-}
-
 
 /*
  * Fn actions
