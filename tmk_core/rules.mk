@@ -427,9 +427,14 @@ dfu: $(TARGET).hex
 	done
 	@echo
 
+ifeq ($(shell dfu-programmer --version 2>&1 | grep -q 0.7; echo $$?),0)
 	dfu-programmer $(MCU) erase --force
+else
+	dfu-programmer $(MCU) erase
+endif
+
 	dfu-programmer $(MCU) flash $(TARGET).hex
-	dfu-programmer $(MCU) reset
+	dfu-programmer $(MCU) reset || true # ignore exit code
 	
 dfu-start:
 	dfu-programmer $(MCU) reset
