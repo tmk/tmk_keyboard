@@ -5,6 +5,7 @@ Target MCU is ATMega32u2 but other USB capable AVR will also work.
 
 Connector
 ---------
+On host/converter:
 
     8Pin mini DIN
        ___ ___
@@ -41,12 +42,99 @@ Frame format: 1-Start bit(Lo), 8-Data bits, Odd-Parity, 1-Stop bit
 
 Build Firmware
 --------------
-Just use 'make'
+Just use 'make' to bild firmware
 
-    $ cd pc98_usb
+    $ make clean
     $ make
 
-Then, load the binary to MCU with your favorite programmer.
+To flash firmware
+
+    $ make dfu
+
+then push button on converter to flash firmware.
+
+
+
+PC98 Scan Codes
+---------------
+    ,---. ,---. ,------------------------. ,------------------------. ,------------------------.
+    |Pau| |PrS| | F1 | F2 | F3 | F4 | F5 | | F6 | F7 | F8 | F9 | F10| | F11| F12| F13| F14| F15|
+    `---' `---' `------------------------' `------------------------' `------------------------'
+    ,-------------------------------------------------------------. ,-------.  ,---------------.
+    | Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY|Bspc| |Ins|Del|  |Hom|End|  -|  /|
+    |-------------------------------------------------------------| |-------|  |---------------|
+    | Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|      | |PgD|PgU|  |  7|  8|  9|  *|
+    |-------------------------------------------------------`Enter| |-------|  |---------------|
+    |Ctl|Cap|  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  \|     | |  Up   |  |  4|  5|  6|  +|
+    |-------------------------------------------------------------| |-------|  |---------------|
+    | Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO| Shift | |Lef|Rig|  |  1|  2|  3|  =|
+    `-------------------------------------------------------------' |-------|  |---------------|
+     ^3|Kana|Gui|Alt|MHEN|       Space        |HENK|Alt|Gui|App|^2  | Down  |  |  0|  ,|  .| ^1|
+       `-------------------------------------------------------'    `-------'  `---------------'
+    ^1: Enter on keypad is identical to Enter on alphanumeric portion.
+    ^2: Right Alt is ALT on DIGITAL WAVE Dboard while Menu on PC-9821 keyboard.
+        App is HOME key on PC98XL keyboard.
+    ^3: Caps and Kana are locking keys, either mechanically or by firmware emulation.
+
+
+    ,---. ,---. ,------------------------. ,------------------------. ,------------------------.
+    | 60| | 61| | 62 | 63 | 64 | 65 | 66 | | 67 | 68 | 69 | 6A | 6B | | 52 | 53 | 54 | 55 | 56 |
+    `---' `---' `------------------------' `------------------------' `------------------------'
+    ,-------------------------------------------------------------. ,-------.  ,---------------.
+    | 00 | 01| 02| 03| 04| 05| 06| 07| 08| 09| 0A| 0B| 0C| 0D| 0E | | 38| 39|  | 3E| 3F| 4D| 41|
+    |-------------------------------------------------------------| |-------|  |---------------|
+    |  0F  | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 1A| 1B|      | | 36| 37|  | 42| 43| 44| 45|
+    |-------------------------------------------------------`  1C | |-------|  |---------------|
+    | 74| 71| 1D| 1E| 1F| 20| 21| 22| 23| 24| 25| 26| 27| 28|     | |   3A  |  | 46| 47| 48| 49|
+    |-------------------------------------------------------------| |-------|  |---------------|
+    |   70    | 29| 2A| 2B| 2C| 2D| 2E| 2F| 30| 31| 32| 33| 70/7D | | 3B| 3C|  | 4A| 4B| 4C| 4D|
+    `-------------------------------------------------------------' |-------|  |---------------|
+       | 72 | 77| 73| 51 |        34          | 35 | 79| 78| 5E|    |   3D  |  | 4E| 4F| 50| 1C|
+       `-------------------------------------------------------'    `-------'  `---------------'
+    5E: HOME on PC98XL keyboard
+    79: ALT on DIGITAL WAVE Dboard
+    77,78,79: Left Win, right Win and Application on PC-9821 keyboard
+
+
+
+PC98 keyboard commands
+----------------------
+http://www.webtech.co.jp/company/doc/undocumented_mem/io_kb.txt
+
+response from keyboard:
+    FAh: ACK
+    FCh: NACK
+
+Inhibit repeating key:
+    9Ch, 70h
+
+LED control:
+    9Dh 7xh
+
+    second byte:
+    0111 xxxx
+         |||`- NumLock
+         ||`-- ?
+         |`--- CapsLock
+         `---- Kana
+
+Enabling Win and App key on PC-9821 keyboard:
+    95h, 03h
+
+
+
+Raku Raku keyboard support
+--------------------------
+NEC PC-9801-98-S02 - raku raku keyboard:
+https://deskthority.net/photos-f62/nec-pc-9801-98-s02-t5212.html
+
+To build firmware for the keyboard
+
+    $ make KEYMAP=rakuraku clean
+    $ make KEYMAP=rakuraku
+    $ make KEYMAP=rakuraku dfu
+
+Its scan code map is very different from standard types. This is not tested.
 
 
 
@@ -61,29 +149,3 @@ http://www.tsp.ne.jp/~sawada/mago/src/gka98at.asm
 
 scan code:
 http://ixsvr.dyndns.org/usb2pc98
-
-NEC PC-9801-98-S02 - raku raku keyboard:
-https://deskthority.net/photos-f62/nec-pc-9801-98-s02-t5212.html
-
-
-
-PC98 keyboard commands
-----------------------
-http://www.webtech.co.jp/company/doc/undocumented_mem/io_kb.txt
-
-response from keyboard:
-    FAh: ACK
-    FCh: NACK
-
-Inhibit repeating key:
-    0x9C, 0x70
-
-LED control:
-    9Dh 7xh
-
-    second byte:
-    0111 xxxx
-         |||`- NumLock
-         ||`-- ?
-         |`--- CapsLock
-         `---- Kana
