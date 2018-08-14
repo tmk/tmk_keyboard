@@ -58,6 +58,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define XT_RST_DDR     DDRB
 #define XT_RST_BIT     7
 
+/*
+ * Uncomment to read on the falling edge of the clock signal. Some keyboards 
+ * only work when reading on the rising edge (original IBM XT Keyboard), whereas
+ * others require reading on the falling edge (Microtech made in Brazil, AT2XT 
+ * Converter).
+ */
+// #define XT_READ_ON_FALLING_EDGE
+
 /* hard reset: low pulse for 500ms and after that HiZ for safety */
 #define XT_RESET() do { \
     XT_RST_PORT &= ~(1<<XT_RST_BIT);  \
@@ -66,11 +74,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     XT_RST_DDR  &= ~(1<<XT_RST_BIT);  \
 } while (0)
 
-/* INT1 for falling edge of clock line */
-#define XT_INT_INIT()  do {    \
-    EICRA |= ((1<<ISC11) |      \
-              (0<<ISC10));      \
-} while (0)
+/* INT1 for rising or falling edge of clock line. */
+#ifdef XT_READ_ON_FALLING_EDGE
+    #define XT_INT_INIT()  do {    \
+        EICRA |= ((1<<ISC11) |      \
+                  (0<<ISC10));      \
+    } while (0)
+#else
+    #define XT_INT_INIT()  do {    \
+        EICRA |= ((1<<ISC11) |      \
+                  (1<<ISC10));      \
+    } while (0)
+#endif
 /* clears flag and enables interrupt */
 #define XT_INT_ON()  do {      \
     EIFR  |= (1<<INTF1);        \
