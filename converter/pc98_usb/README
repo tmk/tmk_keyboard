@@ -25,7 +25,7 @@ Wiring: You can change this with editing config.h.
     2   GND             GND
     3  ~RDY             PD4
     4   RXD             PD2
-    5  ~RTY             PD5
+    5  ~RTY             PD1
     6   NC
     7   NC
     8   5V              VCC
@@ -140,6 +140,9 @@ Its scan code map is very different from standard types. This is not tested.
 
 Other PC98 converter projects and resource
 ------------------------------------------
+PC-9800シリーズ テクニカルデータブック HARDWARE 編 1993年 p139, p343
+https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n355
+
 PC98 to USB
 http://davy.nyacom.net/kbd98usb/
 

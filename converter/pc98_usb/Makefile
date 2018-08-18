@@ -8,6 +8,9 @@ TMK_DIR = ../../tmk_core
 TARGET_DIR = .
 
 # keyboard dependent files
+#   Add one of lines below to select serial protocol implementation
+#	protocol/serial_uart.c
+#	protocol/serial_soft.c
 SRC =	matrix.c \
 	protocol/serial_uart.c
 
