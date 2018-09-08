@@ -42,7 +42,7 @@ Frame format: 1-Start bit(Lo), 8-Data bits, Odd-Parity, 1-Stop bit
 
 Build Firmware
 --------------
-Just use 'make' to bild firmware
+Just use 'make' to bild firmware for TMK PC98 converter.
 
     $ make clean
     $ make
@@ -52,6 +52,12 @@ To flash firmware
     $ make dfu
 
 then push button on converter to flash firmware.
+
+If you are using ATMega32u4 based board instead of premade TMK PC98 converter(ATMega32u2) use following commands.
+
+    $ make -f Makefile.32u4 clean
+    $ make -f Makefile.32u4
+    $ make -f Makefile.32u4 dfu
 
 
 
