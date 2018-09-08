@@ -25,7 +25,7 @@ Wiring: You can change this with editing config.h.
     2   GND             GND
     3  ~RDY             PD4
     4   RXD             PD2
-    5  ~RTY             PD5
+    5  ~RTY             PD1
     6   NC
     7   NC
     8   5V              VCC
@@ -42,7 +42,7 @@ Frame format: 1-Start bit(Lo), 8-Data bits, Odd-Parity, 1-Stop bit
 
 Build Firmware
 --------------
-Just use 'make' to bild firmware
+Just use 'make' to bild firmware for TMK PC98 converter.
 
     $ make clean
     $ make
@@ -52,6 +52,12 @@ To flash firmware
     $ make dfu
 
 then push button on converter to flash firmware.
+
+If you are using ATMega32u4 based board instead of premade TMK PC98 converter(ATMega32u2) use following commands.
+
+    $ make -f Makefile.32u4 clean
+    $ make -f Makefile.32u4
+    $ make -f Makefile.32u4 dfu
 
 
 
@@ -140,6 +146,10 @@ Its scan code map is very different from standard types. This is not tested.
 
 Other PC98 converter projects and resource
 ------------------------------------------
+PC-9800シリーズ テクニカルデータブック HARDWARE 編 1993年 p139, p343
+https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n151
+https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n355
+
 PC98 to USB
 http://davy.nyacom.net/kbd98usb/
 
@@ -149,3 +159,25 @@ http://www.tsp.ne.jp/~sawada/mago/src/gka98at.asm
 
 scan code:
 http://ixsvr.dyndns.org/usb2pc98
+
+
+
+NOTES
+-----
+### Tested on
+- PC-9801V
+- DIGITAL WAVE Dboard
+
+
+### RDY
+Current firmware does not control RDY line and it is drived as low to receive data always. While sending command firmware drive the line high.
+
+PC98 host keeps RDY line high to prevent keyboard from sending data while processing.
+
+https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n359
+
+### Inhibit key repeating
+The command(9Ch, 70h) works with Raku Raku keybaord but not with Dboard.
+
+### LED indicater
+Dboard has LEDs but it seems to ignore LED control command.
