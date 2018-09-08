@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LOCKING_RESYNC_ENABLE
 
 /* Control LED indicatiors, which doesn't work well with locking support */
-//#define PC98_LED_CONTROL
+#define PC98_LED_CONTROL
 
 
 /* PC98 Reset Port shared with TXD */
