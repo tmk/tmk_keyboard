@@ -39,10 +39,20 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
-#include "pbuff.h"
 #include "xt.h"
 #include "wait.h"
 #include "print.h"
+#include "ringbuf.h"
+
+
+#define BUF_SIZE 16
+static uint8_t buf[BUF_SIZE];
+static ringbuf_t rb = {
+    .buffer = buf,
+    .head = 0,
+    .tail = 0,
+    .size_mask = BUF_SIZE - 1
+};
 
 void xt_host_init(void)
 {
@@ -69,10 +79,12 @@ void xt_host_init(void)
 /* get data received by interrupt */
 uint8_t xt_host_recv(void)
 {
-    if (pbuf_has_data()) {
-        return pbuf_dequeue();
-    } else {
+    if (ringbuf_is_empty(&rb)) {
         return 0;
+    } else {
+        int16_t d = ringbuf_get(&rb);
+        XT_DATA_IN();  // ready to receive from keyboard
+        return d;
     }
 }
 
@@ -111,7 +123,11 @@ ISR(XT_INT_VECT)
             break;
     }
     if (state++ == BIT7) {
-        pbuf_enqueue(data);
+        ringbuf_put(&rb, data);
+        if (ringbuf_is_full(&rb)) {
+            XT_DATA_LO();  // inhibit keyboard sending
+            print("Full");
+        }
         state = START;
         data = 0;
     }
