@@ -468,7 +468,7 @@ static void send_keyboard(report_keyboard_t *report)
         Endpoint_SelectEndpoint(KEYBOARD_IN_EPNUM);
 
         /* Check if write ready for a polling interval around 10ms */
-        while (timeout-- && !Endpoint_IsReadWriteAllowed()) _delay_us(40);
+        while (timeout-- && !Endpoint_IsReadWriteAllowed()) _delay_us(80);
         if (!Endpoint_IsReadWriteAllowed()) return;
 
         /* Write Keyboard Report Data */
