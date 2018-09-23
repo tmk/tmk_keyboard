@@ -92,7 +92,7 @@ uint8_t matrix_scan(void)
 
     uint8_t code = xt_host_recv();
     if (!code) return 0;
-    xprintf("%02X ", code);
+    dprintf("%02X ", code);
     switch (state) {
         case INIT:
             switch (code) {
