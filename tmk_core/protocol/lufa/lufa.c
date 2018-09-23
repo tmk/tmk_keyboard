@@ -634,15 +634,19 @@ int main(void)
     keyboard_init();
 
     /* wait for Console startup */
-    // TODO: long delay often works anyhoo but proper startup would be better
-    // 1000ms delay of hid_listen may affect this
-    uint16_t delay = 2000;
-    while (delay--) {
-#ifndef INTERRUPT_CONTROL_ENDPOINT
-        USB_USBTask();
-#endif
-        _delay_ms(1);
+    // TODO: 2000ms delay often works anyhoo but proper startup would be better
+    // 1000ms delay of hid_listen affects this probably
+    #ifdef CONSOLE_ENABLE
+    if (debug_enable) {
+        uint16_t delay = 2000;
+        while (delay--) {
+            #ifndef INTERRUPT_CONTROL_ENDPOINT
+            USB_USBTask();
+            #endif
+            _delay_ms(1);
+        }
     }
+    #endif
 
     hook_late_init();
 
