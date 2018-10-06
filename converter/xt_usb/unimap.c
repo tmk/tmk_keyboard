@@ -30,7 +30,7 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
      * |-------|  |------------------------------------------------------|Ent|---------------|
      * | F5| F6|  | Ctrl |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  `|   |  4|  5|  6|   |
      * |-------|  |----------------------------------------------------------------------|   |
-     * | F7| F8|  |Shif|  \|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|Shift|PrS|  1|  2|  3|  +|
+     * | F7| F8|  |Shif|  \|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|Shift|  *|  1|  2|  3|  +|
      * |-------|  |----------------------------------------------------------------------|   |
      * | F9|F10|  |  Alt  |               Space                  |CapsLck|   0   |   .   |   |
      * `-------'  `--------------------------------------------------------------------------'
@@ -40,7 +40,7 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
     F1,  F2,    ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSPC,     NLCK,     SLCK,
     F3,  F4,    TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,     P7,  P8,  P9,  PMNS,
     F5,  F6,    LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,GRV, ENT, P4,  P5,  P6,
-    F7,  F8,    LSFT,BSLS,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,RSFT,PSCR,P1,  P2,  P3,  PPLS,
+    F7,  F8,    LSFT,BSLS,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,RSFT,PAST,P1,  P2,  P3,  PPLS,
     F9,  F10,   LALT,                    SPC,                          CAPS,          P0,       PDOT
     ),
     */

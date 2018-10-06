@@ -48,15 +48,14 @@ void matrix_init(void)
 // convert E0-escaped codes into unused area
 static uint8_t move_e0code(uint8_t code) {
     switch(code) {
-        // Original IBM XT keyboard has these keys
+        // Original IBM XT keyboard doesn't use E0-codes probably
+        // Some XT compatilble keyobards need these keys?
+        // http://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/translate.pdf
+        // https://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/scancode.doc
         case 0x37: return 0x54; // Print Screen
         case 0x46: return 0x55; // Ctrl + Pause
         case 0x1C: return 0x6F; // Keypad Enter
         case 0x35: return 0x7F; // Keypad /
-
-        // Any XT keyobard with these keys?
-        // http://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/translate.pdf
-        // https://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/scancode.doc
         case 0x5B: return 0x5A; // Left  GUI
         case 0x5C: return 0x5B; // Right GUI
         case 0x5D: return 0x5C; // Application
