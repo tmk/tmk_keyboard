@@ -50,6 +50,7 @@
 #endif
 #include "suspend.h"
 #include "hook.h"
+#include "timer.h"
 
 #ifdef LUFA_DEBUG_SUART
 #include "avr/suart.h"
@@ -99,14 +100,31 @@ static ringbuf_t sendbuf = {
     .size_mask = SENDBUF_SIZE - 1
 };
 
+// TODO: Around 2500ms delay often works anyhoo but proper startup would be better
+// 1000ms delay of hid_listen affects this probably
+/* wait for Console startup */
+static bool console_is_ready(void)
+{
+    static bool hid_listen_ready = false;
+    if (!hid_listen_ready) {
+        if (timer_read32() < 2500)
+            return false;
+        hid_listen_ready = true;
+    }
+    return true;
+}
+
 static bool console_putc(uint8_t c)
 {
+    if (!console_is_ready())
+        goto EXIT;
+
     // return immediately if called while interrupt
     if (!(SREG & (1<<SREG_I)))
-        goto EXIT;;
+        goto EXIT;
 
     if (USB_DeviceState != DEVICE_STATE_Configured)
-        goto EXIT;;
+        goto EXIT;
 
     uint8_t ep = Endpoint_GetCurrentEndpoint();
 
@@ -140,6 +158,9 @@ EXIT:
 
 static void console_flush(void)
 {
+    if (!console_is_ready())
+        return;
+
     if (USB_DeviceState != DEVICE_STATE_Configured)
         return;
 
@@ -633,24 +654,9 @@ int main(void)
 
     keyboard_init();
 
-    /* wait for Console startup */
-    // TODO: 2000ms delay often works anyhoo but proper startup would be better
-    // 1000ms delay of hid_listen affects this probably
-    #ifdef CONSOLE_ENABLE
-    if (debug_enable) {
-        uint16_t delay = 2000;
-        while (delay--) {
-            #ifndef INTERRUPT_CONTROL_ENDPOINT
-            USB_USBTask();
-            #endif
-            _delay_ms(1);
-        }
-    }
-    #endif
-
     hook_late_init();
 
-    print("Keyboard start.\n");
+    print("\nKeyboard start.\n");
     while (1) {
         while (USB_DeviceState == DEVICE_STATE_Suspended) {
 #ifdef LUFA_DEBUG
