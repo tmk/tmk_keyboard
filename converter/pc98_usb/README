@@ -170,14 +170,21 @@ NOTES
 
 
 ### RDY
-Current firmware does not control RDY line and it is drived as low to receive data always. While sending command firmware drive the line high.
-
 PC98 host keeps RDY line high to prevent keyboard from sending data while processing.
 
 https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n359
+
+PC-9801V keyboard requires RDY pulse as acknowledgement from host, it doesn't next data without this. Dboard doens't need this.
+
 
 ### Inhibit key repeating
 The command(9Ch, 70h) works with Raku Raku keybaord but not with Dboard.
 
 ### LED indicater
-Dboard has LEDs but it seems to ignore LED control command.
+Dboard has LEDs but replys with FA to 9D command but ignore it. The LED indicates just its internal states. Dboard replays with FA to 9C command but it doesn't seem to understand repeat setting.
+
+PC-9801V has no LEDs and doesn't accept LED command. It replys with 9D to 9D command. PC-9801V doesn't accept repeat setting command. It replys with 9C to 9C command.
+
+
+## PC-9801V
+Note that you have to connect this keyboard with converter before plug in USB port. It seems this keyboard requires for host to send any command before starting to send scan code.

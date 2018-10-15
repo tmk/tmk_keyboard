@@ -71,12 +71,12 @@ static void pc98_inhibit_repeat(void)
 RETRY:
     pc98_send(0x9C);
     code = pc98_wait_response();
-    if (code != -1) xprintf("PC98: send 9C: %02X\n", code);
-    if (code != 0xFA) goto RETRY;
+    if (code != -1) xprintf("send 9C: %02X\n", code);
+    if (code != 0xFA) return;
 
     pc98_send(0x70);
     code = pc98_wait_response();
-    if (code != -1) xprintf("PC98: send 70: %02X\n", code);
+    if (code != -1) xprintf("send 70: %02X\n", code);
     if (code != 0xFA) goto RETRY;
 }
 
@@ -87,12 +87,12 @@ static void pc98_led_set(void)
 RETRY:
     pc98_send(0x9D);
     code = pc98_wait_response();
-    if (code != -1) xprintf("PC98: send 9D: %02X\n", code);
-    if (code != 0xFA) goto RETRY;
+    if (code != -1) xprintf("send 9D: %02X\n", code);
+    if (code != 0xFA) return;
 
     pc98_send(pc98_led);
     code = pc98_wait_response();
-    if (code != -1) xprintf("PC98: send %02X: %02X\n", pc98_led, code);
+    if (code != -1) xprintf("send %02X: %02X\n", pc98_led, code);
     if (code != 0xFA) goto RETRY;
 }
 
@@ -158,6 +158,12 @@ uint8_t matrix_scan(void)
             matrix[ROW(code)] |=  (1<<COL(code));
         }
     }
+
+    // PC-9801V keyboard requires RDY pulse.
+    // This is not optimal place though, it works.
+    PC98_RDY_PORT |=  (1<<PC98_RDY_BIT);    // RDY: high
+    _delay_us(20);
+    PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);    // RDY: low
     return code;
 }
 
