@@ -643,6 +643,8 @@ int main(void)
 
     sei();
 
+    keyboard_init();
+
     /* wait for USB startup */
     while (USB_DeviceState != DEVICE_STATE_Configured) {
 #if defined(INTERRUPT_CONTROL_ENDPOINT)
@@ -650,9 +652,8 @@ int main(void)
 #else
         USB_USBTask();
 #endif
+        matrix_scan();
     }
-
-    keyboard_init();
 
     hook_late_init();
 

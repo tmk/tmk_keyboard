@@ -87,6 +87,7 @@ uint8_t matrix_rows(void) { return MATRIX_ROWS; }
 uint8_t matrix_cols(void) { return MATRIX_COLS; }
 bool matrix_has_ghost(void) { return false; }
 void matrix_init(void) {
+    debug_enable = true;
     // USB Host Shield setup
     usb_host.Init();
     kbd1.SetReportParser(0, (HIDReportParser*)&kbd_parser1);
