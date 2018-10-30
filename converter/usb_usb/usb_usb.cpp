@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // USB HID host
 #include "Usb.h"
 #include "usbhub.h"
-#include "hid.h"
+#include "usbhid.h"
 #include "hidboot.h"
 #include "parser.h"
 
@@ -73,10 +73,10 @@ static bool matrix_is_mod =false;
 USB usb_host;
 USBHub hub1(&usb_host);
 USBHub hub2(&usb_host);
-HIDBoot<HID_PROTOCOL_KEYBOARD>    kbd1(&usb_host);
-HIDBoot<HID_PROTOCOL_KEYBOARD>    kbd2(&usb_host);
-HIDBoot<HID_PROTOCOL_KEYBOARD>    kbd3(&usb_host);
-HIDBoot<HID_PROTOCOL_KEYBOARD>    kbd4(&usb_host);
+HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    kbd1(&usb_host);
+HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    kbd2(&usb_host);
+HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    kbd3(&usb_host);
+HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    kbd4(&usb_host);
 KBDReportParser kbd_parser1;
 KBDReportParser kbd_parser2;
 KBDReportParser kbd_parser3;

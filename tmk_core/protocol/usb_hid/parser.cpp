@@ -4,7 +4,7 @@
 #include "debug.h"
 
 
-void KBDReportParser::Parse(HID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf)
+void KBDReportParser::Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf)
 {
     dprintf("input %d:", hid->GetAddress());
     for (uint8_t i = 0; i < len; i++) {
