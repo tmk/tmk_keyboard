@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef COMMAND_H
-#define COMMAND
+#define COMMAND_H
 
 /* TODO: Refactoring */
 typedef enum { ONESHOT, CONSOLE, MOUSEKEY } command_state_t;
