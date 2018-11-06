@@ -963,7 +963,7 @@ static bool usb_request_hook_cb(USBDriver *usbp) {
 #endif /* NKRO_ENABLE */
           /* arm the idle timer if boot protocol & idle */
             osalSysLockFromISR();
-            chVTSetI(&keyboard_idle_timer, 4*MS2ST(keyboard_idle), keyboard_idle_timer_cb, (void *)usbp);
+            chVTSetI(&keyboard_idle_timer, 4*TIME_MS2I(keyboard_idle), keyboard_idle_timer_cb, (void *)usbp);
             osalSysUnlockFromISR();
           }
         }
@@ -980,7 +980,7 @@ static bool usb_request_hook_cb(USBDriver *usbp) {
         if(keyboard_idle) {
 #endif /* NKRO_ENABLE */
           osalSysLockFromISR();
-          chVTSetI(&keyboard_idle_timer, 4*MS2ST(keyboard_idle), keyboard_idle_timer_cb, (void *)usbp);
+          chVTSetI(&keyboard_idle_timer, 4*TIME_MS2I(keyboard_idle), keyboard_idle_timer_cb, (void *)usbp);
           osalSysUnlockFromISR();
         }
         usbSetupTransfer(usbp, NULL, 0, NULL);
@@ -1111,7 +1111,7 @@ static void keyboard_idle_timer_cb(void *arg) {
       usbStartTransmitI(usbp, KBD_ENDPOINT, (uint8_t *)&keyboard_report_sent, KBD_EPSIZE);
     }
     /* rearm the timer */
-    chVTSetI(&keyboard_idle_timer, 4*MS2ST(keyboard_idle), keyboard_idle_timer_cb, (void *)usbp);
+    chVTSetI(&keyboard_idle_timer, 4*TIME_MS2I(keyboard_idle), keyboard_idle_timer_cb, (void *)usbp);
   }
 
   /* do not rearm the timer if the condition above fails
@@ -1270,7 +1270,7 @@ void console_in_cb(USBDriver *usbp, usbep_t ep) {
   osalSysLockFromISR();
 
   /* rearm the timer */
-  chVTSetI(&console_flush_timer, MS2ST(CONSOLE_FLUSH_MS), console_flush_cb, (void *)usbp);
+  chVTSetI(&console_flush_timer, TIME_MS2I(CONSOLE_FLUSH_MS), console_flush_cb, (void *)usbp);
 
   /* Freeing the buffer just transmitted, if it was not a zero size packet.*/
   if (usbp->epc[CONSOLE_ENDPOINT]->in_state->txsize > 0U) {
@@ -1322,7 +1322,7 @@ static void console_flush_cb(void *arg) {
   /* check that the states of things are as they're supposed to */
   if(usbGetDriverStateI(usbp) != USB_ACTIVE) {
     /* rearm the timer */
-    chVTSetI(&console_flush_timer, MS2ST(CONSOLE_FLUSH_MS), console_flush_cb, (void *)usbp);
+    chVTSetI(&console_flush_timer, TIME_MS2I(CONSOLE_FLUSH_MS), console_flush_cb, (void *)usbp);
     osalSysUnlockFromISR();
     return;
   }
@@ -1331,7 +1331,7 @@ static void console_flush_cb(void *arg) {
      started.*/
   if (usbGetTransmitStatusI(usbp, CONSOLE_ENDPOINT)) {
     /* rearm the timer */
-    chVTSetI(&console_flush_timer, MS2ST(CONSOLE_FLUSH_MS), console_flush_cb, (void *)usbp);
+    chVTSetI(&console_flush_timer, TIME_MS2I(CONSOLE_FLUSH_MS), console_flush_cb, (void *)usbp);
     osalSysUnlockFromISR();
     return;
   }
@@ -1351,7 +1351,7 @@ static void console_flush_cb(void *arg) {
   }
 
   /* rearm the timer */
-  chVTSetI(&console_flush_timer, MS2ST(CONSOLE_FLUSH_MS), console_flush_cb, (void *)usbp);
+  chVTSetI(&console_flush_timer, TIME_MS2I(CONSOLE_FLUSH_MS), console_flush_cb, (void *)usbp);
   osalSysUnlockFromISR();
 }
 
