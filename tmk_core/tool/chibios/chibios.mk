@@ -142,6 +142,7 @@ CSRC = $(STARTUPSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
        $(STREAMSSRC) \
+       $(LIBSRC) \
        $(TMK_DIR)/protocol/chibios/usb_main.c \
        $(TMK_DIR)/protocol/chibios/main.c \
        $(SRC)
@@ -177,7 +178,7 @@ ASMXSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 INCDIR = $(CHIBIOS)/os/license \
          $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC) \
-         $(STREAMSINC) $(CHIBIOS)/os/various \
+         $(STREAMSINC) $(LIBINC) $(CHIBIOS)/os/various \
          $(TMK_DIR) $(COMMON_DIR) $(TMK_DIR)/protocol/chibios \
          $(TMK_DIR)/protocol $(TARGET_DIR)
 
@@ -256,6 +257,6 @@ endif
 
 RULESPATH = $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC
 ifeq ("$(wildcard $(RULESPATH)/rules.mk)","")
-RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC
+RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk
 endif
 include $(RULESPATH)/rules.mk
