@@ -77,6 +77,10 @@ Update
 2014/12/11  Added Hub support(confirmed with HHKB pro2)
 2016/09/10  Unimap editor support
 2016/10/18  Fix LED state at startup
+2017/05/xx  Fix startup code for FC660C(3eae475)
+2018/02/xx  Add Korean and Brazilian specific keys(ab6ddac,b2fa0ffa)
+2018/07/xx  Fix startup issue(c2ce617)
+2018/10/xx  Use fixed LUFA stack and update USB_Host_Shield_2.0
 
 
 
