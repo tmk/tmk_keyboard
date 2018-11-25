@@ -1,26 +1,29 @@
 # Target file name (without extension).
-TARGET = terminal_lufa
+TARGET ?= ps2_bluefruit
 
 # Directory common source filess exist
-TMK_DIR = ../../tmk_core
+TMK_DIR ?= ../../tmk_core
 
 # Directory keyboard dependent files exist
-TARGET_DIR = .
+TARGET_DIR ?= .
 
 # keyboard dependent files
-SRC = 	keymap.c \
-	matrix.c \
+SRC ?= matrix.c \
 	led.c
+#
+#
+# Keymap file
+#
+KEYMAP_FILE = keymap
+SRC := $(KEYMAP_FILE).c $(SRC)
 
 CONFIG_H = config.h
 
+BLUEFRUIT_TRACE_SERIAL=true
 
 # MCU name, you MUST set this to match the board you are using
 # type "make clean" after changing this, so all files will be rebuilt
-#MCU = at90usb162       # Teensy 1.0
-MCU = atmega32u4       # Teensy 2.0
-#MCU = at90usb646       # Teensy++ 1.0
-#MCU = at90usb1286      # Teensy++ 2.0
+MCU = atmega32u4       
 
 
 # Processor frequency.
@@ -29,7 +32,6 @@ MCU = atmega32u4       # Teensy 2.0
 #   variable to same clock speed.  The _delay_ms() macro uses this, and many
 #   examples use this variable to calculate timings.  Do not add a "UL" here.
 F_CPU = 8000000
-#F_CPU = 16000000
 
 
 #
@@ -54,6 +56,8 @@ F_USB = $(F_CPU)
 # Interrupt driven control endpoint task
 OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 
+# This improves response of keyboard when wakeup
+OPT_DEFS += -DSUSPEND_MODE_STANDBY
 
 # Boot Section Size in bytes
 #   Teensy halfKay   512
@@ -68,10 +72,10 @@ OPT_DEFS += -DBOOTLOADER_SIZE=4096
 #BOOTMAGIC_ENABLE = yes	# Virtual DIP switch configuration(+1000)
 #MOUSEKEY_ENABLE = yes	# Mouse keys(+4700)
 #EXTRAKEY_ENABLE = yes	# Audio control and System control(+450)
-CONSOLE_ENABLE = yes	# Console for debug(+400)
-COMMAND_ENABLE = yes    # Commands for debug and configuration
+CONSOLE_ENABLE = no	# Console for debug(+400)
+COMMAND_ENABLE = no    # Commands for debug and configuration
 #SLEEP_LED_ENABLE = yes  # Breathing sleep LED during USB suspend
-#NKRO_ENABLE = yes	# USB Nkey Rollover
+#NKRO_ENABLE = yes	# USB Nkey Rollover - not yet supported in LUFA
 
 
 #
@@ -80,12 +84,10 @@ COMMAND_ENABLE = yes    # Commands for debug and configuration
 # 	INT implementation will drop simultaneous key strokes.
 #
 #PS2_USE_USART = yes	# uses hardware USART engine for PS/2 signal receive(recomened)
-PS2_USE_INT = yes	# uses external interrupt for falling edge of PS/2 clock pin
-#PS2_USE_BUSYWAIT = yes	# uses primitive reference code
-
+#PS2_USE_INT ?= yes	# uses external interrupt for falling edge of PS/2 clock pin
+PS2_USE_BUSYWAIT = yes	# uses primitive reference code
 
 #---------------- Programming Options --------------------------
-
 AVRDUDE = avrdude
 # Type: avrdude -c ? to get a full listing.
 AVRDUDE_PROGRAMMER = avr109
@@ -105,7 +107,7 @@ AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 # Increase verbosity level.  Please use this when submitting bug
 # reports about avrdude. See <http://savannah.nongnu.org/projects/avrdude>
 # to submit bug reports.
-#AVRDUDE_VERBOSE = -v -v
+AVRDUDE_VERBOSE = -v -v
 
 AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)
 #AVRDUDE_FLAGS = -p $(MCU) -c $(AVRDUDE_PROGRAMMER)
@@ -115,11 +117,15 @@ AVRDUDE_FLAGS += $(AVRDUDE_ERASE_COUNTER)
 
 PROGRAM_CMD = $(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
 
+
+
 # Search Path
 VPATH += $(TARGET_DIR)
 VPATH += $(TMK_DIR)
 
-include $(TMK_DIR)/protocol/lufa.mk
+
+include $(TMK_DIR)/protocol.mk
+include $(TMK_DIR)/protocol/bluefruitle_nrf51.mk
 include $(TMK_DIR)/protocol.mk
 include $(TMK_DIR)/common.mk
 include $(TMK_DIR)/rules.mk
