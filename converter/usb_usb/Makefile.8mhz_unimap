@@ -1,0 +1,7 @@
+TARGET = usb_usb_8mhz_unimap
+TARGET_DIR = ./8mhz_unimap
+F_CPU = 8000000
+F_USB = 8000000
+UNIMAP_ENABLE = yes
+KEYMAP_SECTION_ENABLE = yes
+include Makefile

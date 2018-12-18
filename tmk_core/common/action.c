@@ -432,6 +432,10 @@ void register_code(uint8_t code)
     else if IS_CONSUMER(code) {
         host_consumer_send(KEYCODE2CONSUMER(code));
     }
+    else if IS_MOUSEKEY(code) {
+        mousekey_on(code);
+        mousekey_send();
+    }
 }
 
 void unregister_code(uint8_t code)
@@ -489,6 +493,10 @@ void unregister_code(uint8_t code)
     }
     else if IS_CONSUMER(code) {
         host_consumer_send(0);
+    }
+    else if IS_MOUSEKEY(code) {
+        mousekey_off(code);
+        mousekey_send();
     }
 }
 
