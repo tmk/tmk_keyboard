@@ -32,7 +32,9 @@ static void status_led(bool on)
 
 void rn42_task_init(void)
 {
+#ifdef BATT_ENABLE
     battery_init();
+#endif
 #ifdef NKRO_ENABLE
     rn42_nkro_last = keyboard_nkro;
 #endif
@@ -95,6 +97,7 @@ void rn42_task(void)
     }
 
 
+#ifdef BATT_ENABLE
     static uint16_t prev_timer = 0;
     uint16_t e = timer_elapsed(prev_timer);
     if (e > 1000) {
@@ -122,6 +125,7 @@ void rn42_task(void)
             */
         }
     }
+#endif
 
 
     /* Connection monitor */
@@ -246,13 +250,15 @@ static void pairing(void)
 bool command_extra(uint8_t code)
 {
     uint32_t t;
-    uint16_t b;
+//    uint16_t b;
     switch (code) {
         case KC_H:
         case KC_SLASH: /* ? */
             print("\n\n----- Bluetooth RN-42 Help -----\n");
             print("i:       RN-42 info\n");
+#ifdef BATT_ENABLE
             print("b:       battery voltage\n");
+#endif
             print("Del:     enter/exit RN-42 config mode\n");
             print("Slck:    RN-42 initialize\n");
 #if 0
@@ -312,6 +318,7 @@ bool command_extra(uint8_t code)
                     (USB_DeviceState == DEVICE_STATE_Addressed) ? "Addressed" :
                     (USB_DeviceState == DEVICE_STATE_Configured) ? "Configured" :
                     (USB_DeviceState == DEVICE_STATE_Suspended) ? "Suspended" : "?");
+#ifdef BATT_ENABLE
             xprintf("battery: ");
             switch (battery_status()) {
                 case FULL_CHARGED:  xprintf("FULL"); break;
@@ -321,8 +328,9 @@ bool command_extra(uint8_t code)
                 default:            xprintf("?"); break;
             };
             xprintf("\n");
-            xprintf("RemoteWakeupEnabled: %X\n", USB_Device_RemoteWakeupEnabled);
             xprintf("VBUS: %X\n", USBSTA&(1<<VBUS));
+#endif
+            xprintf("RemoteWakeupEnabled: %X\n", USB_Device_RemoteWakeupEnabled);
             t = timer_read32()/1000;
             uint8_t d = t/3600/24;
             uint8_t h = t/3600;
@@ -336,6 +344,7 @@ bool command_extra(uint8_t code)
             xprintf("LINK3: %s\r\n", get_link(RN42_LINK3));
 #endif
             return true;
+#ifdef BATT_ENABLE
         case KC_B:
             // battery monitor
             t = timer_read32()/1000;
@@ -345,6 +354,7 @@ bool command_extra(uint8_t code)
             xprintf("%02u:",   t%3600/60);
             xprintf("%02u\n",  t%60);
             return true;
+#endif
         case KC_U:
             if (config_mode) return false;
             if (force_usb) {

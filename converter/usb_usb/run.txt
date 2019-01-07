@@ -1,0 +1,9 @@
+make -f Makefile.8mhz_unimap KEYMAP=usb_usb_hhkb_zzh_r TARGET=usb_usb_8mhz_unimap_hhkb_zzh_r
+make -f Makefile.8mhz_unimap KEYMAP=usb_usb_hhkb_zzh_r TARGET=usb_usb_8mhz_unimap_hhkb_zzh_r clean
+
+make -f Makefile.unimap KEYMAP=usb_usb_hhkb_zzh_r TARGET=usb_usb_unimap_hhkb_zzh_r
+make -f Makefile.unimap KEYMAP=usb_usb_hhkb_zzh_r TARGET=usb_usb_unimap_hhkb_zzh_r clean
+
+
+
+avrdude.exe -p atmega32u4 -c avr109 -U flash:w:"D:\Software\HHKB\tmk_keyboard\converter\usb_usb\binary\usb_usb_8mhz_unimap_hhkb_zzh_r.hex":i -P COM12

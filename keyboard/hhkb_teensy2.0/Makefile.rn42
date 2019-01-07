@@ -2,4 +2,5 @@ TARGET ?= hhkb_rn42
 CONFIG_H ?= config_rn42.h
 RN42_ENABLE ?= yes
 NKRO_ENABLE ?= yes
+BATT_ENABLE ?= yes
 include Makefile

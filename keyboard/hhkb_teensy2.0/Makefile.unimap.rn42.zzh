@@ -1,0 +1,5 @@
+TARGET = hhkb_rn42_unimap
+UNIMAP_ENABLE = yes
+KEYMAP_SECTION_ENABLE = yes
+BATT_ENABLE = no
+include Makefile.rn42

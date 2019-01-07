@@ -51,6 +51,7 @@ int main(void)  __attribute__ ((weak));
 int main(void)
 {
     SetupHardware();
+    print("\nSetupHardware\n");
     sei();
 
     /* wait for USB startup to get ready for debug output */
@@ -66,11 +67,14 @@ int main(void)
     print("\nUSB init\n");
 
     rn42_init();
-    rn42_task_init();
     print("RN-42 init\n");
+    
+    rn42_task_init();
+    print("RN-42 task init\n");
 
     /* init modules */
     keyboard_init();
+    print("Keyboard init\n");
 
 #ifdef SLEEP_LED_ENABLE
     sleep_led_init();
@@ -95,11 +99,14 @@ int main(void)
         }
 
         keyboard_task();
+        print("Keyboard task\n");
 
 #if !defined(INTERRUPT_CONTROL_ENDPOINT)
         USB_USBTask();
+        print("USB task\n");
 #endif
 
         rn42_task();
+        print("rn42 task\n");
     }
 }
