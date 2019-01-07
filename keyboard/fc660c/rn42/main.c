@@ -18,7 +18,9 @@
 
 static int8_t sendchar_func(uint8_t c)
 {
+#ifdef LUFA_DEBUG_SUART
     xmit(c);        // SUART
+#endif
     sendchar(c);    // LUFA
     return 0;
 }

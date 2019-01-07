@@ -4,4 +4,5 @@ RN42_ENABLE ?= yes
 NKRO_ENABLE ?= yes
 BATT_ENABLE ?= no
 ENABLE_FC660C_POWER_SAVING ?= no
+LUFA_DEBUG_SUART ?= no
 include Makefile
