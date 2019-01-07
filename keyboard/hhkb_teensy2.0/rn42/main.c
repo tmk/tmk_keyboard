@@ -4,6 +4,7 @@
 #include "lufa.h"
 #include "print.h"
 #include "sendchar.h"
+#include "matrix.h"
 #include "rn42.h"
 #include "rn42_task.h"
 #include "serial.h"
