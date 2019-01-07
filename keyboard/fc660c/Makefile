@@ -14,6 +14,11 @@ SRC ?=	fc660c.c
 # Configure file
 CONFIG_H ?= config.h
 
+ifeq (yes,$(strip $(RN42_ENABLE)))
+CONFIG_H ?= config_rn42.h
+else
+CONFIG_H ?= config.h
+endif
 
 # MCU name
 MCU ?= atmega32u4
@@ -61,7 +66,7 @@ OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 #   Atmel DFU loader 4096	(TMK Alt Controller)
 #   LUFA bootloader  4096
 #   USBaspLoader     2048
-OPT_DEFS += -DBOOTLOADER_SIZE=4096
+OPT_DEFS += -DBOOTLOADER_SIZE=512
 
 
 # Build Options
@@ -105,6 +110,10 @@ endif
 VPATH += $(TARGET_DIR)
 VPATH += $(TMK_DIR)
 
+ifeq (yes,$(strip $(RN42_ENABLE)))
+include rn42.mk
+include $(TMK_DIR)/protocol.mk
+endif
 include $(TMK_DIR)/protocol/lufa.mk
 include $(TMK_DIR)/common.mk
 include $(TMK_DIR)/rules.mk

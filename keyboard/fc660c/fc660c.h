@@ -29,6 +29,24 @@ static inline void KEY_UNABLE(void) { (PORTD |=  (1<<7)); }
 static inline bool KEY_STATE(void) { return (PINC & (1<<6)); }
 static inline void KEY_HYS_ON(void) { (PORTC |=  (1<<7)); }
 static inline void KEY_HYS_OFF(void) { (PORTC &= ~(1<<7)); }
+#ifdef FC660C_POWER_SAVING
+static inline void KEY_POWER_ON(void) {
+    DDRB = 0xFF; PORTB = 0x40;          // change pins output
+    DDRD |= (1<<4); PORTD |= (1<<4);    // MOS FET switch on
+    /* Without this wait you will miss or get false key events. */
+    _delay_ms(5);                       // wait for powering up
+}
+static inline void KEY_POWER_OFF(void) {
+    /* input with pull-up consumes less than without it when pin is open. */
+    DDRB = 0x00; PORTB = 0xFF;          // change pins input with pull-up
+    DDRD |= (1<<4); PORTD &= ~(1<<4);   // MOS FET switch off
+}
+static inline bool KEY_POWER_STATE(void) { return PORTD & (1<<4); }
+#else
+static inline void KEY_POWER_ON(void) {}
+static inline void KEY_POWER_OFF(void) {}
+static inline bool KEY_POWER_STATE(void) { return true; }
+#endif
 static inline void KEY_INIT(void)
 {
     /* Col */

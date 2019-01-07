@@ -20,20 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define VENDOR_ID       0xFEED
-#define PRODUCT_ID      0x4242
-#define DEVICE_VER      0x0104
-#define MANUFACTURER    t.m.k.
-#define PRODUCT         HHKB mod
-#define DESCRIPTION     t.m.k. keyboard firmware for HHKB mod
+#define PRODUCT_ID      0x660C
+#define DEVICE_VER      0x0100
+#define MANUFACTURER    TMK.
+#define PRODUCT         FC660C Alt Controller
+#define DESCRIPTION     TMK. keyboard firmware for FC660C
 
 
 /* matrix size */
-#ifdef HHKB_JP
-#   define MATRIX_ROWS 16
-#else
-#   define MATRIX_ROWS 8
-#endif
-#define MATRIX_COLS 8
+#define MATRIX_ROWS 8
+#define MATRIX_COLS 16
 
 
 /* key combination for command */
@@ -50,9 +46,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Boot Magic salt key: Space */
 #define BOOTMAGIC_KEY_SALT      KC_SPACE
 
-#ifdef ENABLE_HHKB_POWER_SAVING
+#ifdef ENABLE_FC660C_POWER_SAVING
 /* power control of key switch board */
-#   define HHKB_POWER_SAVING
+#   define FC660C_POWER_SAVING
 #endif
 
 /*
@@ -77,11 +73,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         UCSR1B |= (0<<TXCIE1) | (1<<TXEN1); /* TX interrupt, TX: enable */ \
         UCSR1C |= (0<<UPM11) | (0<<UPM10);  /* parity: none(00), even(01), odd(11) */ \
         UCSR1D |= (0<<RTSEN) | (0<<CTSEN);  /* RTS, CTS(no flow control by hardware) */ \
-        DDRD |= (1<<5); PORTD &= ~(1<<5);   /* RTS for flow control by firmware */ \
+        DDRF |= (1<<0); PORTF &= ~(1<<0);   /* RTS for flow control by firmware, PD5 for hhkb, PF0 for 660c */ \
         sei(); \
     } while(0)
-    #define SERIAL_UART_RTS_LO()    do { PORTD &= ~(1<<5); } while (0)
-    #define SERIAL_UART_RTS_HI()    do { PORTD |=  (1<<5); } while (0)
+    #define SERIAL_UART_RTS_LO()    do { PORTF &= ~(1<<0); } while (0)
+    #define SERIAL_UART_RTS_HI()    do { PORTF |=  (1<<0); } while (0)
 #else
     #error "USART configuration is needed."
 #endif

@@ -1,6 +1,6 @@
-TARGET = hhkb_rn42_unimap
+TARGET = fc660c_rn42_unimap
 UNIMAP_ENABLE = yes
 KEYMAP_SECTION_ENABLE = yes
 BATT_ENABLE = no
-ENABLE_HHKB_POWER_SAVING = no
+ENABLE_FC660C_POWER_SAVING = no
 include Makefile.rn42

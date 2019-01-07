@@ -1,7 +1,7 @@
-TARGET ?= hhkb_rn42
+TARGET ?= fc660c_rn42
 CONFIG_H ?= config_rn42.h
 RN42_ENABLE ?= yes
 NKRO_ENABLE ?= yes
 BATT_ENABLE ?= no
-ENABLE_HHKB_POWER_SAVING ?= no
+ENABLE_FC660C_POWER_SAVING ?= no
 include Makefile

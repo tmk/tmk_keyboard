@@ -28,8 +28,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "matrix.h"
 #include "led.h"
 #include "fc660c.h"
+#include <avr/wdt.h>
+#include "suspend.h"
+#include "lufa.h"
 
-
+// matrix power saving
+#define MATRIX_POWER_SAVE       10000
 static uint32_t matrix_last_modified = 0;
 
 // matrix state buffer(1:on, 0:off)
@@ -49,7 +53,7 @@ void matrix_init(void)
 
     KEY_INIT();
 
-    // LEDs on CapsLock and Insert
+    // LEDs on CapsLock(PB6) and Insert(PB5)
     DDRB  |= (1<<5) | (1<<6);
     PORTB |= (1<<5) | (1<<6);
 
@@ -68,7 +72,9 @@ uint8_t matrix_scan(void)
     matrix_prev = matrix;
     matrix = tmp;
 
-    uint8_t row, col;
+    // power on
+    if (!KEY_POWER_STATE()) KEY_POWER_ON();
+    uint8_t col,row;
     for (col = 0; col < MATRIX_COLS; col++) {
         SET_COL(col);
         for (row = 0; row < MATRIX_ROWS; row++) {
@@ -117,6 +123,14 @@ uint8_t matrix_scan(void)
             matrix_last_modified = timer_read32();
         }
     }
+    // power off
+    if (KEY_POWER_STATE() &&
+            (USB_DeviceState == DEVICE_STATE_Suspended ||
+             USB_DeviceState == DEVICE_STATE_Unattached ) &&
+            timer_elapsed32(matrix_last_modified) > MATRIX_POWER_SAVE) {
+        KEY_POWER_OFF();
+        suspend_power_down();
+    }
     return 1;
 }
 
@@ -124,6 +138,13 @@ inline
 matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
+}
+
+void matrix_power_up(void) {
+    KEY_POWER_ON();
+}
+void matrix_power_down(void) {
+    KEY_POWER_OFF();
 }
 
 void led_set(uint8_t usb_led)
