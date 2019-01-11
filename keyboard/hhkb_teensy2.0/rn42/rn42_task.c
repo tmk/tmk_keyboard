@@ -14,7 +14,9 @@
 #include "timer.h"
 #include "wait.h"
 #include "command.h"
+#ifdef BATT_ENABLE
 #include "battery.h"
+#endif
 
 static bool config_mode = false;
 static bool force_usb = false;
@@ -76,7 +78,7 @@ void rn42_task(void)
 
     /* Switch between USB and Bluetooth */
     if (!config_mode) { // not switch while config mode
-        if (!force_usb && !rn42_rts()) {
+        if (!force_usb && !rn42_rts() && rn42_powered()) {
             if (host_get_driver() != &rn42_driver) {
                 clear_keyboard();
 #ifdef NKRO_ENABLE
@@ -308,7 +310,8 @@ bool command_extra(uint8_t code)
             print("\n----- RN-42 info -----\n");
             xprintf("protocol: %s\n", (host_get_driver() == &rn42_driver) ? "RN-42" : "LUFA");
             xprintf("force_usb: %X\n", force_usb);
-            xprintf("rn42: %s\n", rn42_rts() ? "OFF" : (rn42_linked() ? "CONN" : "ON"));
+            //xprintf("rn42: %s\n", rn42_rts() ? "OFF" : (rn42_linked() ? "CONN" : "ON"));
+            xprintf("rn42: %s\n", rn42_powered() ? (rn42_linked() ? "CONN" : "ON") : "OFF");
             xprintf("rn42_autoconnecting(): %X\n", rn42_autoconnecting());
             xprintf("config_mode: %X\n", config_mode);
             xprintf("USB State: %s\n",

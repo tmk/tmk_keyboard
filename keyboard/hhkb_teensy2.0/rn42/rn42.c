@@ -37,6 +37,10 @@ void rn42_init(void)
     DDRF  &= ~(1<<6);
     PORTF |=  (1<<6);
 
+    // PF0: if_powered(low: no powered, high: powered)
+    DDRF &= ~(1<<0);
+    PORTF &= ~(1<<0);
+    
     // PF1: RTS(low: allowed to send, high: not allowed)
     DDRF &= ~(1<<1);
     PORTF &= ~(1<<1);
@@ -100,6 +104,12 @@ void rn42_disconnect(void)
     // low to disconnect
     DDRF |= (1<<7);
     PORTF &= ~(1<<7);
+}
+
+bool rn42_powered(void)
+{
+    // high,3.3v when RN-42 is powered
+    return PINF&(1<<0);
 }
 
 bool rn42_rts(void)

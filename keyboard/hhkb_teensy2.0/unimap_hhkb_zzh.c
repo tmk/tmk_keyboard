@@ -21,6 +21,7 @@ enum macro_id {
     SAVE_AS,
     COPY_LINK,
     RUN_NOTEPAD,
+    RUN_CALC,
     M_1,
     //ALT_TAB,
 };
@@ -29,7 +30,8 @@ enum macro_id {
 #define AC_OPTB    ACTION_MACRO(OPEN_TAB)       //Open in new tab;
 #define AC_SVAS    ACTION_MACRO(SAVE_AS)        //Save As in IE;
 #define AC_CPLK    ACTION_MACRO(COPY_LINK)      //Copy link;
-#define AC_NTPD    ACTION_MACRO(RUN_NOTEPAD)    //Open Notepad;
+#define AC_RNPD    ACTION_MACRO(RUN_NOTEPAD)    //Open Notepad;
+#define AC_RCAL    ACTION_MACRO(RUN_CALC)       //Open Calculator;
 #define AC_M_1     ACTION_MACRO(M_1)            //Run Macro 1;
 
 //Layer keys and dual role keys;
@@ -43,6 +45,8 @@ enum macro_id {
 #define AC_TAB5    ACTION_LAYER_TAP_KEY(5, KC_TAB)
 #define AC_SPC6    ACTION_LAYER_TAP_KEY(6, KC_SPC)
 #define AC_CAP5    ACTION_LAYER_TAP_KEY(5, KC_CAPS)
+#define AC_CMPT    ACTION_MODS_KEY(MOD_LGUI, KC_E)      //Open My Computer
+#define AC_DSKT    ACTION_MODS_KEY(MOD_LGUI, KC_D)      //Show Desktop
 #define AC_BACK    ACTION_MODS_KEY(MOD_LALT, KC_LEFT)
 #define AC_FRWD    ACTION_MODS_KEY(MOD_LALT, KC_RGHT)
 #define AC_LTAB    ACTION_MODS_KEY(MOD_LCTL, KC_PGUP)
@@ -93,14 +97,14 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
     ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,
     CAPS,M_1 ,TRNS,TRNS,TRNS,TRNS,TRNS,PGUP,UP,  PGDN,TRNS,DL1, DL0,      BSPC,
     CAPS,VOLD,VOLU,MUTE,TRNS,TRNS,HOME,LEFT,DOWN,RGHT,END, TRNS,          ENT,
-    TRNS,     TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS,TRNS,
+    MPLY,     MNXT,MPRV,MSTP,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS,TRNS,
          TRNS,TRNS,               SPC,                     TRNS,TRNS ),
     [6] = UNIMAP_HHKB(
     CLSE,F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,
-    CAPS,CPLK,WH_U,MS_U,WH_D,OPTB,OPTB,WH_U,MS_U,WH_D,CPLK,WH_L,WH_R,     BSPC,
-    CAPS,LTAB,MS_L,MS_D,MS_R,RTAB,LTAB,MS_L,MS_D,MS_R,RTAB,BTN5,          ENT,
-    TRNS,     BACK,FRWD,BTN1,BTN2,BTN3,BTN2,BTN1,BACK,FRWD,BTN4,     TRNS,TRNS,
-         MYCM,NTPD,               SPC,                     CALC,MYCM ),
+    CAPS,WH_L,WH_U,MS_U,WH_D,WH_R,DEL, PGUP,UP,  PGDN,TRNS,TRNS,TRNS,     BSPC,
+    CAPS,LTAB,MS_L,MS_D,MS_R,RTAB,HOME,LEFT,DOWN,RGHT,END, BSPC,          ENT,
+    TRNS,     BACK,FRWD,BTN1,BTN2,BTN3,BSPC,ENT, TRNS,TRNS,TRNS,     TRNS,TRNS,
+         CMPT,RNPD,               SPC,                     RCAL,DSKT ),
     [7] = UNIMAP_HHKB(
     PWR, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,
     CAPS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,UP,  TRNS,     BSPC,
@@ -132,6 +136,10 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
         case RUN_NOTEPAD:
             return (record->event.pressed ?
                     MACRO( D(LGUI), D(R), U(R), U(LGUI), W(255), T(N), T(O), T(T), T(E), T(P), T(A), T(D), T(ENT), END ) :
+                    MACRO_NONE );
+        case RUN_CALC:
+            return (record->event.pressed ?
+                    MACRO( D(LGUI), D(R), U(R), U(LGUI), W(255), T(C), T(A), T(L), T(C), T(ENT), END ) :
                     MACRO_NONE );
         case M_1:
             return (record->event.pressed ?

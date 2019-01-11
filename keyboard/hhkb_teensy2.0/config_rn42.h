@@ -88,10 +88,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /* for debug */
-#define SUART_OUT_PORT  PORTD
-#define SUART_OUT_BIT   0
-#define SUART_IN_PIN    PIND
-#define SUART_IN_BIT    1
+#ifdef LUFA_DEBUG_SUART
+#   define SUART_OUT_PORT  PORTD
+#   define SUART_OUT_BIT   0
+#   define SUART_IN_PIN    PIND
+#   define SUART_IN_BIT    1
+#endif
 
 
 /*

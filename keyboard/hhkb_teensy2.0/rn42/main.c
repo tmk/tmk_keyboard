@@ -18,7 +18,9 @@
 
 static int8_t sendchar_func(uint8_t c)
 {
+#ifdef LUFA_DEBUG_SUART
     xmit(c);        // SUART
+#endif
     sendchar(c);    // LUFA
     return 0;
 }
@@ -41,11 +43,13 @@ static void SetupHardware(void)
     USB_Device_EnableSOFEvents();
     print_set_sendchar(sendchar_func);
 
+#ifdef LUFA_DEBUG_SUART
     // SUART PD0:output, PD1:input
     DDRD |= (1<<0);
     PORTD |= (1<<0);
     DDRD &= ~(1<<1);
     PORTD |= (1<<1);
+#endif
 }
 
 int main(void)  __attribute__ ((weak));
@@ -63,9 +67,9 @@ int main(void)
         ;
 #else
         USB_USBTask();
+        print("\nUSB init\n");
 #endif
     }
-    print("\nUSB init\n");
 
     rn42_init();
     print("RN-42 init\n");
@@ -83,7 +87,9 @@ int main(void)
 
     print("Keyboard start\n");
     while (1) {
-        while (rn42_rts() && // RN42 is off
+        while (
+                !rn42_powered() && // RN42 is not powered
+                //rn42_rts() && // RN42 is off
                 USB_DeviceState == DEVICE_STATE_Suspended) {
             print("[s]");
             matrix_power_down();
@@ -100,14 +106,14 @@ int main(void)
         }
 
         keyboard_task();
-        print("Keyboard task\n");
+        //print("Keyboard task\n");
 
 #if !defined(INTERRUPT_CONTROL_ENDPOINT)
         USB_USBTask();
-        print("USB task\n");
+        //print("USB task\n");
 #endif
 
         rn42_task();
-        print("rn42 task\n");
+        //print("rn42 task\n");
     }
 }

@@ -1,4 +1,5 @@
 TARGET = hhkb_unimap
 UNIMAP_ENABLE = yes
 KEYMAP_SECTION_ENABLE = yes
+LUFA_DEBUG_SUART = no
 include Makefile

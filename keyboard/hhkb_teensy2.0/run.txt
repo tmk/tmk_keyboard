@@ -1,3 +1,0 @@
-make -f Makefile.unimap KEYMAP=hhkb_zzh_r TARGET=hhkb_unimap_zzh_r
-
-make -f Makefile.unimap.rn42 KEYMAP=hhkb_zzh_r TARGET=hhkb_rn42_unimap_zzh_r

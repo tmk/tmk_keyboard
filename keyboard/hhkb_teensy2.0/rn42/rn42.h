@@ -15,6 +15,7 @@ void rn42_puts(char *s);
 bool rn42_autoconnecting(void);
 void rn42_autoconnect(void);
 void rn42_disconnect(void);
+bool rn42_powered(void);
 bool rn42_rts(void);
 void rn42_cts_hi(void);
 void rn42_cts_lo(void);

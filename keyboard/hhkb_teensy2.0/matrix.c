@@ -69,8 +69,9 @@ uint8_t matrix_scan(void)
 
     // power on
     if (!KEY_POWER_STATE()) KEY_POWER_ON();
-    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
+    uint8_t row,col;
+    for (row = 0; row < MATRIX_ROWS; row++) {
+        for (col = 0; col < MATRIX_COLS; col++) {
             KEY_SELECT(row, col);
             _delay_us(5);
 
