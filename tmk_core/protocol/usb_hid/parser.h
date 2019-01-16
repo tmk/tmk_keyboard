@@ -12,4 +12,12 @@ public:
     virtual void Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf);
 };
 
+class MOUSEReportParser : public HIDReportParser
+{
+public:
+    report_mouse_t report;
+    uint16_t time_stamp;
+    virtual void Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf);
+};
+
 #endif

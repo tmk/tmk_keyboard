@@ -12,6 +12,10 @@ USB_HOST_SHIELD_SRC = \
 	$(USB_HOST_SHIELD_DIR)/parsetools.cpp \
 	$(USB_HOST_SHIELD_DIR)/message.cpp 
 
+#ifeq (yes,$(strip $(COMPOSITE_ENABLE)))
+#    SRC += $(USB_HOST_SHIELD_DIR)/hidcomposite.cpp
+#    OPT_DEFS += -DCOMPOSITE_ENABLE
+#endif
 
 
 #

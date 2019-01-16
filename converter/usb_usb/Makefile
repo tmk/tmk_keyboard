@@ -92,11 +92,11 @@ OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 MOUSEKEY_ENABLE ?= yes	# Mouse keys
 EXTRAKEY_ENABLE ?= yes	# Media control and System control
 #CONSOLE_ENABLE ?= yes	# Console for debug
-#COMMAND_ENABLE ?= yes    # Commands for debug and configuration
-#NKRO_ENABLE ?= yes	# USB Nkey Rollover
+#COMMAND_ENABLE ?= yes  # Commands for debug and configuration
+#NKRO_ENABLE ?= yes	    # USB Nkey Rollover
 
 #PS2_MOUSE_ENABLE = yes  # PS/2 mouse(TrackPoint) support
-#PS2_USE_BUSYWAIT = yes # uses primitive reference code
+#PS2_USE_BUSYWAIT = yes  # uses primitive reference code
 #PS2_USE_USART = yes     # hardware USART engine for PS/2 signal receive
 #PS2_MOUSE_DEBUG = yes
 

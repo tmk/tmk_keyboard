@@ -1,0 +1,7 @@
+TARGET = usb_usb_unimap_hhkb_zzh
+UNIMAP_ENABLE = yes
+KEYMAP_SECTION_ENABLE = no
+#LUFA_DEBUG_SUART = no
+COMPOSITE_ENABLE = yes
+SRC =  usb_usb_c.cpp
+include Makefile.unimap
