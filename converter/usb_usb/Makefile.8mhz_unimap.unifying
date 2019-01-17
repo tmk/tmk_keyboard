@@ -1,0 +1,21 @@
+TARGET = usb_usb_8mhz_unimap_unifying
+UNIMAP_ENABLE = yes
+KEYMAP_SECTION_ENABLE = no
+MULTI_KBD_ENABLE = no
+COMPOSITE_ENABLE = yes
+USBHUB_ENABLE = yes
+
+ifeq (yes,$(strip $(MULTI_KBD_ENABLE)))
+    OPT_DEFS += -DMULTI_KBD_ENABLE
+endif
+
+ifeq (yes,$(strip $(COMPOSITE_ENABLE)))
+    OPT_DEFS += -DCOMPOSITE_ENABLE
+endif
+
+ifeq (yes,$(strip $(USBHUB_ENABLE)))
+    OPT_DEFS += -DUSBHUB_ENABLE
+endif
+
+SRC =  usb_usb_c.cpp
+include Makefile.8mhz_unimap

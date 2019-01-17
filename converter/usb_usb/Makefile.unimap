@@ -1,5 +1,6 @@
+F_CPU = 16000000
+F_USB = 16000000
 TARGET = usb_usb_unimap
-UNIMAP_ENABLE = yes
-KEYMAP_SECTION_ENABLE = yes
-#LUFA_DEBUG = yes
+UNIMAP_ENABLE ?= yes
+KEYMAP_SECTION_ENABLE ?= yes
 include Makefile

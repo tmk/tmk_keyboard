@@ -1,0 +1,1 @@
+avrdude.exe -p atmega32u4 -c avr109 -U flash:w:"D:\Software\HHKB\tmk_keyboard\converter\usb_usb\binary\usb_usb_8mhz_unimap_hhkb_zzh_r.hex":i -P COM12

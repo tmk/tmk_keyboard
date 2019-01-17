@@ -40,11 +40,10 @@
 
 # Target file name (without extension).
 TARGET ?= usb_usb
-
-TMK_DIR ?= ../../tmk_core
+TARGET_DIR ?= .
 
 # Directory keyboard dependent files exist
-TARGET_DIR ?= .
+TMK_DIR ?= ../../tmk_core
 
 # MCU name
 MCU ?= atmega32u4
@@ -92,9 +91,14 @@ OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 #
 MOUSEKEY_ENABLE ?= yes	# Mouse keys
 EXTRAKEY_ENABLE ?= yes	# Media control and System control
-CONSOLE_ENABLE ?= yes	# Console for debug
-#COMMAND_ENABLE ?= yes    # Commands for debug and configuration
-#NKRO_ENABLE ?= yes	# USB Nkey Rollover
+#CONSOLE_ENABLE ?= yes	# Console for debug
+#COMMAND_ENABLE ?= yes  # Commands for debug and configuration
+#NKRO_ENABLE ?= yes	    # USB Nkey Rollover
+
+#PS2_MOUSE_ENABLE = yes  # PS/2 mouse(TrackPoint) support
+#PS2_USE_BUSYWAIT = yes  # uses primitive reference code
+#PS2_USE_USART = yes     # hardware USART engine for PS/2 signal receive
+#PS2_MOUSE_DEBUG = yes
 
 # Boot Section Size in bytes
 #   Teensy halfKay   512
@@ -142,7 +146,7 @@ VPATH += $(TMK_DIR)
 PROGRAM_CMD = avrdude -p$(MCU) -cavr109 -b57600 -Uflash:w:$(TARGET).hex -P$(DEV)
 
 
-
+#include $(TMK_DIR)/protocol.mk      # Enables PS/2 Trackpoint
 include $(TMK_DIR)/protocol/usb_hid.mk
 include $(TMK_DIR)/protocol/lufa.mk
 include $(TMK_DIR)/common.mk
