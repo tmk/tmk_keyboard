@@ -2,7 +2,7 @@ TARGET = usb_usb_8mhz_unimap_unifying
 UNIMAP_ENABLE = yes
 KEYMAP_SECTION_ENABLE = no
 MULTI_KBD_ENABLE = no
-COMPOSITE_ENABLE = yes
+COMPOSITE_ENABLE = no
 USBHUB_ENABLE = yes
 
 ifeq (yes,$(strip $(MULTI_KBD_ENABLE)))
