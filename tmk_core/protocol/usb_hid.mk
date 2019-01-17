@@ -8,15 +8,12 @@ USB_HOST_SHIELD_DIR = $(USB_HID_DIR)/USB_Host_Shield_2.0-git
 USB_HOST_SHIELD_SRC = \
 	$(USB_HOST_SHIELD_DIR)/Usb.cpp \
 	$(USB_HOST_SHIELD_DIR)/usbhid.cpp \
-	$(USB_HOST_SHIELD_DIR)/usbhub.cpp \
 	$(USB_HOST_SHIELD_DIR)/parsetools.cpp \
 	$(USB_HOST_SHIELD_DIR)/message.cpp 
 
-#ifeq (yes,$(strip $(COMPOSITE_ENABLE)))
-#    SRC += $(USB_HOST_SHIELD_DIR)/hidcomposite.cpp
-#    OPT_DEFS += -DCOMPOSITE_ENABLE
-#endif
-
+ifeq (yes,$(strip $(USBHUB_ENABLE)))
+USB_HOST_SHIELD_SRC += $(USB_HOST_SHIELD_DIR)/usbhub.cpp
+endif
 
 #
 # Arduino

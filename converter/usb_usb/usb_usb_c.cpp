@@ -20,13 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // USB HID host
 #include "Usb.h"
-#include "usbhub.h"
+#ifdef USBHUB_ENABLE
+#   include "usbhub.h"
+#endif
 #include "usbhid.h"
 #include "hidboot.h"
 #include "parser.h"
-//#ifdef COMPOSITE_ENABLE
-//#   include "hidcomposite.h"
-//#endif
 
 #include "keycode.h"
 #include "util.h"
@@ -74,15 +73,23 @@ static bool matrix_is_mod =false;
  * This supports two cascaded hubs and four keyboards
  */
 USB usb_host;
+#ifdef USBHUB_ENABLE
 USBHub hub1(&usb_host);
 USBHub hub2(&usb_host);
+#endif
 HIDBoot<USB_HID_PROTOCOL_KEYBOARD | USB_HID_PROTOCOL_MOUSE> HidComposite1(&usb_host);
 HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    HidKeyboard1(&usb_host);
-HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    HidKeyboard2(&usb_host);
 HIDBoot<USB_HID_PROTOCOL_MOUSE>       HidMouse1(&usb_host);
 KBDReportParser kbd_parser1;
-KBDReportParser kbd_parser2;
 MOUSEReportParser mouse_parser1;
+#ifdef MULTI_KBD_ENABLE
+HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    HidKeyboard2(&usb_host);
+HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    HidKeyboard3(&usb_host);
+HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    HidKeyboard4(&usb_host);
+KBDReportParser kbd_parser2;
+KBDReportParser kbd_parser3;
+KBDReportParser kbd_parser4;
+#endif
 
 
 
@@ -96,10 +103,15 @@ void matrix_init(void) {
     HidComposite1.SetReportParser(0, (HIDReportParser*)&kbd_parser1);
     HidComposite1.SetReportParser(1, (HIDReportParser*)&mouse_parser1);
     HidKeyboard1.SetReportParser(0, (HIDReportParser*)&kbd_parser1);
-    HidKeyboard2.SetReportParser(0, (HIDReportParser*)&kbd_parser2);
     HidMouse1.SetReportParser(0, (HIDReportParser*)&mouse_parser1);
+    #ifdef MULTI_KBD_ENABLE
+    HidKeyboard2.SetReportParser(0, (HIDReportParser*)&kbd_parser2);
+    HidKeyboard3.SetReportParser(0, (HIDReportParser*)&kbd_parser3);
+    HidKeyboard4.SetReportParser(0, (HIDReportParser*)&kbd_parser4);
+    #endif
 }
 
+#ifdef MULTI_KBD_ENABLE
 static void or_report(report_keyboard_t report) {
     // integrate reports into keyboard_report
     keyboard_report.mods |= report.mods;
@@ -114,22 +126,43 @@ static void or_report(report_keyboard_t report) {
         }
     }
 }
+#endif
 
 uint8_t matrix_scan(void) {
     static uint16_t last_time_stamp1 = 0;
+    #ifdef MULTI_KBD_ENABLE
     static uint16_t last_time_stamp2 = 0;
+    static uint16_t last_time_stamp3 = 0;
+    static uint16_t last_time_stamp4 = 0;
+    #endif
+    static uint16_t last_time_stamp1m = 0;
 
     // check report came from keyboards
-    if (kbd_parser1.time_stamp != last_time_stamp1 ||
-        kbd_parser2.time_stamp != last_time_stamp2) {
+    if (   kbd_parser1.time_stamp != last_time_stamp1
+        #ifdef MULTI_KBD_ENABLE
+        || kbd_parser2.time_stamp != last_time_stamp2
+        || kbd_parser3.time_stamp != last_time_stamp3
+        || kbd_parser4.time_stamp != last_time_stamp4
+        #endif
+        ) {
 
         last_time_stamp1 = kbd_parser1.time_stamp;
+        #ifdef MULTI_KBD_ENABLE
         last_time_stamp2 = kbd_parser2.time_stamp;
+        last_time_stamp3 = kbd_parser3.time_stamp;
+        last_time_stamp4 = kbd_parser4.time_stamp;
+        #endif
 
+        #ifdef MULTI_KBD_ENABLE
         // clear and integrate all reports
         keyboard_report = {};
         or_report(kbd_parser1.report);
         or_report(kbd_parser2.report);
+        or_report(kbd_parser3.report);
+        or_report(kbd_parser4.report);
+        #else
+        keyboard_report = kbd_parser1.report;
+        #endif
 
         matrix_is_mod = true;
 
@@ -141,6 +174,19 @@ uint8_t matrix_scan(void) {
     } else {
         matrix_is_mod = false;
     }
+
+    //report that comes from mouse
+    if ( mouse_parser1.time_stamp != last_time_stamp1m ) {
+        last_time_stamp1m = mouse_parser1.time_stamp;
+        mouse_parser1.report.h = 0;
+        host_mouse_send(&mouse_parser1.report);
+        // clear report
+        mouse_parser1.report.x = 0;
+        mouse_parser1.report.y = 0;
+        mouse_parser1.report.v = 0;
+        mouse_parser1.report.h = 0;
+        mouse_parser1.report.buttons = 0;
+    }   
 
     uint16_t timer;
     timer = timer_read();
@@ -225,5 +271,9 @@ void matrix_print(void) {
 void led_set(uint8_t usb_led)
 {
     if (HidKeyboard1.isReady()) HidKeyboard1.SetReport(0, 0, 2, 0, 1, &usb_led);
+    #ifdef MULTI_KBD_ENABLE
     if (HidKeyboard2.isReady()) HidKeyboard2.SetReport(0, 0, 2, 0, 1, &usb_led);
+    if (HidKeyboard3.isReady()) HidKeyboard3.SetReport(0, 0, 2, 0, 1, &usb_led);
+    if (HidKeyboard4.isReady()) HidKeyboard4.SetReport(0, 0, 2, 0, 1, &usb_led);
+    #endif
 }

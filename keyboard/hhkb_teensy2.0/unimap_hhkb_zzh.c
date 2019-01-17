@@ -35,16 +35,15 @@ enum macro_id {
 #define AC_M_1     ACTION_MACRO(M_1)            //Run Macro 1;
 
 //Layer keys and dual role keys;
-#define AC_L4      ACTION_LAYER_MOMENTARY(4)
 #define AC_L5      ACTION_LAYER_MOMENTARY(5)
 #define AC_L6      ACTION_LAYER_MOMENTARY(6)
 #define AC_L7      ACTION_LAYER_MOMENTARY(7)
 #define AC_DL0     ACTION_DEFAULT_LAYER_SET(0)
 #define AC_DL1     ACTION_DEFAULT_LAYER_SET(1)
-#define AC_ESC4    ACTION_LAYER_TAP_KEY(4, KC_ESC)
+#define AC_ESC5    ACTION_LAYER_TAP_KEY(5, KC_ESC)
 #define AC_TAB5    ACTION_LAYER_TAP_KEY(5, KC_TAB)
 #define AC_SPC6    ACTION_LAYER_TAP_KEY(6, KC_SPC)
-#define AC_CAP5    ACTION_LAYER_TAP_KEY(5, KC_CAPS)
+#define AC_CAP6    ACTION_LAYER_TAP_KEY(6, KC_CAPS)
 #define AC_CMPT    ACTION_MODS_KEY(MOD_LGUI, KC_E)      //Open My Computer
 #define AC_DSKT    ACTION_MODS_KEY(MOD_LGUI, KC_D)      //Show Desktop
 #define AC_BACK    ACTION_MODS_KEY(MOD_LALT, KC_LEFT)
@@ -62,11 +61,11 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
 #endif
 // 0, HHKB, Colemak
     [0] = UNIMAP_HHKB(
-    ESC4,1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSLS,GRV,
+    ESC5,1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSLS,GRV,
     TAB5,Q,   W,   F,   P,   G,   J,   L,   U,   Y,   SCLN,LBRC,RBRC,     BSPC,
     LCTL,A,   R,   S,   T,   D,   H,   N,   E,   I,   O,   QUOT,          ENT_,
     LSFT,     Z,   X,   C,   V,   B,   K,   M,   COMM,DOT, SLSH,     RSFT,L7,
-         L5,  LALT,               SPC6,                    CAP5,RGUI ),
+         L5,  LALT,               SPC6,                    CAP6,RGUI ),
 // 1, HHKB, QWERTY, Game
     [1] = UNIMAP_HHKB(
     ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSLS,GRV,

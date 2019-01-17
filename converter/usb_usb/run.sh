@@ -1,5 +1,5 @@
-make -f Makefile.unimap.zzh KEYMAP=usb_usb_hhkb_zzh TARGET=usb_usb_unimap_hhkb_zzh
+make -f Makefile.unimap.unifying KEYMAP=usb_usb_hhkb_zzh_u TARGET=usb_usb_unimap_unifying
 
-mv usb_usb_unimap_hhkb_zzh.hex binary/
+mv usb_usb_unimap_unifying.hex binary/
 
-make -f Makefile.unimap.zzh KEYMAP=usb_usb_hhkb_zzh TARGET=usb_usb_unimap_hhkb_zzh clean
+make -f Makefile.unimap.unifying KEYMAP=usb_usb_hhkb_zzh_u TARGET=usb_usb_unimap_unifying clean
