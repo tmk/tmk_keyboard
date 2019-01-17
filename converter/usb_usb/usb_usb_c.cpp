@@ -178,6 +178,7 @@ uint8_t matrix_scan(void) {
     //report that comes from mouse
     if ( mouse_parser1.time_stamp != last_time_stamp1m ) {
         last_time_stamp1m = mouse_parser1.time_stamp;
+        // disable horizontal wheel for Unifying, work pending.
         mouse_parser1.report.h = 0;
         host_mouse_send(&mouse_parser1.report);
         // clear report
