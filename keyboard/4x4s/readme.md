@@ -1,9 +1,9 @@
-## 4x4 keyboard firmware
+## 4x4s keyboard firmware
 
 ======================
 
 Pinout
 
-    Rows	B2	D1	D0	D4												
-    Cols	C6	D7	E6	B4	B5	B6	B7	D6	F7	F6	F5	F4	F1	F0	B3	B1
+    Rows	F7  F6  F5  F4											
+    Cols	F1  F0  B1  B2  B3  D2  D3  D1  D0  C6  E6  B5  B6  B7  D6  C7
 
