@@ -75,10 +75,8 @@ COMMAND_ENABLE = yes    # Commands for debug and configuration
 
 #
 # PS/2 protocol implementations
-# 	USART is recommended if it is available, others are for reference purpose.
-# 	INT implementation will drop simultaneous key strokes.
 #
-#PS2_USE_USART = yes	# uses hardware USART engine for PS/2 signal receive(recomened)
+#PS2_USE_USART = yes	# uses hardware USART engine for PS/2 signal receive
 PS2_USE_INT = yes	# uses external interrupt for falling edge of PS/2 clock pin
 #PS2_USE_BUSYWAIT = yes	# uses primitive reference code
 

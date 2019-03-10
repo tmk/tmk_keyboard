@@ -11,8 +11,8 @@ CONNECTION
 ----------
 Keyboard    ATMega32U4
 ----------------------
-Data:       PD2
-Clock:      PD5
+Data:       PD0
+Clock:      PD1
 
 And VCC and GND, of course. See RESOURCE for keyboard connector pin assign.
 
@@ -32,6 +32,5 @@ Soarer's Converter: http://geekhack.org/index.php?topic=17458.0
 KbdBabel: http://www.kbdbabel.org/
 RJ45 Connector: http://www.kbdbabel.org/conn/kbd_connector_ibmterm.png
 DIN Connector: http://www.kbdbabel.org/conn/kbd_connector_ibm3179_318x_319x.png
-WinAVR: http://winavr.sourceforge.net/
 
 EOF
