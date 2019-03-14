@@ -1,0 +1,107 @@
+#######################################
+# Syntax Coloring Map For Bluefruit
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Adafruit_BLE	KEYWORD1
+Adafruit_BluefruitLE_SPI	KEYWORD1
+Adafruit_BluefruitLE_UART	KEYWORD1
+Adafruit_ATParser	KEYWORD1
+
+Adafruit_BLEBattery	KEYWORD1
+Adafruit_BLEEddystone	KEYWORD1
+Adafruit_BLEGatt	KEYWORD1
+Adafruit_BLEMIDI	KEYWORD1
+
+Adafruit_FIFO	KEYWORD1
+TimeoutTimer	KEYWORD1
+
+#######################################
+# Adafruit_BLE
+#######################################
+reset	KEYWORD2
+factoryReset	KEYWORD2
+info	KEYWORD2
+echo	KEYWORD2
+isConnected	KEYWORD2
+isVersionAtLeast	KEYWORD2
+disconnect	KEYWORD2
+
+setAdvData	KEYWORD2
+writeNVM	KEYWORD2
+readNVM	KEYWORD2
+update	KEYWORD2
+writeBLEUart	KEYWORD2
+readBLEUart	KEYWORD2
+setDisconnectCallback	KEYWORD2
+setConnectCallback	KEYWORD2
+setBleUartRxCallback	KEYWORD2
+setBleMidiRxCallback	KEYWORD2
+setBleGattRxCallback	KEYWORD2
+
+sendCommandCheckOK	KEYWORD2
+sendCommandWithIntReply	KEYWORD2
+
+#######################################
+# Adafruit_ATParser
+#######################################
+atcommand	KEYWORD2
+atcommandIntReply	KEYWORD2
+atcommand_full	KEYWORD2
+getMode	KEYWORD2
+setMode	KEYWORD2
+verbose	KEYWORD2
+readline	KEYWORD2
+readline_parseInt	KEYWORD2
+waitForOK	KEYWORD2
+readraw	KEYWORD2
+printByteArray	KEYWORD2
+
+#######################################
+# Adafruit_BLEBattery
+#######################################
+update	KEYWORD2
+
+#######################################
+# Adafruit_BLEEddystone
+#######################################
+setURL	KEYWORD2
+startBroadcast	KEYWORD2
+stopBroadcast	KEYWORD2
+startConfigMode	KEYWORD2
+
+#######################################
+# Adafruit_BLEGatt
+#######################################
+addService	KEYWORD2
+addCharacteristic	KEYWORD2
+getChar	KEYWORD2
+getCharInt8	KEYWORD2
+getCharInt16	KEYWORD2
+getCharInt32	KEYWORD2
+getCharStr	KEYWORD2
+setChar	KEYWORD2
+
+# Constants (LITERAL1)
+GATT_CHARS_PROPERTIES_BROADCAST	LITERAL1
+GATT_CHARS_PROPERTIES_READ	LITERAL1
+GATT_CHARS_PROPERTIES_WRITE_WO_RESP	LITERAL1
+GATT_CHARS_PROPERTIES_WRITE	LITERAL1
+GATT_CHARS_PROPERTIES_NOTIFY	LITERAL1
+GATT_CHARS_PROPERTIES_INDICATE	LITERAL1
+
+#######################################
+# Adafruit_BLEMIDI
+#######################################
+send	KEYWORD2
+send_n	KEYWORD2
+setRxCallback	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+BLUEFRUIT_MODE_COMMAND	LITERAL1
+BLUEFRUIT_MODE_DATA	LITERAL1
