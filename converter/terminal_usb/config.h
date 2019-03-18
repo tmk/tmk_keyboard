@@ -28,8 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /* matrix size */
-#define MATRIX_ROWS 17  // keycode bit: 3-0
-#define MATRIX_COLS 8   // keycode bit: 6-4
+#define MATRIX_ROWS 17  // keycode bit: 7-3
+#define MATRIX_COLS 8   // keycode bit: 2-0
 
 
 /* legacy keymap support */
