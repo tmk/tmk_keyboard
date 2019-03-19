@@ -21,19 +21,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keyboard.h"
 #include "action.h"
 
+#ifndef NUM_LAYERS //You can redefine NUM_LAYERS in config.h to improve performance.
+    #define NUM_LAYERS 32
+#endif
+
+#if (NUM_LAYERS <= 8)
+typedef  uint8_t    layer_state_t;
+#elif (NUM_LAYERS <= 16)
+typedef  uint16_t   layer_state_t;
+#elif (NUM_LAYERS <= 32)
+typedef  uint32_t   layer_state_t;
+#else 
+//Note we can't have more than 32 layers due to implementation of action_code.action_layer.bitop
+#error "NUM_LAYERS: invalid value"
+#endif
 
 /*
  * Default Layer
  */
-extern uint32_t default_layer_state;
+extern layer_state_t default_layer_state;
 void default_layer_debug(void);
-void default_layer_set(uint32_t state);
+void default_layer_set(layer_state_t state);
 
 #ifndef NO_ACTION_LAYER
 /* bitwise operation */
-void default_layer_or(uint32_t state);
-void default_layer_and(uint32_t state);
-void default_layer_xor(uint32_t state);
+void default_layer_or(layer_state_t state);
+void default_layer_and(layer_state_t state);
+void default_layer_xor(layer_state_t state);
 #endif
 
 
@@ -41,7 +55,7 @@ void default_layer_xor(uint32_t state);
  * Keymap Layer
  */
 #ifndef NO_ACTION_LAYER
-extern uint32_t layer_state;
+extern layer_state_t layer_state;
 void layer_debug(void);
 void layer_clear(void);
 void layer_move(uint8_t layer);
@@ -49,9 +63,9 @@ void layer_on(uint8_t layer);
 void layer_off(uint8_t layer);
 void layer_invert(uint8_t layer);
 /* bitwise operation */
-void layer_or(uint32_t state);
-void layer_and(uint32_t state);
-void layer_xor(uint32_t state);
+void layer_or(layer_state_t state);
+void layer_and(layer_state_t state);
+void layer_xor(layer_state_t state);
 #endif
 
 
