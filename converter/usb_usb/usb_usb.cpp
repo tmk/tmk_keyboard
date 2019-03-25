@@ -99,6 +99,7 @@ void matrix_init(void) {
 static void or_report(report_keyboard_t report) {
     // integrate reports into keyboard_report
     keyboard_report.mods |= report.mods;
+    keyboard_report.reserved |= report.reserved;
     for (uint8_t i = 0; i < KEYBOARD_REPORT_KEYS; i++) {
         if (IS_ANY(report.keys[i])) {
             for (uint8_t j = 0; j < KEYBOARD_REPORT_KEYS; j++) {
