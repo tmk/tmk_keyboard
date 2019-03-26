@@ -49,7 +49,20 @@ OPT_DEFS += $(LUFA_OPTS)
 # This indicates using LUFA stack
 OPT_DEFS += -DPROTOCOL_LUFA
 
+ifeq (yes,$(strip $(LUFA_DEBUG)))
+    LUFA_OPTS += -DLUFA_DEBUG
+endif
+
 ifeq (yes,$(strip $(LUFA_DEBUG_SUART)))
     SRC += common/avr/suart.S
     LUFA_OPTS += -DLUFA_DEBUG_SUART
+    # Keep print/debug lines when disabling HID console. See common.mk.
+    DEBUG_PRINT_AVAILABLE = yes
+endif
+
+ifeq (yes,$(strip $(LUFA_DEBUG_UART)))
+    SRC += common/avr/uart.c
+    LUFA_OPTS += -DLUFA_DEBUG_UART
+    # Keep print/debug lines when disabling HID console. See common.mk.
+    DEBUG_PRINT_AVAILABLE = yes
 endif

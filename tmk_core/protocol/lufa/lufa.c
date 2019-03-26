@@ -56,6 +56,10 @@
 #include "avr/suart.h"
 #endif
 
+#ifdef LUFA_DEBUG_UART
+#include "uart.h"
+#endif
+
 #include "matrix.h"
 #include "descriptor.h"
 #include "lufa.h"
@@ -218,7 +222,9 @@ static void console_task(void)
 */
 void EVENT_USB_Device_Connect(void)
 {
+#ifdef LUFA_DEBUG
     print("[C]");
+#endif
     /* For battery powered device */
     if (!USB_IsInitialized) {
         USB_Disable();
@@ -229,7 +235,9 @@ void EVENT_USB_Device_Connect(void)
 
 void EVENT_USB_Device_Disconnect(void)
 {
+#ifdef LUFA_DEBUG
     print("[D]");
+#endif
     /* For battery powered device */
     USB_IsInitialized = false;
 /* TODO: This doesn't work. After several plug in/outs can not be enumerated.
@@ -575,25 +583,22 @@ static void send_consumer(uint16_t data)
 /*******************************************************************************
  * sendchar
  ******************************************************************************/
-#ifdef CONSOLE_ENABLE
 int8_t sendchar(uint8_t c)
 {
     #ifdef LUFA_DEBUG_SUART
     xmit(c);
     #endif
 
-    bool r = console_putc(c);
-    return (r ? 0 : -1);
-}
-#else
-int8_t sendchar(uint8_t c)
-{
-    #ifdef LUFA_DEBUG_SUART
-    xmit(c);
+    #ifdef LUFA_DEBUG_UART
+    uart_putchar(c);
     #endif
+
+    #ifdef CONSOLE_ENABLE
+    console_putc(c);
+    #endif
+
     return 0;
 }
-#endif
 
 
 /*******************************************************************************
@@ -627,6 +632,10 @@ int main(void)
 #ifdef LUFA_DEBUG_SUART
     SUART_OUT_DDR |= (1<<SUART_OUT_BIT);
     SUART_OUT_PORT |= (1<<SUART_OUT_BIT);
+#endif
+
+#ifdef LUFA_DEBUG_UART
+    uart_init(115200);
 #endif
 
     // setup sendchar: DO NOT USE print functions before this line
