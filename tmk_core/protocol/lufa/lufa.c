@@ -697,12 +697,12 @@ static uint8_t _led_stats = 0;
  __attribute__((weak))
 void hook_usb_suspend_entry(void)
 {
-    // Turn LED off to save power
-    // Set 0 with putting aside status before suspend and restore
-    // it after wakeup, then LED is updated at keyboard_task() in main loop
+    // Turn off LED to save power and keep its status to resotre it later.
+    // LED status will be updated by keyboard_task() in main loop hopefully.
     _led_stats = keyboard_led_stats;
     keyboard_led_stats = 0;
-    led_set(keyboard_led_stats);
+
+    // Calling long task here can prevent USB state transition
 
     matrix_clear();
     clear_keyboard();
@@ -731,10 +731,8 @@ void hook_usb_wakeup(void)
     sleep_led_disable();
 #endif
 
-    // Restore LED status
-    // BIOS/grub won't recognize/enumerate if led_set() takes long(around 40ms?)
-    // Converters fall into the case and miss wakeup event(timeout to reply?) in the end.
-    //led_set(host_keyboard_leds());
-    // Instead, restore stats and update at keyboard_task() in main loop
+    // Restore LED status and update at keyboard_task() in main loop
     keyboard_led_stats = _led_stats;
+
+    // Calling long task here can prevent USB state transition
 }
