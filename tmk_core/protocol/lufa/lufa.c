@@ -669,9 +669,6 @@ int main(void)
     print("\nKeyboard start.\n");
     while (1) {
         while (USB_DeviceState == DEVICE_STATE_Suspended) {
-#ifdef LUFA_DEBUG
-            print("[s]");
-#endif
             hook_usb_suspend_loop();
         }
 
