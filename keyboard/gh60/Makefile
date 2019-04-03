@@ -40,7 +40,7 @@
 
 # Target file name (without extension).
 TARGET = gh60_lufa
-
+KEYMAP = z62
 # Directory common source filess exist
 TMK_DIR = ../../tmk_core
 
