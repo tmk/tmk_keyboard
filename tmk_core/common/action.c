@@ -218,8 +218,8 @@ void process_action(keyrecord_t *record)
                 /* Default Layer Bitwise Operation */
                 if (!event.pressed) {
                     uint8_t shift = action.layer_bitop.part*4;
-                    uint32_t bits = ((uint32_t)action.layer_bitop.bits)<<shift;
-                    uint32_t mask = (action.layer_bitop.xbit) ? ~(((uint32_t)0xf)<<shift) : 0;
+                    layer_state_t bits = ((layer_state_t)action.layer_bitop.bits)<<shift;
+                    layer_state_t mask = (action.layer_bitop.xbit) ? ~(((layer_state_t)0xf)<<shift) : 0;
                     switch (action.layer_bitop.op) {
                         case OP_BIT_AND: default_layer_and(bits | mask); break;
                         case OP_BIT_OR:  default_layer_or(bits | mask);  break;
@@ -232,8 +232,8 @@ void process_action(keyrecord_t *record)
                 if (event.pressed ? (action.layer_bitop.on & ON_PRESS) :
                                     (action.layer_bitop.on & ON_RELEASE)) {
                     uint8_t shift = action.layer_bitop.part*4;
-                    uint32_t bits = ((uint32_t)action.layer_bitop.bits)<<shift;
-                    uint32_t mask = (action.layer_bitop.xbit) ? ~(((uint32_t)0xf)<<shift) : 0;
+                    layer_state_t bits = ((layer_state_t)action.layer_bitop.bits)<<shift;
+                    layer_state_t mask = (action.layer_bitop.xbit) ? ~(((layer_state_t)0xf)<<shift) : 0;
                     switch (action.layer_bitop.op) {
                         case OP_BIT_AND: layer_and(bits | mask); break;
                         case OP_BIT_OR:  layer_or(bits | mask);  break;

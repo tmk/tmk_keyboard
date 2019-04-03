@@ -14,8 +14,8 @@ Hook function                   | Timing
 `hook_usb_suspend_loop(void)`   | Continuously, while the device is in USB suspend state. *Default action:* power down and periodically check the matrix, causing wakeup if needed.
 `hook_keyboard_loop(void)`      | Continuously, during the main loop, after the matrix is checked.
 `hook_matrix_change(keyevent_t event)`      | When a matrix state change is detected, before any other actions are processed.
-`hook_layer_change(uint32_t layer_state)`   | When any layer is changed.
-`hook_default_layer_change(uint32_t default_layer_state)`   | When any default layer is changed.
+`hook_layer_change(layer_state_t layer_state)`   | When any layer is changed.
+`hook_default_layer_change(layer_state_t default_layer_state)`   | When any default layer is changed.
 `hook_keyboard_leds_change(uint8_t led_status)`             | Whenever a change in the LED status is performed. *Default action:* call `keyboard_set_leds(led_status)`
 
 

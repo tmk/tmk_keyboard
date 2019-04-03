@@ -387,9 +387,9 @@ bs
 
 These parameters works as following code.
 
-    uint32_t layer_state;
+    layer_state_t layer_state;
     uint8_t shift = part*4;
-    uint32_t mask = (bits&0x10) ? ~((uint32_t)0xf<<shift) : 0;
+    layer_state_t mask = (bits&0x10) ? ~((layer_state_t)0xf<<shift) : 0;
     switch (<bitop>) {
     case BIT_AND:
         layer_state = layer_state & (((bits&0xf)<<shift)|mask);
