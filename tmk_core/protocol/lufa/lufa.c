@@ -713,7 +713,10 @@ void hook_usb_suspend_entry(void)
 __attribute__((weak))
 void hook_usb_suspend_loop(void)
 {
+#ifndef LUFA_DEBUG_UART
+    // This corrupts debug print when suspend
     suspend_power_down();
+#endif
     if (USB_Device_RemoteWakeupEnabled && suspend_wakeup_condition()) {
         USB_Device_SendRemoteWakeup();
     }
