@@ -661,7 +661,6 @@ int main(void)
 #else
         USB_USBTask();
 #endif
-        matrix_scan();
     }
     print("\nUSB configured.\n");
 
