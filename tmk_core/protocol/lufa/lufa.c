@@ -642,7 +642,7 @@ int main(void)
     print_set_sendchar(sendchar);
     host_set_driver(&lufa_driver);
 
-    print("Keyboard init.\n");
+    print("\n\nKeyboard init.\n");
     hook_early_init();
     keyboard_setup();
     setup_usb();
@@ -663,6 +663,7 @@ int main(void)
 #endif
         matrix_scan();
     }
+    print("\nUSB configured.\n");
 
     hook_late_init();
 
