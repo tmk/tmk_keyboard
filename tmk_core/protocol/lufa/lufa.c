@@ -654,6 +654,7 @@ int main(void)
 
     keyboard_init();
 
+#ifndef NO_USB_STARTUP_WAIT_LOOP
     /* wait for USB startup */
     while (USB_DeviceState != DEVICE_STATE_Configured) {
 #if defined(INTERRUPT_CONTROL_ENDPOINT)
@@ -663,14 +664,17 @@ int main(void)
 #endif
     }
     print("\nUSB configured.\n");
+#endif
 
     hook_late_init();
 
     print("\nKeyboard start.\n");
     while (1) {
+#ifndef NO_USB_SUSPEND_LOOP
         while (USB_DeviceState == DEVICE_STATE_Suspended) {
             hook_usb_suspend_loop();
         }
+#endif
 
         keyboard_task();
 
