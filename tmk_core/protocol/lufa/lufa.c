@@ -662,6 +662,7 @@ int main(void)
 #else
         USB_USBTask();
 #endif
+        hook_usb_startup_wait_loop();
     }
     print("\nUSB configured.\n");
 #endif
@@ -739,3 +740,6 @@ void hook_usb_wakeup(void)
 
     // Calling long task here can prevent USB state transition
 }
+
+__attribute__((weak))
+void hook_usb_startup_wait_loop(void) {}
