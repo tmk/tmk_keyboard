@@ -35,6 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "host.h"
 #include "keyboard.h"
 
+#include "hook.h"
+#include "suspend.h"
+#include "lufa.h"
+
 
 /* KEY CODE to Matrix
  *
@@ -232,4 +236,29 @@ void led_set(uint8_t usb_led)
     if (kbd2.isReady()) kbd2.SetReport(0, 0, 2, 0, 1, &usb_led);
     if (kbd3.isReady()) kbd3.SetReport(0, 0, 2, 0, 1, &usb_led);
     if (kbd4.isReady()) kbd4.SetReport(0, 0, 2, 0, 1, &usb_led);
+}
+
+// We need to keep doing UHS2 USB::Task() to initialize keyboard
+// even before USB is not configured.
+void hook_usb_startup_wait_loop(void)
+{
+    matrix_scan();
+}
+
+// We need to keep doing UHS2 USB::Task() to initialize keyboard
+// even during USB bus is suspended and remote wakeup is not enabled yet on LUFA side.
+// This situation can happen just after pluging converter into USB port.
+void hook_usb_suspend_loop(void)
+{
+#ifndef LUFA_DEBUG_UART
+    // This corrupts debug print when suspend
+    suspend_power_down();
+#endif
+    if (USB_Device_RemoteWakeupEnabled) {
+        if (suspend_wakeup_condition()) {
+            USB_Device_SendRemoteWakeup();
+        }
+    } else {
+        matrix_scan();
+    }
 }
