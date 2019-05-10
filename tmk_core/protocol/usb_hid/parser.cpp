@@ -12,10 +12,13 @@ void KBDReportParser::Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *b
     }
     dprint("\r\n");
 
-    // ignore Cherry 0101010101010101 bug report
+    // Rollover error
+    // Cherry: 0101010101010101
     // https://geekhack.org/index.php?topic=69169.msg2638223#msg2638223
-    if (buf[1] == 0x01) {
-       dprint("Cherry bug: ignored\r\n");
+    // Apple:  0000010101010101
+    // https://geekhack.org/index.php?topic=69169.msg2760969#msg2760969
+    if (buf[2] == 0x01) {
+       dprint("Rollover error: ignored\r\n");
        return;
     }
 
