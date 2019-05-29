@@ -6,19 +6,19 @@ The following hooks are available available:
 
 Hook function                   | Timing
 --------------------------------|-----------------------------------------------
-`hook_early_init(void)`         | Early in the boot process, before the matrix is initialized and before a connection is made with the host. Thus, this hook has access to very few parameters, but it is a good place to define any custom parameters needed by other early processes.
-`hook_late_init(void)`          | Near the end of the boot process, after Boot Magic has run and LEDs have been initialized.
-`hook_bootmagic(void)`          | During the Boot Magic window, after EEPROM and Bootloader checks are made, but before any other built-in Boot Magic checks are made.
-`hook_usb_startup_wait_loop(void)` | Continuously, until the device gets ready and into USB configured state.
-
-`hook_usb_wakeup(void)`         | When the device wakes up from USB suspend state.
-`hook_usb_suspend_entry(void)`  | When the device enters USB suspend state.
-`hook_usb_suspend_loop(void)`   | Continuously, while the device is in USB suspend state. *Default action:* power down and periodically check the matrix, causing wakeup if needed.
-`hook_keyboard_loop(void)`      | Continuously, during the main loop, after the matrix is checked.
-`hook_matrix_change(keyevent_t event)`      | When a matrix state change is detected, before any other actions are processed.
-`hook_layer_change(uint32_t layer_state)`   | When any layer is changed.
-`hook_default_layer_change(uint32_t default_layer_state)`   | When any default layer is changed.
-`hook_keyboard_leds_change(uint8_t led_status)`             | Whenever a change in the LED status is performed. *Default action:* call `keyboard_set_leds(led_status)`
+`void hook_early_init(void)`         | Early in the boot process, before the matrix is initialized and before a connection is made with the host. Thus, this hook has access to very few parameters, but it is a good place to define any custom parameters needed by other early processes.
+`void hook_late_init(void)`          | Near the end of the boot process, after Boot Magic has run and LEDs have been initialized.
+`void hook_bootmagic(void)`          | During the Boot Magic window, after EEPROM and Bootloader checks are made, but before any other built-in Boot Magic checks are made.
+`void hook_usb_startup_wait_loop(void)` | Continuously, until the device gets ready and into USB configured state.
+`void hook_usb_wakeup(void)`         | When the device wakes up from USB suspend state.
+`void hook_usb_suspend_entry(void)`  | When the device enters USB suspend state.
+`void hook_usb_suspend_loop(void)`   | Continuously, while the device is in USB suspend state. *Default action:* power down and periodically check the matrix, causing wakeup if needed.
+`void hook_keyboard_loop(void)`      | Continuously, during the main loop, after the matrix is checked.
+`void hook_matrix_change(keyevent_t event)`      | When a matrix state change is detected, before any other actions are processed.
+`void hook_layer_change(uint32_t layer_state)`   | When any layer is changed.
+`void hook_default_layer_change(uint32_t default_layer_state)`   | When any default layer is changed.
+`void hook_keyboard_leds_change(uint8_t led_status)`             | Whenever a change in the LED status is performed. *Default action:* call `keyboard_set_leds(led_status)`
+`bool hook_process_action(keyrecord_t *record)`                  | Before key event is processed by tmk_core. Return true if the event is consumed and default action is not needed.
 
 
 

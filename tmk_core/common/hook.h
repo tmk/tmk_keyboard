@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "keyboard.h"
 #include "led.h"
+#include "action.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,6 +84,10 @@ void hook_keyboard_leds_change(uint8_t led_status);
 /* Called once, on checking the bootmagic combos. */
 /* Default behaviour: do nothing. */
 void hook_bootmagic(void);
+
+/* Called on before processing key event */
+/* returns true if the event is consumed and default action is not needed. */
+bool hook_process_action(keyrecord_t *record);
 
 #ifdef __cplusplus
 }

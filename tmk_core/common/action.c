@@ -58,6 +58,8 @@ void action_exec(keyevent_t event)
 
 void process_action(keyrecord_t *record)
 {
+    if (hook_process_action(record)) return;
+
     keyevent_t event = record->event;
 #ifndef NO_ACTION_TAPPING
     uint8_t tap_count = record->tap.count;

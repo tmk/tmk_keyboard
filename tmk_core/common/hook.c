@@ -47,3 +47,8 @@ void hook_keyboard_leds_change(uint8_t led_status) {
 
 __attribute__((weak))
 void hook_bootmagic(void) {}
+
+__attribute__((weak))
+bool hook_process_action(keyrecord_t *record) {
+    return false;
+}
