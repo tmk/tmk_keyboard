@@ -9,6 +9,8 @@ Hook function                   | Timing
 `hook_early_init(void)`         | Early in the boot process, before the matrix is initialized and before a connection is made with the host. Thus, this hook has access to very few parameters, but it is a good place to define any custom parameters needed by other early processes.
 `hook_late_init(void)`          | Near the end of the boot process, after Boot Magic has run and LEDs have been initialized.
 `hook_bootmagic(void)`          | During the Boot Magic window, after EEPROM and Bootloader checks are made, but before any other built-in Boot Magic checks are made.
+`hook_usb_startup_wait_loop(void)` | Continuously, until the device gets ready and into USB configured state.
+
 `hook_usb_wakeup(void)`         | When the device wakes up from USB suspend state.
 `hook_usb_suspend_entry(void)`  | When the device enters USB suspend state.
 `hook_usb_suspend_loop(void)`   | Continuously, while the device is in USB suspend state. *Default action:* power down and periodically check the matrix, causing wakeup if needed.

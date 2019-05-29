@@ -56,6 +56,10 @@
 #include "avr/suart.h"
 #endif
 
+#ifdef LUFA_DEBUG_UART
+#include "uart.h"
+#endif
+
 #include "matrix.h"
 #include "descriptor.h"
 #include "lufa.h"
@@ -218,7 +222,9 @@ static void console_task(void)
 */
 void EVENT_USB_Device_Connect(void)
 {
+#ifdef LUFA_DEBUG
     print("[C]");
+#endif
     /* For battery powered device */
     if (!USB_IsInitialized) {
         USB_Disable();
@@ -229,7 +235,9 @@ void EVENT_USB_Device_Connect(void)
 
 void EVENT_USB_Device_Disconnect(void)
 {
+#ifdef LUFA_DEBUG
     print("[D]");
+#endif
     /* For battery powered device */
     USB_IsInitialized = false;
 /* TODO: This doesn't work. After several plug in/outs can not be enumerated.
@@ -575,25 +583,22 @@ static void send_consumer(uint16_t data)
 /*******************************************************************************
  * sendchar
  ******************************************************************************/
-#ifdef CONSOLE_ENABLE
 int8_t sendchar(uint8_t c)
 {
     #ifdef LUFA_DEBUG_SUART
     xmit(c);
     #endif
 
-    bool r = console_putc(c);
-    return (r ? 0 : -1);
-}
-#else
-int8_t sendchar(uint8_t c)
-{
-    #ifdef LUFA_DEBUG_SUART
-    xmit(c);
+    #ifdef LUFA_DEBUG_UART
+    uart_putchar(c);
     #endif
+
+    #ifdef CONSOLE_ENABLE
+    console_putc(c);
+    #endif
+
     return 0;
 }
-#endif
 
 
 /*******************************************************************************
@@ -629,11 +634,15 @@ int main(void)
     SUART_OUT_PORT |= (1<<SUART_OUT_BIT);
 #endif
 
+#ifdef LUFA_DEBUG_UART
+    uart_init(115200);
+#endif
+
     // setup sendchar: DO NOT USE print functions before this line
     print_set_sendchar(sendchar);
     host_set_driver(&lufa_driver);
 
-    print("Keyboard init.\n");
+    print("\n\nKeyboard init.\n");
     hook_early_init();
     keyboard_setup();
     setup_usb();
@@ -645,6 +654,7 @@ int main(void)
 
     keyboard_init();
 
+#ifndef NO_USB_STARTUP_WAIT_LOOP
     /* wait for USB startup */
     while (USB_DeviceState != DEVICE_STATE_Configured) {
 #if defined(INTERRUPT_CONTROL_ENDPOINT)
@@ -652,19 +662,20 @@ int main(void)
 #else
         USB_USBTask();
 #endif
-        matrix_scan();
+        hook_usb_startup_wait_loop();
     }
+    print("\nUSB configured.\n");
+#endif
 
     hook_late_init();
 
     print("\nKeyboard start.\n");
     while (1) {
+#ifndef NO_USB_SUSPEND_LOOP
         while (USB_DeviceState == DEVICE_STATE_Suspended) {
-#ifdef LUFA_DEBUG
-            print("[s]");
-#endif
             hook_usb_suspend_loop();
         }
+#endif
 
         keyboard_task();
 
@@ -690,12 +701,12 @@ static uint8_t _led_stats = 0;
  __attribute__((weak))
 void hook_usb_suspend_entry(void)
 {
-    // Turn LED off to save power
-    // Set 0 with putting aside status before suspend and restore
-    // it after wakeup, then LED is updated at keyboard_task() in main loop
+    // Turn off LED to save power and keep its status to resotre it later.
+    // LED status will be updated by keyboard_task() in main loop hopefully.
     _led_stats = keyboard_led_stats;
     keyboard_led_stats = 0;
-    led_set(keyboard_led_stats);
+
+    // Calling long task here can prevent USB state transition
 
     matrix_clear();
     clear_keyboard();
@@ -707,7 +718,10 @@ void hook_usb_suspend_entry(void)
 __attribute__((weak))
 void hook_usb_suspend_loop(void)
 {
+#ifndef LUFA_DEBUG_UART
+    // This corrupts debug print when suspend
     suspend_power_down();
+#endif
     if (USB_Device_RemoteWakeupEnabled && suspend_wakeup_condition()) {
         USB_Device_SendRemoteWakeup();
     }
@@ -721,10 +735,11 @@ void hook_usb_wakeup(void)
     sleep_led_disable();
 #endif
 
-    // Restore LED status
-    // BIOS/grub won't recognize/enumerate if led_set() takes long(around 40ms?)
-    // Converters fall into the case and miss wakeup event(timeout to reply?) in the end.
-    //led_set(host_keyboard_leds());
-    // Instead, restore stats and update at keyboard_task() in main loop
+    // Restore LED status and update at keyboard_task() in main loop
     keyboard_led_stats = _led_stats;
+
+    // Calling long task here can prevent USB state transition
 }
+
+__attribute__((weak))
+void hook_usb_startup_wait_loop(void) {}
