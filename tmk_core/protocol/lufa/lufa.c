@@ -642,7 +642,7 @@ int main(void)
     print_set_sendchar(sendchar);
     host_set_driver(&lufa_driver);
 
-    print("\n\nKeyboard init.\n");
+    print("\n\nTMK:" STR(TMK_VERSION) "/LUFA\n\n");
     hook_early_init();
     keyboard_setup();
     setup_usb();

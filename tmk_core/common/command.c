@@ -284,7 +284,7 @@ static bool command_common(uint8_t code)
             print("VID: " STR(VENDOR_ID) "(" STR(MANUFACTURER) ") "
                   "PID: " STR(PRODUCT_ID) "(" STR(PRODUCT) ") "
                   "VER: " STR(DEVICE_VER) "\n");
-            print("BUILD: " STR(VERSION) " (" __TIME__ " " __DATE__ ")\n");
+            print("BUILD: " STR(TMK_VERSION) " (" __TIME__ " " __DATE__ ")\n");
             /* build options */
             print("OPTIONS:"
 #ifdef PROTOCOL_PJRC
