@@ -1,4 +1,0 @@
-TARGET = alps64_editor
-KEYMAP_SECTION_ENABLE = yes	# fixed address keymap for keymap editor
-KEYMAP = editor
-include Makefile
