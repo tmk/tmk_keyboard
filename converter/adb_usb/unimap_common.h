@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Jun Wako <wakojun@gmail.com>
+Copyright 2016-19 Jun Wako <wakojun@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,26 +22,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "unimap.h"
 
 
-/* Apple Extended Keyboard Common layout: ANSI+ISO
- * ,---.   .---------------. ,---------------. ,---------------. ,-----------. ,---------------.
- * |Esc|   |F1 |F2 |F3 |F4 | |F5 |F6 |F7 |F8 | |F9 |F10|F11|F12| |PrS|ScL|Pau| |VDn|VUp|Mut|F24|
- * `---'   `---------------' `---------------' `---------------' `-----------' `---------------'
- * ,-----------------------------------------------------------. ,-----------. ,---------------.
- * |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|Backspa| |Ins|Hom|PgU| |NmL|  =|  /|  *|
- * |-----------------------------------------------------------| |-----------| |---------------|
- * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|    \| |Del|End|PgD| |  7|  8|  9|  -|
- * |-----------------------------------------------------------| `-----------' |---------------|
- * |CapsLo|  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|Return  |               |  4|  5|  6|  +|
- * |-----------------------------------------------------------|     ,---.     |---------------|
+/* ADB Keyboard unified layout
+ * ,---.   .---------------. ,---------------. ,---------------. ,-----------.             ,---.
+ * |Esc|   |F1 |F2 |F3 |F4 | |F5 |F6 |F7 |F8 | |F9 |F10|F11|F12| |PrS|ScL|Pau|             |Pwr|
+ * `---'   `---------------' `---------------' `---------------' `-----------'             `---'
+ * ,-----------------------------------------------------------. ,-----------. ,---------------. ,---.
+ * |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|Backspa| |Ins|Hom|PgU| |NmL|  =|  /|  *| |VUp|
+ * |-----------------------------------------------------------| |-----------| |---------------| |---|
+ * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|    \| |Del|End|PgD| |  7|  8|  9|  -| |VDn|
+ * |-----------------------------------------------------------| `-----------' |---------------| |---|
+ * |CapsLo|  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|Return  |               |  4|  5|  6|  +| |Mut|
+ * |-----------------------------------------------------------|     ,---.     |---------------| `---'
  * |Shif|\  |  Z|  X|  C|  V|  B|  N|  M|  ,|  ,|  /|Shift     |     |Up |     |  1|  2|  3|   |
- * |-----------------------------------------------------------| ,-----------. |-----------|Ent|
- * |Ctrl |Alt |Gui |         Space           |Gui  |Alt |Ctrl  | |Lef|Dow|Rig| |      0|  .|   |
- * `-----------------------------------------------------------' `-----------' `---------------'
- * Command      = Gui
- * Option       = Alt
- * Power key    = F24
- * Mic          = F13(Adjustable keyboard)
+ * |-----------------------------------------------------------| ,-----------. |-----------|Ent| ,---.
+ * |Ctrl |Opt |Gui |         Space           |Gui* |Opt |Ctrl  | |Lef|Dow|Rig| |      0|  .|   | |Ply|
+ * `-----------------------------------------------------------' `-----------' `---------------' `---'
+ * NOTE: Not-extended ADB keyboards have no discrimination between left and right modifiers.
+ * Use left ones for mapping. Right modifier always sends same code as left one.
+ * Apple Extended Keyboard can discriminate the modifiers except for Command(GUI) key.
  */
+#define UNIMAP_ADB( \
+    K29,    K3A,K3B,K3C,K3D,K3E,K3F,K40,K41,K42,K43,K44,K45,      K46,K47,K48,              K73,      \
+    K35,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K2D,K2E,    K2A,  K49,K4A,K4B,  K53,K54,K55,K56, K02, \
+    K2B,K14,K1A,K08,K15,K17,K1C,K18,K0C,K12,K13,K2F,K30,    K31,  K4C,K4D,K4E,  K5F,K60,K61,K57, K01, \
+    K39,K04,K16,K07,K09,K0A,K0B,K0D,K0E,K0F,K33,K34,    K32,K28,                K5C,K5D,K5E,K66, K03, \
+    K79,K64,K1D,K1B,K06,K19,K05,K11,K10,K36,K37,K38,        K7D,      K52,      K59,K5A,K5B,K58,      \
+    K78,K7A,K7B,            K2C,                        K7E,K7C,  K50,K51,K4F,      K62,K63,     K68  \
+) UNIMAP( \
+              K68, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, K73,                                           \
+    K29,      K3A, K3B, K3C, K3D, K3E, K3F, K40, K41, K42, K43, K44, K45,       K46, K47, K48,       K01, K02, K03, \
+    K35, K1E, K1F, K20, K21, K22, K23, K24, K25, K26, K27, K2D, K2E, JYEN,K2A,  K49, K4A, K4B,  K53, K54, K55, K56, \
+    K2B, K14, K1A, K08, K15, K17, K1C, K18, K0C, K12, K13, K2F, K30,      K31,  K4C, K4D, K4E,  K5F, K60, K61, K57, \
+    K39, K04, K16, K07, K09, K0A, K0B, K0D, K0E, K0F, K33, K34,      K32, K28,                  K5C, K5D, K5E, K66, \
+    K79, K64, K1D, K1B, K06, K19, K05, K11, K10, K36, K37, K38,      RO,  K7D,       K52,       K59, K5A, K5B, K58, \
+    K78, K7B, K7A, MHEN,          K2C,           HENK,KANA,K7E, RGUI,APP, K7C,  K50, K51, K4F,       K62, K63, PEQL \
+)
+
+
 // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c
 // http://opensource.apple.com//source/IOHIDFamily/IOHIDFamily-701.20.10/IOHIDFamily/Cosmo_USB2ADB.c
 // http://m0115.web.fc2.com/m0115.jpg
