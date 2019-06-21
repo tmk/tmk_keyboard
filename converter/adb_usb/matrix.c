@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 static bool has_media_keys = false;
 static bool is_iso_layout = false;
+static uint8_t mouse_handler = ADB_HANDLER_CLASSIC1_MOUSE;
 
 // matrix state buffer(1:on, 0:off)
 static matrix_row_t matrix[MATRIX_ROWS];
@@ -54,15 +55,20 @@ void matrix_init(void)
     _delay_ms(2000);
 
     // device scan
-    xprintf("Before init:\n");
+    xprintf("\nScan:\n");
     for (uint8_t addr = 1; addr < 16; addr++) {
         uint16_t reg3 = adb_host_talk(addr, ADB_REG_3);
         if (reg3) {
-            xprintf("Scan: addr:%d, reg3:%04X\n", addr, reg3);
+            xprintf(" addr:%d, reg3:%04X\n", addr, reg3);
         }
         _delay_ms(20);
     }
 
+
+    //
+    // Keyboard
+    //
+    xprintf("\nKeyboard:\n");
     // Determine ISO keyboard by handler id
     // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c?v=4.4#L815
     uint8_t handler_id = (uint8_t) adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
@@ -76,26 +82,88 @@ void matrix_init(void)
         is_iso_layout = false;
         break;
     }
-    xprintf("hadler_id: %02X, is_iso_layout: %s\n", handler_id, (is_iso_layout ? "yes" : "no"));
+    xprintf("hadler: %02X, ISO: %s\n", handler_id, (is_iso_layout ? "yes" : "no"));
 
     // Adjustable keyboard media keys: address=0x07 and handlerID=0x02
     has_media_keys = (0x02 == (adb_host_talk(ADB_ADDR_APPLIANCE, ADB_REG_3) & 0xff));
     if (has_media_keys) {
-        xprintf("Found: media keys\n");
+        xprintf("Media keys\n");
     }
 
     // Enable keyboard left/right modifier distinction
     // Listen Register3
     //  upper byte: reserved bits 0000, keyboard address 0010
     //  lower byte: device handler 00000011
-    adb_host_listen(ADB_ADDR_KEYBOARD, ADB_REG_3, ADB_ADDR_KEYBOARD, ADB_HANDLER_EXTENDED_PROTOCOL);
+    adb_host_listen(ADB_ADDR_KEYBOARD, ADB_REG_3, ADB_ADDR_KEYBOARD, ADB_HANDLER_EXTENDED_KEYBOARD);
 
-    // device scan
-    xprintf("After init:\n");
+
+    #ifdef ADB_MOUSE_ENABLE
+    //
+    // Mouse
+    //
+    // https://developer.apple.com/library/archive/technotes/hw/hw_01.html#Extended
+    xprintf("\nMouse:\n");
+
+    // Some old mouses seems to need wait between commands.
+    _delay_ms(20);
+    adb_host_listen(ADB_ADDR_MOUSE, ADB_REG_3, ADB_ADDR_MOUSE, ADB_HANDLER_CLASSIC2_MOUSE);
+
+    _delay_ms(20);
+    adb_host_listen(ADB_ADDR_MOUSE, ADB_REG_3, ADB_ADDR_MOUSE, ADB_HANDLER_EXTENDED_MOUSE);
+
+    _delay_ms(20);
+    mouse_handler = adb_host_talk(ADB_ADDR_MOUSE, ADB_REG_3) & 0xff;
+    mouse_handler = mouse_handler ? mouse_handler : ADB_HANDLER_CLASSIC1_MOUSE;
+
+    // Extended Mouse Protocol
+    if (mouse_handler == ADB_HANDLER_EXTENDED_MOUSE) {
+        // Device info format(reg1 8-byte data)
+        // 0-3: device id
+        // 4-5: resolution in units/inch (0xC8=200upi)
+        // 6  : device class      (0: Tablet, 1: Mouse, 2: Trackball)
+        // 7  : num of buttons
+        uint8_t len;
+        uint8_t buf[8];
+        len = adb_host_talk_buf(ADB_ADDR_MOUSE, ADB_REG_1, buf, sizeof(buf));
+        if (len) {
+            xprintf("Devinfo: [", len);
+            for (int8_t i = 0; i < len; i++) xprintf("%02X ", buf[i]);
+            xprintf("]\n");
+        }
+
+        // Kensington Turbo Mouse 5
+        if (len == 8 && buf[0] == 0x4B && buf[1] == 0x4D && buf[2] == 0x4C && buf[3] == 0x31) {
+            xprintf("Turbo Mouse 5\n");
+
+            // Turbo Mouse command sequence to enable four buttons
+            // https://elixir.bootlin.com/linux/v4.4/source/drivers/macintosh/adbhid.c#L1176
+            // https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/macppc/dev/ams.c#L261
+            static uint8_t cmd1[] = { 0xE7, 0x8C, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x94 };
+            static uint8_t cmd2[] = { 0xA5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0x27 };
+
+            // configure with new address 9
+            adb_host_listen(ADB_ADDR_MOUSE, ADB_REG_3, 0x69, 0xFE);
+            adb_host_flush(9);
+
+            adb_host_flush(ADB_ADDR_MOUSE);
+            adb_host_listen_buf(ADB_ADDR_MOUSE, ADB_REG_2, cmd1, sizeof(cmd1));
+            adb_host_flush(ADB_ADDR_MOUSE);
+            adb_host_listen_buf(ADB_ADDR_MOUSE, ADB_REG_2, cmd2, sizeof(cmd2));
+        }
+
+        // Add device specific init here
+    }
+    mouse_handler = adb_host_talk(ADB_ADDR_MOUSE, ADB_REG_3) & 0xff;
+    mouse_handler = mouse_handler ? mouse_handler : ADB_HANDLER_CLASSIC1_MOUSE;
+    xprintf("handler: %d\n", mouse_handler);
+    #endif
+
+
+    xprintf("\nScan:\n");
     for (uint8_t addr = 1; addr < 16; addr++) {
         uint16_t reg3 = adb_host_talk(addr, ADB_REG_3);
         if (reg3) {
-            xprintf("Scan: addr:%d, reg3:%04X\n", addr, reg3);
+            xprintf(" addr:%d, reg3:%04X\n", addr, reg3);
         }
         _delay_ms(20);
     }
@@ -108,8 +176,7 @@ void matrix_init(void)
     debug_enable = true;
     //debug_matrix = true;
     //debug_keyboard = true;
-    //debug_mouse = true;
-    print("debug enabled.\n");
+    debug_mouse = true;
 
     // LED off
     DDRD |= (1<<6); PORTD &= ~(1<<6);
@@ -127,7 +194,8 @@ static report_mouse_t mouse_report = {};
 
 void adb_mouse_task(void)
 {
-    uint16_t codes;
+    uint8_t len;
+    uint8_t buf[5];
     int16_t x, y;
     static int8_t mouseacc;
 
@@ -138,47 +206,86 @@ void adb_mouse_task(void)
     if (timer_elapsed(tick_ms) < 12) return;
     tick_ms = timer_read();
 
-    codes = adb_host_mouse_recv();
+    // Extended Mouse Protocol data can be 2-5 bytes
+    // https://developer.apple.com/library/archive/technotes/hw/hw_01.html#Extended
+    //
+    //   Byte 0: b00 y06 y05 y04 y03 y02 y01 y00
+    //   Byte 1: b01 x06 x05 x04 x03 x02 x01 x00
+    //   Byte 2: b02 y09 y08 y07 b03 x09 x08 x07
+    //   Byte 3: b04 y12 y11 y10 b05 x12 x11 x10
+    //   Byte 4: b06 y15 y14 y13 b07 x15 x14 x13
+    //
+    //   b--: Button state.(0: on, 1: off)
+    //   x--: X axis movement.
+    //   y--: Y axis movement.
+    len = adb_host_talk_buf(ADB_ADDR_MOUSE, ADB_REG_0, buf, sizeof(buf));
+
     // If nothing received reset mouse acceleration, and quit.
-    if (!codes) {
+    if (len < 2) {
         mouseacc = 1;
         return;
     };
-    // Bit sixteen is button.
-    if (~codes & (1 << 15))
-        mouse_report.buttons |= MOUSE_BTN1;
-    if (codes & (1 << 15))
-        mouse_report.buttons &= ~MOUSE_BTN1;
-    // lower seven bits are movement, as signed int_7.
-    // low byte is X-axis, high byte is Y.
-    y = (codes>>8 & 0x3F);
-    x = (codes>>0 & 0x3F);
-    // bit seven and fifteen is negative
-    // usb does not use int_8, but int_7 (measuring distance) with sign-bit.
-    if (codes & (1 << 6))
-          x = (x-0x40);
-    if (codes & (1 << 14))
-         y = (y-0x40);
+
+    // Store off-buttons and 0-movements in unused bytes
+    bool xneg = false;
+    bool yneg = false;
+    if (len == 2) {
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+    } else {
+        if (buf[len - 1] & 0x40) yneg = true;
+        if (buf[len - 1] & 0x04) xneg = true;
+    }
+
+    for (int8_t i = len; i < sizeof(buf); i++) {
+        buf[i] = 0x88;
+        if (yneg) buf[i] |= 0x70;
+        if (xneg) buf[i] |= 0x07;
+    }
+
+    // 8 buttons at max
+    // TODO: Fix HID report descriptor for mouse to support button6-8
+    uint8_t buttons = 0;
+    if (!(buf[4] & 0x08)) buttons |= MOUSE_BTN8;
+    if (!(buf[4] & 0x80)) buttons |= MOUSE_BTN7;
+    if (!(buf[3] & 0x08)) buttons |= MOUSE_BTN6;
+    if (!(buf[3] & 0x80)) buttons |= MOUSE_BTN5;
+    if (!(buf[2] & 0x08)) buttons |= MOUSE_BTN4;
+    if (!(buf[2] & 0x80)) buttons |= MOUSE_BTN3;
+    if (!(buf[1] & 0x80)) buttons |= MOUSE_BTN2;
+    if (!(buf[0] & 0x80)) buttons |= MOUSE_BTN1;
+    mouse_report.buttons = buttons;
+
+    int16_t xx, yy;
+    yy = (buf[0] & 0x7F) | (buf[2] & 0x70) << 3 | (buf[3] & 0x70) << 6 | (buf[4] & 0x70) << 9;
+    xx = (buf[1] & 0x7F) | (buf[2] & 0x07) << 7 | (buf[3] & 0x07) << 10 | (buf[4] & 0x07) << 13;
+
     // Accelerate mouse. (They weren't meant to be used on screens larger than 320x200).
-    x *= mouseacc;
-    y *= mouseacc;
+    x = xx * mouseacc;
+    y = yy * mouseacc;
+
+    // TODO: Fix HID report descriptor for mouse to support finer resolution
     // Cap our two bytes per axis to one byte.
     // Easier with a MIN-function, but since -MAX(-a,-b) = MIN(a,b)...
-	 // I.E. MIN(MAX(x,-127),127) = -MAX(-MAX(x, -127), -127) = MIN(-MIN(-x,127),127)
+    // I.E. MIN(MAX(x,-127),127) = -MAX(-MAX(x, -127), -127) = MIN(-MIN(-x,127),127)
     mouse_report.x = -MAX(-MAX(x, -127), -127);
     mouse_report.y = -MAX(-MAX(y, -127), -127);
+
     if (debug_mouse) {
-            print("adb_host_mouse_recv: "); print_bin16(codes); print("\n");
-            print("adb_mouse raw: [");
-            phex(mouseacc); print(" ");
-            phex(mouse_report.buttons); print("|");
-            print_decs(mouse_report.x); print(" ");
-            print_decs(mouse_report.y); print("]\n");
+        xprintf("Mouse raw: [");
+        for (int8_t i = 0; i < len; i++) xprintf("%02X ", buf[i]);
+        xprintf("]\n");
+
+        xprintf("Mouse info[");
+        xprintf("B:%02X, X:%d(%d), Y:%d(%d), A:%d]\n", buttons, x, xx, y, yy, mouseacc);
     }
+
     // Send result by usb.
     host_mouse_send(&mouse_report);
+
     // increase acceleration of mouse
     mouseacc += ( mouseacc < ADB_MOUSE_MAXACC ? 1 : 0 );
+
     return;
 }
 #endif

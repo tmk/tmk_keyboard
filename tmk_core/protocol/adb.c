@@ -41,6 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "adb.h"
+#include "print.h"
 
 
 // GCC doesn't inline functions normally
@@ -92,22 +93,25 @@ uint16_t adb_host_kbd_recv(uint8_t addr)
 }
 
 #ifdef ADB_MOUSE_ENABLE
+__attribute__ ((weak))
 void adb_mouse_init(void) {
-	    return;
+    return;
 }
 
-uint16_t adb_host_mouse_recv(void)
-{
-    return adb_host_talk(ADB_ADDR_MOUSE, ADB_REG_0);
+__attribute__ ((weak))
+void adb_mouse_task(void) {
+    return;
 }
 #endif
 
-uint16_t adb_host_talk(uint8_t addr, uint8_t reg)
+// This sends Talk command to read data from register and returns length of the data.
+uint8_t adb_host_talk_buf(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len)
 {
-    uint16_t data = 0;
+    for (int8_t i =0; i < len; i++) buf[i] = 0;
+
     cli();
     attention();
-    send_byte((addr<<4) | (ADB_CMD_TALK<<2) | reg);
+    send_byte((addr<<4) | ADB_CMD_TALK | reg);
     place_bit0();               // Stopbit(0)
     if (!wait_data_hi(500)) {    // Service Request(310us Adjustable Keyboard): just ignored
         sei();
@@ -118,55 +122,81 @@ uint16_t adb_host_talk(uint8_t addr, uint8_t reg)
         return 0;               // No data to send
     }
 
-    uint8_t n = 17; // start bit + 16 data bits
+    // start bit(1)
+    if (!wait_data_hi(40)) return 0;
+    if (!wait_data_lo(100)) return 0;
+
+    uint8_t n = 0; // bit count
     do {
+        //
+        // |<- bit_cell_max(130) ->|
+        // |        |<-   lo     ->|
+        // |        |       |<-hi->|
+        //           _______
+        // |        |       |
+        // | 130-lo | lo-hi |
+        // |________|       |
+        //
         uint8_t lo = (uint8_t) wait_data_hi(130);
         if (!lo)
-            goto error;
+            goto error; // no more bit or after stop bit
 
         uint8_t hi = (uint8_t) wait_data_lo(lo);
         if (!hi)
-            goto error;
+            goto error; // stop bit extedned by Srq
 
-        hi = lo - hi;
-        lo = 130 - lo;
+        if (n/8 >= len) continue; // can't store in buf
 
-        data <<= 1;
-        if (lo < hi) {
-            data |= 1;
-        }
-        else if (n == 17) {
-            sei();
-            return -20;
+        buf[n/8] <<= 1;
+        if ((130 - lo) < (lo - hi)) {
+            buf[n/8] |= 1;
         }
     }
-    while ( --n );
-
-    // Stop bit can't be checked normally since it could have service request lenghtening
-    // and its high state never goes low.
-    if (!wait_data_hi(351) || wait_data_lo(91)) {
-        sei();
-        return -21;
-    }
-    sei();
-    return data;
+    while ( ++n );
 
 error:
     sei();
-    return -n;
+    return n/8;
+}
+
+uint16_t adb_host_talk(uint8_t addr, uint8_t reg)
+{
+    uint8_t len;
+    uint8_t buf[8];
+    len = adb_host_talk_buf(addr, reg, buf, 8);
+    if (len != 2) return 0;
+    return (buf[0]<<8 | buf[1]);
+}
+
+void adb_host_listen_buf(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len)
+{
+    cli();
+    attention();
+    send_byte((addr<<4) | ADB_CMD_LISTEN | reg);
+    place_bit0();               // Stopbit(0)
+    _delay_us(200);             // Tlt/Stop to Start
+    place_bit1();               // Startbit(1)
+    for (int8_t i = 0; i < len; i++) {
+        send_byte(buf[i]);
+        //xprintf("%02X ", buf[i]);
+    }
+    place_bit0();               // Stopbit(0);
+    sei();
 }
 
 void adb_host_listen(uint8_t addr, uint8_t reg, uint8_t data_h, uint8_t data_l)
 {
+    uint8_t buf[2] = { data_h, data_l };
+    adb_host_listen_buf(addr, reg, buf, 2);
+}
+
+void adb_host_flush(uint8_t addr)
+{
     cli();
     attention();
-    send_byte((addr<<4) | (ADB_CMD_LISTEN<<2) | reg);
+    send_byte((addr<<4) | ADB_CMD_FLUSH);
     place_bit0();               // Stopbit(0)
     _delay_us(200);             // Tlt/Stop to Start
-    place_bit1();               // Startbit(1)
-    send_byte(data_h);
-    send_byte(data_l);
-    place_bit0();               // Stopbit(0);
     sei();
 }
 

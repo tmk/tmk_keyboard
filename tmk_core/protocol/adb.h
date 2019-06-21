@@ -62,8 +62,8 @@ POSSIBILITY OF SUCH DAMAGE.
 // Command Type
 #define ADB_CMD_RESET       0
 #define ADB_CMD_FLUSH       1
-#define ADB_CMD_LISTEN      2
-#define ADB_CMD_TALK        3
+#define ADB_CMD_LISTEN      8
+#define ADB_CMD_TALK        12
 // Register
 #define ADB_REG_0           0
 #define ADB_REG_1           1
@@ -76,16 +76,21 @@ POSSIBILITY OF SUCH DAMAGE.
 #define ADB_HANDLER_M0115               0x02
 #define ADB_HANDLER_M3501               0x02
 #define ADB_HANDLER_M1242_ANSI          0x10
-#define ADB_HANDLER_EXTENDED_PROTOCOL   0x03
+#define ADB_HANDLER_EXTENDED_KEYBOARD   0x03
+#define ADB_HANDLER_CLASSIC1_MOUSE      0x01
+#define ADB_HANDLER_CLASSIC2_MOUSE      0x02
+#define ADB_HANDLER_EXTENDED_MOUSE      0x04
 
 
 // ADB host
 void     adb_host_init(void);
 bool     adb_host_psw(void);
 uint16_t adb_host_kbd_recv(uint8_t addr);
-uint16_t adb_host_mouse_recv(void);
 uint16_t adb_host_talk(uint8_t addr, uint8_t reg);
+uint8_t  adb_host_talk_buf(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len);
 void     adb_host_listen(uint8_t addr, uint8_t reg, uint8_t data_h, uint8_t data_l);
+void     adb_host_listen_buf(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len);
+void     adb_host_flush(uint8_t addr);
 void     adb_host_kbd_led(uint8_t addr, uint8_t led);
 void     adb_mouse_task(void);
 void     adb_mouse_init(void);
