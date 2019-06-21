@@ -1,10 +1,10 @@
 ADB to USB keyboard converter
 =============================
-This firmware converts Apple ADB keyboard protocol to USB, you can use it to plug old ADB keyboard into modern computer. It works on TMK ADB-USB Converter, PJRC Teensy2.0 and other USB AVR MCU(ATMega32U4, AT90USB64/128 or etc) and needs more than 10KB flash at least.
+This firmware converts Apple ADB keyboard/mouse protocol to USB, you can use it to plug old ADB keyboard/mouse into modern computer. It works on prebuilt TMK ADB-USB Converter or generic dev board with USB AVR MCU(ATMega32U4/2) like Teensy2.0.
 
-Discuss here: http://geekhack.org/showwiki.php?title=Island:14290
+Discuss about this here: http://geekhack.org/showwiki.php?title=Island:14290
 
-You can buy a TMK converter here: https://geekhack.org/index.php?topic=72052.0
+Prebuilt TMK ADB-USB converter is available here: https://geekhack.org/index.php?topic=72052.0
 
 
 
@@ -21,13 +21,15 @@ https://github.com/tmk/tmk_keyboard/labels/NOTE
 
 Wiring
 ------
-Connect ADB pins to controller just by 3 lines(Vcc, GND, Data). By default Data line uses port PD0.
+If you build this yourself you have to solder some wires.
+Connect ADB pins to controller just by 3 lines(Vcc, GND, Data) at least. By default Data line uses port PD0.
+This is not needed but you can connect PSW to PD1 optionally.
 
 ADB female socket from the front:
 
       ,--_--.
      / o4 3o \      1: DATA
-    | o2   1o |     2: Power SW
+    | o2   1o |     2: PSW(Power SW)
      -  ===  -      3: VCC
       `-___-'       4: GND
 
@@ -36,13 +38,13 @@ https://github.com/tmk/tmk_keyboard/wiki/FAQ#pull-up-resistor
 
 Pull-up resister:
 
-    Keyboard       Conveter
+    Keyboard       AVR MCU
                    ,------.
     5V------+------|VCC   |
             |      |      |
            [R]     |      |
             |      |      |
-    Signal--+------|PD0   |
+    DATA----+------|PD0   |
                    |      |
     GND------------|GND   |
                    `------'
@@ -58,31 +60,29 @@ Build firmware and Program microcontroller
 ------------------------------------------
 See [doc/build.md](../../tmk_core/doc/build.md).
 
-To build firmware and program TMK Converter run these commands:
+To build firmware and program TMK ADB-USB Converter run these commands:
 
     $ make -f Makefile clean
-    $ make -f Makefile [KEYMAP=(plain|ansi|iso|hasu)]
-    $ make -f Makefile [KEYMAP=(plain|ansi|iso|hasu)] dfu
+    $ make -f Makefile [KEYMAP=yourname]
+    $ make -f Makefile [KEYMAP=yourname] dfu
 
-You can select keymap with optional `KEYMAP=` (plain is default). Push button on the converter before running `dfu` target.
+You can select keymap name with optional `KEYMAP=` ('plain' is default name). Push button on the converter before running `dfu` target.
 
-Use **Makefile.rev1** for old TMK Converter rev.1 and **Makefile.teensy** for Teensy2.0 instead of **Makefile**. For TMK Converter rev.2 just use **Makefile**.
-
-To program Teensy you can use `teensy` target:
-
-    $ make -f Makefile.teensy [KEYMAP=(plain|ansi|iso|hasu)] teensy
+Use **Makefile.rev1** for old TMK Converter rev.1 and Teensy2.0 instead of **Makefile**.
 
 
 
 Keymap
 ------
-You can change a keymap by editing code of keymap_[plain|ansi|iso|hasu|yours].c.
+You can change keymap by editing code of unimap_plain.c directly, or copy it to your own keymap file like unimap_yourname.c and edit the file.
 How to define the keymap is probably obvious. You can find key symbols in common/keycode.h. And see [doc/keymap.md](../../tmk_core/doc/keymap.md) for more detail.
 
 
 Magic command
 -------------
-To get help press `h` holding Magic key. Magic key is `Power key`.
+To get help message in hid_listen press `h` holding Magic key. Magic key is `Power key`.
+
+https://github.com/tmk/tmk_keyboard/wiki#debug
 
 
 Locking CapsLock
@@ -106,11 +106,7 @@ you will always see left control even if you press right control key.
 Apple Extended Keyboard and Apple Extended Keyboard II can discriminate both side
 modifiers except for GUI key(Windows/Command).
 
-And most ADB keyboard has no diodes in its matrix so they are not NKRO,
+And most of ADB keyboards have no diodes in its matrix so they are not NKRO unfortunately,
 though ADB protocol itself supports it. See protocol/adb.c for more info.
-
-If keyboard has ISO layout you may have swapped keys problem, see this for the detail.
-
-https://github.com/tmk/tmk_keyboard/issues/35
 
 EOF
