@@ -38,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static bool has_media_keys = false;
 static bool is_iso_layout = false;
 static uint8_t mouse_handler = ADB_HANDLER_CLASSIC1_MOUSE;
+static uint16_t mouse_cpi = 100;
 
 // matrix state buffer(1:on, 0:off)
 static matrix_row_t matrix[MATRIX_ROWS];
@@ -115,6 +116,9 @@ void matrix_init(void)
     mouse_handler = adb_host_talk(ADB_ADDR_MOUSE, ADB_REG_3) & 0xff;
     mouse_handler = mouse_handler ? mouse_handler : ADB_HANDLER_CLASSIC1_MOUSE;
 
+    if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) { mouse_cpi = 100; }
+    if (mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) { mouse_cpi = 200; }
+
     // Extended Mouse Protocol
     if (mouse_handler == ADB_HANDLER_EXTENDED_MOUSE) {
         // Device info format(reg1 8-byte data)
@@ -129,6 +133,12 @@ void matrix_init(void)
             xprintf("Devinfo: [", len);
             for (int8_t i = 0; i < len; i++) xprintf("%02X ", buf[i]);
             xprintf("]\n");
+        }
+
+        if (len > 5) {
+            mouse_cpi = (buf[4]<<8) | buf[5];
+        } else {
+            mouse_cpi = 100;
         }
 
         // Kensington Turbo Mouse 5
@@ -156,6 +166,7 @@ void matrix_init(void)
     mouse_handler = adb_host_talk(ADB_ADDR_MOUSE, ADB_REG_3) & 0xff;
     mouse_handler = mouse_handler ? mouse_handler : ADB_HANDLER_CLASSIC1_MOUSE;
     xprintf("handler: %d\n", mouse_handler);
+    xprintf("cpi: %d\n", mouse_cpi);
     #endif
 
 
@@ -272,19 +283,18 @@ void adb_mouse_task(void)
     mouse_report.y = -MAX(-MAX(y, -127), -127);
 
     if (debug_mouse) {
-        xprintf("Mouse raw: [");
+        xprintf("Mouse: [");
         for (int8_t i = 0; i < len; i++) xprintf("%02X ", buf[i]);
-        xprintf("]\n");
-
-        xprintf("Mouse info[");
-        xprintf("B:%02X, X:%d(%d), Y:%d(%d), A:%d]\n", buttons, x, xx, y, yy, mouseacc);
+        xprintf("] ");
+        xprintf("[B:%02X, X:%d(%d), Y:%d(%d), A:%d]\n", mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouseacc);
     }
 
     // Send result by usb.
     host_mouse_send(&mouse_report);
 
+    // TODO: acceleration curve is needed for precise operation?
     // increase acceleration of mouse
-    mouseacc += ( mouseacc < ADB_MOUSE_MAXACC ? 1 : 0 );
+    mouseacc += ( mouseacc < (mouse_cpi < 200 ? ADB_MOUSE_MAXACC : ADB_MOUSE_MAXACC/2) ? 1 : 0 );
 
     return;
 }
