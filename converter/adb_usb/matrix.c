@@ -37,17 +37,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 static bool has_media_keys = false;
 static bool is_iso_layout = false;
-static uint8_t mouse_handler = ADB_HANDLER_CLASSIC1_MOUSE;
+
+#if ADB_MOUSE_ENABLE
+#define dmprintf(fmt, ...)  do { if (debug_mouse) xprintf(fmt, ##__VA_ARGS__); } while (0)
 static uint16_t mouse_cpi = 100;
+static void mouse_init(uint8_t addr);
+#endif
 
 // matrix state buffer(1:on, 0:off)
 static matrix_row_t matrix[MATRIX_ROWS];
 
 static void register_key(uint8_t key);
 
+static void device_scan(void)
+{
+    xprintf("\nScan:\n");
+    for (uint8_t addr = 0; addr < 16; addr++) {
+        uint16_t reg3 = adb_host_talk(addr, ADB_REG_3);
+        if (reg3) {
+            xprintf(" addr:%d, reg3:%04X\n", addr, reg3);
+        }
+        _delay_ms(20);
+    }
+}
 
 void matrix_init(void)
 {
+    debug_enable = true;
+    //debug_matrix = true;
+    //debug_keyboard = true;
+    //debug_mouse = true;
+
     // LED on
     DDRD |= (1<<6); PORTD |= (1<<6);
 
@@ -55,16 +75,7 @@ void matrix_init(void)
     // wait for keyboard to boot up and receive command
     _delay_ms(2000);
 
-    // device scan
-    xprintf("\nScan:\n");
-    for (uint8_t addr = 1; addr < 16; addr++) {
-        uint16_t reg3 = adb_host_talk(addr, ADB_REG_3);
-        if (reg3) {
-            xprintf(" addr:%d, reg3:%04X\n", addr, reg3);
-        }
-        _delay_ms(20);
-    }
-
+    device_scan();
 
     //
     // Keyboard
@@ -98,26 +109,88 @@ void matrix_init(void)
     adb_host_listen(ADB_ADDR_KEYBOARD, ADB_REG_3, ADB_ADDR_KEYBOARD, ADB_HANDLER_EXTENDED_KEYBOARD);
 
 
-    #ifdef ADB_MOUSE_ENABLE
     //
     // Mouse
     //
     // https://developer.apple.com/library/archive/technotes/hw/hw_01.html#Extended
+    #ifdef ADB_MOUSE_ENABLE
     xprintf("\nMouse:\n");
 
+    // Check device on addr3
+    mouse_init(ADB_ADDR_MOUSE);
+    #endif
+
+    device_scan();
+
+    // initialize matrix state: all keys off
+    for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
+
+    led_set(host_keyboard_leds());
+
+    // LED off
+    DDRD |= (1<<6); PORTD &= ~(1<<6);
+    return;
+}
+
+#ifdef ADB_MOUSE_ENABLE
+static void mouse_init(uint8_t orig_addr)
+{
+    uint16_t reg3;
+    uint8_t mouse_handler;
+    uint8_t addr;
+
+again:
     // Some old mouses seems to need wait between commands.
     _delay_ms(20);
-    adb_host_listen(ADB_ADDR_MOUSE, ADB_REG_3, ADB_ADDR_MOUSE, ADB_HANDLER_CLASSIC2_MOUSE);
+    mouse_handler = (reg3  = adb_host_talk(orig_addr, ADB_REG_3)) & 0xFF;
+    if (!reg3) return;
+    dmprintf("addr%d reg3: %02X\n", orig_addr, reg3);
+
+    // Move device to tmp address
+    _delay_ms(20);
+    adb_host_flush(orig_addr);
+    _delay_ms(20);
+    adb_host_listen(orig_addr, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_TMP, 0xFE);
+    adb_host_flush(ADB_ADDR_TMP);
 
     _delay_ms(20);
-    adb_host_listen(ADB_ADDR_MOUSE, ADB_REG_3, ADB_ADDR_MOUSE, ADB_HANDLER_EXTENDED_MOUSE);
+    mouse_handler = (reg3  = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3)) & 0xFF;
+    if (!reg3) {
+        dmprintf("move fail\n");
+        goto again;
+    }
+    addr = ADB_ADDR_TMP;
+    dmprintf("addr%d reg3: %02X\n", addr, reg3);
 
-    _delay_ms(20);
-    mouse_handler = adb_host_talk(ADB_ADDR_MOUSE, ADB_REG_3) & 0xff;
-    mouse_handler = mouse_handler ? mouse_handler : ADB_HANDLER_CLASSIC1_MOUSE;
 
-    if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) { mouse_cpi = 100; }
-    if (mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) { mouse_cpi = 200; }
+detect_again:
+    if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE || mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
+        _delay_ms(20);
+        adb_host_flush(addr);
+        adb_host_listen(addr, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_EXTENDED_MOUSE);
+
+        _delay_ms(20);
+        mouse_handler = (reg3  = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
+
+
+        if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
+            _delay_ms(20);
+            adb_host_flush(addr);
+            adb_host_listen(addr, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_CLASSIC2_MOUSE);
+
+            _delay_ms(20);
+            mouse_handler = (reg3  = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
+        }
+
+        if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
+            xprintf("Classic 100cpi\n");
+            mouse_cpi = 100;
+        }
+        if (mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
+            xprintf("Classic 200cpi\n");
+            mouse_cpi = 200;
+        }
+    }
 
     // Extended Mouse Protocol
     if (mouse_handler == ADB_HANDLER_EXTENDED_MOUSE) {
@@ -128,12 +201,8 @@ void matrix_init(void)
         // 7  : num of buttons
         uint8_t len;
         uint8_t buf[8];
-        len = adb_host_talk_buf(ADB_ADDR_MOUSE, ADB_REG_1, buf, sizeof(buf));
-        if (len) {
-            xprintf("Devinfo: [", len);
-            for (int8_t i = 0; i < len; i++) xprintf("%02X ", buf[i]);
-            xprintf("]\n");
-        }
+        _delay_ms(20);
+        len = adb_host_talk_buf(addr, ADB_REG_1, buf, sizeof(buf));
 
         if (len > 5) {
             mouse_cpi = (buf[4]<<8) | buf[5];
@@ -141,60 +210,66 @@ void matrix_init(void)
             mouse_cpi = 100;
         }
 
-        // Kensington Turbo Mouse 5
-        if (len == 8 && buf[0] == 0x4B && buf[1] == 0x4D && buf[2] == 0x4C && buf[3] == 0x31) {
-            xprintf("Turbo Mouse 5\n");
-
-            // Turbo Mouse command sequence to enable four buttons
-            // https://elixir.bootlin.com/linux/v4.4/source/drivers/macintosh/adbhid.c#L1176
-            // https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/macppc/dev/ams.c#L261
-            static uint8_t cmd1[] = { 0xE7, 0x8C, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x94 };
-            static uint8_t cmd2[] = { 0xA5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0x27 };
-
-            // configure with new address 9
-            adb_host_listen(ADB_ADDR_MOUSE, ADB_REG_3, 0x69, 0xFE);
-            adb_host_flush(9);
-
-            adb_host_flush(ADB_ADDR_MOUSE);
-            adb_host_listen_buf(ADB_ADDR_MOUSE, ADB_REG_2, cmd1, sizeof(cmd1));
-            adb_host_flush(ADB_ADDR_MOUSE);
-            adb_host_listen_buf(ADB_ADDR_MOUSE, ADB_REG_2, cmd2, sizeof(cmd2));
+        if (len) {
+            xprintf("Ext: [", len);
+            for (int8_t i = 0; i < len; i++) xprintf("%02X ", buf[i]);
+            xprintf("] cpi=%d\n", mouse_cpi);
         }
 
-        // Add device specific init here
+
+        // Kensington Turbo Mouse 5: default device
+        if (buf[0] == 0x4B && buf[1] == 0x4D && buf[2] == 0x4C && buf[3] == 0x31) {
+            xprintf("TM5: default\n");
+            // Move it to addr0 to remove this device and get new device with handle id 50 on addr 3
+            // and the new device on address 3 should be handled with command sequence later.
+            //
+            // Turbo Mouse 5 has one default device on addr3 as normal mouse at first, and another device
+            // with hander id 50 appears after the default device is moved from addr3.
+            // The mouse has the two devices at same time transiently in the result. The default device is
+            // removed automatically after the another device receives command sequence.
+            // NOTE: The mouse hangs if you try moving the two deivces to same address.
+            adb_host_flush(addr);
+            adb_host_listen(addr, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_0, 0xFE);
+        } else {
+            xprintf("Unknown\n");
+        }
     }
-    mouse_handler = adb_host_talk(ADB_ADDR_MOUSE, ADB_REG_3) & 0xff;
-    mouse_handler = mouse_handler ? mouse_handler : ADB_HANDLER_CLASSIC1_MOUSE;
-    xprintf("handler: %d\n", mouse_handler);
-    xprintf("cpi: %d\n", mouse_cpi);
-    #endif
 
+    if (mouse_handler == ADB_HANDLER_TURBO_MOUSE) {
+        xprintf("TM5: ext\n");
 
-    xprintf("\nScan:\n");
-    for (uint8_t addr = 1; addr < 16; addr++) {
-        uint16_t reg3 = adb_host_talk(addr, ADB_REG_3);
-        if (reg3) {
-            xprintf(" addr:%d, reg3:%04X\n", addr, reg3);
-        }
+        // Kensington Turbo Mouse 5 command sequence to enable four buttons
+        // https://elixir.bootlin.com/linux/v4.4/source/drivers/macintosh/adbhid.c#L1176
+        // https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/macppc/dev/ams.c#L261
+        static uint8_t cmd1[] = { 0xE7, 0x8C, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x94 };
+        static uint8_t cmd2[] = { 0xA5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0x27 };
+
         _delay_ms(20);
+        adb_host_flush(addr);
+        adb_host_listen_buf(addr, ADB_REG_2, cmd1, sizeof(cmd1));
+        adb_host_flush(addr);
+        adb_host_listen_buf(addr, ADB_REG_2, cmd2, sizeof(cmd2));
     }
 
-    // initialize matrix state: all keys off
-    for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
 
-    led_set(host_keyboard_leds());
+    // Move all mouses to a address after init to be polled
+    _delay_ms(20);
+    adb_host_flush(addr);
+    adb_host_listen(addr, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_MOUSE_POLL, 0xFE);
+    adb_host_flush(ADB_ADDR_MOUSE_POLL);
 
-    debug_enable = true;
-    //debug_matrix = true;
-    //debug_keyboard = true;
-    debug_mouse = true;
+    _delay_ms(20);
+    mouse_handler = (reg3  = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
+    if (reg3) {
+        dmprintf("detect again\n");
+        goto detect_again;
+    }
 
-    // LED off
-    DDRD |= (1<<6); PORTD &= ~(1<<6);
-    return;
+    goto again;
+
+//    dmprintf("handler: %d\n", mouse_handler);
+//    dmprintf("cpi: %d\n", mouse_cpi);
 }
-
-#ifdef ADB_MOUSE_ENABLE
 
 #ifdef MAX
 #undef MAX
@@ -217,6 +292,14 @@ void adb_mouse_task(void)
     if (timer_elapsed(tick_ms) < 12) return;
     tick_ms = timer_read();
 
+    static uint16_t detect_ms;
+    if (timer_elapsed(detect_ms) > 1000) {
+        detect_ms = timer_read();
+        dmprintf(".");
+        // check new device on addr3
+        mouse_init(ADB_ADDR_MOUSE);
+    }
+
     // Extended Mouse Protocol data can be 2-5 bytes
     // https://developer.apple.com/library/archive/technotes/hw/hw_01.html#Extended
     //
@@ -229,7 +312,7 @@ void adb_mouse_task(void)
     //   b--: Button state.(0: on, 1: off)
     //   x--: X axis movement.
     //   y--: Y axis movement.
-    len = adb_host_talk_buf(ADB_ADDR_MOUSE, ADB_REG_0, buf, sizeof(buf));
+    len = adb_host_talk_buf(ADB_ADDR_MOUSE_POLL, ADB_REG_0, buf, sizeof(buf));
 
     // If nothing received reset mouse acceleration, and quit.
     if (len < 2) {

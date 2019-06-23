@@ -1,5 +1,5 @@
 /*
-Copyright 2011 Jun WAKO <wakojun@gmail.com>
+Copyright 2011-19 Jun WAKO <wakojun@gmail.com>
 
 This software is licensed with a Modified BSD License.
 All of this is supposed to be Free Software, Open Source, DFSG-free,
@@ -54,11 +54,23 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* ADB commands */
 // Default Address
+#define ADB_ADDR_0          0
 #define ADB_ADDR_DONGLE     1
 #define ADB_ADDR_KEYBOARD   2
 #define ADB_ADDR_MOUSE      3
 #define ADB_ADDR_TABLET     4
 #define ADB_ADDR_APPLIANCE  7
+#define ADB_ADDR_8          8
+#define ADB_ADDR_9          9
+#define ADB_ADDR_10         10
+#define ADB_ADDR_11         11
+#define ADB_ADDR_12         12
+#define ADB_ADDR_13         13
+#define ADB_ADDR_14         14
+#define ADB_ADDR_15         15
+// for temporary purpose, do not use for polling
+#define ADB_ADDR_TMP        15
+#define ADB_ADDR_MOUSE_POLL 10
 // Command Type
 #define ADB_CMD_RESET       0
 #define ADB_CMD_FLUSH       1
@@ -80,6 +92,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define ADB_HANDLER_CLASSIC1_MOUSE      0x01
 #define ADB_HANDLER_CLASSIC2_MOUSE      0x02
 #define ADB_HANDLER_EXTENDED_MOUSE      0x04
+#define ADB_HANDLER_TURBO_MOUSE         0x32
 
 
 // ADB host
