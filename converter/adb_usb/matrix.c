@@ -451,12 +451,14 @@ uint8_t matrix_scan(void)
         register_key(0x7F);
     } else if (codes == 0xFFFF) {   // power key release
         register_key(0xFF);
-    } else if (key0 == 0xFF) {      // error
-        xprintf("adb_host_kbd_recv: ERROR(%d)\n", codes);
-        // something wrong or plug-in
-        matrix_init();
-        return key1;
     } else {
+        // Macally keyboard sends keys inversely against ADB protocol
+        // https://deskthority.net/workshop-f7/macally-mk96-t20116.html
+        if (key0 == 0xFF) {
+            key0 = key1;
+            key1 = 0xFF;
+        }
+
         /* Swap codes for ISO keyboard
          * https://github.com/tmk/tmk_keyboard/issues/35
          *
