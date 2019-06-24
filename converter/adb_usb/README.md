@@ -16,7 +16,7 @@ https://github.com/tmk/tmk_keyboard/tree/master/converter/adb_usb
 Also check these when you are in trouble.
 
 https://github.com/tmk/tmk_keyboard/wiki
-https://github.com/tmk/tmk_keyboard/labels/NOTE
+https://github.com/tmk/tmk_keyboard/issues
 
 
 Wiring
@@ -87,26 +87,33 @@ https://github.com/tmk/tmk_keyboard/wiki#debug
 
 Locking CapsLock
 ----------------
-Many of old ADB keyboards have mechanical push-lock switch for Capslock key and this converter supports the locking Capslock key by default. See README in top directory for more detail about this feature.
+Many of old ADB keyboards have mechanical push-lock switch for Capslock key and this converter supports the locking Capslock key by default. Use keycode `LCAP` instead of `CAPS` in your keymap in short. See README in top directory for more detail.
 https://github.com/tmk/tmk_keyboard/blob/master/README.md#mechanical-locking-support
 
-Also you may want to remove locking pin from the push-lock switch to use capslock as a normal momentary switch.
+If you want to remap Capslock key you will have to remove locking pin or just replace with normal momentary switch. Some keyboards like Apple Adujstable keyboard use firmware-base locking with momentary switch for Capslock and remapping it won't be useful in most cases.
 
 
-Mouse support
--------------
-ADB mouse support was added by @mek-apelsin on Apr,2015. It supports only one button as of now.
-https://github.com/tmk/tmk_keyboard/pull/207
-
-
-Notes
------
+Notes for keyboard
+------------------
 Not-extended ADB keyboards have no discrimination between right modifier and left one,
 you will always see left control even if you press right control key.
 Apple Extended Keyboard and Apple Extended Keyboard II can discriminate both side
 modifiers except for GUI key(Windows/Command).
 
 And most of ADB keyboards have no diodes in its matrix so they are not NKRO unfortunately,
-though ADB protocol itself supports it. See protocol/adb.c for more info.
+though ADB protocol itself supports it. See tmk_core/protocol/adb.c for more info.
+
+
+Notes for mouse
+---------------
+ADB mouse support was added by @mek-apelsin on Apr,2015.
+https://github.com/tmk/tmk_keyboard/pull/207
+
+All one-button mouses should be supported.
+
+As of 2019 June, the converter can handle multi-button mice and trackball up to eight buttons if the pointing device supports Apple Extended Mouse protocol. But some devices use their own specific protocol unfortunately and they will work as one-button mouse unless device specific code is added.
+
+Kensington Turbo Mouse 5(#64210) is supported now.
+https://github.com/tmk/tmk_keyboard/issues/274#issuecomment-504726633
 
 EOF
