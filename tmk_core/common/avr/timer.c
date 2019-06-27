@@ -46,7 +46,11 @@ void timer_init(void)
 #endif
 
     OCR0A = TIMER_RAW_TOP;
+#ifdef TIMSK0
     TIMSK0 = (1<<OCIE0A);
+#else
+    TIMSK = (1<<OCIE0A);
+#endif
 }
 
 inline

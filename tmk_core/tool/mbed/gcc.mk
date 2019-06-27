@@ -23,6 +23,7 @@ CC_FLAGS += \
 	-fdata-sections \
 	-fomit-frame-pointer
 CC_FLAGS += -MMD -MP
+CC_FLAGS += $(OPT_DEFS)
 
 LD_FLAGS = $(CPU) -Wl,--gc-sections --specs=nano.specs
 #LD_FLAGS += -u _printf_float -u _scanf_float

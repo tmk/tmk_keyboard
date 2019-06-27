@@ -50,18 +50,6 @@ static uint8_t matrix[MATRIX_ROWS];
 static bool is_modified = false;
 
 
-inline
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
-
 void matrix_init(void)
 {
     serial_init();
@@ -99,44 +87,8 @@ uint8_t matrix_scan(void)
     return code;
 }
 
-bool matrix_is_modified(void)
-{
-    return is_modified;
-}
-
-inline
-bool matrix_has_ghost(void)
-{
-    return false;
-}
-
-inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & (1<<col));
-}
-
 inline
 uint8_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
-}
-
-void matrix_print(void)
-{
-    print("\nr/c 01234567\n");
-    for (uint8_t row = 0; row < matrix_rows(); row++) {
-        phex(row); print(": ");
-        pbin_reverse(matrix_get_row(row));
-        print("\n");
-    }
-}
-
-uint8_t matrix_key_count(void)
-{
-    uint8_t count = 0;
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        count += bitpop(matrix[i]);
-    }
-    return count;
 }

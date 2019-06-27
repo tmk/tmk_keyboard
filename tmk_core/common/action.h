@@ -62,13 +62,14 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt);
 void process_action(keyrecord_t *record);
 void register_code(uint8_t code);
 void unregister_code(uint8_t code);
+void type_code(uint8_t code);
 void register_mods(uint8_t mods);
 void unregister_mods(uint8_t mods);
 //void set_mods(uint8_t mods);
 void clear_keyboard(void);
 void clear_keyboard_but_mods(void);
 void layer_switch(uint8_t new_layer);
-bool is_tap_key(keypos_t key);
+bool is_tap_key(keyevent_t event);
 
 /* debug */
 void debug_event(keyevent_t event);

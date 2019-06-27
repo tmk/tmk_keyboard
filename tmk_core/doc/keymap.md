@@ -68,7 +68,7 @@ The **default layer** is the base keymap layer (0-31) which is always active and
 
 Note that the `default_layer_state` variable only determines the lowest value to which `layer_state` may be set, and that `default_layer_state` is used by the core firmware when determining the starting value of `layer_state` before applying changes. In other words, the default layer will *always* be set to *on* in `layer_state`.
 
-The default layer is defined in the firmware by the `default_layer_state` variable, which is identical in format to the `layer_state` variable exlpained above. The value may be changed using the following functions:
+The default layer is defined in the firmware by the `default_layer_state` variable, which is identical in format to the `layer_state` variable explained above. The value may be changed using the following functions:
 
 - `default_layer_state_set(state)` sets the state to the specified 32-bit integer value.
 - AND/OR/XOR functions set the state based on a boolean logic comparison between the current state and the specified 32-bit integer value:
@@ -86,7 +86,7 @@ default_layer_state_set(1UL<<3);
 
 
 ### 0.2 Layer Precedence and Transparency
-Note that ***higher layers have priority in the layer stack***. The firmware starts at the topmost active layer, and works down to the bottom to find the an active keycode. Once the search encounters any keycode other than **`KC_TRNS`** (transparent) on an active layer, the search is halted and the remaining lower layers aren't examined, even if they are active.
+Note that ***higher layers have priority in the layer stack***. The firmware starts at the topmost active layer, and works down to the bottom to find an active keycode. Once the search encounters any keycode other than **`KC_TRNS`** (transparent) on an active layer, the search is halted and the remaining lower layers aren't examined, even if they are active.
 
 **Note:** a layer must be activated before it may be included in the stack search.
 
@@ -95,7 +95,7 @@ Note that ***higher layers have priority in the layer stack***. The firmware sta
 
 
 ### 0.3 Keymap Example
-The keymap is defined in the **`keymaps[]`** array, a 2-dimensional array of rows and columns corresponding to positions in the keyboard matrix. But most often the layers are defined using C macros to allow for easier reading and editing of the keymap files. To use complex actions you need to define `Fn` keycodes in the **`fn_actions[]`** array.
+The keymap is defined in the **`uint8_t keymaps[]`** array, a 2-dimensional array of rows and columns corresponding to positions in the keyboard matrix. But most often the layers are defined using C macros to allow for easier reading and editing of the keymap files. To use complex actions you need to define `Fn` action in the **`action_t fn_actions[]`** array.
 
 This is a keymap example for the [HHKB](http://en.wikipedia.org/wiki/Happy_Hacking_Keyboard) keyboard.
 This example has three layers: the QWERTY base layer, and two overlay layers for cursor and mousekey control, respectively.
@@ -109,7 +109,7 @@ In this example,
 
 You can find other keymap definitions in file `keymap.c` located on project directories.
 
-    static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+    const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         /* 0: Qwerty
          * ,-----------------------------------------------------------.
          * |Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|  \|  `|
@@ -140,7 +140,7 @@ You can find other keymap definitions in file `keymap.c` located on project dire
          * `-----------------------------------------------------------'
          *      |Gui |Alt  |Space                  |Alt  |Gui|
          *      `--------------------------------------------'
-         */ 
+         */
         KEYMAP(PWR, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
                CAPS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,UP,  TRNS,BSPC, \
                LCTL,VOLD,VOLU,MUTE,TRNS,TRNS,PAST,PSLS,HOME,PGUP,LEFT,RGHT,ENT, \
@@ -158,7 +158,7 @@ You can find other keymap definitions in file `keymap.c` located on project dire
          * `-----------------------------------------------------------'
          *      |Gui |Alt  |Mb1                    |Alt  |   |
          *      `--------------------------------------------'
-         * Mc: Mouse Cursor / Mb: Mouse Button / Mw: Mouse Wheel 
+         * Mc: Mouse Cursor / Mb: Mouse Button / Mw: Mouse Wheel
          */
         KEYMAP(ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL, \
                TAB, TRNS,TRNS,TRNS,TRNS,TRNS,WH_L,WH_D,WH_U,WH_R,TRNS,TRNS,TRNS,BSPC, \
@@ -167,7 +167,7 @@ You can find other keymap definitions in file `keymap.c` located on project dire
                     LGUI,LALT,          BTN1,               RALT,TRNS),
     };
 
-    static const uint16_t PROGMEM fn_actions[] = {
+    const action_t PROGMEM fn_actions[] = {
         ACTION_LAYER_MOMENTARY(1),                  // FN0
         ACTION_LAYER_TAP_KEY(2, KC_SCLN),           // FN1
         ACTION_LAYER_TOGGLE(2),                     // FN2
@@ -194,7 +194,7 @@ See [`common/keycode.h`](../common/keycode.h) or keycode table below for the det
 - `KC_P1` to `KC_P0`, `KC_PDOT`, `KC_PCMM`, `KC_PSLS`, `KC_PAST`, `KC_PMNS`, `KC_PPLS`, `KC_PEQL`, `KC_PENT` for keypad.
 
 ### 1.2 Modifier
-There are 8 modifiers which has discrimination between left and right. 
+There are 8 modifiers which has discrimination between left and right.
 
 - `KC_LCTL` and `KC_RCTL` for Control
 - `KC_LSFT` and `KC_RSFT` for Shift
@@ -214,7 +214,7 @@ There are 8 modifiers which has discrimination between left and right.
 - `KC_WSCH`, `KC_WHOM`, `KC_WBAK`, `KC_WFWD`, `KC_WSTP`, `KC_WREF`, `KC_WFAV` for web browser operation
 
 ### 1.5 Fn key
-`KC_FNnn` are keycodes for `Fn` key which not given any actions at the beginning unlike most of keycodes has its own inborn action. To use these keycodes in `KEYMAP()` you need to assign action you want at first. Action of `Fn` key is defined in `fn_actions[]` and its index of the array is identical with number part of `KC_FNnn`. Thus `KC_FN0` keycode indicates the action defined in first element of the array. ***32 `Fn` keys can be defined at most.***
+`KC_FNnn` are keycodes for `Fn` key which not given any actions at the beginning unlike most of keycodes has its own inborn action. To use these keycodes in `KEYMAP()` you need to assign action you want at first. Action of `Fn` key is defined in `action_t fn_actions[]` and its index of the array is identical with number part of `KC_FNnn`. Thus `KC_FN0` keycode indicates the action defined in first element of the array. ***32 `Fn` keys can be defined at most.***
 
 ### 1.6 Keycode Table
  See keycode table in [`doc/keycode.txt`](./keycode.txt) for description of keycodes.
@@ -250,21 +250,30 @@ You can define these actions on *'A'* key and *'left shift'* modifier with:
     ACTION_KEY(KC_LSFT)
 
 #### 2.1.2 Modified key
-This action is comprised of strokes of modifiers and a key. `Macro` action is needed if you want more complex key strokes.
+This action is comprised of modifiers and a key.
 
-Say you want to assign a key to `Shift + 1` to get character *'!'* or `Alt + Tab` to switch application windows.
+Modified keys can be defined as below. Say you want to assign a key to `Shift + 1` to get character *'!'* or `Alt + Tab` to switch application windows.
 
     ACTION_MODS_KEY(MOD_LSFT, KC_1)
     ACTION_MODS_KEY(MOD_LALT, KC_TAB)
-
-Or `Alt,Shift + Tab` can be defined. `ACTION_MODS_KEY(mods, key)` requires **4-bit modifier state** and a **keycode** as arguments. See `keycode.h` for `MOD_BIT()` macro.
-
     ACTION_MODS_KEY(MOD_LALT | MOD_LSFT, KC_TAB)
+
+These are identical to examples above.
+
+    ACTION_KEY(MOD_LSFT | KC_1)
+    ACTION_KEY(MOD_LALT | KC_TAB)
+    ACTION_KEY(MOD_LSFT | MOD_LALT | KC_TAB)
 
 #### 2.1.3 Multiple Modifiers
 Registers multiple modifiers with pressing a key. To specify multiple modifiers use `|`.
 
-    ACTION_MODS(MOD_ALT | MOD_LSFT)
+    ACTION_MODS(MOD_LALT | MOD_LSFT)
+    ACTION_MODS(MOD_LALT | MOD_LSFT | MOD_LCTL)
+
+These are identical to examples above.
+
+    ACTION_KEY(MOD_LALT | MOD_LSFT, KC_NO)
+    ACTION_KEY(MOD_LALT | MOD_LSFT | MOD_LCTL, KC_NO)
 
 #### 2.1.3 Modifier with Tap key([Dual role][dual_role])
 Works as a modifier key while holding, but registers a key on tap(press and release quickly).
@@ -283,7 +292,7 @@ You can specify a **target layer** of action and **when the action is executed**
 
 + **layer**: `0`-`31`
 + **on**: { `ON_PRESS` | `ON_RELEASE` | `ON_BOTH` }
-+ **bits**: 4-bit value and 1-bit mask bit
++ **bits**: 5-bit: 1-bit for mask and 4-bit for operand
 
 
 #### 2.2.1 Default Layer
@@ -294,7 +303,7 @@ This sets Default Layer to given parameter `layer` and activate it.
     ACTION_DEFAULT_LAYER_SET(layer)
 
 
-#### 2.2.2 Momentary 
+#### 2.2.2 Momentary
 Turns on `layer` momentarily while holding, in other words it activates when key is pressed and deactivate when released.
 
     ACTION_LAYER_MOMENTARY(layer)
@@ -356,20 +365,44 @@ Turns on layer only and clear all layer on release..
 
 
 #### 2.2.10 Bitwise operation
-
-**part** indicates which part of 32bit layer state(0-7). **bits** is 5-bit value. **on** indicates when the action is executed.
+Performs bitwise operation(AND, OR, XOR, SET) against layer state.
 
     ACTION_LAYER_BIT_AND(part, bits, on)
     ACTION_LAYER_BIT_OR(part, bits, on)
     ACTION_LAYER_BIT_XOR(part, bits, on)
     ACTION_LAYER_BIT_SET(part, bits, on)
 
-These actions works with parameters as following code.
+`part` parameter indicates 0-based index(0-7) of where breaking 32-bit `layer_state` into eight nibbles(4-bit unit).
 
+bs
+
+    part            7    6    5    4    3    2    1    0
+    layer_state     0000 0000 0000 0000 0000 0000 0000 0000
+                    msb                                 lsb
+
+`bits` parameter is 5-bit value and consists of two portions, most significant bit(m) controls mask and other 4 bits(abcd) are operand of bit operation.
+
+                    43210
+    bits            mdcba
+
+These parameters works as following code.
+
+    uint32_t layer_state;
     uint8_t shift = part*4;
-    uint32_t mask = (bits&0x10) ? ~(0xf<<shift) : 0;
-    uint32_t layer_state = layer_state <bitop> ((bits<<shift)|mask);
-
+    uint32_t mask = (bits&0x10) ? ~((uint32_t)0xf<<shift) : 0;
+    switch (<bitop>) {
+    case BIT_AND:
+        layer_state = layer_state & (((bits&0xf)<<shift)|mask);
+        break;
+    case BIT_OR:
+        layer_state = layer_state | (((bits&0xf)<<shift)|mask);
+        break;
+    case BIT_XOR:
+        layer_state = layer_state ^ (((bits&0xf)<<shift)|mask);
+        break;
+    case BIT_SET:
+        layer_state = layer_state <bitop> (((bits&0xf)<<shift)|mask);
+        break;
 
 Default Layer also has bitwise operations, they are executed when key is released.
 
@@ -379,19 +412,33 @@ Default Layer also has bitwise operations, they are executed when key is release
     ACTION_DEFAULT_LAYER_BIT_SET(part, bits)
 
 
-
 ### 2.3 Macro action
-***TBD***
+`Macro` actions allow you to register a complex sequence of keystrokes when a key is pressed, where macros are simple sequences of keypresses.
 
-`Macro` action indicates complex key strokes.
- 
-    MACRO( D(LSHIFT), D(D), END )
-    MACRO( U(D), U(LSHIFT), END )
-    MACRO( I(255), T(H), T(E), T(L), T(L), W(255), T(O), END )
+    ACTION_MACRO(id)
+    ACTION_MACRO_TAP(id)
 
-#### 2.3.1 Macro Commands
-- **MACRO()**
-- **MACRO_NONE**
+`id` is an 8-bit user-defined value the macro getter function can use to pick the specific macro.
+
+
+#### 2.3.1 Implementing Macro getter function
+To implement `macro` functions, the macro lookup list must be implemented:
+
+    const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt);
+
+The function must always return a valid macro, and default implementation of `action_get_macro` always returns `MACRO_NONE` which has no effect.
+
+#### 2.3.1.1 Limitations
+Similar to the Function Action system, the selector functions is passed  a `keyrecord_t` object, so it can inspect the key state (e.g. different macros on key press or release), and key itself.
+
+Unlike the Function Action system,`macros` are pre-recorded key sequences, so you can only select from a list. If you want to use dynamic macros then you should look at the more complex function action system.
+
+#### 2.3.2 Implementing/Defining Macro sequences
+Macros are of the form (must be wrapped by the `MACRO` function, and end with an `END` mark)
+
+    MACRO( ..., END )
+
+Within each macro, the following commands can be used:
 
 - **I()**   change interval of stroke.
 - **D()**   press key
@@ -401,19 +448,25 @@ Default Layer also has bitwise operations, they are executed when key is release
 - **SM()**  store modifier state
 - **RM()**  restore modifier state
 - **CM()**  clear modifier state
-- **END**   end mark
+
+e.g.:
+
+    MACRO( D(LSHIFT), D(D), END )  // hold down LSHIFT and D - will print 'D'
+    MACRO( U(D), U(LSHIFT), END )  // release U and LSHIFT keys (an event.pressed == False counterpart for the one above)
+    MACRO( I(255), T(H), T(E), T(L), T(L), W(255), T(O), END ) // slowly print out h-e-l-l---o
 
 #### 2.3.2 Examples
-***TBD***
+
+in keymap.c, define `action_get_macro`
 
     const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
     {
         switch (id) {
-            case HELLO:
+            case 0:
                 return (record->event.pressed ?
                         MACRO( I(0), T(H), T(E), T(L), T(L), W(255), T(O), END ) :
                         MACRO_NONE );
-            case ALT_TAB:
+            case 1:
                 return (record->event.pressed ?
                         MACRO( D(LALT), D(TAB), END ) :
                         MACRO( U(TAB), END ));
@@ -421,7 +474,12 @@ Default Layer also has bitwise operations, they are executed when key is release
         return MACRO_NONE;
     }
 
+in keymap.c, bind items in `fn_actions` to the macro function
 
+    const action_t PROGMEM fn_actions[] = {
+         [0] = ACTION_MACRO(0), // will print 'hello' for example
+         [1] = ACTION_MACRO(1),
+    };
 
 
 ### 2.4 Function action
@@ -443,7 +501,7 @@ To define tappable `Function` action in keymap use this.
 #### 2.4.3 Implement user function
 `Function` actions can be defined freely with C by user in callback function:
 
-    void keymap_call_function(keyrecord_t *event, uint8_t id, uint8_t opt)
+    void action_function(keyrecord_t *record, uint8_t id, uint8_t opt);
 
 This C function is called every time key is operated, argument `id` selects action to be performed and `opt` can be used for option. Function `id` can be 0-255 and `opt` can be 0-15.
 
@@ -544,6 +602,7 @@ This registers modifier key(s) simultaneously with layer switching.
 
     ACTION_LAYER_MODS(2, MOD_LSFT | MOD_LALT)
 
+You can combine four modifiers at most but cannot use both left and right modifiers at a time, either left or right modifiers only can be allowed.
 
 
 ## 4. Tapping
@@ -598,13 +657,13 @@ Legacy Keymap uses two arrays `fn_layer[]` and `fn_keycode[]` to define Fn key. 
 
 In following setting example, `Fn0`, `Fn1` and `Fn2` switch layer to 1, 2 and 2 respectively. `Fn2` registers `Space` key when tapping while `Fn0` and `Fn1` doesn't send any key.
 
-    static const uint8_t PROGMEM fn_layer[] = {
+    const uint8_t PROGMEM fn_layer[] = {
         1,              // Fn0
         2,              // Fn1
         2,              // Fn2
     };
 
-    static const uint8_t PROGMEM fn_keycode[] = {
+    const uint8_t PROGMEM fn_keycode[] = {
         KC_NO,          // Fn0
         KC_NO,          // Fn1
         KC_SPC,         // Fn2

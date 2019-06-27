@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <stdbool.h>
 #include <avr/io.h>
-#include <util/delay.h>
 #include "print.h"
 #include "util.h"
 #include "debug.h"
@@ -29,126 +28,343 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "matrix.h"
 #include "report.h"
 #include "host.h"
+#include "led.h"
+#include "timer.h"
+#include "wait.h"
 
 
-#if (MATRIX_COLS > 16)
-#   error "MATRIX_COLS must not exceed 16"
+
+
+static bool has_media_keys = false;
+static bool is_iso_layout = false;
+
+#if ADB_MOUSE_ENABLE
+#define dmprintf(fmt, ...)  do { if (debug_mouse) xprintf(fmt, ##__VA_ARGS__); } while (0)
+static uint16_t mouse_cpi = 100;
+static void mouse_init(uint8_t addr);
 #endif
-#if (MATRIX_ROWS > 255)
-#   error "MATRIX_ROWS must not exceed 255"
-#endif
-
-
-static bool is_modified = false;
-static report_mouse_t mouse_report = {};
 
 // matrix state buffer(1:on, 0:off)
-#if (MATRIX_COLS <= 8)
-static uint8_t matrix[MATRIX_ROWS];
-#else
-static uint16_t matrix[MATRIX_ROWS];
-#endif
+static matrix_row_t matrix[MATRIX_ROWS];
 
-#ifdef MATRIX_HAS_GHOST
-static bool matrix_has_ghost_in_row(uint8_t row);
-#endif
 static void register_key(uint8_t key);
 
-
-inline
-uint8_t matrix_rows(void)
+static void device_scan(void)
 {
-    return MATRIX_ROWS;
-}
-
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
+    xprintf("\nScan:\n");
+    for (uint8_t addr = 0; addr < 16; addr++) {
+        uint16_t reg3 = adb_host_talk(addr, ADB_REG_3);
+        if (reg3) {
+            xprintf(" addr:%d, reg3:%04X\n", addr, reg3);
+        }
+    }
 }
 
 void matrix_init(void)
 {
-    adb_host_init();
-    // wait for keyboard to boot up and receive command
-    _delay_ms(1000);
-    // Enable keyboard left/right modifier distinction
-    // Addr:Keyboard(0010), Cmd:Listen(10), Register3(11)
-    // upper byte: reserved bits 0000, device address 0010
-    // lower byte: device handler 00000011
-    adb_host_listen(0x2B,0x02,0x03);
-
-    // initialize matrix state: all keys off
-    for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
-
     debug_enable = true;
     //debug_matrix = true;
     //debug_keyboard = true;
     //debug_mouse = true;
-    print("debug enabled.\n");
 
-    // LED flash
+    // LED on
     DDRD |= (1<<6); PORTD |= (1<<6);
-    _delay_ms(500);
-    DDRD |= (1<<6); PORTD &= ~(1<<6);
 
+    adb_host_init();
+
+    // wait for line and device to be stable
+    wait_ms(100);
+
+    device_scan();
+
+    //
+    // Keyboard
+    //
+    xprintf("\nKeyboard:\n");
+    // Determine ISO keyboard by handler id
+    // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c?v=4.4#L815
+    uint8_t handler_id = (uint8_t) adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
+    switch (handler_id) {
+    case 0x04: case 0x05: case 0x07: case 0x09: case 0x0D:
+    case 0x11: case 0x14: case 0x19: case 0x1D: case 0xC1:
+    case 0xC4: case 0xC7:
+        is_iso_layout = true;
+        break;
+    default:
+        is_iso_layout = false;
+        break;
+    }
+    xprintf("hadler: %02X, ISO: %s\n", handler_id, (is_iso_layout ? "yes" : "no"));
+
+    // Adjustable keyboard media keys: address=0x07 and handlerID=0x02
+    has_media_keys = (0x02 == (adb_host_talk(ADB_ADDR_APPLIANCE, ADB_REG_3) & 0xff));
+    if (has_media_keys) {
+        xprintf("Media keys\n");
+    }
+
+    // Enable keyboard left/right modifier distinction
+    // Listen Register3
+    //  upper byte: reserved bits 0000, keyboard address 0010
+    //  lower byte: device handler 00000011
+    adb_host_listen(ADB_ADDR_KEYBOARD, ADB_REG_3, ADB_ADDR_KEYBOARD, ADB_HANDLER_EXTENDED_KEYBOARD);
+
+
+    //
+    // Mouse
+    //
+    // https://developer.apple.com/library/archive/technotes/hw/hw_01.html#Extended
+    #ifdef ADB_MOUSE_ENABLE
+    xprintf("\nMouse:\n");
+
+    // Check device on addr3
+    mouse_init(ADB_ADDR_MOUSE);
+    #endif
+
+    device_scan();
+
+    // initialize matrix state: all keys off
+    for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
+
+    led_set(host_keyboard_leds());
+
+    // LED off
+    DDRD |= (1<<6); PORTD &= ~(1<<6);
     return;
 }
 
 #ifdef ADB_MOUSE_ENABLE
+static void mouse_init(uint8_t orig_addr)
+{
+    uint16_t reg3;
+    uint8_t mouse_handler;
+    uint8_t addr;
+
+again:
+    mouse_handler = (reg3  = adb_host_talk(orig_addr, ADB_REG_3)) & 0xFF;
+    if (!reg3) return;
+    dmprintf("addr%d reg3: %02X\n", orig_addr, reg3);
+
+    // Move device to tmp address
+    adb_host_flush(orig_addr);
+    adb_host_listen(orig_addr, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_TMP, 0xFE);
+    adb_host_flush(ADB_ADDR_TMP);
+
+    mouse_handler = (reg3  = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3)) & 0xFF;
+    if (!reg3) {
+        dmprintf("move fail\n");
+        goto again;
+    }
+    addr = ADB_ADDR_TMP;
+    dmprintf("addr%d reg3: %02X\n", addr, reg3);
+
+
+detect_again:
+    if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE || mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
+        adb_host_flush(addr);
+        adb_host_listen(addr, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_EXTENDED_MOUSE);
+
+        mouse_handler = (reg3  = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
+
+
+        if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
+            adb_host_flush(addr);
+            adb_host_listen(addr, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_CLASSIC2_MOUSE);
+
+            mouse_handler = (reg3  = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
+        }
+
+        if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
+            xprintf("Classic 100cpi\n");
+            mouse_cpi = 100;
+        }
+        if (mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
+            xprintf("Classic 200cpi\n");
+            mouse_cpi = 200;
+        }
+    }
+
+    // Extended Mouse Protocol
+    if (mouse_handler == ADB_HANDLER_EXTENDED_MOUSE) {
+        // Device info format(reg1 8-byte data)
+        // 0-3: device id
+        // 4-5: resolution in units/inch (0xC8=200upi)
+        // 6  : device class      (0: Tablet, 1: Mouse, 2: Trackball)
+        // 7  : num of buttons
+        uint8_t len;
+        uint8_t buf[8];
+        len = adb_host_talk_buf(addr, ADB_REG_1, buf, sizeof(buf));
+
+        if (len > 5) {
+            mouse_cpi = (buf[4]<<8) | buf[5];
+        } else {
+            mouse_cpi = 100;
+        }
+
+        if (len) {
+            xprintf("Ext: [", len);
+            for (int8_t i = 0; i < len; i++) xprintf("%02X ", buf[i]);
+            xprintf("] cpi=%d\n", mouse_cpi);
+        }
+
+
+        // Kensington Turbo Mouse 5: default device
+        if (buf[0] == 0x4B && buf[1] == 0x4D && buf[2] == 0x4C && buf[3] == 0x31) {
+            xprintf("TM5: default\n");
+            // Move it to addr0 to remove this device and get new device with handle id 50 on addr 3
+            // and the new device on address 3 should be handled with command sequence later.
+            //
+            // Turbo Mouse 5 has one default device on addr3 as normal mouse at first, and another device
+            // with hander id 50 appears after the default device is moved from addr3.
+            // The mouse has the two devices at same time transiently in the result. The default device is
+            // removed automatically after the another device receives command sequence.
+            // NOTE: The mouse hangs if you try moving the two deivces to same address.
+            adb_host_flush(addr);
+            adb_host_listen(addr, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_0, 0xFE);
+        } else {
+            xprintf("Unknown\n");
+        }
+    }
+
+    if (mouse_handler == ADB_HANDLER_TURBO_MOUSE) {
+        xprintf("TM5: ext\n");
+
+        // Kensington Turbo Mouse 5 command sequence to enable four buttons
+        // https://elixir.bootlin.com/linux/v4.4/source/drivers/macintosh/adbhid.c#L1176
+        // https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/macppc/dev/ams.c#L261
+        static uint8_t cmd1[] = { 0xE7, 0x8C, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x94 };
+        static uint8_t cmd2[] = { 0xA5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0x27 };
+
+        adb_host_flush(addr);
+        adb_host_listen_buf(addr, ADB_REG_2, cmd1, sizeof(cmd1));
+        adb_host_flush(addr);
+        adb_host_listen_buf(addr, ADB_REG_2, cmd2, sizeof(cmd2));
+    }
+
+
+    // Move all mouses to a address after init to be polled
+    adb_host_flush(addr);
+    adb_host_listen(addr, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_MOUSE_POLL, 0xFE);
+    adb_host_flush(ADB_ADDR_MOUSE_POLL);
+
+    mouse_handler = (reg3  = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
+    if (reg3) {
+        dmprintf("detect again\n");
+        goto detect_again;
+    }
+
+    goto again;
+
+//    dmprintf("handler: %d\n", mouse_handler);
+//    dmprintf("cpi: %d\n", mouse_cpi);
+}
 
 #ifdef MAX
 #undef MAX
 #endif
 #define MAX(X, Y) ((X) > (Y) ? (X) : (Y))
 
+static report_mouse_t mouse_report = {};
+
 void adb_mouse_task(void)
 {
-    uint16_t codes;
+    uint8_t len;
+    uint8_t buf[5];
     int16_t x, y;
-    static int8_t mouseacc; 
-    _delay_ms(12);  // delay for preventing overload of poor ADB keyboard controller
-    codes = adb_host_mouse_recv();
-    // If nothing received reset mouse acceleration, and quit. 
-    if (!codes) {
+    static int8_t mouseacc;
+
+    /* tick of last polling */
+    static uint16_t tick_ms;
+
+    // polling with 12ms interval
+    if (timer_elapsed(tick_ms) < 12) return;
+    tick_ms = timer_read();
+
+    static uint16_t detect_ms;
+    if (timer_elapsed(detect_ms) > 1000) {
+        detect_ms = timer_read();
+        // check new device on addr3
+        mouse_init(ADB_ADDR_MOUSE);
+    }
+
+    // Extended Mouse Protocol data can be 2-5 bytes
+    // https://developer.apple.com/library/archive/technotes/hw/hw_01.html#Extended
+    //
+    //   Byte 0: b00 y06 y05 y04 y03 y02 y01 y00
+    //   Byte 1: b01 x06 x05 x04 x03 x02 x01 x00
+    //   Byte 2: b02 y09 y08 y07 b03 x09 x08 x07
+    //   Byte 3: b04 y12 y11 y10 b05 x12 x11 x10
+    //   Byte 4: b06 y15 y14 y13 b07 x15 x14 x13
+    //
+    //   b--: Button state.(0: on, 1: off)
+    //   x--: X axis movement.
+    //   y--: Y axis movement.
+    len = adb_host_talk_buf(ADB_ADDR_MOUSE_POLL, ADB_REG_0, buf, sizeof(buf));
+
+    // If nothing received reset mouse acceleration, and quit.
+    if (len < 2) {
         mouseacc = 1;
         return;
     };
-    // Bit sixteen is button.
-    if (~codes & (1 << 15))
-        mouse_report.buttons |= MOUSE_BTN1;
-    if (codes & (1 << 15))
-        mouse_report.buttons &= ~MOUSE_BTN1;
-    // lower seven bits are movement, as signed int_7. 
-    // low byte is X-axis, high byte is Y. 
-    y = (codes>>8 & 0x3F);
-    x = (codes>>0 & 0x3F);
-    // bit seven and fifteen is negative
-    // usb does not use int_8, but int_7 (measuring distance) with sign-bit. 
-    if (codes & (1 << 6))
-          x = (x-0x40);
-    if (codes & (1 << 14))
-         y = (y-0x40);
+
+    // Store off-buttons and 0-movements in unused bytes
+    bool xneg = false;
+    bool yneg = false;
+    if (len == 2) {
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+    } else {
+        if (buf[len - 1] & 0x40) yneg = true;
+        if (buf[len - 1] & 0x04) xneg = true;
+    }
+
+    for (int8_t i = len; i < sizeof(buf); i++) {
+        buf[i] = 0x88;
+        if (yneg) buf[i] |= 0x70;
+        if (xneg) buf[i] |= 0x07;
+    }
+
+    // 8 buttons at max
+    // TODO: Fix HID report descriptor for mouse to support button6-8
+    uint8_t buttons = 0;
+    if (!(buf[4] & 0x08)) buttons |= MOUSE_BTN8;
+    if (!(buf[4] & 0x80)) buttons |= MOUSE_BTN7;
+    if (!(buf[3] & 0x08)) buttons |= MOUSE_BTN6;
+    if (!(buf[3] & 0x80)) buttons |= MOUSE_BTN5;
+    if (!(buf[2] & 0x08)) buttons |= MOUSE_BTN4;
+    if (!(buf[2] & 0x80)) buttons |= MOUSE_BTN3;
+    if (!(buf[1] & 0x80)) buttons |= MOUSE_BTN2;
+    if (!(buf[0] & 0x80)) buttons |= MOUSE_BTN1;
+    mouse_report.buttons = buttons;
+
+    int16_t xx, yy;
+    yy = (buf[0] & 0x7F) | (buf[2] & 0x70) << 3 | (buf[3] & 0x70) << 6 | (buf[4] & 0x70) << 9;
+    xx = (buf[1] & 0x7F) | (buf[2] & 0x07) << 7 | (buf[3] & 0x07) << 10 | (buf[4] & 0x07) << 13;
+
     // Accelerate mouse. (They weren't meant to be used on screens larger than 320x200).
-    x *= mouseacc;
-    y *= mouseacc;
-    // Cap our two bytes per axis to one byte. 
+    x = xx * mouseacc;
+    y = yy * mouseacc;
+
+    // TODO: Fix HID report descriptor for mouse to support finer resolution
+    // Cap our two bytes per axis to one byte.
     // Easier with a MIN-function, but since -MAX(-a,-b) = MIN(a,b)...
-	 // I.E. MIN(MAX(x,-127),127) = -MAX(-MAX(x, -127), -127) = MIN(-MIN(-x,127),127)
+    // I.E. MIN(MAX(x,-127),127) = -MAX(-MAX(x, -127), -127) = MIN(-MIN(-x,127),127)
     mouse_report.x = -MAX(-MAX(x, -127), -127);
     mouse_report.y = -MAX(-MAX(y, -127), -127);
+
     if (debug_mouse) {
-            print("adb_host_mouse_recv: "); print_bin16(codes); print("\n");
-            print("adb_mouse raw: [");
-            phex(mouseacc); print(" ");
-            phex(mouse_report.buttons); print("|");
-            print_decs(mouse_report.x); print(" ");
-            print_decs(mouse_report.y); print("]\n");
+        xprintf("Mouse: [");
+        for (int8_t i = 0; i < len; i++) xprintf("%02X ", buf[i]);
+        xprintf("] ");
+        xprintf("[B:%02X, X:%d(%d), Y:%d(%d), A:%d]\n", mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouseacc);
     }
-    // Send result by usb. 
+
+    // Send result by usb.
     host_mouse_send(&mouse_report);
+
+    // TODO: acceleration curve is needed for precise operation?
     // increase acceleration of mouse
-    mouseacc += ( mouseacc < ADB_MOUSE_MAXACC ? 1 : 0 );
+    mouseacc += ( mouseacc < (mouse_cpi < 200 ? ADB_MOUSE_MAXACC : ADB_MOUSE_MAXACC/2) ? 1 : 0 );
+
     return;
 }
 #endif
@@ -165,15 +381,62 @@ uint8_t matrix_scan(void)
     uint16_t codes;
     uint8_t key0, key1;
 
-    is_modified = false;
+    /* tick of last polling */
+    static uint16_t tick_ms;
 
     codes = extra_key;
     extra_key = 0xFFFF;
 
     if ( codes == 0xFFFF )
     {
-        _delay_ms(12);  // delay for preventing overload of poor ADB keyboard controller
-        codes = adb_host_kbd_recv();
+        // polling with 12ms interval
+        if (timer_elapsed(tick_ms) < 12) return 0;
+        tick_ms = timer_read();
+
+        codes = adb_host_kbd_recv(ADB_ADDR_KEYBOARD);
+
+        // Adjustable keybaord media keys
+        if (codes == 0 && has_media_keys &&
+                (codes = adb_host_kbd_recv(ADB_ADDR_APPLIANCE))) {
+            // key1
+            switch (codes & 0x7f ) {
+            case 0x00:  // Mic
+                codes = (codes & ~0x007f) | 0x42;
+                break;
+            case 0x01:  // Mute
+                codes = (codes & ~0x007f) | 0x4a;
+                break;
+            case 0x02:  // Volume down
+                codes = (codes & ~0x007f) | 0x49;
+                break;
+            case 0x03:  // Volume Up
+                codes = (codes & ~0x007f) | 0x48;
+                break;
+            case 0x7F:  // no code
+                break;
+            default:
+                xprintf("ERROR: media key1\n");
+                return 0x11;
+            }
+            // key0
+            switch ((codes >> 8) & 0x7f ) {
+            case 0x00:  // Mic
+                codes = (codes & ~0x7f00) | (0x42 << 8);
+                break;
+            case 0x01:  // Mute
+                codes = (codes & ~0x7f00) | (0x4a << 8);
+                break;
+            case 0x02:  // Volume down
+                codes = (codes & ~0x7f00) | (0x49 << 8);
+                break;
+            case 0x03:  // Volume Up
+                codes = (codes & ~0x7f00) | (0x48 << 8);
+                break;
+            default:
+                xprintf("ERROR: media key0\n");
+                return 0x10;
+            }
+        }
     }
     key0 = codes>>8;
     key1 = codes&0xFF;
@@ -188,10 +451,54 @@ uint8_t matrix_scan(void)
         register_key(0x7F);
     } else if (codes == 0xFFFF) {   // power key release
         register_key(0xFF);
-    } else if (key0 == 0xFF) {      // error
-        xprintf("adb_host_kbd_recv: ERROR(%d)\n", codes);
-        return key1;
     } else {
+        // Macally keyboard sends keys inversely against ADB protocol
+        // https://deskthority.net/workshop-f7/macally-mk96-t20116.html
+        if (key0 == 0xFF) {
+            key0 = key1;
+            key1 = 0xFF;
+        }
+
+        /* Swap codes for ISO keyboard
+         * https://github.com/tmk/tmk_keyboard/issues/35
+         *
+         * ANSI
+         * ,-----------    ----------.
+         * | *a|  1|  2     =|Backspa|
+         * |-----------    ----------|
+         * |Tab  |  Q|     |  ]|   *c|
+         * |-----------    ----------|
+         * |CapsLo|  A|    '|Return  |
+         * |-----------    ----------|
+         * |Shift   |      Shift     |
+         * `-----------    ----------'
+         *
+         * ISO
+         * ,-----------    ----------.
+         * | *a|  1|  2     =|Backspa|
+         * |-----------    ----------|
+         * |Tab  |  Q|     |  ]|Retur|
+         * |-----------    -----`    |
+         * |CapsLo|  A|    '| *c|    |
+         * |-----------    ----------|
+         * |Shif| *b|      Shift     |
+         * `-----------    ----------'
+         *
+         *         ADB scan code   USB usage
+         *         -------------   ---------
+         * Key     ANSI    ISO     ANSI    ISO
+         * ---------------------------------------------
+         * *a      0x32    0x0A    0x35    0x35
+         * *b      ----    0x32    ----    0x64
+         * *c      0x2A    0x2A    0x31    0x31(or 0x32)
+         */
+        if (is_iso_layout) {
+            if ((key0 & 0x7F) == 0x32) {
+                key0 = (key0 & 0x80) | 0x0A;
+            } else if ((key0 & 0x7F) == 0x0A) {
+                key0 = (key0 & 0x80) | 0x32;
+            }
+        }
         register_key(key0);
         if (key1 != 0xFF)       // key1 is 0xFF when no second key.
             extra_key = key1<<8 | 0xFF; // process in a separate call
@@ -200,92 +507,11 @@ uint8_t matrix_scan(void)
     return 1;
 }
 
-bool matrix_is_modified(void)
-{
-    return is_modified;
-}
-
 inline
-bool matrix_has_ghost(void)
-{
-#ifdef MATRIX_HAS_GHOST
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        if (matrix_has_ghost_in_row(i))
-            return true;
-    }
-#endif
-    return false;
-}
-
-inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & (1<<col));
-}
-
-inline
-#if (MATRIX_COLS <= 8)
-uint8_t matrix_get_row(uint8_t row)
-#else
-uint16_t matrix_get_row(uint8_t row)
-#endif
+matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
 }
-
-void matrix_print(void)
-{
-    if (!debug_matrix) return;
-#if (MATRIX_COLS <= 8)
-    print("r/c 01234567\n");
-#else
-    print("r/c 0123456789ABCDEF\n");
-#endif
-    for (uint8_t row = 0; row < matrix_rows(); row++) {
-        phex(row); print(": ");
-#if (MATRIX_COLS <= 8)
-        pbin_reverse(matrix_get_row(row));
-#else
-        pbin_reverse16(matrix_get_row(row));
-#endif
-#ifdef MATRIX_HAS_GHOST
-        if (matrix_has_ghost_in_row(row)) {
-            print(" <ghost");
-        }
-#endif
-        print("\n");
-    }
-}
-
-uint8_t matrix_key_count(void)
-{
-    uint8_t count = 0;
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-#if (MATRIX_COLS <= 8)
-        count += bitpop(matrix[i]);
-#else
-        count += bitpop16(matrix[i]);
-#endif
-    }
-    return count;
-}
-
-#ifdef MATRIX_HAS_GHOST
-inline
-static bool matrix_has_ghost_in_row(uint8_t row)
-{
-    // no ghost exists in case less than 2 keys on
-    if (((matrix[row] - 1) & matrix[row]) == 0)
-        return false;
-
-    // ghost exists in case same state as other row
-    for (uint8_t i=0; i < MATRIX_ROWS; i++) {
-        if (i != row && (matrix[i] & matrix[row]) == matrix[row])
-            return true;
-    }
-    return false;
-}
-#endif
 
 inline
 static void register_key(uint8_t key)
@@ -298,5 +524,9 @@ static void register_key(uint8_t key)
     } else {
         matrix[row] |=  (1<<col);
     }
-    is_modified = true;
+}
+
+void led_set(uint8_t usb_led)
+{
+    adb_host_kbd_led(ADB_ADDR_KEYBOARD, ~usb_led);
 }

@@ -34,10 +34,6 @@ void default_layer_set(uint32_t state);
 void default_layer_or(uint32_t state);
 void default_layer_and(uint32_t state);
 void default_layer_xor(uint32_t state);
-#else
-#define default_layer_or(state)
-#define default_layer_and(state)
-#define default_layer_xor(state)
 #endif
 
 
@@ -56,22 +52,10 @@ void layer_invert(uint8_t layer);
 void layer_or(uint32_t state);
 void layer_and(uint32_t state);
 void layer_xor(uint32_t state);
-#else
-#define layer_state             0
-#define layer_clear()
-#define layer_move(layer)
-#define layer_on(layer)
-#define layer_off(layer)
-#define layer_invert(layer)
-
-#define layer_or(state)
-#define layer_and(state)
-#define layer_xor(state)
-#define layer_debug()
 #endif
 
 
 /* return action depending on current layer status */
-action_t layer_switch_get_action(keypos_t key);
+action_t layer_switch_get_action(keyevent_t key);
 
 #endif

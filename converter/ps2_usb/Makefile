@@ -1,32 +1,39 @@
-# 
-# Makefile for Teensy
-#
 # Target file name (without extension).
-TARGET = ps2_usb_lufa
+TARGET ?= ps2_usb
 
 # Directory common source filess exist
-TMK_DIR = ../../tmk_core
+TMK_DIR ?= ../../tmk_core
 
 # Directory keyboard dependent files exist
-TARGET_DIR = .
+TARGET_DIR ?= .
 
 # project specific files
-SRC =	keymap_common.c \
-	matrix.c \
+SRC ?=	matrix.c \
 	led.c
 
-ifdef KEYMAP
-    SRC := keymap_$(KEYMAP).c $(SRC)
+#
+# Keymap file
+#
+ifdef UNIMAP_ENABLE
+    KEYMAP_FILE = unimap
 else
-    SRC := keymap_plain.c $(SRC)
+    ifdef ACTIONMAP_ENABLE
+	KEYMAP_FILE = actionmap
+    else
+	KEYMAP_FILE = keymap
+    endif
+endif
+ifdef KEYMAP
+    SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
+else
+    SRC := $(KEYMAP_FILE)_plain.c $(SRC)
 endif
 
-CONFIG_H = config.h
+CONFIG_H ?= config.h
 
 
 # MCU name
-#MCU = at90usb1287
-MCU = atmega32u4
+MCU ?= atmega32u2
 
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the
@@ -39,14 +46,14 @@ MCU = atmega32u4
 #     does not *change* the processor frequency - it should merely be updated to
 #     reflect the processor speed set externally so that the code can use accurate
 #     software delays.
-F_CPU = 16000000
+F_CPU ?= 16000000
 
 
 #
 # LUFA specific
 #
 # Target architecture (see library "Board Types" documentation).
-ARCH = AVR8
+ARCH ?= AVR8
 
 # Input clock frequency.
 #     This will define a symbol, F_USB, in all source code files equal to the
@@ -59,11 +66,14 @@ ARCH = AVR8
 #
 #     If no clock division is performed on the input clock inside the AVR (via the
 #     CPU clock adjust registers or the clock division fuses), this will be equal to F_CPU.
-F_USB = $(F_CPU)
+F_USB ?= $(F_CPU)
 
-# Interrupt driven control endpoint task(+60)
+# Interrupt driven control endpoint task
+# Not work with suart debug
 #OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 
+# This improves response of keyboard when wakeup
+OPT_DEFS += -DSUSPEND_MODE_STANDBY
 
 # Boot Section Size in *bytes*
 #   Teensy halfKay   512
@@ -71,25 +81,26 @@ F_USB = $(F_CPU)
 #   Atmel DFU loader 4096
 #   LUFA bootloader  4096
 #   USBaspLoader     2048
-OPT_DEFS += -DBOOTLOADER_SIZE=512
+BOOTLOADER_SIZE ?= 4096
+OPT_DEFS += -DBOOTLOADER_SIZE=$(BOOTLOADER_SIZE)
 
 
 # Build Options
 #   comment out to disable the options.
 #
-#BOOTMAGIC_ENABLE = yes	# Virtual DIP switch configuration(+1000)
-MOUSEKEY_ENABLE = yes	# Mouse keys(+4700)
-EXTRAKEY_ENABLE = yes	# Audio control and System control(+450)
-CONSOLE_ENABLE = yes	# Console for debug(+400)
-COMMAND_ENABLE = yes    # Commands for debug and configuration
-NKRO_ENABLE = yes	# USB Nkey Rollover - not yet supported in LUFA
+BOOTMAGIC_ENABLE ?= no	# Virtual DIP switch configuration(+1000)
+MOUSEKEY_ENABLE ?= no	# Mouse keys(+4700)
+EXTRAKEY_ENABLE ?= yes	# Audio control and System control(+450)
+CONSOLE_ENABLE ?= yes	# Console for debug(+400)
+COMMAND_ENABLE ?= yes    # Commands for debug and configuration
+NKRO_ENABLE ?= yes	# USB Nkey Rollover
 
 
 # PS/2 Options
 #
-#PS2_USE_USART = yes	# uses hardware USART engine for PS/2 signal receive(recomened)
-PS2_USE_INT = yes	# uses external interrupt for falling edge of PS/2 clock pin
-#PS2_USE_BUSYWAIT = yes	# uses primitive reference code
+#PS2_USE_USART ?= yes	# uses hardware USART engine for PS/2 signal receive(recomened)
+PS2_USE_INT ?= yes	# uses external interrupt for falling edge of PS/2 clock pin
+#PS2_USE_BUSYWAIT ?= yes	# uses primitive reference code
 
 
 # Optimize size but this may cause error "relocation truncated to fit"

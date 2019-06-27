@@ -1,28 +1,25 @@
 # Target file name (without extension).
-TARGET = pc98_usb
+TARGET ?= pc98_usb
 
 # Directory common source filess exist
-TMK_DIR = ../../tmk_core
+TMK_DIR ?= ../../tmk_core
 
 # Directory keyboard dependent files exist
-TARGET_DIR = .
+TARGET_DIR ?= .
 
 # keyboard dependent files
-SRC =	keymap.c \
-	matrix.c \
-	led.c \
-	protocol/serial_uart.c
+#   Add one of lines below to select serial protocol implementation
+#	protocol/serial_uart.c
 #	protocol/serial_soft.c
+SRC ?=	matrix.c \
+	protocol/serial_uart.c
 
-CONFIG_H = config.h
+CONFIG_H ?= config.h
 
 
 # MCU name, you MUST set this to match the board you are using
 # type "make clean" after changing this, so all files will be rebuilt
-#MCU = at90usb162       # Teensy 1.0
-MCU = atmega32u4       # Teensy 2.0
-#MCU = at90usb646       # Teensy++ 1.0
-#MCU = at90usb1286      # Teensy++ 2.0
+MCU ?= atmega32u2       # TMK Converter
 
 
 # Processor frequency.
@@ -30,14 +27,14 @@ MCU = atmega32u4       # Teensy 2.0
 #   so your program will run at the correct speed.  You should also set this
 #   variable to same clock speed.  The _delay_ms() macro uses this, and many
 #   examples use this variable to calculate timings.  Do not add a "UL" here.
-F_CPU = 16000000
+F_CPU ?= 16000000
 
 
 #
 # LUFA specific
 #
 # Target architecture (see library "Board Types" documentation).
-ARCH = AVR8
+ARCH ?= AVR8
 
 # Input clock frequency.
 #     This will define a symbol, F_USB, in all source code files equal to the
@@ -50,7 +47,7 @@ ARCH = AVR8
 #
 #     If no clock division is performed on the input clock inside the AVR (via the
 #     CPU clock adjust registers or the clock division fuses), this will be equal to F_CPU.
-F_USB = $(F_CPU)
+F_USB ?= $(F_CPU)
 
 # Interrupt driven control endpoint task
 OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
@@ -59,10 +56,12 @@ OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 # Build Options
 #   *Comment out* to disable the options.
 #
-MOUSEKEY_ENABLE = yes	# Mouse keys
-EXTRAKEY_ENABLE = yes	# Audio control and System control
-CONSOLE_ENABLE = yes	# Console for debug
-#NKRO_ENABLE = yes	# USB Nkey Rollover
+MOUSEKEY_ENABLE ?= yes	# Mouse keys
+EXTRAKEY_ENABLE ?= yes	# Audio control and System control
+CONSOLE_ENABLE ?= yes	# Console for debug
+COMMAND_ENABLE ?= yes    # Commands for debug and configuration
+#NKRO_ENABLE ?= yes	# USB Nkey Rollover
+UNIMAP_ENABLE ?= yes
 
 
 # Boot Section Size in bytes
@@ -70,6 +69,25 @@ CONSOLE_ENABLE = yes	# Console for debug
 #   Atmel DFU loader 4096
 #   LUFA bootloader  4096
 OPT_DEFS += -DBOOTLOADER_SIZE=4096
+
+
+#
+# Keymap file
+#
+ifeq (yes,$(strip $(UNIMAP_ENABLE)))
+    KEYMAP_FILE = unimap
+else
+    ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
+        KEYMAP_FILE = actionmap
+    else
+        KEYMAP_FILE = keymap
+    endif
+endif
+ifdef KEYMAP
+    SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
+else
+    SRC := $(KEYMAP_FILE).c $(SRC)
+endif
 
 
 # Search Path

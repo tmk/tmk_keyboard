@@ -155,6 +155,6 @@ AquaKeyTest.exe http://geekhack.org/showthread.php?t=6643
 Linux:
 xkeycaps
 xev
-showkeys
+showkey
 
 EOF

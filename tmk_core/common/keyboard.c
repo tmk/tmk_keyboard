@@ -63,7 +63,6 @@ static bool has_ghost_in_row(uint8_t row)
 #endif
 
 
-__attribute__ ((weak)) void matrix_setup(void) {}
 void keyboard_setup(void)
 {
     matrix_setup();
@@ -94,7 +93,7 @@ void keyboard_init(void)
 }
 
 /*
- * Do keyboard routine jobs: scan mantrix, light LEDs, ...
+ * Do keyboard routine jobs: scan matrix, light LEDs, ...
  * This is repeatedly called as fast as possible.
  */
 void keyboard_task(void)
@@ -127,19 +126,22 @@ void keyboard_task(void)
             matrix_ghost[r] = matrix_row;
 #endif
             if (debug_matrix) matrix_print();
-            for (uint8_t c = 0; c < MATRIX_COLS; c++) {
-                if (matrix_change & ((matrix_row_t)1<<c)) {
+            matrix_row_t col_mask = 1;
+            for (uint8_t c = 0; c < MATRIX_COLS; c++, col_mask <<= 1) {
+                if (matrix_change & col_mask) {
                     keyevent_t e = (keyevent_t){
                         .key = (keypos_t){ .row = r, .col = c },
-                        .pressed = (matrix_row & ((matrix_row_t)1<<c)),
+                        .pressed = (matrix_row & col_mask),
                         .time = (timer_read() | 1) /* time should not be 0 */
                     };
                     action_exec(e);
                     hook_matrix_change(e);
                     // record a processed key
-                    matrix_prev[r] ^= ((matrix_row_t)1<<c);
+                    matrix_prev[r] ^= col_mask;
+
+                    // This can miss stroke when scan matrix takes long like Topre
                     // process a key per task call
-                    goto MATRIX_LOOP_END;
+                    //goto MATRIX_LOOP_END;
                 }
             }
         }
@@ -147,7 +149,7 @@ void keyboard_task(void)
     // call with pseudo tick event when no real key event.
     action_exec(TICK);
 
-MATRIX_LOOP_END:
+//MATRIX_LOOP_END:
 
     hook_keyboard_loop();
 

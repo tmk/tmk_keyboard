@@ -28,25 +28,55 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keymap.h"
 
 
-// 32*8(256) byte array which converts PS/2 code into USB code
-extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-extern const uint16_t fn_actions[];
-
-
+/*         ,-----------------------------------------------.
+ *         |F13|F14|F15|F16|F17|F18|F19|F20|F21|F22|F23|F24|
+ * ,---.   |-----------------------------------------------|     ,-----------.     ,-----------.
+ * |Esc|   |F1 |F2 |F3 |F4 |F5 |F6 |F7 |F8 |F9 |F10|F11|F12|     |PrS|ScL|Pau|     |VDn|VUp|Mut|
+ * `---'   `-----------------------------------------------'     `-----------'     `-----------'
+ * ,-----------------------------------------------------------. ,-----------. ,---------------.
+ * |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY|Bsp| |Ins|Hom|PgU| |NmL|  /|  *|  -|
+ * |-----------------------------------------------------------| |-----------| |---------------|
+ * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|  \  | |Del|End|PgD| |  7|  8|  9|  +|
+ * |-----------------------------------------------------------| `-----------' |---------------|
+ * |CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '| ^a|Entr|               |  4|  5|  6|KP,|
+ * |-----------------------------------------------------------|     ,---.     |---------------|
+ * |Shft|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift |     |Up |     |  1|  2|  3|Ent|
+ * |-----------------------------------------------------------| ,-----------. |---------------|
+ * |Ctl|Gui|Alt|MHEN|     Space      |HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |  #|  0|  .|KP=|
+ * `-----------------------------------------------------------' `-----------' `---------------'
+ *
+ * PS/2 scan codes
+ * http://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/translate.pdf
+ *         ,-----------------------------------------------.
+ *         | 08| 10| 18| 20| 28| 30| 38| 40| 48| 50| 57| 5F|
+ * ,---.   |-----------------------------------------------|     ,-----------.     ,-----------.
+ * | 76|   | 05| 06| 04| 0C| 03| 0B| 83| 0A| 01| 09| 78| 07|     | FC| 7E| FE|     | A1| B2| A3|
+ * `---'   `-----------------------------------------------'     `-----------'     `-----------'
+ * ,-----------------------------------------------------------. ,-----------. ,---------------.
+ * | 0E| 16| 1E| 26| 25| 2E| 36| 3D| 3E| 46| 45| 4E| 55| 6A| 66| | F0| EC| FD| | 77| CA| 7C| 7B|
+ * |-----------------------------------------------------------| |-----------| |---------------|
+ * | 0D  | 15| 1D| 24| 2D| 2C| 35| 3C| 43| 44| 4D| 54| 5B|  5D | | F1| E9| FA| | 6C| 75| 7D| 79|
+ * |-----------------------------------------------------------| `-----------' |---------------|
+ * | 58   | 1C| 1B| 23| 2B| 34| 33| 3B| 42| 4B| 4C| 52| ^a| 5A |               | 6B| 73| 74| 6D|
+ * |-----------------------------------------------------------|     ,---.     |---------------|
+ * | 12 | 61| 1A| 22| 21| 2A| 32| 31| 3A| 41| 49| 4A| 51|  59  |     | F5|     | 69| 72| 7A| DA|
+ * |-----------------------------------------------------------| ,-----------. |---------------|
+ * | 14| 9F| 11| 67 |     29         | 64 | 13 | 91| A7| AF| 94| | EB| F2| F4| | 68|70 | 71| 63|
+ * `-----------------------------------------------------------' `-----------' `---------------'
+ * ^a ISO hash key uses identical scancode 5D to US backslash.
+ * 51, 63, 68, 6D: hidden keys in IBM model M
+ */
 /* All keys */
 #define KEYMAP_ALL( \
-    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,     KFC,K7E,KFE,                   \
-    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,K66, KF0,KEC,KFD,  K77,KCA,K7C,K7B, \
-    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,K5D, KF1,KE9,KFA,  K6C,K75,K7D,     \
-    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,    K5A,               K6B,K73,K74,K79, \
-    K12,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,        K59,     KF5,      K69,K72,K7A,     \
-    K14,K9F,K11,        K29,                K91,KA7,KAF,K94, KEB,KF2,KF4,  K70,    K71,KDA, \
+        K08,K10,K18,K20,K28,K30,K38,K40,K48,K50,K57,K5F,                                        \
+    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,         KFC,K7E,KFE,      KA1,KB2,KA3, \
+    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,K6A,K66, KF0,KEC,KFD,  K77,KCA,K7C,K7B, \
+    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,    K5D, KF1,KE9,KFA,  K6C,K75,K7D,K79, \
+    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,        K5A,               K6B,K73,K74,K6D, \
+    K12,K61,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,    K51,K59,     KF5,      K69,K72,K7A,KDA, \
+    K14,K9F,K11,K67,    K29,            K64,K13,K91,KA7,KAF,K94, KEB,KF2,KF4,  K68,K70,K71,K63, \
                                                                                             \
-    K61,                     /* for European ISO */                                         \
-    K51, K13, K6A, K64, K67, /* for Japanese JIS */                                         \
-    K08, K10, K18, K20, K28, K30, K38, K40, K48, K50, K57, K5F, /* F13-24 */                \
     KB7, KBF, KDE,           /* System Power, Sleep, Wake */                                \
-    KA3, KB2, KA1,           /* Mute, Volume Up, Volume Down */                             \
     KCD, K95, KBB, KB4, KD0, /* Next, Previous, Stop, Pause, Media Select */                \
     KC8, KAB, KC0,           /* Mail, Calculator, My Computer */                            \
     K90, KBA, KB8, KB0,      /* WWW Search, Home, Back, Forward */                          \
@@ -64,8 +94,8 @@ extern const uint16_t fn_actions[];
     { KC_##K48, KC_##K49, KC_##K4A, KC_##K4B, KC_##K4C, KC_##K4D, KC_##K4E, KC_NO    }, \
     { KC_##K50, KC_##K51, KC_##K52, KC_NO,    KC_##K54, KC_##K55, KC_NO,    KC_##K57 }, \
     { KC_##K58, KC_##K59, KC_##K5A, KC_##K5B, KC_NO,    KC_##K5D, KC_NO,    KC_##K5F }, \
-    { KC_NO,    KC_##K61, KC_NO,    KC_NO,    KC_##K64, KC_NO,    KC_##K66, KC_##K67 }, \
-    { KC_NO,    KC_##K69, KC_##K6A, KC_##K6B, KC_##K6C, KC_NO,    KC_NO,    KC_NO    }, \
+    { KC_NO,    KC_##K61, KC_NO,    KC_##K63, KC_##K64, KC_NO,    KC_##K66, KC_##K67 }, \
+    { KC_##K68, KC_##K69, KC_##K6A, KC_##K6B, KC_##K6C, KC_##K6D, KC_NO,    KC_NO    }, \
     { KC_##K70, KC_##K71, KC_##K72, KC_##K73, KC_##K74, KC_##K75, KC_##K76, KC_##K77 }, \
     { KC_##K78, KC_##K79, KC_##K7A, KC_##K7B, KC_##K7C, KC_##K7D, KC_##K7E, KC_NO    }, \
     { KC_NO,    KC_NO,    KC_NO,    KC_##K83, KC_NO,    KC_NO,    KC_NO,    KC_NO    }, \
@@ -86,6 +116,31 @@ extern const uint16_t fn_actions[];
     { KC_NO,    KC_NO,    KC_##KFA, KC_NO,    KC_##KFC, KC_##KFD, KC_##KFE, KC_NO    }, \
 }
 
+#define KEYMAP_FULL( \
+        K08,K10,K18,K20,K28,K30,K38,K40,K48,K50,K57,K5F,                                        \
+    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,         KFC,K7E,KFE,      KA1,KB2,KA3, \
+    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,K6A,K66, KF0,KEC,KFD,  K77,KCA,K7C,K7B, \
+    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,    K5D, KF1,KE9,KFA,  K6C,K75,K7D,K79, \
+    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,        K5A,               K6B,K73,K74,K6D, \
+    K12,K61,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,    K51,K59,     KF5,      K69,K72,K7A,KDA, \
+    K14,K9F,K11,K67,    K29,            K64,K13,K91,KA7,KAF,K94, KEB,KF2,KF4,  K68,K70,K71,K63  \
+) \
+KEYMAP_ALL( \
+        K08,K10,K18,K20,K28,K30,K38,K40,K48,K50,K57,K5F,                                        \
+    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,         KFC,K7E,KFE,      KA1,KB2,KA3, \
+    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,K6A,K66, KF0,KEC,KFD,  K77,KCA,K7C,K7B, \
+    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,    K5D, KF1,KE9,KFA,  K6C,K75,K7D,K79, \
+    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,        K5A,               K6B,K73,K74,K6D, \
+    K12,K61,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,    K51,K59,     KF5,      K69,K72,K7A,KDA, \
+    K14,K9F,K11,K67,    K29,            K64,K13,K91,KA7,KAF,K94, KEB,KF2,KF4,  K68,K70,K71,K63, \
+                                                                                                \
+    SYSTEM_POWER, SYSTEM_SLEEP, SYSTEM_WAKE,                                                    \
+    MEDIA_NEXT_TRACK, MEDIA_PREV_TRACK, MEDIA_STOP, MEDIA_PLAY_PAUSE, MEDIA_SELECT,             \
+    MAIL, CALCULATOR, MY_COMPUTER,                                                              \
+    WWW_SEARCH, WWW_HOME, WWW_BACK, WWW_FORWARD,                                                \
+    WWW_STOP, WWW_REFRESH, WWW_FAVORITES                                                        \
+)
+
 /* US layout */
 #define KEYMAP( \
     K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,     KFC,K7E,KFE,                   \
@@ -95,23 +150,14 @@ extern const uint16_t fn_actions[];
     K12,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,        K59,     KF5,      K69,K72,K7A,     \
     K14,K9F,K11,        K29,                K91,KA7,KAF,K94, KEB,KF2,KF4,  K70,    K71,KDA  \
 ) \
-KEYMAP_ALL( \
-    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,     KFC,K7E,KFE,                   \
-    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,K66, KF0,KEC,KFD,  K77,KCA,K7C,K7B, \
-    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,K5D, KF1,KE9,KFA,  K6C,K75,K7D,     \
-    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,    K5A,               K6B,K73,K74,K79, \
-    K12,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,        K59,     KF5,      K69,K72,K7A,     \
-    K14,K9F,K11,        K29,                K91,KA7,KAF,K94, KEB,KF2,KF4,  K70,    K71,KDA, \
-                                                                                            \
-    NUBS,                                                                                   \
-    RO, KANA, JYEN, HENK, MHEN,                                                             \
-    F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24,                             \
-    SYSTEM_POWER, SYSTEM_SLEEP, SYSTEM_WAKE,                                                \
-    AUDIO_MUTE, AUDIO_VOL_UP, AUDIO_VOL_DOWN,                                               \
-    MEDIA_NEXT_TRACK, MEDIA_PREV_TRACK, MEDIA_STOP, MEDIA_PLAY_PAUSE, MEDIA_SELECT,         \
-    MAIL, CALCULATOR, MY_COMPUTER,                                                          \
-    WWW_SEARCH, WWW_HOME, WWW_BACK, WWW_FORWARD,                                            \
-    WWW_STOP, WWW_REFRESH, WWW_FAVORITES                                                    \
+KEYMAP_FULL( \
+        F13,F14,F15,F16,F17,F18,F19,F20,F21,F22,F23,F24,                                        \
+    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,         KFC,K7E,KFE,  VOLD,VOLU,MUTE,  \
+    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,JPY,K66, KF0,KEC,KFD,  K77,KCA,K7C,K7B, \
+    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,    K5D, KF1,KE9,KFA,  K6C,K75,K7D,K79, \
+    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,        K5A,               K6B,K73,K74,PCMM,\
+    K12,NUBS,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,   RO, K59,     KF5,      K69,K72,K7A,KDA, \
+    K14,K9F,K11,MHEN,   K29,          HENK,KANA,K91,KA7,KAF,K94, KEB,KF2,KF4,  PWR,K70,K71,PEQL \
 )
 
 /* ISO layout */
@@ -123,23 +169,14 @@ KEYMAP_ALL( \
     K12,K61,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,    K59,     KF5,      K69,K72,K7A,     \
     K14,K9F,K11,        K29,                K91,KA7,KAF,K94, KEB,KF2,KF4,  K70,    K71,KDA  \
 ) \
-KEYMAP_ALL( \
-    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,     KFC,K7E,KFE,                   \
-    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,K66, KF0,KEC,KFD,  K77,KCA,K7C,K7B, \
-    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,K5D, KF1,KE9,KFA,  K6C,K75,K7D,     \
-    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,    K5A,               K6B,K73,K74,K79, \
-    K12,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,        K59,     KF5,      K69,K72,K7A,     \
-    K14,K9F,K11,        K29,                K91,KA7,KAF,K94, KEB,KF2,KF4,  K70,    K71,KDA, \
-                                                                                            \
-    K61,                                                                                    \
-    RO, KANA, JYEN, HENK, MHEN,                                                             \
-    F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24,                             \
-    SYSTEM_POWER, SYSTEM_SLEEP, SYSTEM_WAKE,                                                \
-    AUDIO_MUTE, AUDIO_VOL_UP, AUDIO_VOL_DOWN,                                               \
-    MEDIA_NEXT_TRACK, MEDIA_PREV_TRACK, MEDIA_STOP, MEDIA_PLAY_PAUSE, MEDIA_SELECT,         \
-    MAIL, CALCULATOR, MY_COMPUTER,                                                          \
-    WWW_SEARCH, WWW_HOME, WWW_BACK, WWW_FORWARD,                                            \
-    WWW_STOP, WWW_REFRESH, WWW_FAVORITES                                                    \
+KEYMAP_FULL( \
+        F13,F14,F15,F16,F17,F18,F19,F20,F21,F22,F23,F24,                                        \
+    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,         KFC,K7E,KFE,  VOLD,VOLU,MUTE,  \
+    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,JPY,K66, KF0,KEC,KFD,  K77,KCA,K7C,K7B, \
+    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,    K5D, KF1,KE9,KFA,  K6C,K75,K7D,K79, \
+    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,        K5A,               K6B,K73,K74,PCMM,\
+    K12,K61,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,    RO, K59,     KF5,      K69,K72,K7A,KDA, \
+    K14,K9F,K11,MHEN,   K29,          HENK,KANA,K91,KA7,KAF,K94, KEB,KF2,KF4,  PWR,K70,K71,PEQL \
 )
 
 /* JIS layout */
@@ -151,23 +188,14 @@ KEYMAP_ALL( \
     K12,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,K51,        K59,     KF5,      K69,K72,K7A,     \
     K14,K9F,K11,    K67,K29,K64,K13,            K91,KA7,KAF,K94, KEB,KF2,KF4,  K70,    K71,KDA  \
 ) \
-KEYMAP_ALL( \
-    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,     KFC,K7E,KFE,                   \
-    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,K66, KF0,KEC,KFD,  K77,KCA,K7C,K7B, \
-    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,K5D, KF1,KE9,KFA,  K6C,K75,K7D,     \
-    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,    K5A,               K6B,K73,K74,K79, \
-    K12,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,        K59,     KF5,      K69,K72,K7A,     \
-    K14,K9F,K11,        K29,                K91,KA7,KAF,K94, KEB,KF2,KF4,  K70,    K71,KDA, \
-                                                                                            \
-    NUBS,                                                                                   \
-    K51, K13, K6A, K64, K67,                                                                \
-    F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24,                             \
-    SYSTEM_POWER, SYSTEM_SLEEP, SYSTEM_WAKE,                                                \
-    AUDIO_MUTE, AUDIO_VOL_UP, AUDIO_VOL_DOWN,                                               \
-    MEDIA_NEXT_TRACK, MEDIA_PREV_TRACK, MEDIA_STOP, MEDIA_PLAY_PAUSE, MEDIA_SELECT,         \
-    MAIL, CALCULATOR, MY_COMPUTER,                                                          \
-    WWW_SEARCH, WWW_HOME, WWW_BACK, WWW_FORWARD,                                            \
-    WWW_STOP, WWW_REFRESH, WWW_FAVORITES                                                    \
+KEYMAP_FULL( \
+        F13,F14,F15,F16,F17,F18,F19,F20,F21,F22,F23,F24,                                        \
+    K76,K05,K06,K04,K0C,K03,K0B,K83,K0A,K01,K09,K78,K07,         KFC,K7E,KFE,  VOLD,VOLU,MUTE,  \
+    K0E,K16,K1E,K26,K25,K2E,K36,K3D,K3E,K46,K45,K4E,K55,K6A,K66, KF0,KEC,KFD,  K77,KCA,K7C,K7B, \
+    K0D,K15,K1D,K24,K2D,K2C,K35,K3C,K43,K44,K4D,K54,K5B,    K5D, KF1,KE9,KFA,  K6C,K75,K7D,K79, \
+    K58,K1C,K1B,K23,K2B,K34,K33,K3B,K42,K4B,K4C,K52,        K5A,               K6B,K73,K74,PCMM,\
+    K12,NUBS,K1A,K22,K21,K2A,K32,K31,K3A,K41,K49,K4A,   K51,K59,     KF5,      K69,K72,K7A,KDA, \
+    K14,K9F,K11,K67,    K29,            K64,K13,K91,KA7,KAF,K94, KEB,KF2,KF4,  PWR,K70,K71,PEQL \
 )
 
 #endif

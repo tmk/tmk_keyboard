@@ -46,3 +46,17 @@ X'tal --+---->Prescaler-------> System Clock
         +---------------------> USB PLL
 
 Design Decision: Install 16MHz crystal on board with using clock rescaler.
+
+
+
+
+2018/03/24
+Pro2 overall:
+with stock 139.3mA
+with TMK    40.8mA
+with TMK_BT 55.2mA      without battery(USB)
+with TMK_BT 93-100mA    without battery(BT)
+
+JP overall:
+with stock  37.1mA
+with TMK    41.6mA

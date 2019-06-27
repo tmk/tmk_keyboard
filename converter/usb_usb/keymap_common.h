@@ -28,10 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keymap.h"
 
 
-extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-extern const uint16_t fn_actions[];
-
-
 /*         ,---------------. ,---------------. ,---------------.
  *         |F13|F14|F15|F16| |F17|F18|F19|F20| |F21|F22|F23|F24|
  * ,---.   |---------------| |---------------| |---------------| ,-----------. ,---------------. ,-------.

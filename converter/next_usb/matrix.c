@@ -66,20 +66,6 @@ static uint8_t matrix[MATRIX_ROWS];
 
 static bool is_modified = false;
 
-/* number of matrix rows */
-inline
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-/* number of matrix columns */
-inline
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
-
 #ifndef NEXT_KBD_LED1_ON
 #define NEXT_KBD_LED1_ON
 #endif
@@ -227,29 +213,11 @@ uint8_t matrix_scan(void)
     return 1;
 }
 
-/* whether modified from previous scan. used after matrix_scan. */
-bool matrix_is_modified()
-{
-    return is_modified;
-}
-
-/* whether a switch is on */
-inline
-bool matrix_is_on(uint8_t row, uint8_t col)
-{
-    return (matrix[row] & (1<<col));
-}
-
 /* matrix state on row */
 inline
 uint8_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
-}
-
-/* print matrix for debug */
-void matrix_print(void)
-{
 }
 
 inline

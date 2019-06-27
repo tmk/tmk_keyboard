@@ -1,0 +1,94 @@
+Panasonic VP-0187A
+==================
+2017/08/06
+
+It is unknown keyboard from Panasonic with Hirose Cherry M8 and 6P6C connector.
+
+Pictures:
+http://imgur.com/a/GAZE7
+
+Hirose Cheery M8 switches:
+https://deskthority.net/wiki/Cherry_M8
+
+
+
+Scan
+----
+The keyboard is comprised of some of 4000 series IC without microcontroller.
+
+
+    RST>-----------+---------------+
+                   |               |
+            TC4520 |        TC4520 |
+            --------- carry ---------
+    CLK>--->|row    |------>|col    |
+            |counter|Q3     |counter|
+            ---------       ---------
+             Q012            Q012
+              |||             |||
+              |||             ABC   TC4028
+              |||           ---------
+              |||           |decoder|
+              |||           ---------
+              |||            |||||| col[0..7]
+              ABC TC4512     vvvvvvv   pull down
+            ---------- <----|+++++++|--100K--+
+            |data    | <----|+++++++|--100K--+
+    STATE<--|selector| <----|+++++++|--100K--+
+            | 7 to 1 | <----|+++++++|--100K--+
+            ---------- <----|+++++++|--100K--+
+                row[0..7]   | 8x8 matrix     |
+                            |                -
+              TC4078        |               GND
+              ------        |
+    SENSE<----| OR |========+ OR'd row[0..7]
+              ------
+
+- TC4520BP - Dual Binary Up Counter 
+- TC4028B  - BCD-to-Decimal Decoder
+- TC4512BP - 8-Channel Data Selector
+- TC4081BP - Quad 2-Input AND Gate
+- TC4071BP - Quad 2-Input OR Gate
+- TC4078BP - 8-Input NOR/OR Gate
+
+
+Matrix
+------
+        0       1       2       3       4       5       6       7
+    --------------------------------------------------------------------
+    0   ESC     1       2       3       4       5       6       7
+    1   8       9       0       -       ^       BS      INS     DEL
+    2   TAB     Q       W       E       R       T       Y       U
+    3   I       O       P       @       [       ]       F2      F1
+    4   CTRL    A       S       D       F       G       H       J
+    5   K       L       ;       :       RETURN  UP      F3      F4
+    6   SHIFT   Z       X       C       V       B       N       M
+    7   SPACE   ,       .       /       LEFT    RIGHT   DOWN    HOME
+
+
+
+6P6C connector pinout
+---------------------
+1. VCC
+2. Clock     - sends clock to binary counter TC4520
+3. Key State - indicates hi if key selected by counter is active
+4. Sense     - indicates lo if any key is active while Reset is hi.
+5. Reset     - resets counter and drives all column
+6. GND
+
+      123456
+    ,--------.
+    | |||||| |
+    |        |
+    `--____--'
+       plug
+
+
+Ping configuration
+------------------
+AVR ATmega32u4 is used as protocol converter.
+
+    PD0: Clock. Counter couts up at falling edge.
+    PD1: Key State. Hi if selected key is activated.
+    PD2: Sense. Lo if any key is activated while Reset is Hi.
+    PD3: Reset. Resets counters at riging edge.

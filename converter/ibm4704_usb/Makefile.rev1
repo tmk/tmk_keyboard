@@ -1,0 +1,6 @@
+# TMK Converter rev.1
+# which looks like this:
+# https://github.com/tmk/keyboard_converter#pcb-rev1
+TARGET = ibm4704_usb_rev1
+MCU = atmega32u4
+include Makefile

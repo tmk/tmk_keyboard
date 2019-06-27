@@ -1,12 +1,22 @@
 TMK Keyboard Firmware Collection
 ================================
-This is a keyboard firmware with some useful features for Atmel AVR controller.
+This repository includes keyboard and converter firmware projects built with [`tmk_core`][tmk_core] keyboard library.
 
-Source code is available here: <http://github.com/tmk/tmk_keyboard>
+The latest source code is available here: <http://github.com/tmk/tmk_keyboard>
 
 
 Updates
 -------
+#### 2017/01/11
+Changed action code for `ACTION_LAYER_MODS` and this may cause incompatibility with existent shared URL and downloaded firmwware of keymap editor. If you are using the action you just have to redefine it on keymap editor. Existent keymap code should not suffer.
+
+#### 2016/06/26
+Keymap framework was updated. `fn_actions[]` should be defined as `action_t` instead of `uint16_t`. And default code for keymap handling is now included in core you just need define `uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS]` and `action_t fn_actions[]`.
+
+
+#### 2016/06/22
+Some projects were moved from `converter` and `keyboard` to `orphan` directory. Those might be removed in some future but you will be able to access them with `orphans` tag. See <https://github.com/tmk/tmk_keyboard/issues/173>
+
 #### 2016/02/10
 core: flabbergast's Chibios protocol was merged from <https://github.com/flabbergast/tmk_keyboard/tree/chibios> (@72b1668). See [tmk_core/protocol/chibios/README.md](tmk_core/protocol/chibios/README.md). Chibios protocol supports Cortex-M such as STM32 and Kinetis.
 
@@ -16,28 +26,6 @@ Core library was separated to other branch `core`. <https://github.com/tmk/tmk_k
 In `Makefile` you need to set `TMK_DIR` to indicate core library location now.
 
     TMK_DIR = ../../tmk_core
-
-
-
-Features
---------
-These features can be used in your keyboard.
-
-* Multi-layer Keymap  - Multiple keyboard layouts with layer switching
-* Mouse key           - Mouse control with keyboard
-* System Control Key  - Power Down, Sleep, Wake Up and USB Remote Wake up
-* Media Control Key   - Volume Down/Up, Mute, Next/Prev track, Play, Stop and etc
-* USB NKRO            - 120 keys(+ 8 modifiers) simultaneously
-* PS/2 mouse support  - PS/2 mouse(TrackPoint) as composite device
-* Keyboard protocols  - PS/2, ADB, M0110, Sun and other old keyboard protocols
-* User Function       - Customizable function of key with writing code
-* Macro               - Very primitive at this time
-* Keyboard Tricks     - Oneshot modifier and modifier with tapping feature
-* Debug Console       - Messages for debug and interaction with firmware
-* Virtual DIP Switch  - Configurations stored EEPROM(Boot Magic)
-* Locking CapsLock    - Mechanical switch support for CapsLock
-* Breathing Sleep LED - Sleep indicator with charm during USB suspend
-* Backlight           - Control backlight levels
 
 
 
@@ -54,32 +42,23 @@ You can find some keyboard specific projects under `converter` and `keyboard` di
 * [x68k_usb](converter/x68k_usb/)           - [Sharp X68000 keyboard to USB][GH_x68k]
 * [sun_usb](converter/sun_usb/)             - [Sun] to USB(type4, 5 and 3?)
 * [pc98_usb](converter/pc98_usb/)           - [PC98] to USB
-* [usb_usb](converter/usb_usb/)             - USB to USB(experimental)
-* [ascii_usb](converter/ascii_usb/)         - ASCII(Serial console terminal) to USB
-* [ibm4704_usb](converter/ibm4704_usb)      - [IBM 4704 keyboard Converter][GH_ibm4704]
+* [usb_usb](converter/usb_usb/)             - [USB to USB][GH_usb]
+* [ibm4704_usb](converter/ibm4704_usb)      - [IBM 4704 keyboard to USB][GH_ibm4704]
+* [next_usb](converter/next_usb)            - NeXT(Non-ADB) to USB, contributed by [BCG](https://github.com/bgould) and based on [Adafruit's work](https://learn.adafruit.com/usb-next-keyboard-with-arduino-micro/overview)
 
 ### keyboard
 * [hhkb](keyboard/hhkb/)                    - [Happy Hacking Keyboard pro][GH_hhkb] **my main board**
-* [gh60](keyboard/gh60/)                    - [GH60] DIY 60% keyboard [prototype][GH60_proto] **my second board**
+* [alps64](keyboard/alps64/)                - [Alps64 PCB](https://geekhack.org/index.php?topic=69740.0)
 * [hbkb](keyboard/hbkb/)                    - [Happy Buckling spring keyboard][GH_hbkb](IBM Model M 60% mod)
-* [hid_liber](keyboard/hid_liber/)          - [HID liberation][HID_liber] controller (by alaricljs)
-* [phantom](keyboard/phantom/)              - [Phantom] keyboard (by Tranquilite)
-* [IIgs_Standard](keyboard/IIgs/)           - Apple [IIGS] keyboard mod(by JeffreySung)
-* [macway](keyboard/macway/)                - [Compact keyboard mod][GH_macway] [retired]
-* [KMAC](keyboard/kmac/)                    - Korean custom keyboard
-* [Lightsaber](keyboard/lightsaber/)        - Korean custom keyboard
 * [Infinity](keyboard/infinity/)            - Massdrop [Infinity keyboard][Infinity]
-* [NerD](keyboard/nerd/)                    - Korean custom keyboard
-* [KittenPaw](keyboard/kitten_paw)          - Custom Majestouch controller
-* [Lightpad](keyboard/lightpad)             - Korean custom keypad
-* [ghost_squid](keyboard/ghost_squid/)      - [The Ghost Squid][ghost_squid] controller for [Cooler Master QuickFire XT][cmxt]
-
-### External projects using tmk_keyboard
-* [ErgoDox_cub-uanic][cub-uanic]            - Split Ergonomic Keyboard [ErgoDox][ergodox_org]
-* [mcdox][mcdox_tmk]                        - [mcdox][mcdox]
+* [gh60](keyboard/gh60/)                    - [GH60] DIY 60% keyboard [prototype][GH60_proto] **my second board**
+* [onekey](keyboard/onekey/)                - Simple one key keyboard example
 
 
-[GH_macway]:    http://geekhack.org/showwiki.php?title=Island:11930
+### Projects based tmk_keyboard or tmk_core
+https://github.com/tmk/tmk_keyboard/wiki/TMK-Based-Projects
+
+
 [GH_hhkb]:      http://geekhack.org/showwiki.php?title=Island:12047
 [GH_ps2]:       http://geekhack.org/showwiki.php?title=Island:14618
 [GH_adb]:       http://geekhack.org/showwiki.php?title=Island:14290
@@ -90,20 +69,12 @@ You can find some keyboard specific projects under `converter` and `keyboard` di
 [GH_x68k]:      http://geekhack.org/showwiki.php?title=Island:29060
 [GH_hbkb]:      http://geekhack.org/showwiki.php?title=Island:29483
 [GH_ibm4704]:   http://geekhack.org/index.php?topic=54706.0
-[HID_liber]:    http://deskthority.net/wiki/HID_Liberation_Device_-_DIY_Instructions
-[Phantom]:      http://geekhack.org/index.php?topic=26742
 [GH60]:         http://geekhack.org/index.php?topic=34959
 [GH60_proto]:   http://geekhack.org/index.php?topic=37570.0
 [PC98]:         http://en.wikipedia.org/wiki/NEC_PC-9801
 [Sun]:          http://en.wikipedia.org/wiki/Sun-3
-[IIGS]:         http://en.wikipedia.org/wiki/Apple_IIGS
 [Infinity]:     https://www.massdrop.com/buy/infinity-keyboard-kit
-[ghost_squid]:  http://deskthority.net/wiki/Costar_replacement_controllers#The_Ghost_Squid
-[cmxt]:         http://gaming.coolermaster.com/en/products/keyboards/quickfirext/
-[ergodox_org]:  http://ergodox.org/
-[cub-uanic]:    https://github.com/cub-uanic/tmk_keyboard/tree/master/keyboard/ergodox
-[mcdox]:        https://github.com/DavidMcEwan/mcdox
-[mcdox_tmk]:    https://github.com/DavidMcEwan/tmk_keyboard/tree/master/keyboard/mcdox
+[tmk_core]:     https://github.com/tmk/tmk_core
 
 
 
@@ -131,7 +102,7 @@ Magic Commands
 --------------
 To see help press `Magic` + `H`.
 
-`Magic` key combination is `LShift` + `RShift` in many project, but `Power` key on ADB converter. 
+`Magic` key combination is `LShift` + `RShift` in many projects, but `Power` key on ADB converter.
 `Magic` keybind can be vary on each project, check `config.h` in project directory.
 
 Following commands can be also executed with `Magic` + key. In console mode `Magic` keybind is not needed.
@@ -202,11 +173,11 @@ To avoid configuring accidentally additive salt key `KC_SPACE` also needs to be 
 
 Mechanical Locking support
 --------------------------
-This feature makes it possible for you to use mechanical locking switch for `CapsLock`, `NumLock` 
+This feature makes it possible for you to use mechanical locking switch for `CapsLock`, `NumLock`
 or `ScrollLock`. To enable this feature define these macros in `config.h` and use `KC_LCAP`, `KC_LN
 UM` or `KC_LSCR` in keymap for locking key instead of normal `KC_CAPS`, `KC_NLCK` or `KC_SLCK`. Res
 ync option tries to keep switch state consistent with keyboard LED state.
- 
+
     #define LOCKING_SUPPORT_ENABLE
     #define LOCKING_RESYNC_ENABLE
 
@@ -214,15 +185,21 @@ ync option tries to keep switch state consistent with keyboard LED state.
 
 Start Your Own Project
 -----------------------
-**TBD**
+1. Add `tmk_core` into your repository using `git submodule` or `git subtree`.
+2. Copy files from `tmk_keybaord` or other project similar to yours
+3. Edit those files to support your keyboard.
+
+See these as examples.
+- https://github.com/tmk/infinity_ergodox
+- https://github.com/tmk/whitefox
 
 
 
 Debugging
 --------
-Use PJRC's `hid_listen` to see debug messages. You can use the tool for debug even if firmware use LUFA stack.
+Use PJRC's `hid_listen` to see debug messages. You can use xprintf() to display debug info, see `tmk_core/common/xprintf.h`.
 
-You can use xprintf() to display debug info on `hid_listen`, see `tmk_core/common/xprintf.h`.
+- https://www.pjrc.com/teensy/hid_listen.html
 
 
 
@@ -233,6 +210,13 @@ Files and Directories
 * converter/    - protocol converter projects
 * tmk_core/     - core library
 * tmk_core/doc/ - documents
+
+
+
+Contribution
+------------
+- Report bugs in github **[Issues](https://github.com/tmk/tmk_keyboard/issues)**.
+- Pull requets are also welcomed.
 
 
 

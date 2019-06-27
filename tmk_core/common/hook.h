@@ -20,16 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "keyboard.h"
 #include "led.h"
+#include "action.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* -------------------------------------
- *       Hardware / one-off hooks
+ * Protocol hooks
  * ------------------------------------- */
 
-/* Called once, before initialising USB. */
+/* Called once, very early stage of initialization, just after processor startup. */
 /* Default behaviour: do nothing. */
 void hook_early_init(void);
 
-/* Called once, after USB is connected and keyboard initialised. */
+/* Called once, very last stage of initialization, just before keyboard loop. */
 /* Default behaviour: do nothing. */
 void hook_late_init(void);
 
@@ -47,12 +52,13 @@ void hook_usb_suspend_loop(void);
  * the "normal" indicator LED status by default. */
 void hook_usb_wakeup(void);
 
-/* Called once, on checking the bootmagic combos. */
+/* Called repeatedly until getting to CONFIGURED state */
 /* Default behaviour: do nothing. */
-void hook_bootmagic(void);
+void hook_usb_startup_wait_loop(void);
+
 
 /* -------------------------------------
- *       Keyboard / periodic hooks
+ * Keyboard hooks
  * ------------------------------------- */
 
 /* Called periodically from the keyboard loop (very often!) */
@@ -63,12 +69,28 @@ void hook_keyboard_loop(void);
 /* Default behaviour: do nothing. */
 void hook_matrix_change(keyevent_t event);
 
+/* Called on default layer state change event. */
+/* Default behaviour: do nothing. */
+void hook_default_layer_change(uint32_t default_layer_state);
+
 /* Called on layer state change event. */
 /* Default behaviour: do nothing. */
-void hook_layer_change(uint8_t layer_state);
+void hook_layer_change(uint32_t layer_state);
 
 /* Called on indicator LED update event (when reported from host). */
-/* Default behaviour: calls keyboard_set_leds (for compatibility). */
+/* Default behaviour: calls keyboard_set_leds. */
 void hook_keyboard_leds_change(uint8_t led_status);
+
+/* Called once, on checking the bootmagic combos. */
+/* Default behaviour: do nothing. */
+void hook_bootmagic(void);
+
+/* Called on before processing key event */
+/* returns true if the event is consumed and default action is not needed. */
+bool hook_process_action(keyrecord_t *record);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _HOOKS_H_ */

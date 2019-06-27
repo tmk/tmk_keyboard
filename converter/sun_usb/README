@@ -48,7 +48,9 @@ Frame format: 1-Start bit, 8-Data bits, No-Parity, 1-Stop bit
     To use AVR UART engine you need external inverter in front of RX and TX pin.
     Otherwise you can software serial routine to communicate the keyboard.
 
-This converter uses software method, you doesn't need any inverter part.
+This converter uses software method by default, so you don't need any inverter part.  But
+it can also be built with 'make HARDWARE_SERIAL=y' to enable hardware serial if there
+is an inverter present.  Good results have been obtained using a 74LS04 and hardware serial.
 
 
 Commands From System To Keyboard

@@ -1,0 +1,7 @@
+TARGET = ibm4704_usb_rev2_alps_unimap
+MCU = atmega32u2
+UNIMAP_ENABLE = yes
+KEYMAP_SECTION_ENABLE = yes
+OPT_DEFS += -DIBM4704_ALPS
+
+include Makefile

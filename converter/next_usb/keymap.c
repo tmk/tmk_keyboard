@@ -50,7 +50,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <avr/pgmspace.h>
 #include "keycode.h"
 #include "print.h"
 #include "debug.h"
@@ -59,7 +58,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "keycode.h"
 
 // 32*8(256) byte array which converts PS/2 code into USB code
-static const uint16_t PROGMEM fn_actions[] = {
+const action_t PROGMEM fn_actions[] = {
     ACTION_LAYER_MOMENTARY(1),                  // FN0 - left command key
     ACTION_LAYER_MOMENTARY(1),                  // FN1 - right command key
     ACTION_KEY(KC_BSLS),                        // FN2 - number pad slash & backslash
@@ -116,62 +115,50 @@ static const uint16_t PROGMEM fn_actions[] = {
 }
 
 
-static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     
     /* Layer 0: default
      * ,-----------------------------------------------------------. ,-----------. ,---------------.
-     * |Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|   BS  | |Ins|Ref|Hom| |`  |  =|  /|  *|
+     * |Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|   BS  | |VoU|Mut|PgU| |  `|  \|  /|  *|
      * |-----------------------------------------------------------| |-----------| |---------------|
-     * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|     | |Del|   |End| |  7|  8|  9|  -|
+     * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|     | |VoD|   |PgD| |  7|  8|  9|  -|
      * |-----------------------------------------------------'     | `---'   `---' |-----------|---|
      * |Ctrl  |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  Return|               |  4|  5|  6|  +|
      * |-----------------------------------------------------------|     ,---.     |---------------|
      * |Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|Shift     |     |Up |     |  1|  2|  3|   |
      * |-----------------------------------------------------------| ,-----------. |-----------|Ent|
-     * |Fn0  |Alt  |              Space                |LGui |Fn1  | |Lef|Dow|Rig| |      0|  .|   |
+     * |LAlt |LGui |              Space                |FN0  |RAlt | |Lef|Dow|Rig| |      0|  .|   |
      * `-----------------------------------------------------------' `-----------' `---------------'
      */
     KEYMAP(
-    ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSPC,  INS, WREF,HOME,  GRV, FN3, FN2, PAST,
-    TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,NO,    DEL,      END,   P7,  P8,  P9,  PMNS,
+    ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSPC,  VOLU,MUTE,PGUP,  GRV, BSLS,PSLS,PAST,
+    TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,BSLS,  VOLD,     PGDN,  P7,  P8,  P9,  PMNS,
     LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     ENT,                    P4,  P5,  P6,  PPLS,
     LSFT,     Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,     RSFT,       UP,         P1,  P2,  P3,  
-    FN0, LALT,                    SPC,                          LGUI,FN1,  LEFT,DOWN,RGHT,  P0,       PDOT,PENT
+    LALT,LGUI,                    SPC,                          FN0, RALT,  LEFT,DOWN,RGHT,  P0,       PDOT,PENT
     
     ),
 
-    /* Layer 1: extra keys
+    /* Layer 1: HHKB like
      * ,-----------------------------------------------------------. ,-----------. ,---------------.
-     * |Grv| F1| F2| F3| F4| F5| F6| F7| F8| F9|F10|F11|F12|   BS  | |VUp|VMu|PgU| |`  |  =|  /|  *|
+     * |  `| F1| F2| F3| F4| F5| F6| F7| F8| F9|F10|F11|F12|  Del  | |   |   |   | |Num|   |   |   |
      * |-----------------------------------------------------------| |-----------| |---------------|
-     * |Tab  |Pau|  W|  E|  R|  T|  Y|  U|  I|  O|PSc|  \|  ]|     | |VDn|   |PgD| |  7|  8|  9|  -|
+     * |Caps |  \|   |   |   |   |   |   |Psc|Slk|Pau|Up |Ins|     | |   |   |   | |   |   |   |   |
      * |-----------------------------------------------------'     | `---'   `---' |-----------|---|
-     * |Ctrl  |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  Return|               |  4|  5|  6|  +|
+     * |      |VoD|VoU|Mut|   |   |  *|  /|Hom|PgU|Lef|Rig|        |               |   |   |   |   |
      * |-----------------------------------------------------------|     ,---.     |---------------|
-     * |Shift   |UND|CUT|COP|PST|  B|  N|  M|  ,|  .|  /|Shift     |     |Up |     |  1|  2|  3|   |
-     * |-----------------------------------------------------------| ,-----------. |-----------|Ent|
-     * |Fn0  |Alt  |              Space                |RGui |Fn1  | |Lef|Dow|Rig| |      0|  .|   |
+     * |        |UND|CUT|COP|PST|   |  +|  -|End|PgD|Dow|          |     |PgU|     |   |   |   |   |
+     * |-----------------------------------------------------------| ,-----------. |-----------|   |
+     * |     |     |                                   |     |     | |Hom|PgD|End| |       |   |   |
      * `-----------------------------------------------------------' `-----------' `---------------'
      */
     KEYMAP(
     
-    GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, TRNS,  VOLU,MUTE,PGUP,  TRNS,TRNS,TRNS,TRNS,
-    TRNS,PAUS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,FN3, BSLS,TRNS,  VOLD,     PGDN,  BTN1,MS_U,BTN2,WH_U,
-    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS,                   MS_L,MS_D,MS_R,WH_D,
-    TRNS,     FN4, FN5, FN6, FN7, TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,     TRNS,       TRNS,       TRNS,TRNS,TRNS,  
-    TRNS,TRNS,                    TRNS,                         TRNS,TRNS,  TRNS,TRNS,TRNS,  TRNS,     TRNS,TRNS
+    GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, DEL,   TRNS,TRNS,TRNS,  NLCK,TRNS,TRNS,TRNS,
+    CAPS,BSLS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,UP,  INS, TRNS,  TRNS,     TRNS,  TRNS,TRNS,TRNS,TRNS,
+    TRNS,VOLD,VOLU,MUTE,TRNS,TRNS,PAST,PSLS,HOME,PGUP,LEFT,RGHT,     TRNS,                   TRNS,TRNS,TRNS,TRNS,
+    TRNS,     FN4, FN5, FN6, FN7, TRNS,PPLS,PMNS,END, PGDN,DOWN,     TRNS,       PGUP,       TRNS,TRNS,TRNS,  
+    TRNS,TRNS,                    TRNS,                         TRNS,TRNS,  HOME,PGDN,END,   TRNS,     TRNS,TRNS
     
     )
 };
-
-/* translates key to keycode */
-uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
-{
-    return pgm_read_byte(&keymaps[(layer)][(key.row)][(key.col)]);
-}
-
-/* translates Fn keycode to action */
-action_t keymap_fn_to_action(uint8_t keycode)
-{
-    return (action_t){ .code = pgm_read_word(&fn_actions[FN_INDEX(keycode)]) };
-}

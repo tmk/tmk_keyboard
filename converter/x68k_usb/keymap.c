@@ -17,9 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <avr/pgmspace.h>
 #include "keycode.h"
+#include "action.h"
 #include "util.h"
+#include "serial.h"
 #include "keymap.h"
 
 
@@ -70,33 +71,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 
-// Assign Fn key(0-7) to a layer to which switch with the Fn key pressed.
-static const uint8_t PROGMEM fn_layer[] = {
-    0,              // Fn0
-    0,              // Fn1
-    0,              // Fn2
-    0,              // Fn3
-    0,              // Fn4
-    0,              // Fn5
-    0,              // Fn6
-    0               // Fn7
+const action_t fn_actions[] PROGMEM = {
+    [0] = ACTION_FUNCTION(0),   // toggle all LEDs
 };
 
-// Assign Fn key(0-7) to a keycode sent when release Fn key without use of the layer.
-// See layer.c for details.
-static const uint8_t PROGMEM fn_keycode[] = {
-    KC_NO,          // Fn0
-    KC_NO,          // Fn1
-    KC_NO,          // Fn2
-    KC_NO,          // Fn3
-    KC_NO,          // Fn4
-    KC_NO,          // Fn5
-    KC_NO,          // Fn6
-    KC_NO           // Fn7
-};
+void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
+{
+    static bool led = false;
+    switch (id) {
+        case 0:
+            if (record->event.pressed) {
+                if ((led = !led))
+                    serial_send(0x80);  // all on
+                else
+                    serial_send(0xff);  // all off
+            }
+            break;
+    }
+}
 
 
-static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* X68000 Keyboard Scan codes
     ,---. ,---.    ,-------------------,    ,-------------------.  ,-----------. ,---------------.
     | 61| | 62|    | 63| 64| 65| 66| 67|    | 68| 69| 6A| 6B| 6C|  | 5A| 5B| 5C| | 5D| 52| 53| 54|
@@ -115,7 +110,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 */
     /* ANSI */
     KEYMAP(
-    F16, F17,     F1,  F2,  F3,  F4,  F5,   F6,  F7,  F8,  F9,  F10,              PSCR,SLCK,PAUS,     CAPS,F11, F12, F13,
+    FN0, F17,     F1,  F2,  F3,  F4,  F5,   F6,  F7,  F8,  F9,  F10,              PSCR,SLCK,PAUS,     CAPS,F11, F12, F13,
     ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSLS,BSPC,   HOME,INS, DEL,      NLCK,PSLS,PAST,PMNS,
     TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,     ENT,    PGDN,PGUP,END,      P7,  P8,  P9,  PPLS,
     LCTL,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,F18,                   UP,            P4,  P5,  P6,  PEQL,
@@ -132,19 +127,3 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
          LGUI,LALT,MHEN,     SPC,      HENK,KANA,APP, ZKHK,                       F14,      F15,      P0,  PCMM,PDOT
     ),
 };
-
-
-uint8_t keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t col)
-{
-    return pgm_read_byte(&keymaps[(layer)][(row)][(col)]);
-}
-
-uint8_t keymap_fn_layer(uint8_t index)
-{
-    return pgm_read_byte(&fn_layer[index]);
-}
-
-uint8_t keymap_fn_keycode(uint8_t index)
-{
-    return pgm_read_byte(&fn_keycode[index]);
-}

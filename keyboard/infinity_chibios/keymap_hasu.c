@@ -119,7 +119,7 @@ enum macro_id {
 /*
  * Fn action definition
  */
-const uint16_t fn_actions[] = {
+const action_t fn_actions[] = {
     [0] = ACTION_DEFAULT_LAYER_SET(0),                // Default layer(not used)
     [1] = ACTION_LAYER_TAP_TOGGLE(1),                 // HHKB layer(toggle with 5 taps)
     [2] = ACTION_LAYER_TAP_KEY(2, KC_SLASH),          // Cursor layer with Slash*

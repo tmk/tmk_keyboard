@@ -20,6 +20,7 @@
 #include "timer.h"
 #include "uart.h"
 #include "debug.h"
+#include "suspend.h"
 
 
 #define UART_BAUD_RATE 115200
@@ -38,6 +39,23 @@ static void initForUsbConnectivity(void)
         _delay_ms(1);
     }
     usbDeviceConnect();
+    sei();
+}
+
+void usb_remote_wakeup(void) {
+    cli();
+
+    int8_t ddr_orig = USBDDR;
+    USBOUT |= (1 << USBMINUS);
+    USBDDR = ddr_orig | USBMASK;
+    USBOUT ^= USBMASK;
+
+    _delay_ms(25);
+
+    USBOUT ^= USBMASK;
+    USBDDR = ddr_orig;
+    USBOUT &= ~(1 << USBMINUS);
+
     sei();
 }
 
@@ -70,19 +88,6 @@ int main(void)
             // Suspend when no SOF in 3ms-10ms(7.1.7.4 Suspending of USB1.1)
             if (timer_elapsed(last_timer) > 5) {
                 suspended = true;
-/*
-                uart_putchar('S');
-                _delay_ms(1);
-                cli();
-                set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-                sleep_enable();
-                sleep_bod_disable();
-                sei();
-                sleep_cpu();
-                sleep_disable();
-                _delay_ms(10);
-                uart_putchar('W');
-*/
             }
         }
 #endif
@@ -95,6 +100,8 @@ int main(void)
                 keyboard_task();
             }
             vusb_transfer_keyboard();
+        } else if (suspend_wakeup_condition()) {
+            usb_remote_wakeup();
         }
     }
 }
