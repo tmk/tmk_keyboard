@@ -39,7 +39,7 @@ Data    ____|__/    X____X____X____X____X____X____X____X____X____X   \___
             |  Start   0    1    2    3    4    5    6    7    P   Stop
             Request by host
 
-Start bit:  can be long as 300-350us.
+Start bit:  can be long as 300-350us during start up and upto 2500us while key scanning
 Request:    Host pulls Clock line down to request to send a command.
 Timing:     After Request keyboard pull up Data and down Clock line to low for start bit.
             After request host release Clock line once Data line becomes hi.
@@ -58,7 +58,7 @@ uint8_t ibm4704_send(uint8_t data)
     clock_lo();
 
     /* wait for Start bit(Clock:lo/Data:hi) */
-    WAIT(data_hi, 300, 0x30);
+    WAIT(data_hi, 5000, 0x30);
 
     /* Data bit */
     for (uint8_t i = 0; i < 8; i++) {
@@ -89,7 +89,7 @@ uint8_t ibm4704_send(uint8_t data)
     return 0;
 ERROR:
     idle();
-    if (ibm4704_error > 0x30) {
+    if (ibm4704_error >= 0x30) {
         xprintf("S:%02X ", ibm4704_error);
     }
     IBM4704_INT_ON();
