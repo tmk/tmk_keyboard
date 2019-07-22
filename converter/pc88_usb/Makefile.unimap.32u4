@@ -1,0 +1,4 @@
+TARGET ?= pc88_usb_32u4_unimap
+MCU ?= atmega32u4
+
+include Makefile.unimap
