@@ -3,6 +3,20 @@ PC88(Late type) to USB keyboard protocol converter
 Target MCU is ATMega32u2 but other USB capable AVR will also work.
 
 
+README FIRST
+---------
+This converter is for TYPE-B keyboard. For keyboards other than TYPE-B, 
+change the mode switch on the back of the keyboard.
+
+Stand the left foot on the back of the keyboard and there are two slits. 
+There is a mode change switch in the back of it.
+
+When this switch is up, TYPE-B mode is set.
+
+When connecting a keyboard to this adapter, be sure to set to TYPE-B mode.
+
+
+
 Connector
 ---------
 On host/converter:
