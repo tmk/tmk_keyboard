@@ -42,33 +42,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Locking resynchronize hack */
 #define LOCKING_RESYNC_ENABLE
 
-/* Control LED indicatiors, which doesn't work well with locking support */
-/*#define PC98_LED_CONTROL*/
-
-
-/* PC98 Reset Port shared with TXD */
-/*
-#define PC98_RST_DDR    DDRD
-#define PC98_RST_PORT   PORTD
-#define PC98_RST_BIT    3
-*/
-/* PC98 Ready Port */
-/*
-#define PC98_RDY_DDR    DDRD
-#define PC98_RDY_PORT   PORTD
-#define PC98_RDY_BIT    4
-*/
-/* PC98 Retry Port */
-/*
-#define PC98_RTY_DDR    DDRD
-#define PC98_RTY_PORT   PORTD
-#define PC98_RTY_BIT    1
-*/
 
 /*
- * PC98 Serial(USART) configuration
- *     asynchronous, positive logic, 19200baud, bit order: LSB first
- *     1-start bit, 8-data bit, odd parity, 1-stop bit
+ * PC88 Serial(USART) configuration
+ *     asynchronous, positive logic, 20800baud, bit order: LSB first
+ *     1-start bit, 8-data bit, non parity, 1-stop bit
  */
 
 /*
