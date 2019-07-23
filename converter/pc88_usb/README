@@ -1,0 +1,73 @@
+PC88(Late type) to USB keyboard protocol converter
+=======================================
+Target MCU is ATMega32u2 but other USB capable AVR will also work.
+
+
+README FIRST
+---------
+This converter is for TYPE-B keyboard. For keyboards other than TYPE-B, 
+change the mode switch on the back of the keyboard.
+
+Stand the left foot on the back of the keyboard and there are two slits. 
+There is a mode change switch in the back of it.
+
+When this switch is up, TYPE-B mode is set.
+
+When connecting a keyboard to this adapter, be sure to set to TYPE-B mode.
+
+
+
+Connector
+---------
+On host/converter:
+
+    5Pin mini DIN
+       ___ ___
+      /  |_|  \
+     / 5     4 \
+    | 3   |   2 |
+     \_     1 _/
+       \_____/
+     (receptacle)
+
+
+Wiring: You can change this with editing config.h.
+
+    Pin mini DIN        MCU
+    ----------------------------------
+    1   5V              VCC
+    2   GND             GND
+    3   DATA            RD2
+    4   NC
+    5   NC
+
+
+
+
+Protocol
+--------
+Signal: Asynchronous, Positive logic, 20800bps, Least bit first
+Frame format: 1-Start bit(Lo), 8-Data bits, non-Parity, 1-Stop bit
+
+
+
+Build Firmware
+--------------
+Just use 'make' to bild firmware for TMK PC88 converter.
+
+    $ make -f Makefile.unimap clean
+    $ make -f Makefile.unimap
+
+To flash firmware
+
+    $ make -f Makefile.unimap dfu
+
+then push button on converter to flash firmware.
+
+If you are using ATMega32u4 based board instead of premade TMK PC88 converter(ATMega32u2) use following commands.
+
+    $ make -f Makefile.unimap.32u4 clean
+    $ make -f Makefile.unimap.32u4
+    $ make -f Makefile.unimap.32u4 dfu
+
+
