@@ -81,6 +81,12 @@ void add_key(uint8_t key)
         return;
     }
 #endif
+#ifdef APPLE_FN_ENABLE
+    if (IS_APPLE_FN(key)) {
+        keyboard_report->apple_fn = 1;
+        return;
+    }
+#endif
     add_key_byte(key);
 }
 
@@ -89,6 +95,12 @@ void del_key(uint8_t key)
 #ifdef NKRO_ENABLE
     if (keyboard_protocol && keyboard_nkro) {
         del_key_bit(key);
+        return;
+    }
+#endif
+#ifdef APPLE_FN_ENABLE
+    if (IS_APPLE_FN(key)) {
+        keyboard_report->apple_fn = 0;
         return;
     }
 #endif

@@ -39,6 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define IS_SPECIAL(code)         ((0xA5 <= (code) && (code) <= 0xDF) || (0xE8 <= (code) && (code) <= 0xFF))
 #define IS_SYSTEM(code)          (KC_PWR       <= (code) && (code) <= KC_WAKE)
 #define IS_CONSUMER(code)        (KC_MUTE      <= (code) && (code) <= KC_WFAV)
+#define IS_APPLE_FN(code)        (KC_APFN      == code)
 #define IS_FN(code)              (KC_FN0       <= (code) && (code) <= KC_FN31)
 #define IS_MOUSEKEY(code)        (KC_MS_UP     <= (code) && (code) <= KC_MS_ACCEL2)
 #define IS_MOUSEKEY_MOVE(code)   (KC_MS_UP     <= (code) && (code) <= KC_MS_RIGHT)
@@ -172,6 +173,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_WSTP KC_WWW_STOP
 #define KC_WREF KC_WWW_REFRESH
 #define KC_WFAV KC_WWW_FAVORITES
+/* Apple Fn */
+#define KC_APFN KC_APPLE_FN
 /* Jump to bootloader */
 #define KC_BTLD KC_BOOTLOADER
 /* Transparent */
@@ -437,6 +440,9 @@ enum internal_special_keycodes {
     KC_WWW_STOP,
     KC_WWW_REFRESH,
     KC_WWW_FAVORITES,    /* 0xBC */
+
+    /* Apple Fn */
+    KC_APPLE_FN,         /* 0xBD */
 
     /* Jump to bootloader */
     KC_BOOTLOADER       = 0xBF,

@@ -51,7 +51,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * ACT_MOUSEKEY(0110): TODO: Not needed?
  * 0101|xxxx| keycode     Mouse key
  *
- * 011x|xxxx xxxx xxxx    (reseved)
+ * ACT_APPLE_FN(0111):
+ * 0111|xxxx| keycode     Apple Fn (keycode is always KC_APPLE_FN)
  *
  *
  * Layer Actions(10xx)
@@ -110,6 +111,8 @@ enum action_kind_id {
     /* Other Keys */
     ACT_USAGE           = 0b0100,
     ACT_MOUSEKEY        = 0b0101,
+    /* Apple Fn */
+    ACT_APPLE_FN        = 0b0111,
     /* Layer Actions */
     ACT_LAYER           = 0b1000,
     ACT_LAYER_TAP       = 0b1010, /* Layer  0-15 */
@@ -231,6 +234,7 @@ enum usage_pages {
 };
 #define ACTION_USAGE_SYSTEM(id)         ACTION(ACT_USAGE, PAGE_SYSTEM<<10 | (id))
 #define ACTION_USAGE_CONSUMER(id)       ACTION(ACT_USAGE, PAGE_CONSUMER<<10 | (id))
+#define ACTION_APPLE_FN(key)            ACTION(ACT_APPLE_FN, key)
 #define ACTION_MOUSEKEY(key)            ACTION(ACT_MOUSEKEY, key)
 
 

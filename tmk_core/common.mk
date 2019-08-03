@@ -47,6 +47,10 @@ ifeq (yes,$(strip $(EXTRAKEY_ENABLE)))
     OPT_DEFS += -DEXTRAKEY_ENABLE
 endif
 
+ifeq (yes,$(strip $(APPLE_FN_ENABLE)))
+    OPT_DEFS += -DAPPLE_FN_ENABLE
+endif
+
 ifeq (yes,$(strip $(CONSOLE_ENABLE)))
     OPT_DEFS += -DCONSOLE_ENABLE
 else

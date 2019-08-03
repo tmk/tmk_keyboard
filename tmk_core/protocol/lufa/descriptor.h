@@ -153,8 +153,11 @@ typedef struct
 #   error "Endpoints are not available enough to support all functions. Disable some of build options in Makefile.(MOUSEKEY, EXTRAKEY, CONSOLE, NKRO)"
 #endif
 
-
-#define KEYBOARD_EPSIZE             8
+#ifdef APPLE_FN_ENABLE
+  #define KEYBOARD_EPSIZE           9
+#else
+  #define KEYBOARD_EPSIZE           8
+#endif
 #define MOUSE_EPSIZE                8
 #define EXTRAKEY_EPSIZE             8
 #define CONSOLE_EPSIZE              32

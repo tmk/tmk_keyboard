@@ -129,6 +129,9 @@ typedef union {
         uint8_t mods;
         uint8_t reserved;
         uint8_t keys[KEYBOARD_REPORT_KEYS];
+#ifdef APPLE_FN_ENABLE
+        uint8_t apple_fn;
+#endif
     };
 #ifdef NKRO_ENABLE
     struct {
