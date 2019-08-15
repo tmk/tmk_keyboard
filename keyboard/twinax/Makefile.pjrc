@@ -50,7 +50,10 @@ TARGET_DIR = .
 # keyboard dependent files
 SRC =	keymap.c \
 	matrix.c \
-	led.c
+	led.c \
+	font.c \
+	i2c.c \
+	lcd.c
 
 CONFIG_H = config.h
 

@@ -18,8 +18,26 @@
  */
 
 #include "led.h"
+#include "lcd.h"
 
 void led_set(uint8_t usb_led)
 {
-/* this keyboard has no leds */
+    /* this keyboard has no leds, but I added an OLED */
+    lcd_gotoxy(0,0);
+    if (usb_led & (1<<0))
+        lcd_puts("NumLock");
+    else
+        lcd_puts("       ");
+
+    lcd_gotoxy(0,1);
+    if (usb_led & (1<<1))
+        lcd_puts("CapsLock");
+    else
+        lcd_puts("        ");
+
+    lcd_gotoxy(0,2);
+    if (usb_led & (1<<2))
+        lcd_puts("ScrollLock");
+    else
+        lcd_puts("          ");
 }

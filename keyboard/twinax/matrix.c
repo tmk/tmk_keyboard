@@ -26,6 +26,7 @@
 #include "debug.h"
 #include "util.h"
 #include "matrix.h"
+#include "lcd.h"
 
 
 #ifndef DEBOUNCE
@@ -54,6 +55,12 @@ uint8_t matrix_cols(void)
 
 void matrix_init(void)
 {
+    lcd_init(LCD_DISP_ON);    // init lcd and turn on
+    lcd_gotoxy(0,6);
+    lcd_puts("IBM Twinax");
+    lcd_gotoxy(0,7);
+    lcd_puts("(C)2019 Dirk Eibach");
+
     unselect_cols();
     init_rows();
 
@@ -150,12 +157,12 @@ uint8_t matrix_key_count(void)
 static void init_rows(void)
 {
     // Input with pull-up(DDR:0, PORT:1)
-    DDRB  &= ~0b10000000;
-    PORTB |=  0b10000000;
+    DDRB  &= ~0b10000011;
+    PORTB |=  0b10000011;
     DDRC  &= ~0b11111111;
     PORTC |=  0b11111111;
-    DDRD  &= ~0b10111111;
-    PORTD |=  0b10111111;
+    DDRD  &= ~0b10111100;
+    PORTD |=  0b10111100;
     DDRE  &= ~0b11000011;
     PORTE |=  0b11000011;
 }
@@ -163,8 +170,8 @@ static void init_rows(void)
 static uint32_t read_rows(void)
 {
     return (PINB&(1<<7) ? 0 : (1UL<<0)) |
-           (PIND&(1<<0) ? 0 : (1UL<<1)) |
-           (PIND&(1<<1) ? 0 : (1UL<<2)) |
+           (PINB&(1<<0) ? 0 : (1UL<<1)) |
+           (PINB&(1<<1) ? 0 : (1UL<<2)) |
            (PIND&(1<<2) ? 0 : (1UL<<3)) |
            (PIND&(1<<3) ? 0 : (1UL<<4)) |
            (PIND&(1<<4) ? 0 : (1UL<<5)) |
