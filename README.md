@@ -186,7 +186,7 @@ ync option tries to keep switch state consistent with keyboard LED state.
 Start Your Own Project
 -----------------------
 1. Add `tmk_core` into your repository using `git submodule` or `git subtree`.
-2. Copy files from `tmk_keybaord` or other project similar to yours
+2. Copy files from `tmk_keyboard` or other project similar to yours
 3. Edit those files to support your keyboard.
 
 See these as examples.
