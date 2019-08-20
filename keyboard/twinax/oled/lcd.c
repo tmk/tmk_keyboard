@@ -130,6 +130,13 @@ void lcd_gotoxy(uint8_t x, uint8_t y){
 #endif
     lcd_command(commandSequence, sizeof(commandSequence));
 }
+void lcd_clrmem(void){
+#ifdef GRAPHICMODE
+    for (uint8_t i = 0; i < DISPLAY_HEIGHT/8; i++){
+        memset(displayBuffer[i], 0x00, sizeof(displayBuffer[i]));
+    }
+#endif
+}
 void lcd_clrscr(void){
 #ifdef GRAPHICMODE
     for (uint8_t i = 0; i < DISPLAY_HEIGHT/8; i++){
@@ -365,6 +372,10 @@ void lcd_drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t color)
         if (e2 < dx) { err += dx; y1 += sy; } /* e_xy+e_y < 0 */
     }
 }
+void lcd_drawFastHLine(uint8_t x1, uint8_t y1, uint8_t width, uint8_t color){
+    lcd_drawLine(x1, y1, x1 + width, y1, color);
+}
+
 void lcd_drawRect(uint8_t px1, uint8_t py1, uint8_t px2, uint8_t py2, uint8_t color){
     if( px1 > DISPLAY_WIDTH-1 ||
        px2 > DISPLAY_WIDTH-1 ||

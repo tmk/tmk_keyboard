@@ -51,9 +51,17 @@ TARGET_DIR = .
 SRC =	keymap.c \
 	matrix.c \
 	led.c \
-	font.c \
-	i2c.c \
-	lcd.c
+	oled/font.c \
+	oled/i2c.c \
+	oled/lcd.c \
+	oled/ibm_logo.c \
+	shootduino/game_state.cpp \
+	shootduino/game_objects.cpp \
+	shootduino/highscores.cpp \
+	shootduino/textutils.cpp \
+	shootduino/gfx.cpp \
+	shootduino/starfield.cpp \
+	shootduino/shootduino.cpp
 
 CONFIG_H = config.h
 
@@ -90,6 +98,7 @@ COMMAND_ENABLE = yes    # Commands for debug and configuration
 # Search Path
 VPATH += $(TARGET_DIR)
 VPATH += $(TMK_DIR)
+VPATH += $(TARGET_DIR)/oled
 
 include $(TMK_DIR)/protocol/pjrc.mk
 include $(TMK_DIR)/common.mk

@@ -26,8 +26,7 @@
 #include "debug.h"
 #include "util.h"
 #include "matrix.h"
-#include "lcd.h"
-
+#include "shootduino/joystick.h"
 
 #ifndef DEBOUNCE
 #   define DEBOUNCE	10
@@ -55,12 +54,6 @@ uint8_t matrix_cols(void)
 
 void matrix_init(void)
 {
-    lcd_init(LCD_DISP_ON);    // init lcd and turn on
-    lcd_gotoxy(0,6);
-    lcd_puts("IBM Twinax");
-    lcd_gotoxy(0,7);
-    lcd_puts("(C)2019 Dirk Eibach");
-
     unselect_cols();
     init_rows();
 
@@ -72,6 +65,8 @@ void matrix_init(void)
 
     debug_enable=true;
 }
+
+struct JoystickState joystick;
 
 uint8_t matrix_scan(void)
 {
@@ -86,6 +81,19 @@ uint8_t matrix_scan(void)
             if (curr_bit)
                 xprintf("%u%c\n", col, 'A' + row);
 #endif
+            if ((col == 0) && (row == ('Q'-'A')))
+                joystick.up = curr_bit;
+            else if ((col == 0) && (row == ('P'-'A')))
+                joystick.down = curr_bit;
+            else if ((col == 6) && (row == ('A'-'A')))
+                joystick.left = curr_bit;
+            else if ((col == 1) && (row == ('T'-'A')))
+                joystick.right = curr_bit;
+            else if ((col == 0) && (row == ('A'-'A')))
+                joystick.right_button = curr_bit;
+            else if ((col == 7) && (row == ('B'-'A')))
+                joystick.left_button = curr_bit;
+
             if (prev_bit != curr_bit) {
                 matrix_debouncing[row] ^= ((matrix_row_t)1<<col);
                 if (debouncing) {

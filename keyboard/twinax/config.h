@@ -40,7 +40,7 @@
 #define MATRIX_HAS_GHOST
 
 /* Set 0 if need no debouncing */
-#define DEBOUNCE    5
+#define DEBOUNCE    3
 
 /* key combination for command */
 #define IS_COMMAND() ( \

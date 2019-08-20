@@ -62,7 +62,7 @@ extern "C" {
     /* TODO: define displaycontroller */
 #define SSD1306                                 // or SSD1306, check datasheet of your display
     /* TODO: define displaymode */
-#define TEXTMODE                // TEXTMODE for only text to display,
+#define GRAPHICMODE                // TEXTMODE for only text to display,
     // GRAPHICMODE for text and graphic
     /* TODO: define font */
 #define FONT            ssd1306oled_font// set font here, refer font-name at font.h/font.c
@@ -92,9 +92,7 @@ extern "C" {
     
 #define DISPLAY_WIDTH        128
 #define DISPLAY_HEIGHT        64
-    
-    
-    
+
     void lcd_command(uint8_t cmd[], uint8_t size);    // transmit command to display
     void lcd_data(uint8_t data[], uint16_t size);    // transmit data to display
     void lcd_init(uint8_t dispAttr);
@@ -107,6 +105,7 @@ extern "C" {
     void lcd_puts_p(const char* progmem_s);        // print string from flash on screen (TEXTMODE)
     // or buffer (GRAPHICMODE)
     
+    void lcd_clrmem(void);                // clear buffer at GRFAICMODE
     void lcd_clrscr(void);                // clear screen (and buffer at GRFAICMODE)
     void lcd_gotoxy(uint8_t x, uint8_t y);        // set curser at pos x, y. x means character,
     // y means line (page, refer lcd manual)
@@ -116,6 +115,7 @@ extern "C" {
 #if defined GRAPHICMODE
     void lcd_drawPixel(uint8_t x, uint8_t y, uint8_t color);
     void lcd_drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t color);
+    void lcd_drawFastHLine(uint8_t x1, uint8_t y1, uint8_t width, uint8_t color);
     void lcd_drawRect(uint8_t px1, uint8_t py1, uint8_t px2, uint8_t py2, uint8_t color);
     void lcd_fillRect(uint8_t px1, uint8_t py1, uint8_t px2, uint8_t py2, uint8_t color);
     void lcd_drawCircle(uint8_t center_x, uint8_t center_y, uint8_t radius, uint8_t color);
