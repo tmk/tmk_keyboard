@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* key combination for command */
 #define IS_COMMAND()    ( \
-    keyboard_report->keys[0] == KC_STOP || \
+    matrix_is_on(12, 0) || /* STOP */ \
     keyboard_report->mods == (MOD_BIT(KC_LALT) | MOD_BIT(KC_RALT)) \
 )
 

@@ -26,7 +26,7 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
 #endif
     /*
     ,---. ,---. ,------------------------. ,------------------------. ,------------------------.
-    |Pau| |PrS| | F1 | F2 | F3 | F4 | F5 | | F6 | F7 | F8 | F9 | F10| | F11| F12| F13| F14| F15|
+    |   | |PrS| | F1 | F2 | F3 | F4 | F5 | | F6 | F7 | F8 | F9 | F10| | F11| F12| F13| F14| F15|
     `---' `---' `------------------------' `------------------------' `------------------------'
     ,-------------------------------------------------------------. ,-------.  ,---------------.
     | Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY|Bspc| |Ins|Del|  |Hom|End|  -|  /|
@@ -42,7 +42,7 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
     Caps and Kana are locking keys.
     */
     UNIMAP_PC98(
-    PAUS,PSCR,     F1,  F2,  F3,  F4,  F5,            F6,  F7,  F8,  F9,  F10,          F11, F12, F13, F14, F15,
+    NO,  PSCR,     F1,  F2,  F3,  F4,  F5,            F6,  F7,  F8,  F9,  F10,          F11, F12, F13, F14, F15,
     ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, JYEN,BSPC,  INS, DEL,   HOME,END, PMNS,PSLS,
     TAB,      Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,       PGDN,PGUP,  P7,  P8,  P9,  PAST,
     LCTL,LCAP,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,BSLS,ENT,      UP,      P4,  P5,  P6,  PPLS,
