@@ -64,23 +64,23 @@ If you are using ATMega32u4 based board instead of premade TMK PC98 converter(AT
 PC98 Scan Codes
 ---------------
     ,---. ,---. ,------------------------. ,------------------------. ,------------------------.
-    |Pau| |PrS| | F1 | F2 | F3 | F4 | F5 | | F6 | F7 | F8 | F9 | F10| | F11| F12| F13| F14| F15|
+    |Stp| |Cpy| | F1 | F2 | F3 | F4 | F5 | | F6 | F7 | F8 | F9 | F10| | F11| F12| F13| F14| F15|
     `---' `---' `------------------------' `------------------------' `------------------------'
     ,-------------------------------------------------------------. ,-------.  ,---------------.
-    | Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY|Bspc| |Ins|Del|  |Hom|End|  -|  /|
+    | Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY|Bspc| |Ins|Del|  |Hom|Hlp|  -|  /|
     |-------------------------------------------------------------| |-------|  |---------------|
-    | Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|      | |PgD|PgU|  |  7|  8|  9|  *|
+    | Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|      | |RUp|RDn|  |  7|  8|  9|  *|
     |-------------------------------------------------------`Enter| |-------|  |---------------|
     |Ctl|Cap|  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  \|     | |  Up   |  |  4|  5|  6|  +|
     |-------------------------------------------------------------| |-------|  |---------------|
     | Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO| Shift | |Lef|Rig|  |  1|  2|  3|  =|
     `-------------------------------------------------------------' |-------|  |---------------|
-     ^3|Kana|Gui|Alt|MHEN|       Space        |HENK|Alt|Gui|App|^2  | Down  |  |  0|  ,|  .| ^1|
+       |Kana|Win|GRP|NFER|       Space        |XFER| ^2|Win| ^3|    | Down  |  |  0|  ,|  .| ^1|
        `-------------------------------------------------------'    `-------'  `---------------'
-    ^1: Enter on keypad is identical to Enter on alphanumeric portion.
-    ^2: Right Alt is ALT on DIGITAL WAVE Dboard while Menu on PC-9821 keyboard.
-        App is HOME key on PC98XL keyboard.
-    ^3: Caps and Kana are locking keys, either mechanically or by firmware emulation.
+    ^1: Enter on keypad is identical to Enter on alphanumeric portion
+    ^2: ALT on DIGITAL WAVE Dboard while Menu on PC-9821 keyboard
+    ^3: HOME on PC98XL keyboard
+    ^4: CAPS and Kana are locking keys, either mechanically or by firmware emulation
 
 
     ,---. ,---. ,------------------------. ,------------------------. ,------------------------.
