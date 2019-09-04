@@ -71,12 +71,12 @@ static void pc98_inhibit_repeat(void)
 RETRY:
     pc98_send(0x9C);
     code = pc98_wait_response();
-    if (code != -1) xprintf("send 9C: %02X\n", code);
+    if (code != -1) dprintf("send 9C: %02X\n", code);
     if (code != 0xFA) return;
 
     pc98_send(0x70);
     code = pc98_wait_response();
-    if (code != -1) xprintf("send 70: %02X\n", code);
+    if (code != -1) dprintf("send 70: %02X\n", code);
     if (code != 0xFA) goto RETRY;
 }
 
@@ -87,18 +87,17 @@ static void pc98_led_set(void)
 RETRY:
     pc98_send(0x9D);
     code = pc98_wait_response();
-    if (code != -1) xprintf("send 9D: %02X\n", code);
+    if (code != -1) dprintf("send 9D: %02X\n", code);
     if (code != 0xFA) return;
 
     pc98_send(pc98_led);
     code = pc98_wait_response();
-    if (code != -1) xprintf("send %02X: %02X\n", pc98_led, code);
+    if (code != -1) dprintf("send %02X: %02X\n", pc98_led, code);
     if (code != 0xFA) goto RETRY;
 }
 
 void matrix_init(void)
 {
-    debug_keyboard = true;
     PC98_RST_DDR |= (1<<PC98_RST_BIT);
     PC98_RDY_DDR |= (1<<PC98_RDY_BIT);
     PC98_RTY_DDR |= (1<<PC98_RTY_BIT);
@@ -125,7 +124,6 @@ void matrix_init(void)
     // ready to receive from keyboard
     PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);    // RDY: low
 
-    print("matrix_init done.\n");
     return;
 }
 
@@ -145,7 +143,7 @@ uint8_t matrix_scan(void)
         return 0;
     }
 
-    print_hex8(code); print(" ");
+    dprintf("%02X ", code);
 
     if (code&0x80) {
         // break code
@@ -180,6 +178,6 @@ void led_set(uint8_t usb_led)
     pc98_led = 0x70;
     if (usb_led & (1<<USB_LED_NUM_LOCK))    pc98_led |= (1<<0);
     if (usb_led & (1<<USB_LED_CAPS_LOCK))   pc98_led |= (1<<2);
-    xprintf("usb_led: %02X\n", usb_led);
-    xprintf("pc98_led: %02X\n", pc98_led);
+    dprintf("usb_led: %02X\n", usb_led);
+    dprintf("pc98_led: %02X\n", pc98_led);
 }
