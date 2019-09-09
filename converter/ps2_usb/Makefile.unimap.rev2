@@ -1,6 +1,0 @@
-TARGET = ps2_usb_rev2_unimap
-UNIMAP_ENABLE = yes
-KEYMAP_SECTION_ENABLE = yes
-#LUFA_DEBUG_SUART = yes
-
-include Makefile.rev2

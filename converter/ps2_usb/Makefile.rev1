@@ -1,6 +1,6 @@
-TARGET ?= ps2_usb_rev1
+TARGET ?= ps2_usb_rev1_unimap
 MCU = atmega32u4
-CONFIG_H = config_rev1.h
+CONFIG_H = config.h
 BOOTLOADER_SIZE = 4096
 
 BOOTMAGIC_ENABLE ?= no
@@ -13,5 +13,8 @@ NKRO_ENABLE ?= yes
 PS2_USE_USART = yes
 PS2_USE_INT = no
 PS2_USE_BUSYWAIT = no
+
+UNIMAP_ENABLE = yes
+KEYMAP_SECTION_ENABLE = yes
 
 include Makefile

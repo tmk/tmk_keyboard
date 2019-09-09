@@ -1,5 +1,0 @@
-TARGET = ps2_usb_rev1_unimap
-UNIMAP_ENABLE = yes
-KEYMAP_SECTION_ENABLE = yes
-
-include Makefile.rev1
