@@ -87,6 +87,14 @@ void bootloader_jump(void) {
     _delay_ms(5);
 #endif
 
+#ifndef NO_BOOTLOADER_CATERINA_BOOTKEY
+    // Set bootkey for Arduino Leonardo and Pro Micro bootloader
+    // Watchdog reset with bootkey causes the bootloader to enter program mode instead of starting application.
+    // https://github.com/arduino/ArduinoCore-avr/blob/master/bootloaders/caterina/Caterina.c#L68-L69
+    // https://github.com/sparkfun/SF32u4_boards/blob/master/sparkfun/avr/bootloaders/caterina/Caterina.c#L88-L89
+    *(volatile uint16_t *)0x0800 = 0x7777;
+#endif
+
     // watchdog reset
     reset_key = BOOTLOADER_RESET_KEY;
     wdt_enable(WDTO_250MS);
@@ -107,6 +115,13 @@ void bootloader_jump_after_watchdog_reset(void)
         // Seems like Teensy halfkay loader requires clearing WDRF and disabling watchdog.
         MCUSR &= ~(1<<WDRF);
         wdt_disable();
+
+#ifndef NO_BOOTLOADER_CATERINA_BOOTKEY
+        // Clear bootkey of Caterina bootloader for other bootloaders
+        // Leonardo and Pro Micro with Arduino default fuse setting don't reach here
+        // because bootloader section are executed before application everytime.
+        *(volatile uint16_t *)0x0800 = 0;
+#endif
 
         // This is compled into 'icall', address should be in word unit, not byte.
         ((void (*)(void))(BOOTLOADER_START/2))();
