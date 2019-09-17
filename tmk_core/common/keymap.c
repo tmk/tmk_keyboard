@@ -155,9 +155,7 @@ static action_t keycode_to_action(uint8_t keycode)
             return (action_t)ACTION_TRANSPARENT;
             break;
         case KC_BOOTLOADER:
-            clear_keyboard();
-            wait_ms(50);
-            bootloader_jump(); // not return
+            return (action_t)ACTION_COMMAND(COMMAND_BOOTLOADER, 0);
             break;
         default:
             return (action_t)ACTION_NO;

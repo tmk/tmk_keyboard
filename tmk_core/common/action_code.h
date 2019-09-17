@@ -48,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 0100|10| usage(10)     (reserved)
  * 0100|11| usage(10)     (reserved)
  *
- * ACT_MOUSEKEY(0110): TODO: Not needed?
+ * ACT_MOUSEKEY(0101): TODO: Not needed?
  * 0101|xxxx| keycode     Mouse key
  *
  * 011x|xxxx xxxx xxxx    (reseved)
@@ -290,6 +290,12 @@ enum layer_pram_tap_op {
 /*
  * Extensions
  */
+/* Macro */
+#define ACTION_MACRO(id)                ACTION(ACT_MACRO, (id))
+#define ACTION_MACRO_TAP(id)            ACTION(ACT_MACRO, FUNC_TAP<<8 | (id))
+#define ACTION_MACRO_OPT(id, opt)       ACTION(ACT_MACRO, (opt)<<8 | (id))
+
+/* Backlight */
 enum backlight_opt {
     BACKLIGHT_INCREASE = 0,
     BACKLIGHT_DECREASE = 1,
@@ -297,18 +303,18 @@ enum backlight_opt {
     BACKLIGHT_STEP     = 3,
     BACKLIGHT_LEVEL    = 4,
 };
-/* Macro */
-#define ACTION_MACRO(id)                ACTION(ACT_MACRO, (id))
-#define ACTION_MACRO_TAP(id)            ACTION(ACT_MACRO, FUNC_TAP<<8 | (id))
-#define ACTION_MACRO_OPT(id, opt)       ACTION(ACT_MACRO, (opt)<<8 | (id))
-/* Backlight */
 #define ACTION_BACKLIGHT_INCREASE()     ACTION(ACT_BACKLIGHT, BACKLIGHT_INCREASE << 8)
 #define ACTION_BACKLIGHT_DECREASE()     ACTION(ACT_BACKLIGHT, BACKLIGHT_DECREASE << 8)
 #define ACTION_BACKLIGHT_TOGGLE()       ACTION(ACT_BACKLIGHT, BACKLIGHT_TOGGLE << 8)
 #define ACTION_BACKLIGHT_STEP()         ACTION(ACT_BACKLIGHT, BACKLIGHT_STEP << 8)
 #define ACTION_BACKLIGHT_LEVEL(level)   ACTION(ACT_BACKLIGHT, BACKLIGHT_LEVEL << 8 | level)
+
 /* Command */
-#define ACTION_COMMAND(id, opt)         ACTION(ACT_COMMAND,  (opt)<<8 | (addr))
+enum command_ids {
+    COMMAND_BOOTLOADER, // jump to bootloader
+};
+#define ACTION_COMMAND(id, opt)         ACTION(ACT_COMMAND,  (opt)<<8 | (id))
+
 /* Function */
 enum function_opts {
     FUNC_TAP = 0x8,     /* indciates function is tappable */

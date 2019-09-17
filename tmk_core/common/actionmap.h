@@ -283,43 +283,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AC_WWW_STOP		ACTION_USAGE_CONSUMER(APPCONTROL_STOP)
 #define AC_WWW_REFRESH		ACTION_USAGE_CONSUMER(APPCONTROL_REFRESH)
 #define AC_WWW_FAVORITES	ACTION_USAGE_CONSUMER(APPCONTROL_BOOKMARKS)
-/* Jump to bootloader */
-#define AC_BOOTLOADER		ACTION_KEY(KC_BOOTLOADER)
-/* Fn key */
-/*
-#define AC_FN0			ACTION_KEY(KC_FN0)
-#define AC_FN1			ACTION_KEY(KC_FN1)
-#define AC_FN2			ACTION_KEY(KC_FN2)
-#define AC_FN3			ACTION_KEY(KC_FN3)
-#define AC_FN4			ACTION_KEY(KC_FN4)
-#define AC_FN5			ACTION_KEY(KC_FN5)
-#define AC_FN6			ACTION_KEY(KC_FN6)
-#define AC_FN7			ACTION_KEY(KC_FN7)
-#define AC_FN8			ACTION_KEY(KC_FN8)
-#define AC_FN9			ACTION_KEY(KC_FN9)
-#define AC_FN10			ACTION_KEY(KC_FN10)
-#define AC_FN11			ACTION_KEY(KC_FN11)
-#define AC_FN12			ACTION_KEY(KC_FN12)
-#define AC_FN13			ACTION_KEY(KC_FN13)
-#define AC_FN14			ACTION_KEY(KC_FN14)
-#define AC_FN15			ACTION_KEY(KC_FN15)
-#define AC_FN16			ACTION_KEY(KC_FN16)
-#define AC_FN17			ACTION_KEY(KC_FN17)
-#define AC_FN18			ACTION_KEY(KC_FN18)
-#define AC_FN19			ACTION_KEY(KC_FN19)
-#define AC_FN20			ACTION_KEY(KC_FN20)
-#define AC_FN21			ACTION_KEY(KC_FN21)
-#define AC_FN22			ACTION_KEY(KC_FN22)
-#define AC_FN23			ACTION_KEY(KC_FN23)
-#define AC_FN24			ACTION_KEY(KC_FN24)
-#define AC_FN25			ACTION_KEY(KC_FN25)
-#define AC_FN26			ACTION_KEY(KC_FN26)
-#define AC_FN27			ACTION_KEY(KC_FN27)
-#define AC_FN28			ACTION_KEY(KC_FN28)
-#define AC_FN29			ACTION_KEY(KC_FN29)
-#define AC_FN30			ACTION_KEY(KC_FN30)
-#define AC_FN31			ACTION_KEY(KC_FN31)
-*/
+
 /* Mousekey */
 #define AC_MS_UP		ACTION_MOUSEKEY(KC_MS_UP)
 #define AC_MS_DOWN		ACTION_MOUSEKEY(KC_MS_DOWN)
@@ -337,6 +301,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AC_MS_ACCEL0		ACTION_MOUSEKEY(KC_MS_ACCEL0)
 #define AC_MS_ACCEL1		ACTION_MOUSEKEY(KC_MS_ACCEL1)
 #define AC_MS_ACCEL2		ACTION_MOUSEKEY(KC_MS_ACCEL2)
+
+/* Command */
+#define AC_BOOTLOADER		ACTION_COMMAND(COMMAND_BOOTLOADER, 0)
+
 
 /*
  * Short names
@@ -447,9 +415,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AC_WSTP			ACTION_USAGE_CONSUMER(APPCONTROL_STOP)
 #define AC_WREF			ACTION_USAGE_CONSUMER(APPCONTROL_REFRESH)
 #define AC_WFAV			ACTION_USAGE_CONSUMER(APPCONTROL_BOOKMARKS)
-/* Jump to bootloader */
-#define AC_BTLD			ACTION_KEY(KC_BOOTLOADER)
 /* Transparent */
 #define AC_TRNS			ACTION_KEY(KC_TRANSPARENT)
+
+/* Command */
+#define AC_BTLD			AC_BOOTLOADER
 
 #endif
