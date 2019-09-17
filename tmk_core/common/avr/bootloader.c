@@ -3,6 +3,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
+#include <avr/boot.h>
 #include <util/delay.h>
 #include "bootloader.h"
 
@@ -41,13 +42,42 @@
  *          |  Bootloader   | 4KB   BOOTLOADER_SIZE
  * 0x7FFF   +---------------+ <---- FLASHEND
  */
-#ifndef BOOTLOADER_SIZE
-#warning To use bootloader_jump() you need to define BOOTLOADER_SIZE in config.h.
-#define BOOTLOADER_SIZE     4096
-#endif
 
-#define FLASH_SIZE          (FLASHEND + 1L)
-#define BOOTLOADER_START    (FLASH_SIZE - BOOTLOADER_SIZE)
+/* bootloader start address in byte */
+#define BOOTLOADER_START      (FLASHEND - bootloader_size() + 1)
+
+/* boot section size in byte */
+static inline uint16_t bootloader_size(void)
+{
+#if defined(BOOTLOADER_SIZE)
+    return BOOTLOADER_SIZE;
+#else
+    #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega32U2__) || \
+            defined(__AVR_ATmega16U4__) || defined(__AVR_ATmega16U2__) || \
+            defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__)
+        uint8_t hfuse = boot_lock_fuse_bits_get(GET_HIGH_FUSE_BITS);
+        switch ((hfuse >> 1) & 3) {
+            case 0: return 4096;
+            case 1: return 2048;
+            case 2: return 1024;
+            case 3: return 512;
+        }
+        return 4096;
+    #elif defined(__AVR_AT90USB646__) || defined(__AVR_AT90USB647__) || \
+            defined(__AVR_AT90USB1286__) || defined(__AVR_AT90USB1287__)
+        uint8_t hfuse = boot_lock_fuse_bits_get(GET_HIGH_FUSE_BITS);
+        switch ((hfuse >> 1) & 3) {
+            case 0: return 8192;
+            case 1: return 4096;
+            case 2: return 2048;
+            case 3: return 1024;
+        }
+        return 8192;
+    #else
+        #error Set Boot section size to BOOTLOADER_SIZE in config.h
+    #endif
+#endif
+}
 
 
 /*
@@ -110,6 +140,6 @@ void bootloader_jump_after_watchdog_reset(void)
 #endif
 
         // This is compled into 'icall', address should be in word unit, not byte.
-        ((void (*)(void))(BOOTLOADER_START/2))();
+        ((void (*)(void))(BOOTLOADER_START / 2))();
     }
 }
