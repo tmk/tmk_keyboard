@@ -92,7 +92,6 @@ void bootloader_jump(void) {
 #ifdef PROTOCOL_LUFA
     USB_Disable();
     cli();
-    _delay_ms(2000);
 #endif
 
 #ifdef PROTOCOL_PJRC
@@ -125,11 +124,10 @@ void bootloader_jump_after_watchdog_reset(void)
     if ((MCUSR & (1<<WDRF)) && reset_key == BOOTLOADER_RESET_KEY) {
         reset_key = 0;
 
-        // My custom USBasploader requires this to come up.
+        // some of bootloaders may need to preseve?
         MCUSR = 0;
 
-        // Seems like Teensy halfkay loader requires clearing WDRF and disabling watchdog.
-        MCUSR &= ~(1<<WDRF);
+        // disable watchdog timer
         wdt_disable();
 
 #ifndef NO_BOOTLOADER_CATERINA_BOOTKEY
