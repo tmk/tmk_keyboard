@@ -140,12 +140,6 @@ uint8_t matrix_scan(void) {
         or_report(kbd_parser4.report);
 
         matrix_is_mod = true;
-
-        dprintf("state:  %02X %02X", keyboard_report.mods, keyboard_report.reserved);
-        for (uint8_t i = 0; i < KEYBOARD_REPORT_KEYS; i++) {
-            dprintf(" %02X", keyboard_report.keys[i]);
-        }
-        dprint("\r\n");
     } else {
         matrix_is_mod = false;
     }
@@ -155,17 +149,17 @@ uint8_t matrix_scan(void) {
     usb_host.Task();
     timer = timer_elapsed(timer);
     if (timer > 100) {
-        dprintf("host.Task: %d\n", timer);
+        xprintf("host.Task: %d\n", timer);
     }
 
     static uint8_t usb_state = 0;
     if (usb_state != usb_host.getUsbTaskState()) {
         usb_state = usb_host.getUsbTaskState();
-        dprintf("usb_state: %02X\n", usb_state);
+        xprintf("usb_state: %02X\n", usb_state);
 
         // restore LED state when keyboard comes up
         if (usb_state == USB_STATE_RUNNING) {
-            dprintf("speed: %s\n", usb_host.getVbusState()==FSHOST ? "full" : "low");
+            xprintf("speed: %s\n", usb_host.getVbusState()==FSHOST ? "full" : "low");
             keyboard_set_leds(host_keyboard_leds());
         }
     }
@@ -222,12 +216,6 @@ uint8_t matrix_key_count(void) {
 }
 
 void matrix_print(void) {
-    print("\nr/c 0123456789ABCDEF\n");
-    for (uint8_t row = 0; row < matrix_rows(); row++) {
-        xprintf("%02d: ", row);
-        print_bin_reverse16(matrix_get_row(row));
-        print("\n");
-    }
 }
 
 void led_set(uint8_t usb_led)
