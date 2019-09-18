@@ -81,6 +81,7 @@ Update
 2018/02/xx  Add Korean and Brazilian specific keys(ab6ddac,b2fa0ffa)
 2018/07/xx  Fix startup issue(c2ce617)
 2018/10/xx  Use fixed LUFA stack and update USB_Host_Shield_2.0
+2019/09/18  Add BTLD(bootlader jump) key to unimap
 
 
 
