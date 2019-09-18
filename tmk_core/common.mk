@@ -58,6 +58,14 @@ else
     endif
 endif
 
+ifeq (yes,$(strip $(NO_DEBUG)))
+    OPT_DEFS += -DNO_DEBUG
+endif
+
+ifeq (yes,$(strip $(NO_PRINT)))
+    OPT_DEFS += -DNO_PRINT
+endif
+
 ifeq (yes,$(strip $(COMMAND_ENABLE)))
     SRC += $(COMMON_DIR)/command.c
     OPT_DEFS += -DCOMMAND_ENABLE
