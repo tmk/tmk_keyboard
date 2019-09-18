@@ -1,7 +1,8 @@
 USB to USB keyboard protocol converter
 ======================================
-See for detail and discussion.
-https://geekhack.org/index.php?topic=69169.0
+See for detail and discussion here.
+
+- https://geekhack.org/index.php?topic=69169.0
 
 
 Hardware requirement
@@ -9,27 +10,16 @@ Hardware requirement
 There are two options.
 
 ### TMK USB-USB Converter
-You can buy a fully assembled converter from me here.
+You can buy a fully preassembled converter from me here.
 
-    https://geekhack.org/index.php?topic=69169.0
+- https://geekhack.org/index.php?topic=72052.0
 
-### Arduino Leonardo + Circuit@Home USB Host Shield 2.0
-Buying Arduino Leonardo and USB Host Shield 2.0(from Circuit@home) will be better, you won't need even soldering iron.
+### Arduino Leonardo + USB Host Shield
+Buying Arduino Leonardo and USB Host Shield.
 
-    http://arduino.cc/en/Main/ArduinoBoardLeonardo 
-    https://www.circuitsathome.com/products-page/arduino-shields/usb-host-shield-2-0-for-arduino-assembled/
-
-Other compatible boards like Arduino's Shield will also work well but I think Sparkfun's needs to be modified.
-
-    http://arduino.cc/en/Main/ArduinoUSBHostShield
-    https://www.sparkfun.com/products/9947
-
-Also Pro Micro 3.3V(not Mini) or Teensy with mini host shield will work with some fixes on signal/power routing.
-
-    https://www.circuitsathome.com/products-page/arduino-shields/usb-host-shield-for-arduino-pro-mini
-    https://www.sparkfun.com/products/12587
-    https://www.pjrc.com/teensy/td_libs_USBHostShield.html
-
+- https://store.arduino.cc/usa/leonardo
+- https://store.arduino.cc/usa/arduino-usb-host-shield
+- https://www.sparkfun.com/products/9947
 
 
 Build firmware
@@ -74,32 +64,33 @@ You can editor keymap and download firmware with web brwoser.
 
 Update
 ------
-2014/12/11  Added Hub support(confirmed with HHKB pro2)
-2016/09/10  Unimap editor support
-2016/10/18  Fix LED state at startup
-2017/05/xx  Fix startup code for FC660C(3eae475)
-2018/02/xx  Add Korean and Brazilian specific keys(ab6ddac,b2fa0ffa)
-2018/07/xx  Fix startup issue(c2ce617)
-2018/10/xx  Use fixed LUFA stack and update USB_Host_Shield_2.0
-2019/09/18  Add BTLD(bootlader jump) key to unimap
+- 2014/12/11  Added Hub support(confirmed with HHKB pro2)
+- 2016/09/10  Unimap editor support
+- 2016/10/18  Fix LED state at startup
+- 2017/05/xx  Fix startup code for FC660C(3eae475)
+- 2018/02/xx  Add Korean and Brazilian specific keys(ab6ddac,b2fa0ffa)
+- 2018/07/xx  Fix startup issue(c2ce617)
+- 2018/10/xx  Use fixed LUFA stack and update USB_Host_Shield_2.0
+- 2019/09/18  Add BTLD(bootlader jump) key to unimap
 
 
 
 Resource
 --------
-USB Host Sheild 2.0
-    https://www.circuitsathome.com/products-page/arduino-shields/usb-host-shield-2-0-for-arduino
-    https://www.circuitsathome.com/products-page/arduino-shields/usb-host-shield-for-arduino-pro-mini
-USB Host Sheild 2.0 source
-    https://github.com/felis/USB_Host_Shield_2.0
-Arduino USB Host Shield(with bootst converter)
-    http://arduino.cc/en/Main/ArduinoUSBHostShield
-Arduino source
-    https://github.com/arduino/Arduino/hardware/arduino/{cores,variants}
-Initial release of TMK USB-USB converter
-    https://geekhack.org/index.php?topic=33057.msg653549#msg653549
-    http://deskthority.net/workshop-f7/is-remapping-a-usb-keyboard-using-teensy-possible-t2841-30.html#p74854
-Arduino-based hardware keyboard remapper - Colemak forum
-    http://forum.colemak.com/viewtopic.php?id=1561
-Teensy + Host Shield
-    http://www.pjrc.com/teensy/td_libs_USBHostShield.html
+### USB Host Sheild 2.0
+- https://www.circuitsathome.com/products-page/arduino-shields/usb-host-shield-2-0-for-arduino
+
+### USB Host Sheild 2.0 source
+- https://github.com/felis/USB_Host_Shield_2.0
+
+### Arduino USB Host Shield(with bootst converter)
+- http://arduino.cc/en/Main/ArduinoUSBHostShield
+
+### Arduino source
+- https://github.com/arduino/Arduino/hardware/arduino/{cores,variants}
+
+### Arduino-based hardware keyboard remapper - Colemak forum
+- http://forum.colemak.com/viewtopic.php?id=1561
+
+### Teensy + Host Shield
+- http://www.pjrc.com/teensy/td_libs_USBHostShield.html
