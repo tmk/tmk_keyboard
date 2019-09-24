@@ -1,0 +1,29 @@
+Keyboard ID: AB83
+Code Set: 2 (extended)
+Mode: AT/PS2
+
+Key          Scan         Matrix
+Name         Code         Index
+F11          78           78
+F12          07           07
+F13          E0 04        84
+F14          E0 0C        8C
+Help         E0 03        83
+Do           E0 0B        8B            (sometimes just 0B on key down)
+F17          E0 83        28
+F18          E0 12 E0 7C  FC            (PrtSc)
+F19          7E           7E            (ScrollLock)
+F20          E1 14 77     FE            (Pause - down+up sent together)
+
+PF1          77           77            (NumLock)
+PF2          E0 4A        CA            (KP/)
+PF3          7C           7C            (KP*)
+PF4          7B           7B            (KP-)
+KP-          E0 79        F9            (KP+)
+KP,          79           79
+Enter        E0 5A        DA
+
+LCompose     E0 0D        8D
+LAlt         11           11
+RAlt         E0 11        91
+RCompose     E0 14        94            (RCtrl)

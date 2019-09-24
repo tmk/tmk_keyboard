@@ -120,11 +120,12 @@ static void command_common_help(void)
           "x:	debug matrix\n"
           "k:	debug keyboard\n"
           "m:	debug mouse\n"
+          ".:	debug scancode\n"
           "v:	version\n"
           "s:	status\n"
           "c:	console mode\n"
           "0-4:	layer0-4(F10-F4)\n"
-          "Paus:	bootloader\n"
+          "b/Paus:	bootloader\n"
 
 #ifdef KEYBOARD_LOCK_ENABLE
           "Caps:	Lock\n"
@@ -156,6 +157,7 @@ static void print_eeconfig(void)
     print(".matrix: "); print_dec(dc.matrix); print("\n");
     print(".keyboard: "); print_dec(dc.keyboard); print("\n");
     print(".mouse: "); print_dec(dc.mouse); print("\n");
+    print(".scancode: "); print_dec(dc.scancode); print("\n");
 
     keymap_config_t kc;
     kc.raw = eeconfig_read_keymap();
@@ -228,11 +230,13 @@ static bool command_common(uint8_t code)
             debug_matrix   = false;
             debug_keyboard = false;
             debug_mouse    = false;
+            debug_scancode = false;
             debug_enable   = false;
             command_console_help();
             print("C> ");
             command_state = CONSOLE;
             break;
+        case KC_B:
         case KC_PAUSE:
             clear_keyboard();
             print("\n\nbootloader... ");
@@ -245,6 +249,7 @@ static bool command_common(uint8_t code)
                 debug_matrix   = false;
                 debug_keyboard = false;
                 debug_mouse    = false;
+                debug_scancode = false;
                 debug_enable   = false;
             } else {
                 print("\ndebug: on\n");
@@ -276,6 +281,15 @@ static bool command_common(uint8_t code)
                 debug_enable = true;
             } else {
                 print("\nmouse: off\n");
+            }
+            break;
+        case KC_DOT: // debug scancode toggle
+            debug_scancode = !debug_scancode;
+            if (debug_scancode) {
+                print("\nscancode: on\n");
+                debug_enable = true;
+            } else {
+                print("\nscancode: off\n");
             }
             break;
         case KC_V: // print version & information

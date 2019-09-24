@@ -346,6 +346,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AC_LSCR			ACTION_KEY(KC_LOCKING_SCROLL)
 #define AC_ERAS			ACTION_KEY(KC_ALT_ERASE,)
 #define AC_CLR 			ACTION_KEY(KC_CLEAR)
+#define AC_EXEC			ACTION_KEY(KC_EXECUTE)
 /* Japanese specific */
 #define AC_ZKHK			ACTION_KEY(KC_GRAVE)
 #define AC_RO  			ACTION_KEY(KC_INT1)

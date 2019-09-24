@@ -35,6 +35,9 @@
 #ifndef BOOTMAGIC_KEY_DEBUG_MOUSE
 #define BOOTMAGIC_KEY_DEBUG_MOUSE       KC_M
 #endif
+#ifndef BOOTMAGIC_KEY_DEBUG_SCANCODE
+#define BOOTMAGIC_KEY_DEBUG_SCANCODE    KC_DOT
+#endif
 
 /*
  * keymap config

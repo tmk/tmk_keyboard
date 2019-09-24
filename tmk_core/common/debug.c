@@ -11,6 +11,7 @@ debug_config_t debug_config = {
     .matrix = false,
     .keyboard = false,
     .mouse = false,
+    .scancode = false,
     .reserved = 0
 #else
     {
@@ -18,6 +19,7 @@ debug_config_t debug_config = {
         false,  // .matrix
         false,  // .keyboard
         false,  // .mouse
+        false,  // .scancode
         0       // .reserved
     }
 #endif
