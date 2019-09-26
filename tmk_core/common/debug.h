@@ -42,6 +42,7 @@ typedef union {
 } debug_config_t;
 
 extern debug_config_t debug_config;
+extern bool debug_inline;
 
 #ifdef __cplusplus
 }
@@ -89,6 +90,9 @@ extern debug_config_t debug_config;
 #define debug_bin(data)             debug_bin8(data)
 #define debug_bin_reverse(data)     debug_bin8(data)
 
+void print_scancode (uint8_t code, uint8_t error, char prefix);
+void print_modcode  (uint8_t code, char prefix);
+
 #else /* NO_DEBUG */
 
 #define dprint(s)                   ((void)0)
@@ -113,6 +117,9 @@ extern debug_config_t debug_config;
 #define debug_hex(data)             ((void)0)
 #define debug_bin(data)             ((void)0)
 #define debug_bin_reverse(data)     ((void)0)
+
+#define print_scancode(code,error,prefix) ((void)0)
+#define print_modcode(code,prefix)  ((void)0)
 
 #endif /* NO_DEBUG */
 

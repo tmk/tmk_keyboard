@@ -67,7 +67,6 @@ static uint8_t matrix[MATRIX_ROWS];
 #define PAUSE          (0xFE)
 
 static bool is_modified = false;
-static bool debugging = false;
 
 
 void matrix_init(void)
@@ -178,10 +177,7 @@ uint8_t matrix_scan(void)
     uint8_t code = ps2_host_recv();
 #ifndef NO_PRINT
     if (debug_scancode && !(code == 0x00 && ps2_error == 0x20)) {
-      if (!debugging) print("Key:");
-      xprintf(" %02X", code);
-      if (ps2_error) xprintf("!%X", ps2_error);
-      debugging= true;
+        print_scancode (code, ps2_error, '\0');
     }
 #endif
     if (!ps2_error) {
@@ -389,12 +385,13 @@ uint8_t matrix_scan(void)
                 state = INIT;
         }
     }
-#ifndef NO_PRINT
-    if (debug_scancode && debugging && state == INIT && matrix_is_empty()) {
-      print("\r\n");
-      debugging = false;
-    }
-#endif
+    //// Use following if don't add \n somewhere else.
+    //#ifndef NO_PRINT
+    //    if (debug_scancode && debug_inline && state == INIT && matrix_is_empty()) {
+    //      print("\r\n");
+    //      debug_inline = false;
+    //    }
+    //#endif
 
     // TODO: request RESEND when error occurs?
 /*

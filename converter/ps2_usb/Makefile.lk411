@@ -1,7 +1,7 @@
 TARGET ?= ps2_usb_lk411
 MCU = atmega32u4
 CONFIG_H = config.h
-BOOTLOADER_SIZE = 512
+PJRC_BOOTLOADER_JUMP = yes
 KEYMAP ?= lk411
 
 BOOTMAGIC_ENABLE ?= no

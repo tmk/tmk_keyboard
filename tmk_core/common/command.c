@@ -120,12 +120,14 @@ static void command_common_help(void)
           "x:	debug matrix\n"
           "k:	debug keyboard\n"
           "m:	debug mouse\n"
+#ifndef NO_PRINT
           ".:	debug scancode\n"
+#endif
           "v:	version\n"
           "s:	status\n"
           "c:	console mode\n"
           "0-4:	layer0-4(F10-F4)\n"
-          "b/Paus:	bootloader\n"
+          "Paus:	bootloader\n"
 
 #ifdef KEYBOARD_LOCK_ENABLE
           "Caps:	Lock\n"
@@ -236,10 +238,10 @@ static bool command_common(uint8_t code)
             print("C> ");
             command_state = CONSOLE;
             break;
-        case KC_B:
         case KC_PAUSE:
+        case KC_PSCR:   // Shift+Pause = PrtScr
             clear_keyboard();
-            print("\n\nbootloader... ");
+            print("\n\nbootloader...\n");
             wait_ms(1000);
             bootloader_jump(); // not return
             break;
@@ -283,15 +285,19 @@ static bool command_common(uint8_t code)
                 print("\nmouse: off\n");
             }
             break;
+#ifndef NO_PRINT
         case KC_DOT: // debug scancode toggle
             debug_scancode = !debug_scancode;
             if (debug_scancode) {
                 print("\nscancode: on\n");
                 debug_enable = true;
+                debug_inline = false;
+                host_set_last_keyboard_report(keyboard_report);
             } else {
                 print("\nscancode: off\n");
             }
             break;
+#endif
         case KC_V: // print version & information
             print("\n\t- Version -\n");
             print("DESC: " STR(DESCRIPTION) "\n");
