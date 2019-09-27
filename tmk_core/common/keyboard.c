@@ -173,7 +173,9 @@ void keyboard_task(void)
     // update LED
     if (led_status != host_keyboard_leds()) {
         led_status = host_keyboard_leds();
+#ifdef DEBUG_KEYBOARD_VERBOSE
         if (debug_keyboard) dprintf("LED: %02X\n", led_status);
+#endif
         hook_keyboard_leds_change(led_status);
     }
 }

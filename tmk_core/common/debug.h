@@ -35,14 +35,13 @@ typedef union {
         bool matrix:1;
         bool keyboard:1;
         bool mouse:1;
-        bool scancode:1;
-        uint8_t reserved:3;
+        uint8_t reserved:4;
     };
     uint8_t raw;
 } debug_config_t;
 
 extern debug_config_t debug_config;
-extern bool debug_inline;
+extern bool debug_inline, debug_empty_matrix, debug_empty_report;
 
 #ifdef __cplusplus
 }
@@ -53,7 +52,6 @@ extern bool debug_inline;
 #define debug_matrix    (debug_config.matrix)
 #define debug_keyboard  (debug_config.keyboard)
 #define debug_mouse     (debug_config.mouse)
-#define debug_scancode  (debug_config.scancode)
 
 
 /*

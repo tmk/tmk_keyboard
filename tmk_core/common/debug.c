@@ -11,7 +11,6 @@ debug_config_t debug_config = {
     .matrix = false,
     .keyboard = false,
     .mouse = false,
-    .scancode = false,
     .reserved = 0
 #else
     {
@@ -19,31 +18,32 @@ debug_config_t debug_config = {
         false,  // .matrix
         false,  // .keyboard
         false,  // .mouse
-        false,  // .scancode
         0       // .reserved
     }
 #endif
 };
 
-bool debug_inline = false;
+bool debug_inline = false, debug_empty_matrix = false, debug_empty_report = false;
 
 #ifndef NO_PRINT
 void print_scancode (uint8_t code, uint8_t error, char prefix)
 {
-  if (!debug_scancode) return;
-  if (!debug_inline) print("Key:");
+  if (!debug_keyboard) return;
+  if (!debug_inline) print("keyboard>");
   debug_inline= true;
-  if (prefix) xprintf(" %c%02X", prefix, code);
-  else        xprintf(  " %02X",         code);
-  if (error)  xprintf("!%X", error);
+  xputc(' ');
+  if (prefix) xputc(prefix);
+  xprintf("%02X", code);
+  if (error) xprintf("!%X", error);
 }
 
 void print_modcode (uint8_t code, char prefix)
 {
-  if (!debug_scancode) return;
-  if (!debug_inline) print("Key:");
+  if (!debug_keyboard) return;
+  if (!debug_inline) print("keyboard>");
   debug_inline= true;
-  if (prefix) xprintf(" %cM%X", prefix, code);
-  else        xprintf(  " M%X",         code);
+  xputc(' ');
+  if (prefix) xputc(prefix);
+  xprintf("M%X", code);
 }
 #endif

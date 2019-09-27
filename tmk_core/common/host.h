@@ -42,6 +42,11 @@ host_driver_t *host_get_driver(void);
 
 /* host driver interface */
 uint8_t host_keyboard_leds(void);
+#ifndef NO_PRINT
+void print_keyboard_report (report_keyboard_t *report, report_keyboard_t *last_keyboard_report);
+#else
+#define print_keyboard_report(report,last_keyboard_report) ((void)0)
+#endif
 void host_keyboard_send(report_keyboard_t *report);
 void host_mouse_send(report_mouse_t *report);
 void host_system_send(uint16_t data);

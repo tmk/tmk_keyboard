@@ -120,9 +120,6 @@ static void command_common_help(void)
           "x:	debug matrix\n"
           "k:	debug keyboard\n"
           "m:	debug mouse\n"
-#ifndef NO_PRINT
-          ".:	debug scancode\n"
-#endif
           "v:	version\n"
           "s:	status\n"
           "c:	console mode\n"
@@ -159,7 +156,6 @@ static void print_eeconfig(void)
     print(".matrix: "); print_dec(dc.matrix); print("\n");
     print(".keyboard: "); print_dec(dc.keyboard); print("\n");
     print(".mouse: "); print_dec(dc.mouse); print("\n");
-    print(".scancode: "); print_dec(dc.scancode); print("\n");
 
     keymap_config_t kc;
     kc.raw = eeconfig_read_keymap();
@@ -232,7 +228,6 @@ static bool command_common(uint8_t code)
             debug_matrix   = false;
             debug_keyboard = false;
             debug_mouse    = false;
-            debug_scancode = false;
             debug_enable   = false;
             command_console_help();
             print("C> ");
@@ -251,7 +246,6 @@ static bool command_common(uint8_t code)
                 debug_matrix   = false;
                 debug_keyboard = false;
                 debug_mouse    = false;
-                debug_scancode = false;
                 debug_enable   = false;
             } else {
                 print("\ndebug: on\n");
@@ -272,6 +266,10 @@ static bool command_common(uint8_t code)
             if (debug_keyboard) {
                 print("\nkeyboard: on\n");
                 debug_enable = true;
+#ifndef DEBUG_KEYBOARD_VERBOSE
+                debug_inline = false;
+                host_set_last_keyboard_report(keyboard_report);
+#endif
             } else {
                 print("\nkeyboard: off\n");
             }
@@ -285,19 +283,6 @@ static bool command_common(uint8_t code)
                 print("\nmouse: off\n");
             }
             break;
-#ifndef NO_PRINT
-        case KC_DOT: // debug scancode toggle
-            debug_scancode = !debug_scancode;
-            if (debug_scancode) {
-                print("\nscancode: on\n");
-                debug_enable = true;
-                debug_inline = false;
-                host_set_last_keyboard_report(keyboard_report);
-            } else {
-                print("\nscancode: off\n");
-            }
-            break;
-#endif
         case KC_V: // print version & information
             print("\n\t- Version -\n");
             print("DESC: " STR(DESCRIPTION) "\n");

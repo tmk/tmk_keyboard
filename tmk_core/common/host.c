@@ -48,76 +48,78 @@ uint8_t host_keyboard_leds(void)
     if (!driver) return 0;
     return (*driver->keyboard_leds)();
 }
+
+#ifndef NO_PRINT
+static void print_changed_bits (uint8_t index, uint8_t byte, uint8_t last)
+{
+    uint8_t new = byte ^ last;
+    if (!new) return;
+    uint8_t mask = 1, bit = 0;
+    for (; mask; mask<<=1, bit++) {
+        if (new & mask) {
+            char state = (byte & mask) ? '_' : '^';
+            if (index) print_scancode (((index-1)<<3)|bit, 0, state);
+            else       print_modcode  (bit, state);
+        }
+    }
+}
+
+void print_keyboard_report (report_keyboard_t *report, report_keyboard_t *last_keyboard_report)
+{
+    if (!debug_keyboard) return;
+#ifndef DEBUG_KEYBOARD_VERBOSE
+    if (debug_inline) print(" <");
+    debug_empty_report = true;
+#ifdef NKRO_ENABLE
+    if (keyboard_protocol && keyboard_nkro) {
+        for (uint8_t i = 0; i < KEYBOARD_REPORT_SIZE; i++) {
+            uint8_t byte = report->raw[i];
+            if (byte) debug_empty_report = false;
+            print_changed_bits (i, byte, last_keyboard_report->raw[i]);
+            last_keyboard_report->raw[i] = byte;
+        }
+    }
+    else
+#endif
+    {
+        uint8_t mods = report->mods;
+        if (mods) debug_empty_report = false;
+        print_changed_bits (0, mods, last_keyboard_report->mods);
+        last_keyboard_report->mods = mods;
+
+        for (uint8_t i = 0; i < KEYBOARD_REPORT_KEYS; i++) {
+            uint8_t key = report->keys[i], last = last_keyboard_report->keys[i];
+            if (key) debug_empty_report = false;
+            if (key != last) {
+                if (last) print_scancode (last, 0, '^');
+                if (key)  print_scancode (key,  0, '_');
+            }
+            last_keyboard_report->keys[i] = key;
+        }
+    }
+    if (debug_inline) {
+        print(" >");
+        if (debug_empty_matrix && debug_empty_report) {
+            print("\r\n");
+            debug_inline = false;
+        }
+    }
+#else /* DEBUG_KEYBOARD_VERBOSE */
+    dprint("keyboard: ");
+    for (uint8_t i = 0; i < KEYBOARD_REPORT_SIZE; i++) {
+        dprintf("%02X ", report->raw[i]);
+    }
+    dprint("\n");
+#endif
+}
+#endif
+
 /* send report */
 void host_keyboard_send(report_keyboard_t *report)
 {
     if (!driver) return;
     (*driver->send_keyboard)(report);
-
-#ifndef NO_PRINT
-    if (debug_scancode) {
-        if (debug_inline) print(" >");
-        bool report_is_empty = true;
-#ifdef NKRO_ENABLE
-        if (keyboard_protocol && keyboard_nkro) {
-            for (uint8_t i = 0; i < KEYBOARD_REPORT_SIZE; i++) {
-                uint8_t raw = report->raw[i], new = raw ^ last_keyboard_report->raw[i];
-                if (raw) report_is_empty = false;
-                if (new) {
-                    uint8_t mask = 1, bit = 0;
-                    for (; mask; mask<<=1, bit++) {
-                        if (new & mask) {
-                            char state = (raw & mask) ? '_' : '^';
-                            if (i) print_scancode (((i-1)<<3)|bit, 0, state);
-                            else   print_modcode  (bit, state);
-                        }
-                    }
-                    last_keyboard_report->raw[i] = raw;
-                }
-            }
-        }
-        else
-#endif
-        {
-            uint8_t mod = report->mods, new = mod ^ last_keyboard_report->mods;
-            if (mod) report_is_empty = false;
-            if (new) {
-                uint8_t mask = 1, bit = 0;
-                for (; mask; mask<<=1, bit++) {
-                    if (new & mask) {
-                        char state = (mod & mask) ? '_' : '^';
-                        print_modcode  (bit, state);
-                    }
-                }
-            }
-            last_keyboard_report->mods = mod;
-            for (uint8_t i = 0; i < KEYBOARD_REPORT_KEYS; i++) {
-                uint8_t key = report->keys[i], last = last_keyboard_report->keys[i];
-                if (key) report_is_empty = false;
-                if (key != last) {
-                    if (last) print_scancode (last, 0, '^');
-                    if (key)  print_scancode (key,  0, '_');
-                }
-                last_keyboard_report->keys[i] = key;
-            }
-        }
-        if (debug_inline) {
-            if (report_is_empty) {
-                print("\r\n");
-                debug_inline = false;
-            } else {
-                print(" <");
-            }
-        }
-    }
-#endif
-    if (debug_keyboard) {
-        dprint("keyboard: ");
-        for (uint8_t i = 0; i < KEYBOARD_REPORT_SIZE; i++) {
-            dprintf("%02X ", report->raw[i]);
-        }
-        dprint("\n");
-    }
+    print_keyboard_report (report, last_keyboard_report);
 }
 
 void host_mouse_send(report_mouse_t *report)
@@ -134,9 +136,11 @@ void host_system_send(uint16_t report)
     if (!driver) return;
     (*driver->send_system)(report);
 
+#ifdef DEBUG_KEYBOARD_VERBOSE
     if (debug_keyboard) {
-        dprintf("system: %04X\n", report);
+      dprintf("system: %04X\n", report);
     }
+#endif
 }
 
 void host_consumer_send(uint16_t report)
@@ -147,9 +151,11 @@ void host_consumer_send(uint16_t report)
     if (!driver) return;
     (*driver->send_consumer)(report);
 
+#ifdef DEBUG_KEYBOARD_VERBOSE
     if (debug_keyboard) {
         dprintf("consumer: %04X\n", report);
     }
+#endif
 }
 
 void host_set_last_keyboard_report(const report_keyboard_t *report)

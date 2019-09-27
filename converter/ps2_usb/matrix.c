@@ -176,7 +176,7 @@ uint8_t matrix_scan(void)
 
     uint8_t code = ps2_host_recv();
 #ifndef NO_PRINT
-    if (debug_scancode && !(code == 0x00 && ps2_error == 0x20)) {
+    if (debug_keyboard && !(code == 0x00 && ps2_error == 0x20)) {
         print_scancode (code, ps2_error, '\0');
     }
 #endif
@@ -204,12 +204,12 @@ uint8_t matrix_scan(void)
                     case 0x00:  // Overrun [3]p.25
                         matrix_clear();
                         clear_keyboard();
-                        print("Overrun\r\n");
+                        print("Overrun\n");
                         state = INIT;
                         break;
                     case 0xAA:  // Self-test passed
                     case 0xFC:  // Self-test failed
-                        printf("BAT %s\r\n", (code == 0xAA) ? "OK" : "NG");
+                        printf("BAT %s\n", (code == 0xAA) ? "OK" : "NG");
                         led_set(host_keyboard_leds());
                         state = INIT;
                         break;
@@ -219,7 +219,7 @@ uint8_t matrix_scan(void)
                         } else {
                             matrix_clear();
                             clear_keyboard();
-                            xprintf("unexpected scan code at INIT: %02X\r\n", code);
+                            xprintf("unexpected scan code at INIT: %02X\n", code);
                         }
                         state = INIT;
                 }
@@ -246,7 +246,7 @@ uint8_t matrix_scan(void)
                         } else {
                             matrix_clear();
                             clear_keyboard();
-                            xprintf("unexpected scan code at E0: %02X\r\n", code);
+                            xprintf("unexpected scan code at E0: %02X\n", code);
                         }
                         state = INIT;
                 }
@@ -264,7 +264,7 @@ uint8_t matrix_scan(void)
                     case 0xF0:
                         matrix_clear();
                         clear_keyboard();
-                        xprintf("unexpected scan code at F0: F0(clear and cont.)\r\n");
+                        xprintf("unexpected scan code at F0: F0(clear and cont.)\n");
                         break;
                     default:
                     if (code < 0x80) {
@@ -272,7 +272,7 @@ uint8_t matrix_scan(void)
                     } else {
                         matrix_clear();
                         clear_keyboard();
-                        xprintf("unexpected scan code at F0: %02X\r\n", code);
+                        xprintf("unexpected scan code at F0: %02X\n", code);
                     }
                     state = INIT;
                 }
@@ -293,7 +293,7 @@ uint8_t matrix_scan(void)
                         } else {
                             matrix_clear();
                             clear_keyboard();
-                            xprintf("unexpected scan code at E0_F0: %02X\r\n", code);
+                            xprintf("unexpected scan code at E0_F0: %02X\n", code);
                         }
                         state = INIT;
                 }
@@ -385,13 +385,13 @@ uint8_t matrix_scan(void)
                 state = INIT;
         }
     }
-    //// Use following if don't add \n somewhere else.
-    //#ifndef NO_PRINT
-    //    if (debug_scancode && debug_inline && state == INIT && matrix_is_empty()) {
-    //      print("\r\n");
-    //      debug_inline = false;
-    //    }
-    //#endif
+#ifndef NO_PRINT
+    debug_empty_matrix = (state == INIT && matrix_is_empty());
+    if (debug_keyboard && debug_inline && debug_empty_matrix && debug_empty_report) {
+      print("\r\n");
+      debug_inline = false;
+    }
+#endif
 
     // TODO: request RESEND when error occurs?
 /*

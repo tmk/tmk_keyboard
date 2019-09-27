@@ -119,12 +119,12 @@ uint8_t ps2_host_send(uint8_t data)
     idle();
     PS2_INT_ON();
     resp = ps2_host_recv_response();
-    print_scancode (data, ps2_error, '>');
+    print_scancode (data, ps2_error, '@');
     return resp;
 ERROR:
     idle();
     PS2_INT_ON();
-    print_scancode (data, ps2_error, '>');
+    print_scancode (data, ps2_error, '@');
     return 0;
 }
 
