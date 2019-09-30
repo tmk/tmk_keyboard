@@ -484,22 +484,22 @@ $(function() {
         var hash = url_encode_keymap({ keymaps: keymaps });
         var editor_url = document.location.origin + document.location.pathname + document.location.search;
 
-        // goo.gl URL shortener
-        GOOGLE_API_KEY = "AIzaSyCGb3QgZsj96VrtkBJVUkgnEAKQMZ5lYtA";
+        // Don't compromise this token :D
+        BITLY_TOKEN = "fe1d845c97a9ee8872333eb531b07b64c14829ce";
         $.ajax({
             method: "POST",
-            url: "https://www.googleapis.com/urlshortener/v1/url?key=" + GOOGLE_API_KEY,
-            contentType: "application/json; charset=utf-8",
-            data: '{ longUrl: "' + editor_url + '#' + hash + '" }'
+            url: "https://api-ssl.bitly.com/v4/shorten",
+            contentType: "application/json",
+            data: '{ "long_url": "' + editor_url + '#' + hash + '" }',
+            headers:  { Authorization: "Bearer " + BITLY_TOKEN }
         }).done(function(d) {
+            console.log(d);
             $("#share-url-display").show();
-            $("#share-url").text(d.id);
+            $("#share-url").text(d.link);
         }).fail(function(d) {
             console.log(d);
-            console.log('{ longUrl: "' + editor_url + '#' + hash + '" }');
+            console.log('{ long_url: "' + editor_url + '#' + hash + '" }');
         });
-        //window.open("https://bitly.com/shorten/?url=" + encodeURIComponent(editor_url + "#" + hash));
-        //window.open("http://tinyurl.com/create.php?url=" + encodeURIComponent(editor_url + "#" + hash));
     });
 
 
