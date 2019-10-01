@@ -51,7 +51,7 @@ void matrix_init(void)
 
     // LEDs on NumLock, CapsLock and ScrollLock(PB4, PB5, PB6)
     DDRB  |= (1<<4) | (1<<5) | (1<<6);
-    PORTB |= (1<<4) | (1<<5) | (1<<6);
+    PORTB &= ~((1<<4) | (1<<5) | (1<<6));
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) _matrix0[i] = 0x00;
