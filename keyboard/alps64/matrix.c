@@ -25,13 +25,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "print.h"
 #include "debug.h"
 #include "util.h"
+#include "timer.h"
 #include "matrix.h"
 
 
 #ifndef DEBOUNCE
 #   define DEBOUNCE	5
 #endif
-static uint8_t debouncing = DEBOUNCE;
+static bool debouncing = false;
+static uint16_t debouncing_time = 0;
 
 /* matrix state(1:on, 0:off) */
 static matrix_row_t matrix[MATRIX_ROWS];
@@ -70,26 +72,24 @@ uint8_t matrix_scan(void)
 {
     for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
         select_row(i);
-        _delay_us(30);  // without this wait read unstable value.
+        _delay_us(1);  // delay for settling
         matrix_row_t cols = read_cols();
         if (matrix_debouncing[i] != cols) {
-            matrix_debouncing[i] = cols;
             if (debouncing) {
-                debug("bounce!: "); debug_hex(debouncing); debug("\n");
+                dprintf("bounce: %d %d@%02X\n", timer_elapsed(debouncing_time), i, matrix_debouncing[i]^cols);
             }
-            debouncing = DEBOUNCE;
+            matrix_debouncing[i] = cols;
+            debouncing = true;
+            debouncing_time = timer_read();
         }
         unselect_rows();
     }
 
-    if (debouncing) {
-        if (--debouncing) {
-            _delay_ms(1);
-        } else {
-            for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-                matrix[i] = matrix_debouncing[i];
-            }
+    if (debouncing && timer_elapsed(debouncing_time) >= DEBOUNCE) {
+        for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
+            matrix[i] = matrix_debouncing[i];
         }
+        debouncing = false;
     }
 
     return 1;
