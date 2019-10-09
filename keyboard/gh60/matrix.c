@@ -73,12 +73,11 @@ uint8_t matrix_scan(void)
     }
 
     if (debouncing) {
-        if (--debouncing) {
-            _delay_ms(1);
-        } else {
-            for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-                matrix[i] = matrix_debouncing[i];
-            }
+        _delay_ms(1);
+        debouncing--;
+    } else {
+        for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
+            matrix[i] = matrix_debouncing[i];
         }
     }
 
