@@ -72,6 +72,7 @@ MOUSEKEY_ENABLE ?= yes	# Mouse keys(+4700)
 EXTRAKEY_ENABLE ?= yes	# Audio control and System control(+450)
 CONSOLE_ENABLE ?= yes	# Console for debug(+400)
 COMMAND_ENABLE ?= yes    # Commands for debug and configuration
+DEBOUNCE_HASU ?= yes    # Default debounce algorithm
 #SLEEP_LED_ENABLE ?= yes  # Breathing sleep LED during USB suspend
 #NKRO_ENABLE ?= yes	# USB Nkey Rollover
 #ACTIONMAP_ENABLE ?= yes	# Use 16bit action codes in keymap instead of 8bit keycodes

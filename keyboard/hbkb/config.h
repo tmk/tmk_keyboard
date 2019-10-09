@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_HAS_GHOST
 
 /* Set 0 if need no debouncing */
-#define DEBOUNCE    5
+#define DEBOUNCE    10
 
 /* legacy keymap support */
 #define USE_LEGACY_KEYMAP

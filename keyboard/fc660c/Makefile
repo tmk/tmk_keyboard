@@ -73,6 +73,7 @@ EXTRAKEY_ENABLE ?= yes		# Audio control and System control
 CONSOLE_ENABLE ?= yes		# Console for debug
 COMMAND_ENABLE ?= yes    	# Commands for debug and configuration
 NKRO_ENABLE ?= yes		# USB Nkey Rollover
+DEBOUNCE_HASU ?= yes    # Default debounce algorithm
 #ACTIONMAP_ENABLE ?= yes		# Use 16bit actionmap instead of 8bit keymap
 UNIMAP_ENABLE ?= yes		# Universal keymap
 KEYMAP_SECTION_ENABLE ?= yes	# fixed address keymap for keymap editor

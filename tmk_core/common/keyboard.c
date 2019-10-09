@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include "keyboard.h"
 #include "matrix.h"
+#include "debounce.h"
 #include "keymap.h"
 #include "host.h"
 #include "led.h"
@@ -60,6 +61,19 @@ static bool has_ghost_in_row(uint8_t row)
     }
     return false;
 }
+
+//Returns whether there was a ghost in the row, then copies new contents 
+//into matrix_ghost
+static bool matrix_deghost(uint8_t row, matrix_row_t matrix_row, matrix_row_t* matrix_ghost)
+{    
+    bool result = has_ghost_in_row(row);
+    if (debug_matrix && result && matrix_ghost[row] != matrix_row)
+    {
+        matrix_print();
+    }
+    matrix_ghost[row] = matrix_row;
+    return result;
+}
 #endif
 
 
@@ -96,6 +110,7 @@ void keyboard_init(void)
  * Do keyboard routine jobs: scan matrix, light LEDs, ...
  * This is repeatedly called as fast as possible.
  */
+
 void keyboard_task(void)
 {
     static matrix_row_t matrix_prev[MATRIX_ROWS];
@@ -107,23 +122,14 @@ void keyboard_task(void)
     matrix_row_t matrix_change = 0;
 
     matrix_scan();
+    matrix_debounce();
+
     for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
-        matrix_row = matrix_get_row(r);
+        matrix_row = matrix_debounce_get_row(r);
         matrix_change = matrix_row ^ matrix_prev[r];
-        if (matrix_change) {
+        if (matrix_change) {            
 #ifdef MATRIX_HAS_GHOST
-            if (has_ghost_in_row(r)) {
-                /* Keep track of whether ghosted status has changed for
-                 * debugging. But don't update matrix_prev until un-ghosted, or
-                 * the last key would be lost.
-                 */
-                if (debug_matrix && matrix_ghost[r] != matrix_row) {
-                    matrix_print();
-                }
-                matrix_ghost[r] = matrix_row;
-                continue;
-            }
-            matrix_ghost[r] = matrix_row;
+            if (matrix_deghost(r, matrix_row, matrix_ghost)) continue;
 #endif
             if (debug_matrix) matrix_print();
             matrix_row_t col_mask = 1;
