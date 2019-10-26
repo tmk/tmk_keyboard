@@ -212,8 +212,8 @@ enum unimap_position_codes {
     UNIMAP_F22,             // 0x71
     UNIMAP_F23,             // 0x72
     UNIMAP_F24,             // 0x73
-    UNIMAP_EXECUTE,         // 0x74
-    UNIMAP_HELP,            // 0x75
+    UNIMAP_JYEN,            // 0x74
+    UNIMAP_RO,              // 0x75
     UNIMAP_HENK,            // 0x76
     UNIMAP_MHEN,            // 0x77
     UNIMAP_LCTRL,           // 0x78
@@ -262,7 +262,6 @@ enum unimap_position_codes {
 #define UNIMAP_APP  UNIMAP_APPLICATION
 #define UNIMAP_NUHS UNIMAP_NONUS_HASH
 #define UNIMAP_NUBS UNIMAP_NONUS_BSLASH
-#define UNIMAP_EXEC UNIMAP_EXECUTE
 /* Japanese specific */
 #define UNIMAP_ZKHK UNIMAP_GRAVE
 /* Keypad */
