@@ -112,7 +112,20 @@ void print_keyboard_report (report_keyboard_t *report, report_keyboard_t *last_k
     dprint("\n");
 #endif
 }
-#endif
+
+void print_hostcode (uint16_t code, const char* prefix)
+{
+  if (!debug_keyboard) return;
+  if (!debug_inline) print("keyboard>");
+  debug_inline= true;
+  debug_empty_report= (code==0);
+  xprintf(" < %s%04X >", (prefix ? prefix : ""), code);
+  if (debug_empty_matrix && debug_empty_report) {
+    print("\r\n");
+    debug_inline = false;
+  }
+}
+#endif /* NO_PRINT */
 
 /* send report */
 void host_keyboard_send(report_keyboard_t *report)
@@ -136,9 +149,13 @@ void host_system_send(uint16_t report)
     if (!driver) return;
     (*driver->send_system)(report);
 
-#ifdef DEBUG_KEYBOARD_VERBOSE
+#ifndef NO_PRINT
     if (debug_keyboard) {
-      dprintf("system: %04X\n", report);
+#ifndef DEBUG_KEYBOARD_VERBOSE
+        print_hostcode (report, "s");
+#else /* DEBUG_KEYBOARD_VERBOSE */
+        dprintf("system: %04X\n", report);
+#endif
     }
 #endif
 }
@@ -151,9 +168,13 @@ void host_consumer_send(uint16_t report)
     if (!driver) return;
     (*driver->send_consumer)(report);
 
-#ifdef DEBUG_KEYBOARD_VERBOSE
+#ifndef NO_PRINT
     if (debug_keyboard) {
+#ifndef DEBUG_KEYBOARD_VERBOSE
+        print_hostcode (report, "c");
+#else /* DEBUG_KEYBOARD_VERBOSE */
         dprintf("consumer: %04X\n", report);
+#endif
     }
 #endif
 }
