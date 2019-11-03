@@ -3,27 +3,39 @@ Code Set: 2 (extended)
 Mode: AT/PS2
 
 Key          Scan         Type1        Matrix    HID code  i8042 (Type1)
-Name         Code         equiv        Index     chosen    Scan Code
+Name         Code         equiv        Index     (*=repl)  Scan Code
+============ ============ ============ ========= ========= =============
+F1           05           3B           05        3A        3B
+F2           06           3C           06        3B        3C
+F3           04           3D           04        3C        3D
+F4           0C           3E           0C        3D        3E
+F5           03           3F           03        3E        3F
+F6           0B           40           0B        3F        40
+F7           83           41           83        6A *      66             (F15)
+F8           0A           42           0A        41        42
+F9           01           43           01        42        43
+F10          09           44           09        43        44
 F11          78           57           78        44        57
 F12          07           58           07        45        58
-F13          E0 04        E0 3D        84        68        64
-F14          E0 0C        E0 3E        8C        69        65
-Help         E0 03        E0 3F        83        6A        66
-Do           E0 0B        E0 40        8B        6B        67             (sometimes just 0B on key down)
-F17          E0 83        E0 42        28        6C        68
+F13          E0 04        E0 3D        84        68 *      64
+F14          E0 0C        E0 3E        8C        69 *      65
+Help         E0 03        E0 3F        83        6A *      66
+Do           E0 0B        E0 40        8B        6B *      67             (sometimes just 0B on key down)
+F17          E0 83        E0 42        28        6C *      68
 F18          E0 12 E0 7C  E0 2A E0 37  FC        46        E0 2A E0 37    (PrtSc)
 F19          7E           46           7E        47        46             (ScrollLock)
 F20          E1 14 77     E1 1D 45     FE        48        E1 1D 45       (Pause - down+up sent together)
+C-F20        E0 7E        E0 46        C6        48        E0 46          (Break = C-Pause; down+up sent together)
 
 PF1          77           45           77        53        45             (NumLock)
 PF2          E0 4A        E0 35        CA        54        E0 35          (KP/)
 PF3          7C           37           7C        55        37             (KP*)
 PF4          7B           4A           7B        56        4A             (KP-)
-KP-          E0 79        E0 4E        F9        57        4E             (KP+)
-KP,          79           4E           79        85        7E
+KP-          E0 79        E0 4E        F9        57 *      4E             (KP+)
+KP,          79           4E           79        85 *      7E
 Enter        E0 5A        E0 1C        DA        58        E0 1C
 
-LCompose     E0 0D        E0 0F        8D        M3        E0 5B          (Left GUI)
+LCompose     E0 0D        E0 0F        8D        M3 *      E0 5B          (Left GUI)
 LAlt         11           38           11        M2        38
 RAlt         E0 11        E0 38        91        M6        E0 38
 RCompose     E0 14        E0 1D        94        M4        E0 1D          (RCtrl)
