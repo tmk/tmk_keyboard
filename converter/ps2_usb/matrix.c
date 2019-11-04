@@ -61,7 +61,7 @@ static uint8_t matrix[MATRIX_ROWS];
 #define COL(code)      (code&0x07)
 
 // matrix positions for exceptional keys
-#define F7             (0x83)
+#define F7             (0x02)   /* changed from 0x83, so Help can use 0x83 */
 #define F17            (0x28)
 #define PRINT_SCREEN   (0xFC)
 #define PAUSE          (0xFE)
