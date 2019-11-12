@@ -116,6 +116,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_P8   KC_KP_8
 #define KC_P9   KC_KP_9
 #define KC_P0   KC_KP_0
+#define KC_P00  KC_KP_00
+#define KC_P000 KC_KP_000
 #define KC_PDOT KC_KP_DOT
 #define KC_PCMM KC_KP_COMMA
 #define KC_PSLS KC_KP_SLASH

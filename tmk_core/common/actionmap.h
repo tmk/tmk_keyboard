@@ -364,6 +364,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AC_P8  			ACTION_KEY(KC_KP_8)
 #define AC_P9  			ACTION_KEY(KC_KP_9)
 #define AC_P0  			ACTION_KEY(KC_KP_0)
+#define AC_P00  		ACTION_KEY(KC_KP_00)
+#define AC_P000  		ACTION_KEY(KC_KP_000)
 #define AC_PDOT			ACTION_KEY(KC_KP_DOT)
 #define AC_PCMM			ACTION_KEY(KC_KP_COMMA)
 #define AC_PSLS			ACTION_KEY(KC_KP_SLASH)
