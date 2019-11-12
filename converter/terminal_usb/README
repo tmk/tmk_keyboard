@@ -27,10 +27,20 @@ $ make
 RESOURCE
 --------
 Soarer's Converter: http://geekhack.org/index.php?topic=17458.0
-102keys(1392595): http://geekhack.org/index.php?topic=10737.0
-122keys(1390876): http://www.seasip.info/VintagePC/ibm_1390876.html
 KbdBabel: http://www.kbdbabel.org/
 RJ45 Connector: http://www.kbdbabel.org/conn/kbd_connector_ibmterm.png
 DIN Connector: http://www.kbdbabel.org/conn/kbd_connector_ibm3179_318x_319x.png
+
+Terminal keyboards
+------------------
+122-key
+    1390876 http://www.seasip.info/VintagePC/ibm_1390876.html
+    6110344 http://www.seasip.info/VintagePC/ibm_6110344.html
+
+102-key
+    1392595 https://deskthority.net/viewtopic.php?t=8371 https://geekhack.org/index.php?topic=10737.0
+    1386303 https://geekhack.org/index.php?topic=66959.0
+    1391406 http://www.seasip.info/VintagePC/ibm_1391406.html
+
 
 EOF
