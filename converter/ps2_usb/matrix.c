@@ -386,10 +386,12 @@ uint8_t matrix_scan(void)
         }
     }
 #ifndef NO_PRINT
-    debug_empty_matrix = (state == INIT && matrix_is_empty());
-    if (debug_keyboard && debug_inline && debug_empty_matrix && debug_empty_report) {
-      print("\r\n");
-      debug_inline = false;
+    if (debug_keyboard) {
+      debug_empty_matrix = (state == INIT && matrix_is_empty());
+      if (debug_inline && debug_empty_matrix && debug_empty_report) {
+        print("\r\n");
+        debug_inline = false;
+      }
     }
 #endif
 

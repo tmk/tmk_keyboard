@@ -23,7 +23,7 @@ debug_config_t debug_config = {
 #endif
 };
 
-bool debug_inline = false, debug_empty_matrix = false, debug_empty_report = false;
+bool debug_inline = false, debug_empty_matrix = true, debug_empty_report = false;
 
 #ifndef NO_PRINT
 void print_scancode (uint8_t code, uint8_t error, char prefix)

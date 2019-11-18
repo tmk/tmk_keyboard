@@ -66,7 +66,6 @@ static void print_changed_bits (uint8_t index, uint8_t byte, uint8_t last)
 
 void print_keyboard_report (report_keyboard_t *report, report_keyboard_t *last_keyboard_report)
 {
-    if (!debug_keyboard) return;
 #ifndef DEBUG_KEYBOARD_VERBOSE
     if (debug_inline) print(" <");
     debug_empty_report = true;
@@ -115,14 +114,13 @@ void print_keyboard_report (report_keyboard_t *report, report_keyboard_t *last_k
 
 void print_hostcode (uint16_t code, const char* prefix)
 {
-  if (!debug_keyboard) return;
   if (!debug_inline) print("keyboard>");
   debug_inline= true;
   debug_empty_report= (code==0);
   xprintf(" < %s%04X >", (prefix ? prefix : ""), code);
   if (debug_empty_matrix && debug_empty_report) {
-    print("\r\n");
-    debug_inline = false;
+      print("\r\n");
+      debug_inline = false;
   }
 }
 #endif /* NO_PRINT */
@@ -132,7 +130,9 @@ void host_keyboard_send(report_keyboard_t *report)
 {
     if (!driver) return;
     (*driver->send_keyboard)(report);
-    print_keyboard_report (report, last_keyboard_report);
+    if (debug_keyboard) {
+        print_keyboard_report (report, last_keyboard_report);
+    }
 }
 
 void host_mouse_send(report_mouse_t *report)

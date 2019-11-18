@@ -266,6 +266,7 @@ static bool command_common(uint8_t code)
             if (debug_keyboard) {
                 print("\nkeyboard: on\n");
                 debug_enable = true;
+                debug_empty_matrix = false;
 #ifndef DEBUG_KEYBOARD_VERBOSE
                 debug_inline = false;
                 host_set_last_keyboard_report(keyboard_report);
