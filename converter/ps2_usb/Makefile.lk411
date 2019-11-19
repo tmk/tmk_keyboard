@@ -18,4 +18,6 @@ PS2_USE_BUSYWAIT = no
 UNIMAP_ENABLE = yes
 KEYMAP_SECTION_ENABLE = yes
 
+TMK_VERSION ?= LK411-1.0
+
 include Makefile
