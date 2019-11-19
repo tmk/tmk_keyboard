@@ -61,8 +61,12 @@ static uint8_t matrix[MATRIX_ROWS];
 #define COL(code)      (code&0x07)
 
 // matrix positions for exceptional keys
+#ifndef LK411_LAYOUT
+#define F7             (0x83)
+#else
 #define F7             (0x02)   /* changed from 0x83, so Help can use 0x83 */
 #define F17            (0x28)
+#endif
 #define PRINT_SCREEN   (0xFC)
 #define PAUSE          (0xFE)
 
@@ -233,10 +237,12 @@ uint8_t matrix_scan(void)
                     case 0x7E:  // Control'd Pause
                         state = E0_7E;
                         break;
+#ifdef LK411_LAYOUT
                     case 0x83:  // F17
                         matrix_make(F17);
                         state = INIT;
                         break;
+#endif
                     case 0xF0:
                         state = E0_F0;
                         break;
@@ -283,10 +289,12 @@ uint8_t matrix_scan(void)
                     case 0x59:  // to be ignored
                         state = INIT;
                         break;
+#ifdef LK411_LAYOUT
                     case 0x83:  // F17
                         matrix_break(F17);
                         state = INIT;
                         break;
+#endif
                     default:
                         if (code < 0x80) {
                             matrix_break(code|0x80);
