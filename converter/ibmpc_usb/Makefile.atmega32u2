@@ -1,3 +1,4 @@
+TARGET = ibmpc_usb_atmega32u2
 MCU = atmega32u2
 
 include Makefile

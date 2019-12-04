@@ -1,4 +1,4 @@
+TARGET = ibmpc_usb_at90usb1286
 MCU = at90usb1286
-BOOTLOADER_SIZE = 8192
 
 include Makefile

@@ -63,8 +63,9 @@ OPT_DEFS += -DSUSPEND_MODE_STANDBY
 #   Atmel DFU loader 4096
 #   LUFA bootloader  4096
 #   USBaspLoader     2048
-BOOTLOADER_SIZE ?= 4096
-OPT_DEFS += -DBOOTLOADER_SIZE=$(BOOTLOADER_SIZE)
+# Bootloader size can be calculated from fuse bits
+#BOOTLOADER_SIZE ?= 4096
+#OPT_DEFS += -DBOOTLOADER_SIZE=$(BOOTLOADER_SIZE)
 
 
 # Build Options
