@@ -138,6 +138,6 @@ void bootloader_jump_after_watchdog_reset(void)
 #endif
 
         // This is compled into 'icall', address should be in word unit, not byte.
-        ((void (*)(void))(BOOTLOADER_START / 2))();
+        ((void (*)(void))( (uint16_t)(BOOTLOADER_START / 2) ))();
     }
 }
