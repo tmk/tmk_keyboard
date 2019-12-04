@@ -14,7 +14,53 @@ __SIGNATURE_REGION_LENGTH__ = DEFINED(__SIGNATURE_REGION_LENGTH__) ? __SIGNATURE
 __USER_SIGNATURE_REGION_LENGTH__ = DEFINED(__USER_SIGNATURE_REGION_LENGTH__) ? __USER_SIGNATURE_REGION_LENGTH__ : 1K;
 MEMORY
 {
+  /* With keymap section
+   *
+   * TODO: should be as below
+   * Flash Map of AT90USB(128KB)
+   * +------------+ 0x0000
+   * | .vectors   |
+   * | .progmem   |
+   * | .init0-9   | > text region
+   * | .text      |
+   * | .fini9-0   |
+   * |            |
+   * |------------| _etext
+   * | .data      |
+   * | .bss       | > data region
+   * | .noinit    |
+   * |            |
+   * |------------| 0x1D800
+   * | .keymap    | > keymap region(2KB)
+   * |------------| 0x1E000
+   * | bootloader | 8KB
+   * +------------+ 0x1FFFF
+   *
+   * FIXME: Use this To fit to ATMega32U4 unimap address
+   * Flash Map of AT90USB(128KB)
+   * +------------+ 0x0000
+   * | .vectors   |
+   * | .progmem   |
+   * | .init0-9   | > text region
+   * | .text      |
+   * | .fini9-0   |
+   * |            |
+   * |------------| _etext
+   * | .data      |
+   * | .bss       | > data region
+   * | .noinit    |
+   * |            |
+   * |------------| 0x6800
+   * | .keymap    | > keymap region(2KB)
+   * |------------| 0x7000
+   * ~            ~
+   * ~            ~
+   * |------------| 0x1E000
+   * | bootloader | 8KB
+   * +------------+ 0x1FFFF
+   */
   text   (rx)   : ORIGIN = 0, LENGTH = __TEXT_REGION_LENGTH__
+  keymap (rw!x) : ORIGIN = 0x6800, LENGTH = 2K
   data   (rw!x) : ORIGIN = 0x800100, LENGTH = __DATA_REGION_LENGTH__
   eeprom (rw!x) : ORIGIN = 0x810000, LENGTH = __EEPROM_REGION_LENGTH__
   fuse      (rw!x) : ORIGIN = 0x820000, LENGTH = __FUSE_REGION_LENGTH__
@@ -196,6 +242,19 @@ SECTIONS
      _end = . ;
      PROVIDE (__heap_start = .) ;
   }  > data
+  /* keymap region is located at end of flash
+   * .fn_actions        Fn actions definitions
+   * .keymaps           Mapping layers
+   */
+  .keymap :
+  {
+    PROVIDE(__keymap_start = .) ;
+    *(.keymap.fn_actions)   /* 32*actions = 64bytes */
+    . = ALIGN(0x40);
+    *(.keymap.keymaps)      /* rest of .keymap section */
+    *(.keymap*)
+    /* . = ALIGN(0x800); */ /* keymap section takes 2KB- */
+  } > keymap = 0x00         /* zero fill */
   .eeprom  :
   {
     /* See .data above...  */
