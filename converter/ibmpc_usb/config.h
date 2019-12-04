@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
  * Pin and interrupt configuration
  */
-#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega32U2__)
+#if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega32U2__) || defined(__AVR_AT90USB1286__)
 /* uses INT1 for clock line */
 #define IBMPC_CLOCK_PORT  PORTD
 #define IBMPC_CLOCK_PIN   PIND

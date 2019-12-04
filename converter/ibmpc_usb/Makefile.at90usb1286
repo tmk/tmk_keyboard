@@ -1,0 +1,4 @@
+MCU = at90usb1286
+BOOTLOADER_SIZE = 8192
+
+include Makefile
