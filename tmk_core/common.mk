@@ -101,6 +101,8 @@ ifeq (yes,$(strip $(KEYMAP_SECTION_ENABLE)))
 	EXTRALDFLAGS = -Wl,-L$(TMK_DIR),-Tldscript_keymap_avr35.x
     else ifeq ($(strip $(MCU)),atmega32u4)
 	EXTRALDFLAGS = -Wl,-L$(TMK_DIR),-Tldscript_keymap_avr5.x
+    else ifeq ($(strip $(MCU)),at90usb1286)
+	EXTRALDFLAGS = -Wl,-L$(TMK_DIR),-Tldscript_keymap_avr51.x
     else
 	EXTRALDFLAGS = $(error no ldscript for keymap section)
     endif
