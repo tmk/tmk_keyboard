@@ -334,8 +334,10 @@ static bool command_common(uint8_t code)
         case KC_S:
             print("\n\t- Status -\n");
             print_val_hex8(host_keyboard_leds());
+#ifndef PROTOCOL_VUSB
             print_val_hex8(keyboard_protocol);
             print_val_hex8(keyboard_idle);
+#endif
 #ifdef NKRO_ENABLE
             print_val_hex8(keyboard_nkro);
 #endif
