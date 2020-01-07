@@ -116,7 +116,7 @@ uint8_t matrix_scan(void)
 
 
     if (ibmpc_error) {
-        xprintf("err: %02X\n", ibmpc_error);
+        xprintf("\nERR: %02X\n", ibmpc_error);
 
         // when recv error, neither send error nor buffer full
         if (!(ibmpc_error & (IBMPC_ERR_SEND | IBMPC_ERR_FULL))) {
@@ -151,7 +151,7 @@ uint8_t matrix_scan(void)
         case READ_ID:
             keyboard_id = read_keyboard_id();
             if (ibmpc_error) {
-                xprintf("err: %02X\n", ibmpc_error);
+                xprintf("\nERR: %02X\n", ibmpc_error);
                 ibmpc_error = IBMPC_ERR_NONE;
             }
             xprintf("ID: %04X\n", keyboard_id);
@@ -202,13 +202,13 @@ uint8_t matrix_scan(void)
         case LOOP:
             switch (keyboard_kind) {
                 case PC_XT:
-                    process_cs1();
+                    if (process_cs1() == -1) state = INIT;
                     break;
                 case PC_AT:
-                    process_cs2();
+                    if (process_cs2() == -1) state = INIT;
                     break;
                 case PC_TERMINAL:
-                    process_cs3();
+                    if (process_cs3() == -1) state = INIT;
                     break;
                 default:
                     break;
@@ -765,8 +765,9 @@ static int8_t process_cs3(void)
         case READY:
             switch (code) {
                 case 0x00:
-                case 0xff:
+                case 0xFF:
                     xprintf("!CS3_%02X!\n", code);
+                    return -1;
                     break;
                 case 0xF0:
                     state = F0;
@@ -782,16 +783,17 @@ static int8_t process_cs3(void)
                         matrix_make(code);
                     } else {
                         xprintf("!CS3_%02X!\n", code);
+                        return -1;
                     }
-                    state = READY;
             }
             break;
         case F0:    // Break code
             switch (code) {
                 case 0x00:
-                case 0xff:
+                case 0xFF:
                     xprintf("!CS3_F0_%02X!\n", code);
                     state = READY;
+                    return -1;
                     break;
                 case 0x83:  // F7
                     matrix_break(0x02);
@@ -802,12 +804,13 @@ static int8_t process_cs3(void)
                     state = READY;
                     break;
                 default:
+                    state = READY;
                     if (code < 0x80) {
                         matrix_break(code);
                     } else {
                         xprintf("!CS3_F0_%02X!\n", code);
+                        return -1;
                     }
-                    state = READY;
             }
             break;
     }
