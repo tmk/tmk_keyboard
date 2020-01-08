@@ -78,10 +78,6 @@ static uint16_t read_keyboard_id(void)
 void matrix_init(void)
 {
     debug_enable = true;
-    ibmpc_host_init();
-
-    // hard reset for XT keyboard
-    IBMPC_RESET();
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
@@ -138,6 +134,9 @@ uint8_t matrix_scan(void)
             keyboard_id = 0x0000;
             last_time = timer_read();
             state = WAIT_STARTUP;
+
+            ibmpc_host_init();
+            IBMPC_RESET();  // hard reset for some old XT keyboards
             matrix_clear();
             clear_keyboard();
             break;
