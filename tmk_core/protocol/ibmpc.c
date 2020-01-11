@@ -192,6 +192,7 @@ ISR(IBMPC_INT_VECT)
                 if (dbit)
                     goto ERROR;
             }
+            break;
         case BIT0:
         case BIT1:
         case BIT2:
