@@ -172,10 +172,7 @@ ISR(IBMPC_INT_VECT)
     static uint8_t data = 0;
     static uint8_t parity = 1;
 
-    // return unless falling edge
-    if (clock_in()) {
-        return;
-    }
+    uint8_t dbit = IBMPC_DATA_PIN&(1<<IBMPC_DATA_BIT);
 
     // Reset state when taking more than 1ms
     if (last_time && timer_elapsed(last_time) > 10) {
@@ -190,9 +187,9 @@ ISR(IBMPC_INT_VECT)
         case START:
             if (ibmpc_protocol == IBMPC_PROTOCOL_XT) {
                 // ignore start(0) bit
-                if (!data_in()) return;
+                if (!dbit) return;
             } else {
-                if (data_in())
+                if (dbit)
                     goto ERROR;
             }
         case BIT0:
@@ -204,7 +201,7 @@ ISR(IBMPC_INT_VECT)
         case BIT6:
         case BIT7:
             data >>= 1;
-            if (data_in()) {
+            if (dbit) {
                 data |= 0x80;
                 parity++;
             }
@@ -218,7 +215,7 @@ ISR(IBMPC_INT_VECT)
             }
             break;
         case PARITY:
-            if (data_in()) {
+            if (dbit) {
                 if (!(parity & 0x01))
                     goto ERROR;
             } else {
@@ -227,7 +224,7 @@ ISR(IBMPC_INT_VECT)
             }
             break;
         case STOP:
-            if (!data_in())
+            if (!dbit)
                 goto ERROR;
             if (!ringbuf_put(&rb, data)) {
                 ibmpc_error = IBMPC_ERR_FULL;
