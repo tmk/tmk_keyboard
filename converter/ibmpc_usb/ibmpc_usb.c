@@ -55,22 +55,23 @@ static uint16_t read_keyboard_id(void)
     int16_t  code = 0;
 
     // Disable
-    code = ibmpc_host_send(0xF5);
+    //code = ibmpc_host_send(0xF5);
 
     // Read ID
     code = ibmpc_host_send(0xF2);
-    if (code == -1)  return 0xFFFF;     // XT or No keyboard
-    if (code != 0xFA) return 0xFFFE;    // Broken PS/2?
+    if (code == -1) { id = 0xFFFF; goto DONE; }     // XT or No keyboard
+    if (code != 0xFA) { id = 0xFFFE; goto DONE; }   // Broken PS/2?
 
     code = read_wait(1000);
-    if (code == -1)  return 0x0000;     // AT
+    if (code == -1) { id = 0x0000; goto DONE; }     // AT
     id = (code & 0xFF)<<8;
 
     code = read_wait(1000);
     id |= code & 0xFF;
 
+DONE:
     // Enable
-    code = ibmpc_host_send(0xF4);
+    //code = ibmpc_host_send(0xF4);
 
     return id;
 }
