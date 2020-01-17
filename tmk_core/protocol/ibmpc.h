@@ -89,6 +89,8 @@ extern volatile uint8_t ibmpc_protocol;
 extern volatile uint8_t ibmpc_error;
 
 void ibmpc_host_init(void);
+void ibmpc_host_enable(void);
+void ibmpc_host_disable(void);
 int16_t ibmpc_host_send(uint8_t data);
 int16_t ibmpc_host_recv_response(void);
 int16_t ibmpc_host_recv(void);
@@ -102,12 +104,6 @@ void ibmpc_host_set_led(uint8_t usb_led);
 /*
  * Clock
  */
-static inline void clock_init(void)
-{
-    IBMPC_CLOCK_PORT &= ~(1<<IBMPC_CLOCK_BIT);
-    IBMPC_CLOCK_DDR  |=  (1<<IBMPC_CLOCK_BIT);
-}
-
 static inline void clock_lo(void)
 {
     IBMPC_CLOCK_PORT &= ~(1<<IBMPC_CLOCK_BIT);
@@ -132,12 +128,6 @@ static inline bool clock_in(void)
 /*
  * Data
  */
-static inline void data_init(void)
-{
-    IBMPC_DATA_DDR  &= ~(1<<IBMPC_DATA_BIT);
-    IBMPC_DATA_PORT |=  (1<<IBMPC_DATA_BIT);
-}
-
 static inline void data_lo(void)
 {
     IBMPC_DATA_PORT &= ~(1<<IBMPC_DATA_BIT);

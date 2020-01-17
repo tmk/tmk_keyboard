@@ -70,13 +70,26 @@ volatile uint8_t ibmpc_error = IBMPC_ERR_NONE;
 
 void ibmpc_host_init(void)
 {
-    clock_init();
-    data_init();
-    idle();
+    // initialize reset pin
+    IBMPC_RST_PORT |=  (1<<IBMPC_RST_BIT1);
+    IBMPC_RST_DDR  |=  (1<<IBMPC_RST_BIT1);
+    IBMPC_RST_PORT |=  (1<<IBMPC_RST_BIT2);
+    IBMPC_RST_DDR  |=  (1<<IBMPC_RST_BIT2);
+    inhibit();
     IBMPC_INT_INIT();
+    IBMPC_INT_OFF();
+}
+
+void ibmpc_host_enable(void)
+{
     IBMPC_INT_ON();
-    // POR(150-2000ms) plus BAT(300-500ms) may take 2.5sec([3]p.20)
-    //wait_ms(2500);
+    idle();
+}
+
+void ibmpc_host_disable(void)
+{
+    inhibit();
+    IBMPC_INT_OFF();
 }
 
 int16_t ibmpc_host_send(uint8_t data)
