@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "action.h"
 #include "ibmpc_usb.h"
+#include "ibmpc.h"
 
 
 static void matrix_make(uint8_t code);
@@ -79,6 +80,7 @@ DONE:
 void matrix_init(void)
 {
     debug_enable = true;
+    ibmpc_host_init();
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
@@ -109,7 +111,7 @@ uint8_t matrix_scan(void)
         LOOP,
         END
     } state = INIT;
-    static uint16_t last_time;
+    static uint16_t init_time;
 
 
     if (ibmpc_error) {
@@ -122,6 +124,10 @@ uint8_t matrix_scan(void)
                 xprintf("init\n");
                 state = INIT;
             }
+            // probably XT signal, not AT
+            if (state == WAIT_STARTUP) {
+                state = READ_ID;
+            }
         }
 
         // clear or process error
@@ -133,22 +139,46 @@ uint8_t matrix_scan(void)
             ibmpc_protocol = IBMPC_PROTOCOL_AT;
             keyboard_kind = NONE;
             keyboard_id = 0x0000;
-            last_time = timer_read();
-            state = WAIT_STARTUP;
+            init_time = timer_read();
+            xprintf("I%u\n", init_time);
 
-            ibmpc_host_init();
-            IBMPC_RESET();  // hard reset for some old XT keyboards
+            // re-initialize keyboard
+            // XT: hard reset 500ms for IBM XT Type-1 keyboard and clones
+            // XT: soft reset 20ms min(clock Lo)
+            ibmpc_host_disable();   // soft reset: inihibit(clock Lo/Data Hi)
+            IBMPC_RESET();          // hard reset
+            ibmpc_host_enable();    // soft reset: idle(clock Hi/Data Hi)
+
+            // TODO: should in while disabling interrupt?
+            // clear ISR state after protocol recognition
+            ibmpc_host_isr_clear();
+
             matrix_clear();
             clear_keyboard();
+
+            state = WAIT_STARTUP;
             break;
         case WAIT_STARTUP:
-            // read and ignore BAT code and other codes when power-up
-            ibmpc_host_recv();
-            if (timer_elapsed(last_time) > 1000) {
+            // 1) Read and ignore BAT code and ID when power-up
+            // For example, XT/AT sends 'AA' and Terminal sends 'AA BF BF' after BAT
+            // AT 84-key: POR and BAT can take 900-9900ms according to AT TechRef [8] 4-7
+            // AT 101/102-key: POR and BAT can take 450-2500ms according to AT TechRef [8] 4-39
+            // 2) Read and ignore key input by user when signal handling/protocol error occurs
+            // This can happen in case of keyboard hotswap, unstable hardware, signal integrity problem or bug
+
+            if (ibmpc_host_recv() != -1 || timer_elapsed(init_time) > 10000) {
+                // 500ms max wait for ID after AA TechRef [8] 4-41
+                // 122-key Terminal 6110345: 1ms wait is enough
+                wait_ms(100); ibmpc_host_recv();
+                wait_ms(100); ibmpc_host_recv();
                 state = READ_ID;
             }
+
+            // XT's 'AA' can not be handled correctly because protocol is configured as AT at this point.
+            // TODO: Check ISR timeout error for XT AA?
             break;
         case READ_ID:
+            xprintf("R%u\n", timer_read());
             keyboard_id = read_keyboard_id();
             if (ibmpc_error) {
                 xprintf("\nERR: %02X\n", ibmpc_error);
@@ -194,9 +224,14 @@ uint8_t matrix_scan(void)
                 xprintf("kbd: Unknown\n");
                 ibmpc_protocol = IBMPC_PROTOCOL_AT;
             }
+
+            // clear ISR state after protocol recognition
+            ibmpc_host_isr_clear();
+
             state = LED_SET;
             break;
         case LED_SET:
+            xprintf("L%u\n", timer_read());
             led_set(host_keyboard_leds());
             state = LOOP;
         case LOOP:
