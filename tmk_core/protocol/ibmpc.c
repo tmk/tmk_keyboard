@@ -88,6 +88,7 @@ void ibmpc_host_enable(void)
 
 void ibmpc_host_disable(void)
 {
+    // TODO: test order? uneeded interrupt happens by making clock lo
     inhibit();
     IBMPC_INT_OFF();
 }
@@ -143,6 +144,10 @@ int16_t ibmpc_host_send(uint8_t data)
     WAIT(clock_hi, 50, 8);
     WAIT(data_hi, 50, 9);
 
+    // clear buffer to get response correctly
+    ringbuf_reset(&rb);
+    ibmpc_host_isr_clear();
+
     idle();
     IBMPC_INT_ON();
     return ibmpc_host_recv_response();
@@ -173,30 +178,41 @@ int16_t ibmpc_host_recv(void)
     return data;
 }
 
+
+/*
+ * Receive data from keyboard with ISR
+ */
+static enum {
+    START,
+    BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7,
+    PARITY,
+    STOP, } isr_state = START;
+static uint8_t isr_data = 0;
+static uint8_t isr_parity = 1;
+static uint16_t isr_time = 0;
+
+void ibmpc_host_isr_clear(void)
+{
+    isr_state = START;
+    isr_data = 0;
+    isr_parity = 1;
+    isr_time = 0;
+}
+
 ISR(IBMPC_INT_VECT)
 {
-    static uint16_t last_time = 0;
-    static enum {
-        START,
-        BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7,
-        PARITY,
-        STOP,
-    } state = START;
-    static uint8_t data = 0;
-    static uint8_t parity = 1;
-
     uint8_t dbit = IBMPC_DATA_PIN&(1<<IBMPC_DATA_BIT);
 
     // Reset state when taking more than 1ms
-    if (last_time && timer_elapsed(last_time) > 10) {
-        ibmpc_error = IBMPC_ERR_TIMEOUT | IBMPC_ERR_RECV | state;
-        state = START;
-        data = 0;
-        parity = 1;
+    if (isr_time && timer_elapsed(isr_time) > 1) {
+        ibmpc_error = IBMPC_ERR_TIMEOUT | IBMPC_ERR_RECV | isr_state;
+        isr_state = START;
+        isr_data = 0;
+        isr_parity = 1;
     }
-    last_time = timer_read();
+    isr_time = timer_read();
 
-    switch (state) {
+    switch (isr_state) {
         case START:
             if (ibmpc_protocol == IBMPC_PROTOCOL_XT) {
                 // ignore start(0) bit
@@ -214,13 +230,13 @@ ISR(IBMPC_INT_VECT)
         case BIT5:
         case BIT6:
         case BIT7:
-            data >>= 1;
+            isr_data >>= 1;
             if (dbit) {
-                data |= 0x80;
-                parity++;
+                isr_data |= 0x80;
+                isr_parity++;
             }
-            if (state == BIT7 && ibmpc_protocol == IBMPC_PROTOCOL_XT) {
-                if (!ringbuf_put(&rb, data)) {
+            if (isr_state == BIT7 && ibmpc_protocol == IBMPC_PROTOCOL_XT) {
+                if (!ringbuf_put(&rb, isr_data)) {
                     ibmpc_error = IBMPC_ERR_FULL;
                     goto ERROR;
                 }
@@ -230,17 +246,17 @@ ISR(IBMPC_INT_VECT)
             break;
         case PARITY:
             if (dbit) {
-                if (!(parity & 0x01))
+                if (!(isr_parity & 0x01))
                     goto ERROR;
             } else {
-                if (parity & 0x01)
+                if (isr_parity & 0x01)
                     goto ERROR;
             }
             break;
         case STOP:
             if (!dbit)
                 goto ERROR;
-            if (!ringbuf_put(&rb, data)) {
+            if (!ringbuf_put(&rb, isr_data)) {
                 ibmpc_error = IBMPC_ERR_FULL;
                 goto ERROR;
             }
@@ -253,17 +269,17 @@ ISR(IBMPC_INT_VECT)
     goto NEXT;
 
 ERROR:
-    ibmpc_error |= state;
+    ibmpc_error |= isr_state;
     ibmpc_error |= IBMPC_ERR_RECV;
     ringbuf_reset(&rb);
 DONE:
-    last_time = 0;
-    state = START;
-    data = 0;
-    parity = 1;
+    isr_state = START;
+    isr_data = 0;
+    isr_parity = 1;
+    isr_time = 0;
     return;
 NEXT:
-    state++;
+    isr_state++;
     return;
 }
 
