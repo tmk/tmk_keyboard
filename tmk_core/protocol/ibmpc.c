@@ -41,6 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdbool.h>
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 #include "ringbuf.h"
 #include "ibmpc.h"
 #include "debug.h"
@@ -88,9 +89,8 @@ void ibmpc_host_enable(void)
 
 void ibmpc_host_disable(void)
 {
-    // TODO: test order? uneeded interrupt happens by making clock lo
-    inhibit();
     IBMPC_INT_OFF();
+    inhibit();
 }
 
 int16_t ibmpc_host_send(uint8_t data)
@@ -158,128 +158,123 @@ ERROR:
     return -1;
 }
 
+/*
+ * Receive data from keyboard with ISR
+ */
+static volatile int16_t recv_data = -1;
+static volatile uint16_t isr_data = 0x8000;
+
+void ibmpc_host_isr_clear(void)
+{
+    isr_data = 0x8000;
+}
+
+int16_t ibmpc_host_recv(void)
+{
+    int16_t data = 0;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+        data = recv_data;
+        recv_data = -1;
+    }
+    if (data != -1) {
+        dprintf("r%04X ", data);
+    }
+    return data;
+
+}
+
 int16_t ibmpc_host_recv_response(void)
 {
     // Command may take 25ms/20ms at most([5]p.46, [3]p.21)
     uint8_t retry = 25;
-    while (retry-- && ringbuf_is_empty(&rb)) {
+    int16_t data = -1;
+    while (retry-- && (data = ibmpc_host_recv()) == -1) {
         wait_ms(1);
     }
-    int16_t data = ringbuf_get(&rb);
-    if (data != -1) dprintf("r%02X ", data);
     return data;
-}
-
-/* get data received by interrupt */
-int16_t ibmpc_host_recv(void)
-{
-    int16_t data = ringbuf_get(&rb);
-    if (data != -1) dprintf("r%02X ", data);
-    return data;
-}
-
-
-/*
- * Receive data from keyboard with ISR
- */
-static enum {
-    START,
-    BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7,
-    PARITY,
-    STOP, } isr_state = START;
-static uint8_t isr_data = 0;
-static uint8_t isr_parity = 1;
-static uint16_t isr_time = 0;
-
-void ibmpc_host_isr_clear(void)
-{
-    isr_state = START;
-    isr_data = 0;
-    isr_parity = 1;
-    isr_time = 0;
 }
 
 ISR(IBMPC_INT_VECT)
 {
-    uint8_t dbit = IBMPC_DATA_PIN&(1<<IBMPC_DATA_BIT);
+    uint8_t dbit;
+    dbit = IBMPC_DATA_PIN&(1<<IBMPC_DATA_BIT);
+    isr_data = isr_data>>1;
+    if (dbit) isr_data |= 0x8000;
 
-    // Reset state when taking more than 1ms
-    if (isr_time && timer_elapsed(isr_time) > 1) {
-        ibmpc_error = IBMPC_ERR_TIMEOUT | IBMPC_ERR_RECV | isr_state;
-        isr_state = START;
-        isr_data = 0;
-        isr_parity = 1;
-    }
-    isr_time = timer_read();
-
-    switch (isr_state) {
-        case START:
-            if (ibmpc_protocol == IBMPC_PROTOCOL_XT) {
-                // ignore start(0) bit
-                if (!dbit) return;
-            } else {
-                if (dbit)
-                    goto ERROR;
-            }
+    // isr_data:
+    //            15 14 13 12   11 10  9  8    7  6  5  4    3  2  1  0
+    //            -----------------------------------------------------
+    // Initial:   *1  0  0  0    0  0  0  0 |  0  0  0  0    0  0  0  0
+    // XT IBM:    b7 b6 b5 b4   b3 b2 b1 b0 | s1 s0 *1  0    0  0  0  0     after receiving **
+    // XT Clone:  b7 b6 b5 b4   b3 b2 b1 b0 | s1 *1  0  0    0  0  0  0     after receiving
+    // AT:        st pr b7 b6   b5 b4 b3 b2 | b1 b0 s0 *1    0  0  0  0     after receiving
+    // AT**:      pr b7 b6 b5   b4 b3 b2 b1 | b0 s0 *1  0    0  0  0  0     before stop bit **
+    //
+    //             x  x  x  x    x  x  x  x |  0  0  0  0    0  0  0  0     midway(0-7 bits received)
+    //             x  x  x  x    x  x  x  x |  1  0  0  0    0  0  0  0     midway(8 bits received)
+    //             x  x  x  x    x  x  x  x |  0  1  0  0    0  0  0  0     XT IBM-midway or AT-midway
+    //             x  x  x  x    x  x  x  x |  1  1  0  0    0  0  0  0     XT Clone-done
+    //             x  x  x  x    x  x  x  x |  0  0  1  0    0  0  0  0     AT-midway
+    //             x  x  x  x    x  x  x  x |  1  0  1  0    0  0  0  0     XT IBM-done or AT-midway **
+    //             x  x  x  x    x  x  x  x |  x  1  1  0    0  0  0  0     illegal
+    //             x  x  x  x    x  x  x  x |  x  x  0  1    0  0  0  0     AT-done
+    //             x  x  x  x    x  x  x  x |  x  x  1  1    0  0  0  0     illegal
+    //                                          other states than avobe     illegal
+    //
+    // **: AT can take same as end sate of XT IBM(1010 000) when b0 is 1,
+    // to discriminate between them we will have to wait a while for stop bit.
+    //
+    // mask for isr_data:
+    // 0x00A0(1010 0000) when XT IBM
+    // 0x00C0(1100 0000) when XT Clone
+    // 0x0010(xx01 0000) when AT
+    //
+    switch (isr_data & 0xFF) {
+        case 0b00000000:
+        case 0b10000000:
+        case 0b01000000:
+        case 0b00100000:
+            // midway
+            return;
             break;
-        case BIT0:
-        case BIT1:
-        case BIT2:
-        case BIT3:
-        case BIT4:
-        case BIT5:
-        case BIT6:
-        case BIT7:
-            isr_data >>= 1;
-            if (dbit) {
-                isr_data |= 0x80;
-                isr_parity++;
-            }
-            if (isr_state == BIT7 && ibmpc_protocol == IBMPC_PROTOCOL_XT) {
-                if (!ringbuf_put(&rb, isr_data)) {
-                    ibmpc_error = IBMPC_ERR_FULL;
-                    goto ERROR;
-                }
-                ibmpc_error = IBMPC_ERR_NONE;
+        case 0b11000000:
+            // XT Clone-done
+            recv_data = (isr_data>>8) & 0xFF;
+            goto DONE;
+            break;
+        case 0b10100000:
+            // XT IBM-done or AT-midway
+            // wait and check for clock of AT stop bit
+            if (wait_clock_hi(100) && wait_clock_lo(100)) { // FIXME this makes ISR prologe long
+                // AT-midway
+                return;
+            } else {
+                // XT-IBM-done
+                recv_data = (isr_data>>8) & 0xFF;
                 goto DONE;
             }
             break;
-        case PARITY:
-            if (dbit) {
-                if (!(isr_parity & 0x01))
-                    goto ERROR;
-            } else {
-                if (isr_parity & 0x01)
-                    goto ERROR;
-            }
-            break;
-        case STOP:
-            if (!dbit)
-                goto ERROR;
-            if (!ringbuf_put(&rb, isr_data)) {
-                ibmpc_error = IBMPC_ERR_FULL;
-                goto ERROR;
-            }
-            ibmpc_error = IBMPC_ERR_NONE;
+        case 0b00010000:
+        case 0b10010000:
+        case 0b01010000:
+        case 0b11010000:
+            // AT-done
+            recv_data = (isr_data>>6) & 0xFF;
             goto DONE;
             break;
-        default:
-            goto ERROR;
+        case 0b01100000:
+        case 0b11100000:
+        case 0b00110000:
+        case 0b10110000:
+        case 0b01110000:
+        case 0b11110000:
+        default:            // xxxx_oooo(any 1 in low nibble)
+            recv_data = isr_data;
+            break;
     }
-    goto NEXT;
-
-ERROR:
-    ibmpc_error |= isr_state;
-    ibmpc_error |= IBMPC_ERR_RECV;
-    ringbuf_reset(&rb);
 DONE:
-    isr_state = START;
-    isr_data = 0;
-    isr_parity = 1;
-    isr_time = 0;
-    return;
-NEXT:
-    isr_state++;
+    // TODO: buffer for recv_data
+    isr_data = 0x8000;  // clear to next data
     return;
 }
 
