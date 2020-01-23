@@ -75,7 +75,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
               (0<<ISC10));      \
 } while (0)
 
+/* NOTE: clear flag and enabling to ditch unwanted interrupt */
 #define IBMPC_INT_ON()  do {    \
+    EIFR  |= (1<<INTF1);        \
     EIMSK |= (1<<INT1);         \
 } while (0)
 
