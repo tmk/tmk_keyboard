@@ -63,11 +63,12 @@ static uint16_t read_keyboard_id(void)
     if (code == -1) { id = 0xFFFF; goto DONE; }     // XT or No keyboard
     if (code != 0xFA) { id = 0xFFFE; goto DONE; }   // Broken PS/2?
 
-    code = read_wait(1000);
+    // ID takes 500ms max TechRef [8] 4-41
+    code = read_wait(500);
     if (code == -1) { id = 0x0000; goto DONE; }     // AT
     id = (code & 0xFF)<<8;
 
-    code = read_wait(1000);
+    code = read_wait(500);
     id |= code & 0xFF;
 
 DONE:
@@ -141,27 +142,26 @@ uint8_t matrix_scan(void)
 
     switch (state) {
         case INIT:
+            xprintf("S%u\n", timer_read());
             ibmpc_protocol = IBMPC_PROTOCOL_AT;
             keyboard_kind = NONE;
             keyboard_id = 0x0000;
-            init_time = timer_read();
-            xprintf("I%u\n", init_time);
 
-            // re-initialize keyboard
+            matrix_clear();
+            clear_keyboard();
+
+            // Reset XT-initialize keyboard
             // XT: hard reset 500ms for IBM XT Type-1 keyboard and clones
             // XT: soft reset 20ms min(clock Lo)
             ibmpc_host_disable();   // soft reset: inihibit(clock Lo/Data Hi)
             IBMPC_RST_LO();
             wait_ms(500);
             IBMPC_RST_HIZ();
+            ibmpc_host_isr_clear();
             ibmpc_host_enable();    // soft reset: idle(clock Hi/Data Hi)
 
-            // TODO: should in while disabling interrupt?
-            // clear ISR state after protocol recognition
-            ibmpc_host_isr_clear();
-
-            matrix_clear();
-            clear_keyboard();
+            init_time = timer_read();
+            xprintf("I%u\n", init_time);
 
             state = WAIT_STARTUP;
             break;
@@ -170,19 +170,16 @@ uint8_t matrix_scan(void)
             // For example, XT/AT sends 'AA' and Terminal sends 'AA BF BF' after BAT
             // AT 84-key: POR and BAT can take 900-9900ms according to AT TechRef [8] 4-7
             // AT 101/102-key: POR and BAT can take 450-2500ms according to AT TechRef [8] 4-39
-            // 2) Read and ignore key input by user when signal handling/protocol error occurs
+            // 2) Read key typed by user after error on protocol or scan code
             // This can happen in case of keyboard hotswap, unstable hardware, signal integrity problem or bug
 
             if (ibmpc_host_recv() != -1 || timer_elapsed(init_time) > 10000) {
-                // 500ms max wait for ID after AA TechRef [8] 4-41
-                // 122-key Terminal 6110345: 1ms wait is enough
-                wait_ms(100); ibmpc_host_recv();
-                wait_ms(100); ibmpc_host_recv();
+                xprintf("W%u\n", timer_read());
+                // ID takes 500ms max? TechRef [8] 4-41, though, 1ms is enough for 122-key Terminal 6110345
+                read_wait(500); // for BF from Terminal
+                read_wait(500); // for BF from Terminal
                 state = READ_ID;
             }
-
-            // XT's 'AA' can not be handled correctly because protocol is configured as AT at this point.
-            // TODO: Check ISR timeout error for XT AA?
             break;
         case READ_ID:
             xprintf("R%u\n", timer_read());
@@ -231,9 +228,6 @@ uint8_t matrix_scan(void)
                 xprintf("kbd: Unknown\n");
                 ibmpc_protocol = IBMPC_PROTOCOL_AT;
             }
-
-            // clear ISR state after protocol recognition
-            ibmpc_host_isr_clear();
 
             state = LED_SET;
             break;

@@ -42,7 +42,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <avr/interrupt.h>
 #include <util/atomic.h>
-#include "ringbuf.h"
 #include "ibmpc.h"
 #include "debug.h"
 #include "timer.h"
@@ -57,17 +56,19 @@ POSSIBILITY OF SUCH DAMAGE.
 } while (0)
 
 
-#define BUF_SIZE 16
-static uint8_t buf[BUF_SIZE];
-static ringbuf_t rb = {
-    .buffer = buf,
-    .head = 0,
-    .tail = 0,
-    .size_mask = BUF_SIZE - 1
-};
-
 volatile uint8_t ibmpc_protocol = IBMPC_PROTOCOL_AT;
 volatile uint8_t ibmpc_error = IBMPC_ERR_NONE;
+
+/* 2-byte buffer for data received from keyhboard
+ * buffer states:
+ *      FFFF: empty
+ *      FFss: one data
+ *      sstt: two data(full)
+ *  0xFF can not be stored as data in buffer because it means empty or no data.
+ */
+static volatile uint16_t recv_data = 0xFFFF;
+/* internal state of receiving data */
+static volatile uint16_t isr_data = 0x8000;
 
 void ibmpc_host_init(void)
 {
@@ -142,7 +143,7 @@ int16_t ibmpc_host_send(uint8_t data)
     WAIT(data_hi, 50, 9);
 
     // clear buffer to get response correctly
-    ringbuf_reset(&rb);
+    recv_data = 0xFFFF;
     ibmpc_host_isr_clear();
 
     idle();
@@ -156,27 +157,28 @@ ERROR:
 }
 
 /*
- * Receive data from keyboard with ISR
+ * Receive data from keyboard
  */
-static volatile int16_t recv_data = -1;
-static volatile uint16_t isr_data = 0x8000;
-
-void ibmpc_host_isr_clear(void)
-{
-    isr_data = 0x8000;
-}
-
 int16_t ibmpc_host_recv(void)
 {
-    int16_t data = 0;
+    uint16_t data = 0;
+    uint8_t ret = 0xFF;
+
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         data = recv_data;
-        recv_data = -1;
+        if ((data&0xFF00) != 0xFF00) {      // recv_data:sstt -> recv_data:FFtt, ret:ss
+            ret = (data>>8)&0x00FF;
+            recv_data = data | 0xFF00;
+        } else if (data != 0xFFFF) {        // recv_data:FFss -> recv_data:FFFF, ret:ss
+            ret = data&0x00FF;
+            recv_data = data | 0x00FF;
+        }
     }
-    if (data != -1) {
-        dprintf("r%04X ", data);
+
+    if (ret != 0xFF) {
+        dprintf("r%02X(%04X) ", ret, recv_data);
     }
-    return data;
+    return ((ret != 0xFF) ? ret : -1);
 
 }
 
@@ -191,7 +193,14 @@ int16_t ibmpc_host_recv_response(void)
     return data;
 }
 
-// NOTE: to read data line early as possible:
+void ibmpc_host_isr_clear(void)
+{
+    isr_data = 0x8000;
+    recv_data = 0xFFFF;
+}
+
+// NOTE: With this ISR data line can be read within 2us after clock falling edge.
+// To read data line early as possible:
 // write naked ISR with asembly code to read the line and call C func to do other job?
 ISR(IBMPC_INT_VECT)
 {
@@ -200,7 +209,7 @@ ISR(IBMPC_INT_VECT)
     isr_data = isr_data>>1;
     if (dbit) isr_data |= 0x8000;
 
-    // isr_data:
+    // isr_data: state of receiving data from keyboard
     //            15 14 13 12   11 10  9  8    7  6  5  4    3  2  1  0
     //            -----------------------------------------------------
     // Initial:   *1  0  0  0    0  0  0  0 |  0  0  0  0    0  0  0  0
@@ -238,7 +247,8 @@ ISR(IBMPC_INT_VECT)
             break;
         case 0b11000000:
             // XT Clone-done
-            recv_data = (isr_data>>8) & 0xFF;
+            recv_data = recv_data<<8;
+            recv_data |= (isr_data>>8) & 0xFF;
             goto DONE;
             break;
         case 0b10100000:
@@ -255,7 +265,8 @@ ISR(IBMPC_INT_VECT)
                 } else {
                     // no stop bit
                     // XT-IBM-done
-                    recv_data = (isr_data>>8) & 0xFF;
+                    recv_data = recv_data<<8;
+                    recv_data |= (isr_data>>8) & 0xFF;
                     goto DONE;
                 }
              }
@@ -265,7 +276,8 @@ ISR(IBMPC_INT_VECT)
         case 0b01010000:
         case 0b11010000:
             // AT-done
-            recv_data = (isr_data>>6) & 0xFF;
+            recv_data = recv_data<<8;
+            recv_data |= (isr_data>>6) & 0xFF;
             goto DONE;
             break;
         case 0b01100000:
@@ -279,7 +291,9 @@ ISR(IBMPC_INT_VECT)
             break;
     }
 DONE:
-    // TODO: buffer for recv_data
+    // TODO: check protocol change to support keyboard howswap
+    //       not correct if there is clock edge within short time like 100us after receving data
+    // TODO: process error code: 0x00(AT), 0xFF(XT) in particular
     isr_data = 0x8000;  // clear to next data
     return;
 }
