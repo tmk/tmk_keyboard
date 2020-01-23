@@ -191,6 +191,8 @@ int16_t ibmpc_host_recv_response(void)
     return data;
 }
 
+// NOTE: to read data line early as possible:
+// write naked ISR with asembly code to read the line and call C func to do other job?
 ISR(IBMPC_INT_VECT)
 {
     uint8_t dbit;
@@ -240,16 +242,23 @@ ISR(IBMPC_INT_VECT)
             goto DONE;
             break;
         case 0b10100000:
-            // XT IBM-done or AT-midway
-            // wait and check for clock of AT stop bit
-            if (wait_clock_hi(100) && wait_clock_lo(100)) { // FIXME this makes ISR prologe long
-                // AT-midway
-                return;
-            } else {
-                // XT-IBM-done
-                recv_data = (isr_data>>8) & 0xFF;
-                goto DONE;
-            }
+            {
+                uint8_t us = 150;
+                // wait for rising and falling edge of AT stop bit
+                while (!(IBMPC_CLOCK_PIN&(1<<IBMPC_CLOCK_BIT)) && us) { wait_us(1); us--; }
+                while (  IBMPC_CLOCK_PIN&(1<<IBMPC_CLOCK_BIT)  && us) { wait_us(1); us--; }
+
+                if (us) {
+                    // found stop bit: return immediately and process the stop bit in ISR
+                    // AT-midway
+                    return;
+                } else {
+                    // no stop bit
+                    // XT-IBM-done
+                    recv_data = (isr_data>>8) & 0xFF;
+                    goto DONE;
+                }
+             }
             break;
         case 0b00010000:
         case 0b10010000:
