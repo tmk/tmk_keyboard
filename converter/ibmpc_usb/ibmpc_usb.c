@@ -77,10 +77,15 @@ DONE:
     return id;
 }
 
+void hook_early_init(void)
+{
+    ibmpc_host_init();
+    ibmpc_host_enable();
+}
+
 void matrix_init(void)
 {
     debug_enable = true;
-    ibmpc_host_init();
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
@@ -146,7 +151,9 @@ uint8_t matrix_scan(void)
             // XT: hard reset 500ms for IBM XT Type-1 keyboard and clones
             // XT: soft reset 20ms min(clock Lo)
             ibmpc_host_disable();   // soft reset: inihibit(clock Lo/Data Hi)
-            IBMPC_RESET();          // hard reset
+            IBMPC_RST_LO();
+            wait_ms(500);
+            IBMPC_RST_HIZ();
             ibmpc_host_enable();    // soft reset: idle(clock Hi/Data Hi)
 
             // TODO: should in while disabling interrupt?

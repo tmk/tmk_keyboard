@@ -71,11 +71,8 @@ volatile uint8_t ibmpc_error = IBMPC_ERR_NONE;
 
 void ibmpc_host_init(void)
 {
-    // initialize reset pin
-    IBMPC_RST_PORT |=  (1<<IBMPC_RST_BIT1);
-    IBMPC_RST_DDR  |=  (1<<IBMPC_RST_BIT1);
-    IBMPC_RST_PORT |=  (1<<IBMPC_RST_BIT2);
-    IBMPC_RST_DDR  |=  (1<<IBMPC_RST_BIT2);
+    // initialize reset pin to HiZ
+    IBMPC_RST_HIZ();
     inhibit();
     IBMPC_INT_INIT();
     IBMPC_INT_OFF();
