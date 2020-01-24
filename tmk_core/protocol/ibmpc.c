@@ -175,9 +175,8 @@ int16_t ibmpc_host_recv(void)
         }
     }
 
-    if (ret != 0xFF) {
-        dprintf("r%02X(%04X) ", ret, recv_data);
-    }
+    if (ret != 0xFF) dprintf("r%02X ", ret);
+    if (recv_data != 0xFFFF) dprintf("b%04X ", recv_data);
     return ((ret != 0xFF) ? ret : -1);
 
 }
@@ -206,13 +205,14 @@ ISR(IBMPC_INT_VECT)
 {
     uint8_t dbit;
     dbit = IBMPC_DATA_PIN&(1<<IBMPC_DATA_BIT);
+PINB|=0x01;
     isr_data = isr_data>>1;
     if (dbit) isr_data |= 0x8000;
 
     // isr_data: state of receiving data from keyboard
     //            15 14 13 12   11 10  9  8    7  6  5  4    3  2  1  0
     //            -----------------------------------------------------
-    // Initial:   *1  0  0  0    0  0  0  0 |  0  0  0  0    0  0  0  0
+    // Initial:   *1  0  0  0    0  0  0  0 |  0  0  0  0    0  0  0  0     MSB sentinel
     // XT IBM:    b7 b6 b5 b4   b3 b2 b1 b0 | s1 s0 *1  0    0  0  0  0     after receiving **
     // XT Clone:  b7 b6 b5 b4   b3 b2 b1 b0 | s1 *1  0  0    0  0  0  0     after receiving
     // AT:        st pr b7 b6   b5 b4 b3 b2 | b1 b0 s0 *1    0  0  0  0     after receiving
@@ -253,7 +253,7 @@ ISR(IBMPC_INT_VECT)
             break;
         case 0b10100000:
             {
-                uint8_t us = 150;
+                uint8_t us = 100;
                 // wait for rising and falling edge of AT stop bit
                 while (!(IBMPC_CLOCK_PIN&(1<<IBMPC_CLOCK_BIT)) && us) { wait_us(1); us--; }
                 while (  IBMPC_CLOCK_PIN&(1<<IBMPC_CLOCK_BIT)  && us) { wait_us(1); us--; }
