@@ -68,7 +68,7 @@ volatile uint8_t ibmpc_error = IBMPC_ERR_NONE;
  */
 static volatile uint16_t recv_data = 0xFFFF;
 /* internal state of receiving data */
-static volatile uint16_t isr_data = 0x8000;
+static volatile uint16_t isr_state = 0x8000;
 
 void ibmpc_host_init(void)
 {
@@ -194,7 +194,7 @@ int16_t ibmpc_host_recv_response(void)
 
 void ibmpc_host_isr_clear(void)
 {
-    isr_data = 0x8000;
+    isr_state = 0x8000;
     recv_data = 0xFFFF;
 }
 
@@ -205,50 +205,47 @@ ISR(IBMPC_INT_VECT)
 {
     uint8_t dbit;
     dbit = IBMPC_DATA_PIN&(1<<IBMPC_DATA_BIT);
-PINB|=0x01;
-    isr_data = isr_data>>1;
-    if (dbit) isr_data |= 0x8000;
+    isr_state = isr_state>>1;
+    if (dbit) isr_state |= 0x8000;
 
-    // isr_data: state of receiving data from keyboard
+    // isr_state: state of receiving data from keyboard
+    //      This is initialized with 0x8000 before start receiving data and  MSB '1' of
+    //      the initial value is marker bit to discrimitate between protocols.
+    //      It stores sampled bit at MSB after right shift on each clock falling edge.
+    //
     //            15 14 13 12   11 10  9  8    7  6  5  4    3  2  1  0
     //            -----------------------------------------------------
-    // Initial:   *1  0  0  0    0  0  0  0 |  0  0  0  0    0  0  0  0     MSB sentinel
-    // XT IBM:    b7 b6 b5 b4   b3 b2 b1 b0 | s1 s0 *1  0    0  0  0  0     after receiving **
-    // XT Clone:  b7 b6 b5 b4   b3 b2 b1 b0 | s1 *1  0  0    0  0  0  0     after receiving
-    // AT:        st pr b7 b6   b5 b4 b3 b2 | b1 b0 s0 *1    0  0  0  0     after receiving
-    // AT**:      pr b7 b6 b5   b4 b3 b2 b1 | b0 s0 *1  0    0  0  0  0     before stop bit **
+    // Initial:   *1  0  0  0    0  0  0  0 |  0  0  0  0    0  0  0  0     with MSB marker *1
+    // XT_Type-1: b7 b6 b5 b4   b3 b2 b1 b0 |  1  0 *1  0    0  0  0  0     start bit 0 and 1 **
+    // XT_Type-2: b7 b6 b5 b4   b3 b2 b1 b0 |  1 *1  0  0    0  0  0  0     start bit 1
+    // AT:        st pr b7 b6   b5 b4 b3 b2 | b1 b0  0 *1    0  0  0  0     start bit 0
+    // AT**:      pr b7 b6 b5   b4 b3 b2 b1 | b0  0 *1  0    0  0  0  0     before stop bit **
     //
     //             x  x  x  x    x  x  x  x |  0  0  0  0    0  0  0  0     midway(0-7 bits received)
-    //             x  x  x  x    x  x  x  x |  1  0  0  0    0  0  0  0     midway(8 bits received)
-    //             x  x  x  x    x  x  x  x |  0  1  0  0    0  0  0  0     XT IBM-midway or AT-midway
-    //             x  x  x  x    x  x  x  x |  1  1  0  0    0  0  0  0     XT Clone-done
-    //             x  x  x  x    x  x  x  x |  0  0  1  0    0  0  0  0     AT-midway
-    //             x  x  x  x    x  x  x  x |  1  0  1  0    0  0  0  0     XT IBM-done or AT-midway **
+    //             x  x  x  x    x  x  x  x | *1  0  0  0    0  0  0  0     midway(8 bits received)
+    //             x  x  x  x    x  x  x  x |  0 *1  0  0    0  0  0  0     XT_Type1-midway or AT-midway
+    //             x  x  x  x    x  x  x  x |  1 *1  0  0    0  0  0  0     XT_Type2-done
+    //             x  x  x  x    x  x  x  x |  0  0 *1  0    0  0  0  0     AT-midway[b0=0]
+    //             x  x  x  x    x  x  x  x |  1  0 *1  0    0  0  0  0     XT_Type1-done or AT-midway[b0=1]
     //             x  x  x  x    x  x  x  x |  x  1  1  0    0  0  0  0     illegal
     //             x  x  x  x    x  x  x  x |  x  x  0  1    0  0  0  0     AT-done
     //             x  x  x  x    x  x  x  x |  x  x  1  1    0  0  0  0     illegal
-    //                                          other states than avobe     illegal
+    //                                          other states than above     illegal
     //
-    // **: AT can take same as end sate of XT IBM(1010 000) when b0 is 1,
-    // to discriminate between them we will have to wait a while for stop bit.
-    //
-    // mask for isr_data:
-    // 0x00A0(1010 0000) when XT IBM
-    // 0x00C0(1100 0000) when XT Clone
-    // 0x0010(xx01 0000) when AT
-    //
-    switch (isr_data & 0xFF) {
+    // **: AT takes same state as XT_Type1-done(1010 000) in case that AT b0 is 1,
+    // to discriminate between the two protocol we will have to wait a while for AT stop bit.
+    switch (isr_state & 0xFF) {
         case 0b00000000:
         case 0b10000000:
         case 0b01000000:
         case 0b00100000:
             // midway
-            return;
+            goto NEXT;
             break;
         case 0b11000000:
-            // XT Clone-done
+            // XT_Type2-done
             recv_data = recv_data<<8;
-            recv_data |= (isr_data>>8) & 0xFF;
+            recv_data |= (isr_state>>8) & 0xFF;
             goto DONE;
             break;
         case 0b10100000:
@@ -259,14 +256,12 @@ PINB|=0x01;
                 while (  IBMPC_CLOCK_PIN&(1<<IBMPC_CLOCK_BIT)  && us) { wait_us(1); us--; }
 
                 if (us) {
-                    // found stop bit: return immediately and process the stop bit in ISR
-                    // AT-midway
-                    return;
+                    // found stop bit: AT-midway - process the stop bit in next ISR
+                    goto NEXT;
                 } else {
-                    // no stop bit
-                    // XT-IBM-done
+                    // no stop bit: XT_Type1-done
                     recv_data = recv_data<<8;
-                    recv_data |= (isr_data>>8) & 0xFF;
+                    recv_data |= (isr_state>>8) & 0xFF;
                     goto DONE;
                 }
              }
@@ -277,7 +272,7 @@ PINB|=0x01;
         case 0b11010000:
             // AT-done
             recv_data = recv_data<<8;
-            recv_data |= (isr_data>>6) & 0xFF;
+            recv_data |= (isr_state>>6) & 0xFF;
             goto DONE;
             break;
         case 0b01100000:
@@ -287,14 +282,20 @@ PINB|=0x01;
         case 0b01110000:
         case 0b11110000:
         default:            // xxxx_oooo(any 1 in low nibble)
-            recv_data = isr_data;
+            // Illegal
+            goto ERROR;
             break;
     }
+
+ERROR:
+    isr_state = 0x8000;
+    recv_data = 0xFF00; // clear data and scancode of error 0x00
+    ibmpc_error = 0xFF;
+    return;
 DONE:
-    // TODO: check protocol change to support keyboard howswap
-    //       not correct if there is clock edge within short time like 100us after receving data
     // TODO: process error code: 0x00(AT), 0xFF(XT) in particular
-    isr_data = 0x8000;  // clear to next data
+    isr_state = 0x8000;  // clear to next data
+NEXT:
     return;
 }
 
