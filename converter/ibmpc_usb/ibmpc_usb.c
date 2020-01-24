@@ -111,11 +111,15 @@ uint8_t matrix_scan(void)
     // scan code reading states
     static enum {
         INIT,
-        WAIT_STARTUP,
+        XT_RESET,
+        XT_RESET_WAIT,
+        XT_RESET_DONE,
+        WAIT_AA,
+        WAIT_AABF,
+        WAIT_AABFBF,
         READ_ID,
-        LED_SET,
+        SETUP,
         LOOP,
-        END
     } state = INIT;
     static uint16_t init_time;
 
@@ -130,10 +134,6 @@ uint8_t matrix_scan(void)
                 xprintf("init\n");
                 state = INIT;
             }
-            // probably XT signal, not AT
-            if (state == WAIT_STARTUP) {
-                state = READ_ID;
-            }
         }
 
         // clear or process error
@@ -142,99 +142,123 @@ uint8_t matrix_scan(void)
 
     switch (state) {
         case INIT:
-            xprintf("S%u\n", timer_read());
-            ibmpc_protocol = IBMPC_PROTOCOL_AT;
+            xprintf("I%u ", timer_read());
             keyboard_kind = NONE;
             keyboard_id = 0x0000;
 
             matrix_clear();
             clear_keyboard();
 
+            state = XT_RESET;
+            break;
+        case XT_RESET:
             // Reset XT-initialize keyboard
             // XT: hard reset 500ms for IBM XT Type-1 keyboard and clones
             // XT: soft reset 20ms min(clock Lo)
             ibmpc_host_disable();   // soft reset: inihibit(clock Lo/Data Hi)
-            IBMPC_RST_LO();
-            wait_ms(500);
-            IBMPC_RST_HIZ();
+            IBMPC_RST_LO();         // hard reset: reset pin Lo
+
+            init_time = timer_read();
+            state = XT_RESET_WAIT;
+            break;
+        case XT_RESET_WAIT:
+            if (timer_elapsed(init_time) > 500) {
+                state = XT_RESET_DONE;
+            }
+            break;
+        case XT_RESET_DONE:
+            IBMPC_RST_HIZ();        // hard reset: reset pin HiZ
             ibmpc_host_isr_clear();
             ibmpc_host_enable();    // soft reset: idle(clock Hi/Data Hi)
 
+            xprintf("X%u ", timer_read());
             init_time = timer_read();
-            xprintf("I%u\n", init_time);
-
-            state = WAIT_STARTUP;
+            state = WAIT_AA;
             break;
-        case WAIT_STARTUP:
-            // 1) Read and ignore BAT code and ID when power-up
+        case WAIT_AA:
+            // 1) Read BAT code and ID on keybaord power-up
             // For example, XT/AT sends 'AA' and Terminal sends 'AA BF BF' after BAT
             // AT 84-key: POR and BAT can take 900-9900ms according to AT TechRef [8] 4-7
             // AT 101/102-key: POR and BAT can take 450-2500ms according to AT TechRef [8] 4-39
-            // 2) Read key typed by user after error on protocol or scan code
+            // 2) Read key typed by user or anything after error on protocol or scan code
             // This can happen in case of keyboard hotswap, unstable hardware, signal integrity problem or bug
 
-            if (ibmpc_host_recv() != -1 || timer_elapsed(init_time) > 10000) {
-                xprintf("W%u\n", timer_read());
-                // ID takes 500ms max? TechRef [8] 4-41, though, 1ms is enough for 122-key Terminal 6110345
-                read_wait(500); // for BF from Terminal
-                read_wait(500); // for BF from Terminal
+            if (timer_elapsed(init_time) > 10000) {
+                state = READ_ID;
+            }
+            if (ibmpc_host_recv() != -1) {  // wait for AA
+                xprintf("W%u ", timer_read());
+                init_time = timer_read();
+                state = WAIT_AABF;
+            }
+            break;
+        case WAIT_AABF:
+            // NOTE: we can omit to wait BF BF
+            // ID takes 500ms max? TechRef [8] 4-41, though 1ms is enough for 122-key Terminal 6110345
+            if (timer_elapsed(init_time) > 500) {
+                state = READ_ID;
+            }
+            if (ibmpc_host_recv() != -1) {  // wait for BF
+                xprintf("W%u ", timer_read());
+                init_time = timer_read();
+                state = WAIT_AABFBF;
+            }
+            break;
+        case WAIT_AABFBF:
+            if (timer_elapsed(init_time) > 500) {
+                state = READ_ID;
+            }
+            if (ibmpc_host_recv() != -1) {  // wait for BF
+                xprintf("W%u ", timer_read());
                 state = READ_ID;
             }
             break;
         case READ_ID:
-            xprintf("R%u\n", timer_read());
+            xprintf("R%u ", timer_read());
+
             keyboard_id = read_keyboard_id();
             if (ibmpc_error) {
                 xprintf("\nERR: %02X\n", ibmpc_error);
                 ibmpc_error = IBMPC_ERR_NONE;
             }
-            xprintf("ID: %04X\n", keyboard_id);
-            if (0xAB00 == (keyboard_id & 0xFF00)) {
-                // CodeSet2 PS/2
+
+            xprintf("ID:%04X\n", keyboard_id);
+
+            if (0xAB00 == (keyboard_id & 0xFF00)) {         // CodeSet2 PS/2
                 keyboard_kind = PC_AT;
-            } else if (0xBF00 == (keyboard_id & 0xFF00)) {
-                // CodeSet3 Terminal
+            } else if (0xBF00 == (keyboard_id & 0xFF00)) {  // CodeSet3 Terminal
                 keyboard_kind = PC_TERMINAL;
-            } else if (0x0000 == keyboard_id) {
-                // CodeSet2 AT
+            } else if (0x0000 == keyboard_id) {             // CodeSet2 AT
                 keyboard_kind = PC_AT;
-            } else if (0xFFFF == keyboard_id) {
-                // CodeSet1 XT
+            } else if (0xFFFF == keyboard_id) {             // CodeSet1 XT
                 keyboard_kind = PC_XT;
-            } else if (0xFFFE == keyboard_id) {
-                // CodeSet2 PS/2 fails to response?
+            } else if (0xFFFE == keyboard_id) {             // CodeSet2 PS/2 fails to response?
                 keyboard_kind = PC_AT;
-            } else if (0x00FF == keyboard_id) {
-                // Mouse is not supported
+            } else if (0x00FF == keyboard_id) {             // Mouse is not supported
                 xprintf("Mouse: not supported\n");
                 keyboard_kind = NONE;
             } else {
                 keyboard_kind = PC_AT;
             }
 
-            // protocol
-            if (keyboard_kind == PC_XT) {
-                xprintf("kbd: XT\n");
-                ibmpc_protocol = IBMPC_PROTOCOL_XT;
-            } else if (keyboard_kind == PC_AT) {
-                xprintf("kbd: AT\n");
-                ibmpc_protocol = IBMPC_PROTOCOL_AT;
-            } else if (keyboard_kind == PC_TERMINAL) {
-                xprintf("kbd: Terminal\n");
-                ibmpc_protocol = IBMPC_PROTOCOL_AT;
-                // Set all keys - make/break [3]p.23
-                ibmpc_host_send(0xF8);
-            } else {
-                xprintf("kbd: Unknown\n");
-                ibmpc_protocol = IBMPC_PROTOCOL_AT;
-            }
-
-            state = LED_SET;
+            state = SETUP;
             break;
-        case LED_SET:
-            xprintf("L%u\n", timer_read());
-            led_set(host_keyboard_leds());
+        case SETUP:
+            xprintf("S%u ", timer_read());
+            switch (keyboard_kind) {
+                case PC_XT:
+                    break;
+                case PC_AT:
+                    led_set(host_keyboard_leds());
+                    break;
+                case PC_TERMINAL:
+                    ibmpc_host_send(0xF8);
+                    break;
+                default:
+                    break;
+            }
             state = LOOP;
+            xprintf("L%u ", timer_read());
         case LOOP:
             switch (keyboard_kind) {
                 case PC_XT:
