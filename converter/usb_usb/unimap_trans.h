@@ -55,7 +55,7 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
       UNIMAP_PAUSE,     UNIMAP_INSERT,      UNIMAP_HOME,        UNIMAP_PGUP,    UNIMAP_DELETE,      UNIMAP_END,         UNIMAP_PGDOWN,  UNIMAP_RIGHT        }, /* 48-4F */
     { UNIMAP_LEFT,      UNIMAP_DOWN,        UNIMAP_UP,          UNIMAP_NUMLOCK, UNIMAP_KP_SLASH,    UNIMAP_KP_ASTERISK, UNIMAP_KP_MINUS,UNIMAP_KP_PLUS,        /* 50-57 */
       UNIMAP_KP_ENTER,  UNIMAP_KP_1,        UNIMAP_KP_2,        UNIMAP_KP_3,    UNIMAP_KP_4,        UNIMAP_KP_5,        UNIMAP_KP_6,    UNIMAP_KP_7         }, /* 58-5F */
-    { UNIMAP_KP_8,      UNIMAP_KP_9,        UNIMAP_KP_0,        UNIMAP_KP_DOT,  UNIMAP_NONUS_BSLASH,UNIMAP_APPLICATION, UNIMAP_KP_COMMA,UNIMAP_KP_EQUAL,       /* 60-67 */
+    { UNIMAP_KP_8,      UNIMAP_KP_9,        UNIMAP_KP_0,        UNIMAP_KP_DOT,  UNIMAP_NONUS_BSLASH,UNIMAP_APPLICATION, UNIMAP_F24,     UNIMAP_KP_EQUAL,       /* 60-67 */
       UNIMAP_F13,       UNIMAP_F14,         UNIMAP_F15,         UNIMAP_F16,     UNIMAP_F17,         UNIMAP_F18,         UNIMAP_F19,     UNIMAP_F20          }, /* 68-6F */
     { UNIMAP_F21,       UNIMAP_F22,         UNIMAP_F23,         UNIMAP_F24,     UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO,             /* 70-77 */
       UNIMAP_NO,        UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_MUTE         }, /* 78-7F */
@@ -76,5 +76,14 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
     { UNIMAP_NO,        UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO,             /* F0-F7 */
       UNIMAP_NO,        UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO           }, /* F8-FF */
 };
+
+/*  Exceptional translation:
+ *
+ *  HID Keyboard usage      Unimap code         Note
+ *  -------------------------------------------------------------------------------
+ *  0x66 Power              UNIMAP_F24
+ *  0x80 LANG1              UNIMAP_HENK         Korean Hangul/English
+ *  0x81 LANG2              UNIMAP_MHEN         Korean Hanja conversion
+ */
 
 #endif
