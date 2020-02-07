@@ -120,20 +120,35 @@ static bool console_is_ready(void)
 
 static bool console_putc(uint8_t c)
 {
-    if (!console_is_ready())
-        goto EXIT;
-
     // return immediately if called while interrupt
     if (!(SREG & (1<<SREG_I)))
         goto EXIT;
 
-    if (USB_DeviceState != DEVICE_STATE_Configured)
+    if (USB_DeviceState != DEVICE_STATE_Configured && !ringbuf_is_full(&sendbuf))
         goto EXIT;
 
-    uint8_t ep = Endpoint_GetCurrentEndpoint();
+    if (!console_is_ready() && !ringbuf_is_full(&sendbuf))
+        goto EXIT;
 
+    /* Data lost considerations:
+     * 1. When buffer is full at early satage of startup, we will have to start sending
+     * before console_is_ready() returns true. Data can be lost even if sending data
+     * seems to be successful on USB. hid_listen on host is not ready perhaps?
+     * Sometime first few packets are lost when buffer is full at startup.
+     * 2. When buffer is full and USB pipe is not ready, new coming data will be lost.
+     * 3. console_task() cannot send data in buffer while main loop is blocked.
+     */
+    /* retry timeout */
+    const uint8_t CONSOLE_TIMOUT = 5;   // 1 is too small, 2 seems to be enough for Linux
+    static uint8_t timeout = CONSOLE_TIMOUT;
+    uint16_t prev = timer_read();
+    bool done = false;
+
+    uint8_t ep = Endpoint_GetCurrentEndpoint();
     Endpoint_SelectEndpoint(CONSOLE_IN_EPNUM);
-    if (!Endpoint_IsEnabled() || !Endpoint_IsConfigured()) {
+
+AGAIN:
+    if (Endpoint_IsStalled() || !Endpoint_IsEnabled() || !Endpoint_IsConfigured()) {
         goto EXIT_RESTORE_EP;
     }
 
@@ -144,14 +159,42 @@ static bool console_putc(uint8_t c)
         // clear bank when it is full
         if (!Endpoint_IsReadWriteAllowed() && Endpoint_IsINReady()) {
             Endpoint_ClearIN();
+            timeout = CONSOLE_TIMOUT; // re-enable retry only when host can receive
         }
     }
 
     // write c to bank directly if there is no others in buffer
     if (ringbuf_is_empty(&sendbuf) && Endpoint_IsReadWriteAllowed()) {
         Endpoint_Write_8(c);
+        done = true;
+    }
+
+    // clear bank when there are chars in bank
+    if (Endpoint_BytesInEndpoint() && Endpoint_IsINReady()) {
+        // Windows needs to fill packet with 0
+        while (Endpoint_IsReadWriteAllowed()) {
+                Endpoint_Write_8(0);
+        }
+        Endpoint_ClearIN();
+        timeout = CONSOLE_TIMOUT; // re-enable retry only when host can receive
+    }
+
+    if (done) {
         Endpoint_SelectEndpoint(ep);
         return true;
+    }
+
+    /* retry when buffer is full.
+     * once timeout this is disabled until host receives actually,
+     * otherwise this will block or make main loop execution sluggish.
+     */
+    if (ringbuf_is_full(&sendbuf) && timeout) {
+        uint16_t curr = timer_read();
+        if (curr != prev) {
+            timeout--;
+            prev = curr;
+        }
+        goto AGAIN;
     }
 
 EXIT_RESTORE_EP:
