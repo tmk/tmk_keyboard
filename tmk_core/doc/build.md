@@ -103,7 +103,7 @@ You may want to use other programmer like [`avrdude`][avrdude]. In that case you
     $ make -f Makefile.<variant> program
 
 
-[atmelgcc]:     http://www.atmel.com/tools/ATMELAVRTOOLCHAINFORWINDOWS.aspx
+[atmelgcc]:     https://www.microchip.com/mplab/avr-support/avr-and-arm-toolchains-c-compilers
 [cygwin]:       https://www.cygwin.com/
 [mingw]:        http://www.mingw.org/
 [crosspack]:    http://www.obdev.at/products/crosspack/index.html
