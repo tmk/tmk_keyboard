@@ -162,18 +162,8 @@ typedef struct
 
 
 uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
-                                    const uint8_t wIndex,
+                                    const uint16_t wIndex,
                                     const void** const DescriptorAddress)
                                     ATTR_WARN_UNUSED_RESULT ATTR_NON_NULL_PTR_ARG(3);
-
-
-/* new API */
-#if LUFA_VERSION_INTEGER < 0x140302
-    #undef VERSION_BCD
-    #define VERSION_BCD(Major, Minor, Revision) \
-                                              CPU_TO_LE16( ((Major & 0xFF) << 8) | \
-                                                           ((Minor & 0x0F) << 4) | \
-                                                           (Revision & 0x0F) )
-#endif
 
 #endif
