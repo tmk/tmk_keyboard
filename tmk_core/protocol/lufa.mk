@@ -49,20 +49,20 @@ ifeq ($(MCU),atmega32u2)
         TMK_LUFA_OPTS += -DNO_LIMITED_CONTROLLER_CONNECT
 endif
 
-ifeq (yes,$(strip $(LUFA_DEBUG)))
-    TMK_LUFA_OPTS += -DLUFA_DEBUG
+ifeq (yes,$(strip $(TMK_LUFA_DEBUG)))
+    TMK_LUFA_OPTS += -DTMK_LUFA_DEBUG
 endif
 
-ifeq (yes,$(strip $(LUFA_DEBUG_SUART)))
+ifeq (yes,$(strip $(TMK_LUFA_DEBUG_SUART)))
     SRC += common/avr/suart.S
-    TMK_LUFA_OPTS += -DLUFA_DEBUG_SUART
+    TMK_LUFA_OPTS += -DTMK_LUFA_DEBUG_SUART
     # Keep print/debug lines when disabling HID console. See common.mk.
     DEBUG_PRINT_AVAILABLE = yes
 endif
 
-ifeq (yes,$(strip $(LUFA_DEBUG_UART)))
+ifeq (yes,$(strip $(TMK_LUFA_DEBUG_UART)))
     SRC += common/avr/uart.c
-    TMK_LUFA_OPTS += -DLUFA_DEBUG_UART
+    TMK_LUFA_OPTS += -DTMK_LUFA_DEBUG_UART
     # Keep print/debug lines when disabling HID console. See common.mk.
     DEBUG_PRINT_AVAILABLE = yes
 endif

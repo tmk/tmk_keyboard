@@ -5,10 +5,10 @@ TARGET = usb_usb_debug
 
 # LUFA debug print
 # This may prevent USB enumeration and keyboard init
-LUFA_DEBUG = yes
+TMK_LUFA_DEBUG = yes
 # Select one of outputs for debug print
-LUFA_DEBUG_UART = yes
-#LUFA_DEBUG_SUART = yes
+TMK_LUFA_DEBUG_UART = yes
+#TMK_LUFA_DEBUG_SUART = yes
 
 # USB_Host_Shield_2.0 debug print
 # This may prevent USB enumeration and keyboard init

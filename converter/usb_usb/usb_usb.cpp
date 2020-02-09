@@ -238,7 +238,7 @@ void hook_usb_startup_wait_loop(void)
 // This situation can happen just after pluging converter into USB port.
 void hook_usb_suspend_loop(void)
 {
-#ifndef LUFA_DEBUG_UART
+#ifndef TMK_LUFA_DEBUG_UART
     // This corrupts debug print when suspend
     suspend_power_down();
 #endif

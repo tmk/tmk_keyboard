@@ -52,11 +52,11 @@
 #include "hook.h"
 #include "timer.h"
 
-#ifdef LUFA_DEBUG_SUART
+#ifdef TMK_LUFA_DEBUG_SUART
 #include "avr/suart.h"
 #endif
 
-#ifdef LUFA_DEBUG_UART
+#ifdef TMK_LUFA_DEBUG_UART
 #include "uart.h"
 #endif
 
@@ -65,7 +65,7 @@
 #include "lufa.h"
 
 
-//#define LUFA_DEBUG
+//#define TMK_LUFA_DEBUG
 
 
 uint8_t keyboard_idle = 0;
@@ -265,7 +265,7 @@ static void console_task(void)
 */
 void EVENT_USB_Device_Connect(void)
 {
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
     print("[C]");
 #endif
     /* For battery powered device */
@@ -278,7 +278,7 @@ void EVENT_USB_Device_Connect(void)
 
 void EVENT_USB_Device_Disconnect(void)
 {
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
     print("[D]");
 #endif
     /* For battery powered device */
@@ -294,14 +294,14 @@ void EVENT_USB_Device_Disconnect(void)
 
 void EVENT_USB_Device_Reset(void)
 {
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
     print("[R]");
 #endif
 }
 
 void EVENT_USB_Device_Suspend()
 {
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
     print("[S]");
 #endif
     hook_usb_suspend_entry();
@@ -309,7 +309,7 @@ void EVENT_USB_Device_Suspend()
 
 void EVENT_USB_Device_WakeUp()
 {
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
     print("[W]");
 #endif
     hook_usb_wakeup();
@@ -328,7 +328,7 @@ void EVENT_USB_Device_StartOfFrame(void)
  */
 void EVENT_USB_Device_ConfigurationChanged(void)
 {
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
     print("[c]");
 #endif
     bool ConfigSuccess = true;
@@ -407,7 +407,7 @@ void EVENT_USB_Device_ControlRequest(void)
                 /* Write the report data to the control endpoint */
                 Endpoint_Write_Control_Stream_LE(ReportData, ReportSize);
                 Endpoint_ClearOUT();
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
                 xprintf("[r%d]", USB_ControlRequest.wIndex);
 #endif
             }
@@ -433,7 +433,7 @@ void EVENT_USB_Device_ControlRequest(void)
 
                     Endpoint_ClearOUT();
                     Endpoint_ClearStatusStage();
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
                     xprintf("[L%d]", USB_ControlRequest.wIndex);
 #endif
                     break;
@@ -452,7 +452,7 @@ void EVENT_USB_Device_ControlRequest(void)
                     Endpoint_Write_8(keyboard_protocol);
                     Endpoint_ClearIN();
                     Endpoint_ClearStatusStage();
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
                     print("[p]");
 #endif
                 }
@@ -468,7 +468,7 @@ void EVENT_USB_Device_ControlRequest(void)
 
                     keyboard_protocol = (USB_ControlRequest.wValue & 0xFF);
                     clear_keyboard();
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
                     print("[P]");
 #endif
                 }
@@ -482,7 +482,7 @@ void EVENT_USB_Device_ControlRequest(void)
                 Endpoint_ClearStatusStage();
 
                 keyboard_idle = ((USB_ControlRequest.wValue & 0xFF00) >> 8);
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
                 xprintf("[I%d]%d", USB_ControlRequest.wIndex, (USB_ControlRequest.wValue & 0xFF00) >> 8);
 #endif
             }
@@ -496,7 +496,7 @@ void EVENT_USB_Device_ControlRequest(void)
                 Endpoint_Write_8(keyboard_idle);
                 Endpoint_ClearIN();
                 Endpoint_ClearStatusStage();
-#ifdef LUFA_DEBUG
+#ifdef TMK_LUFA_DEBUG
                 print("[i]");
 #endif
             }
@@ -628,11 +628,11 @@ static void send_consumer(uint16_t data)
  ******************************************************************************/
 int8_t sendchar(uint8_t c)
 {
-    #ifdef LUFA_DEBUG_SUART
+    #ifdef TMK_LUFA_DEBUG_SUART
     xmit(c);
     #endif
 
-    #ifdef LUFA_DEBUG_UART
+    #ifdef TMK_LUFA_DEBUG_UART
     uart_putchar(c);
     #endif
 
@@ -672,12 +672,12 @@ int main(void)
 {
     setup_mcu();
 
-#ifdef LUFA_DEBUG_SUART
+#ifdef TMK_LUFA_DEBUG_SUART
     SUART_OUT_DDR |= (1<<SUART_OUT_BIT);
     SUART_OUT_PORT |= (1<<SUART_OUT_BIT);
 #endif
 
-#ifdef LUFA_DEBUG_UART
+#ifdef TMK_LUFA_DEBUG_UART
     uart_init(115200);
 #endif
 
@@ -761,7 +761,7 @@ void hook_usb_suspend_entry(void)
 __attribute__((weak))
 void hook_usb_suspend_loop(void)
 {
-#ifndef LUFA_DEBUG_UART
+#ifndef TMK_LUFA_DEBUG_UART
     // This corrupts debug print when suspend
     suspend_power_down();
 #endif
