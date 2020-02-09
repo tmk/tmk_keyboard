@@ -160,7 +160,7 @@ static void flexram_wait(void)
 	}
 }
 
-void eeprom_write_byte(uint8_t *addr, uint8_t value)
+void eeprom_update_byte(uint8_t *addr, uint8_t value)
 {
 	uint32_t offset = (uint32_t)addr;
 
@@ -172,7 +172,7 @@ void eeprom_write_byte(uint8_t *addr, uint8_t value)
 	}
 }
 
-void eeprom_write_word(uint16_t *addr, uint16_t value)
+void eeprom_update_word(uint16_t *addr, uint16_t value)
 {
 	uint32_t offset = (uint32_t)addr;
 
@@ -199,7 +199,7 @@ void eeprom_write_word(uint16_t *addr, uint16_t value)
 #endif
 }
 
-void eeprom_write_dword(uint32_t *addr, uint32_t value)
+void eeprom_update_dword(uint32_t *addr, uint32_t value)
 {
 	uint32_t offset = (uint32_t)addr;
 
@@ -242,7 +242,7 @@ void eeprom_write_dword(uint32_t *addr, uint32_t value)
 #endif
 }
 
-void eeprom_write_block(const void *buf, void *addr, uint32_t len)
+void eeprom_update_block(const void *buf, void *addr, uint32_t len)
 {
 	uint32_t offset = (uint32_t)addr;
 	const uint8_t *src = (const uint8_t *)buf;
@@ -367,7 +367,7 @@ static void flash_write(const uint16_t *code, uint32_t addr, uint32_t data)
 	MCM->PLACR |= MCM_PLACR_CFCC;
 }
 
-void eeprom_write_byte(uint8_t *addr, uint8_t data)
+void eeprom_update_byte(uint8_t *addr, uint8_t data)
 {
 	uint32_t offset = (uint32_t)addr;
 	const uint16_t *p, *end = (const uint16_t *)((uint32_t)flashend);
@@ -475,28 +475,28 @@ int eeprom_is_ready(void)
 	return 1;
 }
 
-void eeprom_write_word(uint16_t *addr, uint16_t value)
+void eeprom_update_word(uint16_t *addr, uint16_t value)
 {
 	uint8_t *p = (uint8_t *)addr;
-	eeprom_write_byte(p++, value);
-	eeprom_write_byte(p, value >> 8);
+	eeprom_update_byte(p++, value);
+	eeprom_update_byte(p, value >> 8);
 }
 
-void eeprom_write_dword(uint32_t *addr, uint32_t value)
+void eeprom_update_dword(uint32_t *addr, uint32_t value)
 {
 	uint8_t *p = (uint8_t *)addr;
-	eeprom_write_byte(p++, value);
-	eeprom_write_byte(p++, value >> 8);
-	eeprom_write_byte(p++, value >> 16);
-	eeprom_write_byte(p, value >> 24);
+	eeprom_update_byte(p++, value);
+	eeprom_update_byte(p++, value >> 8);
+	eeprom_update_byte(p++, value >> 16);
+	eeprom_update_byte(p, value >> 24);
 }
 
-void eeprom_write_block(const void *buf, void *addr, uint32_t len)
+void eeprom_update_block(const void *buf, void *addr, uint32_t len)
 {
 	uint8_t *p = (uint8_t *)addr;
 	const uint8_t *src = (const uint8_t *)buf;
 	while (len--) {
-		eeprom_write_byte(p++, *src++);
+		eeprom_update_byte(p++, *src++);
 	}
 }
 
@@ -511,24 +511,24 @@ void eeprom_write_block(const void *buf, void *addr, uint32_t len)
 
 void eeconfig_init(void)
 {
-    eeprom_write_word(EECONFIG_MAGIC,          EECONFIG_MAGIC_NUMBER);
-    eeprom_write_byte(EECONFIG_DEBUG,          0);
-    eeprom_write_byte(EECONFIG_DEFAULT_LAYER,  0);
-    eeprom_write_byte(EECONFIG_KEYMAP,         0);
-    eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL, 0);
+    eeprom_update_word(EECONFIG_MAGIC,          EECONFIG_MAGIC_NUMBER);
+    eeprom_update_byte(EECONFIG_DEBUG,          0);
+    eeprom_update_byte(EECONFIG_DEFAULT_LAYER,  0);
+    eeprom_update_byte(EECONFIG_KEYMAP,         0);
+    eeprom_update_byte(EECONFIG_MOUSEKEY_ACCEL, 0);
 #ifdef BACKLIGHT_ENABLE
-    eeprom_write_byte(EECONFIG_BACKLIGHT,      0);
+    eeprom_update_byte(EECONFIG_BACKLIGHT,      0);
 #endif
 }
 
 void eeconfig_enable(void)
 {
-    eeprom_write_word(EECONFIG_MAGIC, EECONFIG_MAGIC_NUMBER);
+    eeprom_update_word(EECONFIG_MAGIC, EECONFIG_MAGIC_NUMBER);
 }
 
 void eeconfig_disable(void)
 {
-    eeprom_write_word(EECONFIG_MAGIC, 0xFFFF);
+    eeprom_update_word(EECONFIG_MAGIC, 0xFFFF);
 }
 
 bool eeconfig_is_enabled(void)
@@ -537,15 +537,15 @@ bool eeconfig_is_enabled(void)
 }
 
 uint8_t eeconfig_read_debug(void)      { return eeprom_read_byte(EECONFIG_DEBUG); }
-void eeconfig_write_debug(uint8_t val) { eeprom_write_byte(EECONFIG_DEBUG, val); }
+void eeconfig_update_debug(uint8_t val) { eeprom_update_byte(EECONFIG_DEBUG, val); }
 
 uint8_t eeconfig_read_default_layer(void)      { return eeprom_read_byte(EECONFIG_DEFAULT_LAYER); }
-void eeconfig_write_default_layer(uint8_t val) { eeprom_write_byte(EECONFIG_DEFAULT_LAYER, val); }
+void eeconfig_update_default_layer(uint8_t val) { eeprom_update_byte(EECONFIG_DEFAULT_LAYER, val); }
 
 uint8_t eeconfig_read_keymap(void)      { return eeprom_read_byte(EECONFIG_KEYMAP); }
-void eeconfig_write_keymap(uint8_t val) { eeprom_write_byte(EECONFIG_KEYMAP, val); }
+void eeconfig_update_keymap(uint8_t val) { eeprom_update_byte(EECONFIG_KEYMAP, val); }
 
 #ifdef BACKLIGHT_ENABLE
 uint8_t eeconfig_read_backlight(void)      { return eeprom_read_byte(EECONFIG_BACKLIGHT); }
-void eeconfig_write_backlight(uint8_t val) { eeprom_write_byte(EECONFIG_BACKLIGHT, val); }
+void eeconfig_update_backlight(uint8_t val) { eeprom_update_byte(EECONFIG_BACKLIGHT, val); }
 #endif
