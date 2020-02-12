@@ -72,8 +72,13 @@ void matrix_init(void)
 
     adb_host_init();
 
-    // wait for line and device to be stable
-    wait_ms(100);
+    // AEK/AEKII(ANSI/ISO) startup is slower. Without proper delay
+    // it would fail to recognize layout and enable Extended protocol.
+    // 200ms seems to be enough for AEKs. 1000ms is used for safety.
+    // Tested with devices:
+    // M0115J(AEK), M3501(AEKII), M0116(Standard), M1242(Adjustable),
+    // G5431(Mouse), 64210(Kensington Trubo Mouse 5)
+    wait_ms(1000);
 
     device_scan();
 
@@ -94,7 +99,7 @@ void matrix_init(void)
         is_iso_layout = false;
         break;
     }
-    xprintf("hadler: %02X, ISO: %s\n", handler_id, (is_iso_layout ? "yes" : "no"));
+    xprintf("handler: %02X, ISO: %s\n", handler_id, (is_iso_layout ? "yes" : "no"));
 
     // Adjustable keyboard media keys: address=0x07 and handlerID=0x02
     has_media_keys = (0x02 == (adb_host_talk(ADB_ADDR_APPLIANCE, ADB_REG_3) & 0xff));
@@ -112,6 +117,8 @@ void matrix_init(void)
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
 
     led_set(host_keyboard_leds());
+
+    device_scan();
 
     // LED off
     DDRD |= (1<<6); PORTD &= ~(1<<6);
