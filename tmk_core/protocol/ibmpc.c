@@ -69,6 +69,7 @@ volatile uint8_t ibmpc_error = IBMPC_ERR_NONE;
 static volatile uint16_t recv_data = 0xFFFF;
 /* internal state of receiving data */
 static volatile uint16_t isr_state = 0x8000;
+static uint8_t timer_start = 0;
 
 void ibmpc_host_init(void)
 {
@@ -205,6 +206,25 @@ ISR(IBMPC_INT_VECT)
 {
     uint8_t dbit;
     dbit = IBMPC_DATA_PIN&(1<<IBMPC_DATA_BIT);
+
+    // Timeout check
+    uint8_t t;
+    // use only the least byte of millisecond timer
+    asm("lds %0, %1" : "=r" (t) : "p" (&timer_count));
+    //t = (uint8_t)timer_count;    // compiler uses four registers instead of one
+    if (isr_state == 0x8000) {
+        timer_start = t;
+    } else {
+        // should not take more than 1ms
+        if (timer_start != t && (uint8_t)(timer_start + 1) != t) {
+            ibmpc_error = IBMPC_ERR_TIMEOUT;
+            //goto ERROR;
+            // timeout error recovery by clearing isr_state?
+            timer_start = t;
+            isr_state = 0x8000;
+        }
+    }
+
     isr_state = isr_state>>1;
     if (dbit) isr_state |= 0x8000;
 
@@ -270,6 +290,7 @@ ISR(IBMPC_INT_VECT)
         case 0b10010000:
         case 0b01010000:
         case 0b11010000:
+            // TODO: parity check?
             // AT-done
             recv_data = recv_data<<8;
             recv_data |= (isr_state>>6) & 0xFF;
@@ -283,6 +304,7 @@ ISR(IBMPC_INT_VECT)
         case 0b11110000:
         default:            // xxxx_oooo(any 1 in low nibble)
             // Illegal
+            ibmpc_error = IBMPC_ERR_ILLEGAL;
             goto ERROR;
             break;
     }
@@ -290,7 +312,6 @@ ISR(IBMPC_INT_VECT)
 ERROR:
     isr_state = 0x8000;
     recv_data = 0xFF00; // clear data and scancode of error 0x00
-    ibmpc_error = 0xFF;
     return;
 DONE:
     // TODO: process error code: 0x00(AT), 0xFF(XT) in particular
