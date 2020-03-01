@@ -268,8 +268,7 @@ ISR(IBMPC_INT_VECT)
             break;
         case 0b11000000:
             // XT_Clone-done
-            recv_data = recv_data<<8;
-            recv_data |= (isr_state>>8) & 0xFF;
+            isr_state = isr_state>>8;
             goto DONE;
             break;
         case 0b10100000:    // ^2
@@ -284,8 +283,7 @@ ISR(IBMPC_INT_VECT)
                     goto NEXT;
                 } else {
                     // no stop bit: XT_IBM-done
-                    recv_data = recv_data<<8;
-                    recv_data |= (isr_state>>8) & 0xFF;
+                    isr_state = isr_state>>8;
                     goto DONE;
                 }
              }
@@ -294,10 +292,9 @@ ISR(IBMPC_INT_VECT)
         case 0b10010000:
         case 0b01010000:
         case 0b11010000:
-            // TODO: parity check?
             // AT-done
-            recv_data = recv_data<<8;
-            recv_data |= (isr_state>>6) & 0xFF;
+            // TODO: parity check?
+            isr_state = isr_state>>6;
             goto DONE;
             break;
         case 0b01100000:
@@ -318,7 +315,16 @@ ERROR:
     recv_data = 0xFF00; // clear data and scancode of error 0x00
     return;
 DONE:
-    // TODO: process error code: 0x00(AT), 0xFF(XT) in particular
+    if ((isr_state & 0x00FF) == 0x00FF) {
+        // receive error code 0xFF
+        ibmpc_error = IBMPC_ERR_FF;
+    }
+    if ((recv_data & 0xFF00) != 0xFF00) {
+        // buffer full and overwritten
+        ibmpc_error = IBMPC_ERR_FULL;
+    }
+    recv_data = recv_data<<8;
+    recv_data |= isr_state & 0xFF;
     isr_state = 0x8000;  // clear to next data
 NEXT:
     return;
