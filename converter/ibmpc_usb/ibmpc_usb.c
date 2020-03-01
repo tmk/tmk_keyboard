@@ -222,8 +222,6 @@ uint8_t matrix_scan(void)
                 ibmpc_error = IBMPC_ERR_NONE;
             }
 
-            xprintf("ID:%04X\n", keyboard_id);
-
             if (0xAB00 == (keyboard_id & 0xFF00)) {         // CodeSet2 PS/2
                 keyboard_kind = PC_AT;
             } else if (0xBF00 == (keyboard_id & 0xFF00)) {  // CodeSet3 Terminal
@@ -240,6 +238,8 @@ uint8_t matrix_scan(void)
             } else {
                 keyboard_kind = PC_AT;
             }
+
+            xprintf("ID:%04X(%d)\n", keyboard_id, keyboard_kind);
 
             state = SETUP;
             break;
@@ -434,6 +434,11 @@ static int8_t process_cs1(void)
     switch (state) {
         case INIT:
             switch (code) {
+                case 0x00:
+                case 0xFF:  // Error/Overrun [3]p.26
+                    xprintf("!CS1_%02X!\n", code);
+                    return -1;
+                    break;
                 case 0xE0:
                     state = E0;
                     break;
@@ -651,6 +656,13 @@ static int8_t process_cs2(void)
     switch (state) {
         case INIT:
             switch (code) {
+                case 0x00:  // Error/Overrun [3]p.26
+                case 0xFF:
+                    matrix_clear();
+                    xprintf("!CS2_%02X!\n", code);
+                    state = INIT;
+                    return -1;
+                    break;
                 case 0xE0:
                     state = E0;
                     break;
@@ -668,11 +680,6 @@ static int8_t process_cs2(void)
                     matrix_make(0x6F);
                     state = INIT;
                     break;
-                case 0x00:  // Overrun [3]p.26
-                    matrix_clear();
-                    xprintf("!CS2_OVERRUN!\n");
-                    state = INIT;
-                    break;
                 case 0xAA:  // Self-test passed
                 case 0xFC:  // Self-test failed
                     // reset or plugin-in new keyboard
@@ -680,13 +687,14 @@ static int8_t process_cs2(void)
                     return -1;
                     break;
                 default:    // normal key make
+                    state = INIT;
                     if (code < 0x80) {
                         matrix_make(code);
                     } else {
                         matrix_clear();
                         xprintf("!CS2_INIT!\n");
+                        return -1;
                     }
-                    state = INIT;
             }
             break;
         case E0:    // E0-Prefixed
@@ -699,13 +707,14 @@ static int8_t process_cs2(void)
                     state = E0_F0;
                     break;
                 default:
+                    state = INIT;
                     if (code < 0x80) {
                         matrix_make(cs2_e0code(code));
                     } else {
                         matrix_clear();
                         xprintf("!CS2_E0!\n");
+                        return -1;
                     }
-                    state = INIT;
             }
             break;
         case F0:    // Break code
@@ -719,13 +728,14 @@ static int8_t process_cs2(void)
                     state = INIT;
                     break;
                 default:
+                    state = INIT;
                     if (code < 0x80) {
                         matrix_break(code);
                     } else {
                         matrix_clear();
                         xprintf("!CS2_F0!\n");
+                        return -1;
                     }
-                    state = INIT;
             }
             break;
         case E0_F0: // Break code of E0-prefixed
@@ -735,13 +745,14 @@ static int8_t process_cs2(void)
                     state = INIT;
                     break;
                 default:
+                    state = INIT;
                     if (code < 0x80) {
                         matrix_break(cs2_e0code(code));
                     } else {
                         matrix_clear();
                         xprintf("!CS2_E0_F0!\n");
+                        return -1;
                     }
-                    state = INIT;
             }
             break;
         // Pause make: E1 14 77
@@ -824,7 +835,7 @@ static int8_t process_cs3(void)
     switch (state) {
         case READY:
             switch (code) {
-                case 0x00:
+                case 0x00:  // Error/Overrun [3]p.26
                 case 0xFF:
                     xprintf("!CS3_%02X!\n", code);
                     return -1;
