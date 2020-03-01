@@ -183,9 +183,11 @@ uint8_t matrix_scan(void)
             // 2) Read key typed by user or anything after error on protocol or scan code
             // This can happen in case of keyboard hotswap, unstable hardware, signal integrity problem or bug
 
+            /* wait until keyboard sends any code without 10000ms timeout
             if (timer_elapsed(init_time) > 10000) {
                 state = READ_ID;
             }
+            */
             if (ibmpc_host_recv() != -1) {  // wait for AA
                 xprintf("W%u ", timer_read());
                 init_time = timer_read();
