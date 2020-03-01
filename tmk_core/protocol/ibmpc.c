@@ -229,49 +229,53 @@ ISR(IBMPC_INT_VECT)
     if (dbit) isr_state |= 0x8000;
 
     // isr_state: state of receiving data from keyboard
-    //      This is initialized with 0x8000 before start receiving data and  MSB '1' of
-    //      the initial value is marker bit to discrimitate between protocols.
-    //      It stores sampled bit at MSB after right shift on each clock falling edge.
     //
-    //            15 14 13 12   11 10  9  8    7  6  5  4    3  2  1  0
-    //            -----------------------------------------------------
-    // Initial:   *1  0  0  0    0  0  0  0 |  0  0  0  0    0  0  0  0     with MSB marker *1
-    // XT_Type-1: b7 b6 b5 b4   b3 b2 b1 b0 |  1  0 *1  0    0  0  0  0     start bit 0 and 1 **
-    // XT_Type-2: b7 b6 b5 b4   b3 b2 b1 b0 |  1 *1  0  0    0  0  0  0     start bit 1
-    // AT:        st pr b7 b6   b5 b4 b3 b2 | b1 b0  0 *1    0  0  0  0     start bit 0
-    // AT**:      pr b7 b6 b5   b4 b3 b2 b1 | b0  0 *1  0    0  0  0  0     before stop bit **
+    // This should be initialized with 0x8000 before receiving data and
+    // the MSB '*1' works as marker to discrimitate between protocols.
+    // It stores sampled bit at MSB after right shift on each clock falling edge.
     //
-    //             x  x  x  x    x  x  x  x |  0  0  0  0    0  0  0  0     midway(0-7 bits received)
-    //             x  x  x  x    x  x  x  x | *1  0  0  0    0  0  0  0     midway(8 bits received)
-    //             x  x  x  x    x  x  x  x |  0 *1  0  0    0  0  0  0     XT_Type1-midway or AT-midway
-    //             x  x  x  x    x  x  x  x |  1 *1  0  0    0  0  0  0     XT_Type2-done
-    //             x  x  x  x    x  x  x  x |  0  0 *1  0    0  0  0  0     AT-midway[b0=0]
-    //             x  x  x  x    x  x  x  x |  1  0 *1  0    0  0  0  0     XT_Type1-done or AT-midway[b0=1]
-    //             x  x  x  x    x  x  x  x |  x  1  1  0    0  0  0  0     illegal
-    //             x  x  x  x    x  x  x  x |  x  x  0  1    0  0  0  0     AT-done
-    //             x  x  x  x    x  x  x  x |  x  x  1  1    0  0  0  0     illegal
-    //                                          other states than above     illegal
+    // XT protocol has two variants of signaling; XT_IBM and XT_Clone.
+    // XT_IBM uses two start bits 0 and 1 while XT_Clone uses just start bit 1.
+    // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-XT-Keyboard-Protocol
     //
-    // **: AT takes same state as XT_Type1-done(1010 000) in case that AT b0 is 1,
-    // to discriminate between the two protocol we will have to wait a while for AT stop bit.
+    //      15 14 13 12   11 10  9  8    7  6  5  4    3  2  1  0
+    //      -----------------------------------------------------
+    //      *1  0  0  0    0  0  0  0 |  0  0  0  0    0  0  0  0     Initial state(0x8000)
+    //
+    //       x  x  x  x    x  x  x  x |  0  0  0  0    0  0  0  0     midway(0-7 bits received)
+    //       x  x  x  x    x  x  x  x | *1  0  0  0    0  0  0  0     midway(8 bits received)
+    //      b6 b5 b4 b3   b2 b1 b0  1 |  0 *1  0  0    0  0  0  0     XT_IBM-midway ^1
+    //      b7 b6 b5 b4   b3 b2 b1 b0 |  0 *1  0  0    0  0  0  0     AT-midway ^1
+    //      b7 b6 b5 b4   b3 b2 b1 b0 |  1 *1  0  0    0  0  0  0     XT_Clone-done
+    //      pr b7 b6 b5   b4 b3 b2 b1 |  0  0 *1  0    0  0  0  0     AT-midway[b0=0]
+    //      b7 b6 b5 b4   b3 b2 b1 b0 |  1  0 *1  0    0  0  0  0     XT_IBM-done ^2
+    //      pr b7 b6 b5   b4 b3 b2 b1 |  1  0 *1  0    0  0  0  0     AT-midway[b0=1] ^2
+    //       x  x  x  x    x  x  x  x |  x  1  1  0    0  0  0  0     illegal
+    //      st pr b7 b6   b5 b4 b3 b2 | b1 b0  0 *1    0  0  0  0     AT-done
+    //       x  x  x  x    x  x  x  x |  x  x  1 *1    0  0  0  0     illegal
+    //                                all other states than above     illegal
+    //
+    // ^1: AT and XT_IBM takes same state.
+    // ^2: AT and XT_IBM takes same state in case that AT b0 is 1,
+    // we have to check AT stop bit to discriminate between the two protocol.
     switch (isr_state & 0xFF) {
         case 0b00000000:
         case 0b10000000:
-        case 0b01000000:
+        case 0b01000000:    // ^1
         case 0b00100000:
             // midway
             goto NEXT;
             break;
         case 0b11000000:
-            // XT_Type2-done
+            // XT_Clone-done
             recv_data = recv_data<<8;
             recv_data |= (isr_state>>8) & 0xFF;
             goto DONE;
             break;
-        case 0b10100000:
+        case 0b10100000:    // ^2
             {
                 uint8_t us = 100;
-                // wait for rising and falling edge of AT stop bit
+                // wait for rising and falling edge of AT stop bit to discriminate between XT and AT
                 while (!(IBMPC_CLOCK_PIN&(1<<IBMPC_CLOCK_BIT)) && us) { wait_us(1); us--; }
                 while (  IBMPC_CLOCK_PIN&(1<<IBMPC_CLOCK_BIT)  && us) { wait_us(1); us--; }
 
@@ -279,7 +283,7 @@ ISR(IBMPC_INT_VECT)
                     // found stop bit: AT-midway - process the stop bit in next ISR
                     goto NEXT;
                 } else {
-                    // no stop bit: XT_Type1-done
+                    // no stop bit: XT_IBM-done
                     recv_data = recv_data<<8;
                     recv_data |= (isr_state>>8) & 0xFF;
                     goto DONE;
