@@ -3,7 +3,12 @@ IBM PC Keyboard Converter
 The converter translates IBM PC keyboard protocols to use classic keyboards with modern computer with USB ports.
 It supports both IBM XT and AT protocols, and all of scan code set 1, 2 and 3 with one firmware.
 
-This is not finish project and still work in progress as of 2019-12-02. Test in the field and feedback from users are needed to improve
+This is not finished project and still work in progress as of 2020-03-02. Test in the field and feedback from users are needed to improve firmware code.
+
+You can discuss about this project here.
+
+https://geekhack.org/index.php?topic=103648.0
+
 
 This project is intended to integrated existent TMK XT, PS/2 and Terminal converters.
 
