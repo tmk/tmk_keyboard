@@ -125,7 +125,7 @@ uint8_t matrix_scan(void)
 
 
     if (ibmpc_error) {
-        xprintf("\nERR: %02X\n", ibmpc_error);
+        xprintf("\nERR:%02X\n", ibmpc_error);
 
         // when recv error, neither send error nor buffer full
         if (!(ibmpc_error & (IBMPC_ERR_SEND | IBMPC_ERR_FULL))) {
@@ -220,7 +220,7 @@ uint8_t matrix_scan(void)
 
             keyboard_id = read_keyboard_id();
             if (ibmpc_error) {
-                xprintf("\nERR: %02X\n", ibmpc_error);
+                xprintf("\nERR:%02X\n", ibmpc_error);
                 ibmpc_error = IBMPC_ERR_NONE;
             }
 
@@ -411,7 +411,7 @@ static uint8_t cs1_e0code(uint8_t code) {
         case 0x63: return 0x7B; // Wake  (MUHENKAN)
 
         default:
-           xprintf("!CS1_?!\n");
+           xprintf("!CS1_E0_%02X!\n", code);
            return code;
     }
     return 0x00;
@@ -422,7 +422,7 @@ static int8_t process_cs1(void)
     static enum {
         INIT,
         E0,
-        // Pause: E1 1D 45, E1 9D C5
+        // Pause: E1 1D 45, E1 9D C5 [a] (TODO: test)
         E1,
         E1_1D,
         E1_9D,
@@ -433,12 +433,20 @@ static int8_t process_cs1(void)
         return 0;
     }
 
+    // Check invalid codes; 0x59-7F won't be used in real XT keyboards probably
+    // 0x62 is used to handle escape code E0 and E1
+    if ((code & 0x7F) >= 0x62) {
+        xprintf("!CS1_INV!\n");
+        state = INIT;
+        return -1;
+    }
+
     switch (state) {
         case INIT:
             switch (code) {
                 case 0x00:
                 case 0xFF:  // Error/Overrun [3]p.26
-                    xprintf("!CS1_%02X!\n", code);
+                    xprintf("!CS1_ERR!\n");
                     return -1;
                     break;
                 case 0xE0:
@@ -661,7 +669,7 @@ static int8_t process_cs2(void)
                 case 0x00:  // Error/Overrun [3]p.26
                 case 0xFF:
                     matrix_clear();
-                    xprintf("!CS2_%02X!\n", code);
+                    xprintf("!CS2_ERR!\n");
                     state = INIT;
                     return -1;
                     break;
@@ -839,7 +847,7 @@ static int8_t process_cs3(void)
             switch (code) {
                 case 0x00:  // Error/Overrun [3]p.26
                 case 0xFF:
-                    xprintf("!CS3_%02X!\n", code);
+                    xprintf("!CS3_ERR!\n");
                     return -1;
                     break;
                 case 0xF0:
@@ -855,7 +863,7 @@ static int8_t process_cs3(void)
                     if (code < 0x80) {
                         matrix_make(code);
                     } else {
-                        xprintf("!CS3_%02X!\n", code);
+                        xprintf("!CS3_READY!\n");
                         return -1;
                     }
             }
@@ -864,7 +872,7 @@ static int8_t process_cs3(void)
             switch (code) {
                 case 0x00:
                 case 0xFF:
-                    xprintf("!CS3_F0_%02X!\n", code);
+                    xprintf("!CS3_F0_ERR!\n");
                     state = READY;
                     return -1;
                     break;
@@ -881,7 +889,7 @@ static int8_t process_cs3(void)
                     if (code < 0x80) {
                         matrix_break(code);
                     } else {
-                        xprintf("!CS3_F0_%02X!\n", code);
+                        xprintf("!CS3_F0!\n");
                         return -1;
                     }
             }
