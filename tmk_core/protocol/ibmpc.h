@@ -70,10 +70,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #define IBMPC_RESEND      0xFE
 #define IBMPC_SET_LED     0xED
 
-#define IBMPC_PROTOCOL_AT   0
-#define IBMPC_PROTOCOL_XT   1
+#define IBMPC_PROTOCOL_NO       0
+#define IBMPC_PROTOCOL_AT       1
+#define IBMPC_PROTOCOL_XT_IBM   2
+#define IBMPC_PROTOCOL_XT_CLONE 3
 
-// TODO: error numbers
+// Error numbers
 #define IBMPC_ERR_NONE        0
 #define IBMPC_ERR_RECV        0x00
 #define IBMPC_ERR_SEND        0x10

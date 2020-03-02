@@ -56,7 +56,7 @@ POSSIBILITY OF SUCH DAMAGE.
 } while (0)
 
 
-volatile uint8_t ibmpc_protocol = IBMPC_PROTOCOL_AT;
+volatile uint8_t ibmpc_protocol = IBMPC_PROTOCOL_NO;
 volatile uint8_t ibmpc_error = IBMPC_ERR_NONE;
 
 /* 2-byte buffer for data received from keyhboard
@@ -96,8 +96,6 @@ int16_t ibmpc_host_send(uint8_t data)
 {
     bool parity = true;
     ibmpc_error = IBMPC_ERR_NONE;
-
-    if (ibmpc_protocol == IBMPC_PROTOCOL_XT) return -1;
 
     dprintf("w%02X ", data);
 
@@ -269,6 +267,7 @@ ISR(IBMPC_INT_VECT)
         case 0b11000000:
             // XT_Clone-done
             isr_state = isr_state>>8;
+            ibmpc_protocol = IBMPC_PROTOCOL_XT_CLONE;
             goto DONE;
             break;
         case 0b10100000:    // ^2
@@ -284,6 +283,7 @@ ISR(IBMPC_INT_VECT)
                 } else {
                     // no stop bit: XT_IBM-done
                     isr_state = isr_state>>8;
+                    ibmpc_protocol = IBMPC_PROTOCOL_XT_IBM;
                     goto DONE;
                 }
              }
@@ -295,6 +295,7 @@ ISR(IBMPC_INT_VECT)
             // AT-done
             // TODO: parity check?
             isr_state = isr_state>>6;
+            ibmpc_protocol = IBMPC_PROTOCOL_AT;
             goto DONE;
             break;
         case 0b01100000:
