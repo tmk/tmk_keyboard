@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "unimap_trans.h"
 
 
-#define AC_FN0 ACTION_LAYER_MOMENTARY(1)
+#define AC_FN0 ACTION_LAYER_TAP_KEY(1, KC_APPLICATION)
 
 #ifdef KEYMAP_SECTION_ENABLE
 const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] __attribute__ ((section (".keymap.keymaps"))) = {
