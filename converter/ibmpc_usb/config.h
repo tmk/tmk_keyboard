@@ -44,38 +44,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Pin and interrupt configuration
  */
 #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega32U2__) || defined(__AVR_AT90USB1286__)
-/* uses INT1 for clock line */
+/* clock line */
 #define IBMPC_CLOCK_PORT  PORTD
 #define IBMPC_CLOCK_PIN   PIND
 #define IBMPC_CLOCK_DDR   DDRD
 #define IBMPC_CLOCK_BIT   1
+/* data line */
 #define IBMPC_DATA_PORT   PORTD
 #define IBMPC_DATA_PIN    PIND
 #define IBMPC_DATA_DDR    DDRD
 #define IBMPC_DATA_BIT    0
+/* reset line */
 #define IBMPC_RST_PORT    PORTB
 #define IBMPC_RST_PIN     PINB
 #define IBMPC_RST_DDR     DDRB
 #define IBMPC_RST_BIT1    6
 #define IBMPC_RST_BIT2    7
 
-/* reset for XT keyboard: low pulse for 500ms and after that HiZ for safety */
-#define IBMPC_RESET() do { \
+/* reset for XT Type-1 keyboard: low pulse for 500ms */
+#define IBMPC_RST_HIZ() do { \
+    IBMPC_RST_PORT &= ~(1<<IBMPC_RST_BIT1);  \
+    IBMPC_RST_DDR  &= ~(1<<IBMPC_RST_BIT1);  \
+    IBMPC_RST_PORT &= ~(1<<IBMPC_RST_BIT2);  \
+    IBMPC_RST_DDR  &= ~(1<<IBMPC_RST_BIT2);  \
+} while (0)
+
+#define IBMPC_RST_LO() do { \
     IBMPC_RST_PORT &= ~(1<<IBMPC_RST_BIT1);  \
     IBMPC_RST_DDR  |=  (1<<IBMPC_RST_BIT1);  \
     IBMPC_RST_PORT &= ~(1<<IBMPC_RST_BIT2);  \
     IBMPC_RST_DDR  |=  (1<<IBMPC_RST_BIT2);  \
-    _delay_ms(500);                   \
-    IBMPC_RST_DDR  &= ~(1<<IBMPC_RST_BIT1);  \
-    IBMPC_RST_DDR  &= ~(1<<IBMPC_RST_BIT2);  \
 } while (0)
 
+/* interrupt for clock line */
 #define IBMPC_INT_INIT()  do {  \
     EICRA |= ((1<<ISC11) |      \
               (0<<ISC10));      \
 } while (0)
 
+/* NOTE: clear flag and enabling to ditch unwanted interrupt */
 #define IBMPC_INT_ON()  do {    \
+    EIFR  |= (1<<INTF1);        \
     EIMSK |= (1<<INT1);         \
 } while (0)
 

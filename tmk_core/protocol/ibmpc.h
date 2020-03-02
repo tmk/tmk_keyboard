@@ -70,15 +70,19 @@ POSSIBILITY OF SUCH DAMAGE.
 #define IBMPC_RESEND      0xFE
 #define IBMPC_SET_LED     0xED
 
-#define IBMPC_PROTOCOL_AT   0
-#define IBMPC_PROTOCOL_XT   1
+#define IBMPC_PROTOCOL_NO       0
+#define IBMPC_PROTOCOL_AT       1
+#define IBMPC_PROTOCOL_XT_IBM   2
+#define IBMPC_PROTOCOL_XT_CLONE 3
 
-// TODO: error numbers
+// Error numbers
 #define IBMPC_ERR_NONE        0
 #define IBMPC_ERR_RECV        0x00
 #define IBMPC_ERR_SEND        0x10
 #define IBMPC_ERR_TIMEOUT     0x20
 #define IBMPC_ERR_FULL        0x40
+#define IBMPC_ERR_ILLEGAL     0x80
+#define IBMPC_ERR_FF          0xFF
 
 #define IBMPC_LED_SCROLL_LOCK 0
 #define IBMPC_LED_NUM_LOCK    1
@@ -89,9 +93,12 @@ extern volatile uint8_t ibmpc_protocol;
 extern volatile uint8_t ibmpc_error;
 
 void ibmpc_host_init(void);
+void ibmpc_host_enable(void);
+void ibmpc_host_disable(void);
 int16_t ibmpc_host_send(uint8_t data);
 int16_t ibmpc_host_recv_response(void);
 int16_t ibmpc_host_recv(void);
+void ibmpc_host_isr_clear(void);
 void ibmpc_host_set_led(uint8_t usb_led);
 
 
@@ -102,12 +109,6 @@ void ibmpc_host_set_led(uint8_t usb_led);
 /*
  * Clock
  */
-static inline void clock_init(void)
-{
-    IBMPC_CLOCK_PORT &= ~(1<<IBMPC_CLOCK_BIT);
-    IBMPC_CLOCK_DDR  |=  (1<<IBMPC_CLOCK_BIT);
-}
-
 static inline void clock_lo(void)
 {
     IBMPC_CLOCK_PORT &= ~(1<<IBMPC_CLOCK_BIT);
@@ -132,12 +133,6 @@ static inline bool clock_in(void)
 /*
  * Data
  */
-static inline void data_init(void)
-{
-    IBMPC_DATA_DDR  &= ~(1<<IBMPC_DATA_BIT);
-    IBMPC_DATA_PORT |=  (1<<IBMPC_DATA_BIT);
-}
-
 static inline void data_lo(void)
 {
     IBMPC_DATA_PORT &= ~(1<<IBMPC_DATA_BIT);
