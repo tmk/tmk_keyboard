@@ -667,6 +667,10 @@ static int8_t process_cs2(void)
         case INIT:
             switch (code) {
                 case 0x00:  // Error/Overrun [3]p.26
+                    xprintf("!CS2_OVR!\n");
+                    matrix_clear();
+                    clear_keyboard();
+                    break;
                 case 0xFF:
                     matrix_clear();
                     xprintf("!CS2_ERR!\n");
@@ -846,6 +850,10 @@ static int8_t process_cs3(void)
         case READY:
             switch (code) {
                 case 0x00:  // Error/Overrun [3]p.26
+                    xprintf("!CS3_OVR!\n");
+                    matrix_clear();
+                    clear_keyboard();
+                    break;
                 case 0xFF:
                     xprintf("!CS3_ERR!\n");
                     return -1;
@@ -871,6 +879,11 @@ static int8_t process_cs3(void)
         case F0:    // Break code
             switch (code) {
                 case 0x00:
+                    xprintf("!CS3_F0_OVR!\n");
+                    matrix_clear();
+                    clear_keyboard();
+                    state = READY;
+                    break;
                 case 0xFF:
                     xprintf("!CS3_F0_ERR!\n");
                     state = READY;
