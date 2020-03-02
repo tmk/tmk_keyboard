@@ -174,8 +174,8 @@ int16_t ibmpc_host_recv(void)
         }
     }
 
+    if ((data | 0x00FF) != 0xFFFF) dprintf("b%04X ", data);
     if (ret != 0xFF) dprintf("r%02X ", ret);
-    if (recv_data != 0xFFFF) dprintf("b%04X ", recv_data);
     return ((ret != 0xFF) ? ret : -1);
 
 }
