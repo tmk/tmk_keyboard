@@ -41,7 +41,7 @@ static bool is_iso_layout = false;
 #if ADB_MOUSE_ENABLE
 #define dmprintf(fmt, ...)  do { /* if (debug_mouse) */ xprintf("M:" fmt, ##__VA_ARGS__); } while (0)
 static uint16_t mouse_cpi = 100;
-static void mouse_init(uint8_t addr);
+static void mouse_init(void);
 #endif
 
 // matrix state buffer(1:on, 0:off)
@@ -58,6 +58,7 @@ static void device_scan(void)
             xprintf(" addr:%d, reg3:%04X\n", addr, reg3);
         }
     }
+    xprintf("\n");
 }
 
 void matrix_init(void)
@@ -128,59 +129,56 @@ void matrix_init(void)
 }
 
 #ifdef ADB_MOUSE_ENABLE
-static void mouse_init(uint8_t orig_addr)
+static void mouse_init(void)
 {
     uint16_t reg3;
     uint8_t mouse_handler;
-    uint8_t addr;
 
 again:
-    // Move to tmp address 15 to setup mouse function
-    mouse_handler = (reg3  = adb_host_talk(orig_addr, ADB_REG_3)) & 0xFF;
-    if (!reg3) return;
-    dmprintf("addr%d reg3: %04X\n", orig_addr, reg3);
-
-    // Move device to tmp address
-    adb_host_flush(orig_addr);
-    adb_host_listen(orig_addr, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_TMP, 0xFE);
-    adb_host_flush(ADB_ADDR_TMP);
-
-    mouse_handler = (reg3  = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3)) & 0xFF;
-    if (!reg3) {
-        dmprintf("move fail\n");
-        goto again;
+    // Check if there is mouse device at default address 3
+    reg3 = adb_host_talk(ADB_ADDR_MOUSE, ADB_REG_3);
+    if (reg3) {
+        // Move device to tmp address
+        // Collision detection can fail sometimes in fact when two devices are connected on startup
+        // and the devices can be moved to tmp address at same time in the result. In that case
+        // initialization of mouse can fail. To recover this you may have to replug mouse or converter.
+        // It is safe to have just one mouse device, but more than one device can be handled somehow.
+        adb_host_flush(ADB_ADDR_MOUSE);
+        adb_host_listen(ADB_ADDR_MOUSE, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_TMP, 0xFE);
+        adb_host_flush(ADB_ADDR_TMP);
     }
-    addr = ADB_ADDR_TMP;
+
+    // Check if there is mouse device to setup at temporary address 15
+    mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3)) & 0xFF;
+    if (!reg3) {
+        return;
+    }
+    dmprintf("TMP: reg3:%04X\n", reg3);
 
 
-detect_again:
     // Try to escalate into extended/classic2 protocol
     if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE || mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
-        adb_host_flush(addr);
-        adb_host_listen(addr, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_EXTENDED_MOUSE);
-
-        mouse_handler = (reg3  = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
-
+        adb_host_flush(ADB_ADDR_TMP);
+        adb_host_listen(ADB_ADDR_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_EXTENDED_MOUSE);
+        mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3)) & 0xFF;
 
         if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
-            adb_host_flush(addr);
-            adb_host_listen(addr, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_CLASSIC2_MOUSE);
-
-            mouse_handler = (reg3  = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
+            adb_host_flush(ADB_ADDR_TMP);
+            adb_host_listen(ADB_ADDR_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_CLASSIC2_MOUSE);
+            mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3)) & 0xFF;
         }
-        dmprintf("addr%d reg3: %04X\n", addr, reg3);
-
+        dmprintf("EXT: reg3:%04X\n", reg3);
     }
 
     // Classic Protocol 100cpi
     if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
-        xprintf("Classic 100cpi\n");
+        dmprintf("Classic 100cpi\n");
         mouse_cpi = 100;
     }
 
     // Classic Protocol 200cpi
     if (mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
-        xprintf("Classic 200cpi\n");
+        dmprintf("Classic 200cpi\n");
         mouse_cpi = 200;
     }
 
@@ -193,7 +191,7 @@ detect_again:
         // 7  : num of buttons
         uint8_t len;
         uint8_t buf[8];
-        len = adb_host_talk_buf(addr, ADB_REG_1, buf, sizeof(buf));
+        len = adb_host_talk_buf(ADB_ADDR_TMP, ADB_REG_1, buf, sizeof(buf));
 
         if (len > 5) {
             mouse_cpi = (buf[4]<<8) | buf[5];
@@ -202,15 +200,13 @@ detect_again:
         }
 
         if (len) {
-            xprintf("Ext: [", len);
-            for (int8_t i = 0; i < len; i++) xprintf("%02X ", buf[i]);
-            xprintf("] cpi=%d\n", mouse_cpi);
+            dmprintf("EXT: [%02X %02X %02X %02X %02X %02X %02X %02X] cpi=%d\n",
+                    buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], mouse_cpi);
         }
-
 
         // Kensington Turbo Mouse 5: default device
         if (buf[0] == 0x4B && buf[1] == 0x4D && buf[2] == 0x4C && buf[3] == 0x31) {
-            xprintf("TM5: default\n");
+            dmprintf("TM5: found\n");
             // Move it to addr0 to remove this device and get new device with handle id 50 on addr 3
             // and the new device on address 3 should be handled with command sequence later.
             //
@@ -219,10 +215,11 @@ detect_again:
             // The mouse has the two devices at same time transiently in the result. The default device is
             // removed automatically after the another device receives command sequence.
             // NOTE: The mouse hangs if you try moving the two deivces to same address.
-            adb_host_flush(addr);
-            adb_host_listen(addr, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_0, 0xFE);
+            adb_host_flush(ADB_ADDR_TMP);
+            adb_host_listen(ADB_ADDR_TMP, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_0, 0xFE);
+            goto again;
         } else {
-            xprintf("Unknown\n");
+            dmprintf("Unknown\n");
         }
     }
 
@@ -273,23 +270,24 @@ detect_again:
         static uint8_t cmd[] = { 0xB5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0xFF };
         cmd[7] = cmd[0] ^ cmd[1] ^ cmd[2] ^ cmd[3] ^ cmd[4] ^ cmd[5] ^ cmd[6] ^ cmd[7];
 
-        adb_host_flush(addr);
-        adb_host_listen_buf(addr, ADB_REG_2, cmd, sizeof(cmd));
+        adb_host_flush(ADB_ADDR_TMP);
+        adb_host_listen_buf(ADB_ADDR_TMP, ADB_REG_2, cmd, sizeof(cmd));
     }
 
 
     // Move to address 10 for mouse polling
-    adb_host_flush(addr);
-    adb_host_listen(addr, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_MOUSE_POLL, 0xFE);
+    adb_host_flush(ADB_ADDR_TMP);
+    adb_host_listen(ADB_ADDR_TMP, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_MOUSE_POLL, 0xFE);
     adb_host_flush(ADB_ADDR_MOUSE_POLL);
-
-    mouse_handler = (reg3  = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
+    reg3 = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3);
     if (reg3) {
-        dmprintf("detect again\n");
-        goto detect_again;
+        dmprintf("POL: fail reg3:%04X\n", reg3);
+    } else {
+        dmprintf("POL: done\n");
     }
 
-    goto again;
+    device_scan();
+    return;
 }
 
 static report_mouse_t mouse_report = {};
@@ -315,7 +313,7 @@ void adb_mouse_task(void)
     if (timer_elapsed(detect_ms) > 1000) {
         detect_ms = timer_read();
         // check new device on addr3
-        mouse_init(ADB_ADDR_MOUSE);
+        mouse_init();
     }
 
     // Extended Mouse Protocol data can be 2-5 bytes
