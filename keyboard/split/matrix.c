@@ -186,6 +186,7 @@ static void select_row(uint8_t row)
             DDRF  |= (1<<4);
             PORTF &= ~(1<<4);
             break;
+        // mind that 6 and 5 are swapped because there was a soldering error 
         case 12:
             DDRF  |= (1<<6);
             PORTF &= ~(1<<6);
