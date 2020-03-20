@@ -50,8 +50,8 @@ ARCH ?= AVR8
 #     CPU clock adjust registers or the clock division fuses), this will be equal to F_CPU.
 F_USB ?= $(F_CPU)
 
-# Interrupt driven control endpoint task
-# Not work with suart debug
+# Interrupt driven control endpoint task. Do not enable this.
+# This blocks long for capslock and etc. and can prevent signal handling.
 #OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 
 # This improves response of keyboard when wakeup
