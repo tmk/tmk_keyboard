@@ -272,7 +272,6 @@ void EVENT_USB_Device_Connect(void)
     if (!USB_IsInitialized) {
         USB_Disable();
         USB_Init();
-        USB_Device_EnableSOFEvents();
     }
 }
 
@@ -313,11 +312,6 @@ void EVENT_USB_Device_WakeUp()
     print("[W]");
 #endif
     hook_usb_wakeup();
-}
-
-// called every 1ms
-void EVENT_USB_Device_StartOfFrame(void)
-{
 }
 
 /** Event handler for the USB_ConfigurationChanged event.
@@ -663,8 +657,6 @@ static void setup_usb(void)
     USB_Disable();
 
     USB_Init();
-
-    USB_Device_EnableSOFEvents();
 }
 
 int main(void)  __attribute__ ((weak));
