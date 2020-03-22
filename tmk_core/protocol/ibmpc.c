@@ -244,10 +244,12 @@ ISR(IBMPC_INT_VECT)
     //       x  x  x  x    x  x  x  x | *1  0  0  0    0  0  0  0     midway(8 bits received)
     //      b6 b5 b4 b3   b2 b1 b0  1 |  0 *1  0  0    0  0  0  0     XT_IBM-midway ^1
     //      b7 b6 b5 b4   b3 b2 b1 b0 |  0 *1  0  0    0  0  0  0     AT-midway ^1
-    //      b7 b6 b5 b4   b3 b2 b1 b0 |  1 *1  0  0    0  0  0  0     XT_Clone-done
+    //      b7 b6 b5 b4   b3 b2 b1 b0 |  1 *1  0  0    0  0  0  0     XT_Clone-done ^3
+    //      b6 b5 b4 b3   b2 b1 b0  1 |  1 *1  0  0    0  0  0  0     XT_IBM-error ^3
     //      pr b7 b6 b5   b4 b3 b2 b1 |  0  0 *1  0    0  0  0  0     AT-midway[b0=0]
     //      b7 b6 b5 b4   b3 b2 b1 b0 |  1  0 *1  0    0  0  0  0     XT_IBM-done ^2
     //      pr b7 b6 b5   b4 b3 b2 b1 |  1  0 *1  0    0  0  0  0     AT-midway[b0=1] ^2
+    //      b7 b6 b5 b4   b3 b2 b1 b0 |  1  1 *1  0    0  0  0  0     XT_IBM-error-done
     //       x  x  x  x    x  x  x  x |  x  1  1  0    0  0  0  0     illegal
     //      st pr b7 b6   b5 b4 b3 b2 | b1 b0  0 *1    0  0  0  0     AT-done
     //       x  x  x  x    x  x  x  x |  x  x  1 *1    0  0  0  0     illegal
@@ -264,10 +266,28 @@ ISR(IBMPC_INT_VECT)
             // midway
             goto NEXT;
             break;
-        case 0b11000000:
-            // XT_Clone-done
+        case 0b11000000:    // ^3
+            {
+                uint8_t us = 100;
+                // wait for rising and falling edge of b7 of XT_IBM
+                while (!(IBMPC_CLOCK_PIN&(1<<IBMPC_CLOCK_BIT)) && us) { wait_us(1); us--; }
+                while (  IBMPC_CLOCK_PIN&(1<<IBMPC_CLOCK_BIT)  && us) { wait_us(1); us--; }
+
+                if (us) {
+                    // XT_IBM-error: read start(0) as 1
+                    goto NEXT;
+                } else {
+                    // XT_Clone-done
+                    isr_state = isr_state>>8;
+                    ibmpc_protocol = IBMPC_PROTOCOL_XT_CLONE;
+                    goto DONE;
+                }
+            }
+            break;
+        case 0b11100000:
+            // XT_IBM-error-done
             isr_state = isr_state>>8;
-            ibmpc_protocol = IBMPC_PROTOCOL_XT_CLONE;
+            ibmpc_protocol = IBMPC_PROTOCOL_XT_ERROR;
             goto DONE;
             break;
         case 0b10100000:    // ^2
@@ -301,7 +321,6 @@ ISR(IBMPC_INT_VECT)
             goto DONE;
             break;
         case 0b01100000:
-        case 0b11100000:
         case 0b00110000:
         case 0b10110000:
         case 0b01110000:
