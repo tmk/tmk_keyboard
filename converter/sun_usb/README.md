@@ -24,7 +24,7 @@ Modern Type 4 and 5 keyboards uses 8Pin mini DIN.
      / 8  7  6 \
     | 5    4  3 |
      \_ 2   1 _/
-       \_____/  
+       \_____/
      (receptacle)
 
     Wiring:
@@ -76,7 +76,7 @@ It can be still built with 'make HARDWARE_SERIAL=y' to enable hardware serial if
             means no keys pressed.
     0xFE Layout Response
     0xFF Reset Response(followed by 0x04)
-     
+
 ### Reference
 - http://kentie.net/article/sunkbd/page2.htm
 - http://kentie.net/article/sunkbd/KBD.pdf
@@ -84,12 +84,16 @@ It can be still built with 'make HARDWARE_SERIAL=y' to enable hardware serial if
 
 Build Firmware
 --------------
-Just use 'make'
+For TMK converter with ATmega32U2 just run `make` to build firmware hex file.
+For other DIY converters with ATmega32U4 like Teensy2 or Pro Micro use `make -f Makefile.atmega32u4` instead of `make`.
 
     $ cd sun_usb
     $ make
 
-Then, load the binary to MCU with your favorite programmer.
+Then, load the hex file into MCU with your favorite programmer. If you have `dfu-programmer` installed you can use `make dfu`.
+
+    $ make dfu
+
 
 
 Keyboard Control
