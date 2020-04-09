@@ -145,5 +145,20 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-x68k_usb.html",
         },
+        /*
+         * SUN-USB
+         */
+        sun_usb: {
+            desc: "SUN-USB Converter(TMK)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/sun_usb/binary/sun_usb.hex",
+            firmware_format: "ihex",
+            layout: "layout-sun_type5.html",
+        },
+        sun_usb_32u4: {
+            desc: "SUN-USB Converter(ATmega32U4)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/sun_usb/binary/sun_usb_atmega32u4.hex",
+            firmware_format: "ihex",
+            layout: "layout-sun_type5.html",
+        },
     },
 };
