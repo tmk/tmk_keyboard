@@ -115,7 +115,7 @@ function source_output(keymaps) {
         for (var j in keymaps[i]) {
             output += "        { ";
             for (var k in keymaps[i][j]) {
-                output += '0x' + ('0' + keymaps[i][j][k].toString(16)).substr(-2);
+                output += '0x' + ('000' + keymaps[i][j][k].toString(16)).substr(-4);
                 output += ',';
             }
             output += " },\n";
