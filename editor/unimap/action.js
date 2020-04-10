@@ -96,6 +96,7 @@ var kind_codes = {
     LAYER_BIT_XOR:      ACT_LAYER<<12 | OP_BIT_XOR<<10,
     LAYER_BIT_SET:      ACT_LAYER<<12 | OP_BIT_SET<<10,
     DEFAULT_LAYER_SET:  ACT_LAYER<<12 | OP_BIT_SET<<10 | ON_SPECIAL_USE<<8,
+    COMMAND:            ACT_COMMAND<<12,
     UNKNOWN:            0,
 };
 
@@ -161,6 +162,11 @@ function Action(code) {
     });
     // ACT_MOUSEKEY
     Object.defineProperty(this, "mousekey_code", {
+        set: function(val)  { this.code |= (val & 0xff); },
+        get: function()     { return (this.code & 0x00ff); }
+    });
+    // ACT_COMMAND
+    Object.defineProperty(this, "command_id", {
         set: function(val)  { this.code |= (val & 0xff); },
         get: function()     { return (this.code & 0x00ff); }
     });
@@ -317,6 +323,14 @@ function Action(code) {
                                 desc: mousekey_codes[this.mousekey_code].desc
                             });
                 break;
+            case ACT_COMMAND:
+                if (command_ids[this.command_id])
+                    return $.extend({}, action_kinds.COMMAND,
+                            {
+                                name: command_ids[this.command_id].name,
+                                desc: command_ids[this.command_id].desc
+                            });
+                break;
         };
         return action_kinds.UNKNOWN;
     };
@@ -378,6 +392,7 @@ var action_kinds = {
     LAYER_BIT_XOR:      { id: "LAYER_BIT_XOR",          name: "ACTION_LAYER_BIT_XOR",       desc: "Layer Bit XOR" },
     LAYER_BIT_SET:      { id: "LAYER_BIT_SET",          name: "ACTION_LAYER_BIT_SET",       desc: "Layer Bit SET" },
     DEFAULT_LAYER_SET:  { id: "DEFAULT_LAYER_SET",      name: "ACTION_DEFAULT_LAYER_SET",   desc: "Set a default layer" },
+    COMMAND:            { id: "COMMAND",                name: "ACTION_COMMAND",             desc: "Built-in Command" },
     UNKNOWN:            { id: "UNKNOWN",                name: "ACTION_UNKNOWN",             desc: "Unknown action" },
 };
 
@@ -750,3 +765,10 @@ on_codes = [];
 on_codes[0x1] = { id: 0x1, name: "On Press", desc: "On Press" };
 on_codes[0x2] = { id: 0x1, name: "On Release", desc: "On Release" };
 on_codes[0x3] = { id: 0x1, name: "On Both", desc: "On Press and Release" };
+
+
+/**********************************************************************
+ * Commands
+ **********************************************************************/
+command_ids = [];
+command_ids[0] = { id: 'BTLD', name: 'BTLD', desc: 'Start Bootloader' };

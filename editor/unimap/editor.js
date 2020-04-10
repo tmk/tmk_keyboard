@@ -155,6 +155,11 @@ $(function() {
                 .attr({ value: code, title: on_codes[code].desc })
                 .text(on_codes[code].name));
     }
+    for (var ids in command_ids) {
+        $("#command_ids_dropdown").append($("<option></option>")
+                .attr({ value: ids, title: command_ids[ids].desc })
+                .text(command_ids[ids].name));
+    }
     $(window).load(function() { action_editor_set_code(0); });
 
     // set code to editor
@@ -170,6 +175,7 @@ $(function() {
         $("#layer_dropdown").val(act.layer_tap_val);
         $("#layer_mods_dropdown").val(act.layer_tap_code & 0x1f);
         $("#layer_on_dropdown").val(act.layer_bitop_op);
+        $("#command_ids_dropdown").val(act.command_id);
     };
 
     // compile action code from editor
@@ -183,6 +189,7 @@ $(function() {
         var layer = parseInt($("#layer_dropdown").val());
         var layer_mods = parseInt($("#layer_mods_dropdown").val());
         var layer_on =  parseInt($("#layer_on_dropdown").val());
+        var command_id = parseInt($("#command_ids_dropdown").val());
         switch (action_kind) {
             case "KEY":
                 return kind_codes[action_kind] | keycode;
@@ -222,6 +229,9 @@ $(function() {
                 return kind_codes[action_kind] | (layer/4)<<5 | 1<<(layer%4);
             case "LAYER_CLEAR":
                 return kind_codes[action_kind] | layer_on<<8 | 0<<5 | 0;
+
+            case "COMMAND":
+                return kind_codes[action_kind] | command_id;
         };
         return 0;
     };
@@ -287,6 +297,9 @@ $(function() {
                 break;
             case "LAYER_CLEAR":
                 $("#layer_on_dropdown").show();
+                break;
+            case "COMMAND":
+                $("#command_ids_dropdown").show();
                 break;
         };
     });
