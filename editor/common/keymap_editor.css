@@ -99,6 +99,10 @@ textarea {
 .btn850 { width:400px; }    /* 425      - 25 */
 .btn875 { width:412.5px; }  /* 437.5    - 25 */
 .btn900 { width:425px; }    /* 450      - 25 */
+.btn925 { width:437.5px; }  /* 462.5    - 25 */
+.btn950 { width:450px; }    /* 475      - 25 */
+.btn975 { width:462.5px; }  /* 487.5    - 25 */
+.btn1000  { width:475px; }  /* 490      - 25 */
 
 .spc025 { width:12.5px; visibility:hidden; padding:0; border:0; margin:0; }
 .spc050 { width:0px; visibility:hidden; }
