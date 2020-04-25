@@ -243,13 +243,13 @@ CONFIG = {
             layout: "layout-128key.html",
         },
         ibmpc_usb_32u4_xt: {
-            desc: "IBMPC-USB Converter(ATMega32U4) - 83-key XT",
+            desc: "IBMPC-USB Converter(ATmega32U4) - 83-key XT",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibmpc_usb/binary/ibmpc_usb_atmega32u4.hex",
             firmware_format: "ihex",
             layout: "layout-83key_xt.html",
         },
         ibmpc_usb_32u4_at: {
-            desc: "IBMPC-USB Converter(ATMega32U4) - 84-key AT",
+            desc: "IBMPC-USB Converter(ATmega32U4) - 84-key AT",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibmpc_usb/binary/ibmpc_usb_atmega32u4.hex",
             firmware_format: "ihex",
             layout: "layout-84key_at.html",
@@ -257,6 +257,31 @@ CONFIG = {
         ibmpc_usb_32u4_terminal: {
             desc: "IBMPC-USB Converter(ATmega32U4) - 122-key Terminal",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibmpc_usb/binary/ibmpc_usb_atmega32u4.hex",
+            firmware_format: "ihex",
+            layout: "layout-122key_terminal.html",
+        },
+        /* AT90USB1286 */
+        ibmpc_usb_1286: {
+            desc: "IBMPC-USB Converter(AT90USB1286)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibmpc_usb/binary/ibmpc_usb_at90usb1286.hex",
+            firmware_format: "ihex",
+            layout: "layout-128key.html",
+        },
+        ibmpc_usb_1286_xt: {
+            desc: "IBMPC-USB Converter(AT90USB1286) - 83-key XT",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibmpc_usb/binary/ibmpc_usb_at90usb1286.hex",
+            firmware_format: "ihex",
+            layout: "layout-83key_xt.html",
+        },
+        ibmpc_usb_1286_at: {
+            desc: "IBMPC-USB Converter(AT90USB1286) - 84-key AT",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibmpc_usb/binary/ibmpc_usb_at90usb1286.hex",
+            firmware_format: "ihex",
+            layout: "layout-84key_at.html",
+        },
+        ibmpc_usb_1286_terminal: {
+            desc: "IBMPC-USB Converter(AT90USB1286) - 122-key Terminal",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibmpc_usb/binary/ibmpc_usb_at90usb1286.hex",
             firmware_format: "ihex",
             layout: "layout-122key_terminal.html",
         },
