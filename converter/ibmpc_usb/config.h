@@ -39,6 +39,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     keyboard_report->mods == (MOD_BIT(KC_LALT) | MOD_BIT(KC_RALT)) \
 )
 
+// G80-2551 terminal keyboard support
+#define G80_2551_SUPPORT
+
 
 /*
  * Pin and interrupt configuration

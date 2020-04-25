@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Jun Wako <wakojun@gmail.com>
+Copyright 2019,2020 Jun Wako <wakojun@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -656,6 +656,11 @@ static int8_t process_cs2(void)
         E1_F0,
         E1_F0_14,
         E1_F0_14_F0,
+#ifdef G80_2551_SUPPORT
+        // G80-2551 four extra keys around cursor keys
+        G80,
+        G80_F0,
+#endif
     } state = INIT;
 
     uint16_t code = ibmpc_host_recv();
@@ -700,6 +705,44 @@ static int8_t process_cs2(void)
                     state = INIT;
                     return -1;
                     break;
+#ifdef G80_2551_SUPPORT
+                /*
+                 * G80-2551 terminal keyboard support
+                 */
+                case 0x80:  // G80-2551 four extra keys around cursor keys
+                    state = G80;
+                    break;
+                case 0x19:
+                    matrix_make(0x7F);  // MUTE
+                    break;
+                case 0x39:
+                    matrix_make(0x6E);  // VOLU
+                    break;
+                case 0x53:
+                    matrix_make(0x65);  // VOLD
+                    break;
+                case 0x6F:
+                    matrix_make(0x5C);  // APP
+                    break;
+                case 0x5C:
+                    matrix_make(0x19);  // LGUI
+                    break;
+                case 0x1F:
+                    matrix_make(0x1F);  // RGUI
+                    break;
+                case 0x27:
+                    matrix_make(0x67);  // MHEN
+                    break;
+                case 0x2F:
+                    matrix_make(0x57);  // F23
+                    break;
+                case 0x5E:
+                    matrix_make(0x64);  // HENK
+                    break;
+                case 0x17:
+                    matrix_make(0x77);  // NLCK
+                    break;
+#endif
                 default:    // normal key make
                     state = INIT;
                     if (code < 0x80) {
@@ -741,6 +784,54 @@ static int8_t process_cs2(void)
                     matrix_break(0x6F);
                     state = INIT;
                     break;
+#ifdef G80_2551_SUPPORT
+                /*
+                 * G80-2551 terminal keyboard support
+                 * https://deskthority.net/wiki/Cherry_G80-2551
+                 * https://geekhack.org/index.php?topic=103648.msg2893404#msg2893404
+                 * https://gist.github.com/tmk/22cb8680ca8ef854630ecd1953268c5b
+                 */
+                case 0x19:
+                    matrix_break(0x7F);  // MUTE
+                    state = INIT;
+                    break;
+                case 0x39:
+                    matrix_break(0x6E);  // VOLU
+                    state = INIT;
+                    break;
+                case 0x53:
+                    matrix_break(0x65);  // VOLD
+                    state = INIT;
+                    break;
+                case 0x6F:
+                    matrix_break(0x5C);  // APP
+                    state = INIT;
+                    break;
+                case 0x5C:
+                    matrix_break(0x19);  // LGUI
+                    state = INIT;
+                    break;
+                case 0x1F:
+                    matrix_break(0x1F);  // RGUI
+                    state = INIT;
+                    break;
+                case 0x27:
+                    matrix_break(0x67);  // MHEN
+                    state = INIT;
+                    break;
+                case 0x2F:
+                    matrix_break(0x57);  // F23
+                    state = INIT;
+                    break;
+                case 0x5E:
+                    matrix_break(0x64);  // HENK
+                    state = INIT;
+                    break;
+                case 0x17:
+                    matrix_break(0x77);  // NLCK
+                    state = INIT;
+                    break;
+#endif
                 default:
                     state = INIT;
                     if (code < 0x80) {
@@ -821,6 +912,53 @@ static int8_t process_cs2(void)
                     state = INIT;
             }
             break;
+#ifdef G80_2551_SUPPORT
+        case G80:   // G80-2551 four extra keys around cursor keys
+            switch (code) {
+                case (0x26):    // TD= -> JYEN
+                    matrix_make(0x6A);
+                    break;
+                case (0x25):    // page with edge -> NUHS
+                    matrix_make(0x68);
+                    break;
+                case (0x16):    // two pages -> RO
+                    matrix_make(0x51);
+                    break;
+                case (0x1E):    // calc -> KANA
+                    matrix_make(0x13);
+                    break;
+                case (0xF0):
+                    state = G80_F0;
+                    return 0;
+                default:
+                    // Not supported
+                    matrix_clear();
+                    break;
+            }
+            state = INIT;
+            break;
+        case G80_F0:
+            switch (code) {
+                case (0x26):    // TD= -> JYEN
+                    matrix_break(0x6A);
+                    break;
+                case (0x25):    // page with edge -> NUHS
+                    matrix_break(0x68);
+                    break;
+                case (0x16):    // two pages -> RO
+                    matrix_break(0x51);
+                    break;
+                case (0x1E):    // calc -> KANA
+                    matrix_break(0x13);
+                    break;
+                default:
+                    // Not supported
+                    matrix_clear();
+                    break;
+            }
+            state = INIT;
+            break;
+#endif
         default:
             state = INIT;
     }
