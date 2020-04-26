@@ -861,10 +861,10 @@ static int8_t process_cs3(void)
                 case 0xF0:
                     state = F0;
                     break;
-                case 0x83:  // F7
+                case 0x83:
                     matrix_make(0x02);
                     break;
-                case 0x84:  // keypad -
+                case 0x84:
                     matrix_make(0x7F);
                     break;
                 default:    // normal key make
@@ -889,11 +889,11 @@ static int8_t process_cs3(void)
                     state = READY;
                     return -1;
                     break;
-                case 0x83:  // F7
+                case 0x83:
                     matrix_break(0x02);
                     state = READY;
                     break;
-                case 0x84:  // keypad -
+                case 0x84:
                     matrix_break(0x7F);
                     state = READY;
                     break;

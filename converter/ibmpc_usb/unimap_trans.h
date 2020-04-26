@@ -73,6 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * | 43| 44|  |  38   |              39                      |  3A   |  52   |  53   |   |
  * `-------'  `--------------------------------------------------------------------------'
  * [3], [a]
+ * unused: UNIMAP_NUBS
  */
 const uint8_t PROGMEM unimap_cs1[MATRIX_ROWS][MATRIX_COLS] = {
     { UNIMAP_NO,    UNIMAP_ESC,   UNIMAP_1,     UNIMAP_2,     UNIMAP_3,     UNIMAP_4,     UNIMAP_5,     UNIMAP_6     }, /* 00-07 */
@@ -162,15 +163,15 @@ const uint8_t PROGMEM unimap_cs2[MATRIX_ROWS][MATRIX_COLS] = {
  *               |F1 |F2 |F3 |F4 |F5 |F6 |F7 |F8 |F9 |F10|F11|F12|
  *               `-----------------------------------------------'
  * ,-------. ,-----------------------------------------------------------. ,-----------. ,---------------.
- * |PrS|Esc| |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|Yen| BS| |Ins|Hom|PgU| |NmL|  /|  *|  -|
+ * |Mut|Hkn| |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY| BS| |  /|PgU|PgD| |Esc|NmL|ScL|  *|
  * |-------| |-----------------------------------------------------------| |-----------| |---------------|
- * |ScL|Hen| |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|    \| |Del|End|PgD| |  7|  8|  9|  +|
+ * |VoU|Pau| |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|    \| |End|Ins|Del| |  7|  8|  9|  +|
  * |-------| |-----------------------------------------------------------| `-----------' |-----------|---|
- * |Pau|Muh| |CapsLo|  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  #| Ret|     |Up |     |  4|  5|  6|  ,|
+ * |VoD|Mhk| |CapsLo|  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  #| Ret|     |Up |     |  4|  5|  6|  -|
  * |-------| |-----------------------------------------------------------| ,-----------. |---------------|
- * |VoD|VoU| |Shif|  \|  Z|  X|  C|  V|  B|  N|  M|  ,|  ,|  /| RO| Shift| |Lef|App|Rig| |  1|  2|  3|Ent|
+ * |Psc|App| |Shif|  \|  Z|  X|  C|  V|  B|  N|  M|  ,|  ,|  /| RO| Shift| |Lef|Hom|Rig| |  1|  2|  3|Ent|
  * |-------| |-----------------------------------------------------------| `-----------' |-----------|---|
- * |Gui|Gui| |Ctrl|    |Alt |          Space              |Alt |    |Ctrl|     |Dow|     |Kan|  0|  .|  =|
+ * |Gui|Gui| |Ctrl|    |Alt |          Space              |Alt |    |Ctrl|     |Dow|     |  ,|  0|  .|  =|
  * `-------' `----'    `---------------------------------------'    `----'     `---'     `---------------'
  *
  *               ,-----------------------------------------------.
@@ -189,12 +190,13 @@ const uint8_t PROGMEM unimap_cs2[MATRIX_ROWS][MATRIX_COLS] = {
  * |-------| |-----------------------------------------------------------| `-----------' |---------------|
  * | 01| 09| | 11  |   |19  |        29                   |39  |   | 58  |     | 60|     | 68| 70| 71| 78|
  * `-------' `-----'   `---------------------------------------'   `-----'     `---'     `---------------'
- * *: 83=02, 84=7F
+ * *: remapped 83->02, 84->7F
  * 51, 5C, 5D, 68, 78: Hidden keys in IBM 122-key terminal keyboard [7]
+ * unused: UNIMAP_KANA
  */
 const uint8_t PROGMEM unimap_cs3[MATRIX_ROWS][MATRIX_COLS] = {
-    { UNIMAP_NO,    UNIMAP_LGUI,  UNIMAP_VOLD,  UNIMAP_PAUSE, UNIMAP_SLCK,  UNIMAP_PSCR,  UNIMAP_ESC,   UNIMAP_F1    }, /* 00-07 */
-    { UNIMAP_F13,   UNIMAP_RGUI,  UNIMAP_VOLU,  UNIMAP_MHEN,  UNIMAP_HENK,  UNIMAP_TAB,   UNIMAP_GRV,   UNIMAP_F2    }, /* 08-0F */
+    { UNIMAP_NO,    UNIMAP_LGUI,  UNIMAP_PSCR,  UNIMAP_VOLD,  UNIMAP_VOLU,  UNIMAP_MUTE,  UNIMAP_HENK,  UNIMAP_F1    }, /* 00-07 */
+    { UNIMAP_F13,   UNIMAP_RGUI,  UNIMAP_APP,   UNIMAP_MHEN,  UNIMAP_PAUS,  UNIMAP_TAB,   UNIMAP_GRV,   UNIMAP_F2    }, /* 08-0F */
     { UNIMAP_F14,   UNIMAP_LCTL,  UNIMAP_LSHIFT,UNIMAP_NUBS,  UNIMAP_CAPS,  UNIMAP_Q,     UNIMAP_1,     UNIMAP_F3    }, /* 10-17 */
     { UNIMAP_F15,   UNIMAP_LALT,  UNIMAP_Z,     UNIMAP_S,     UNIMAP_A,     UNIMAP_W,     UNIMAP_2,     UNIMAP_F4    }, /* 18-1F */
     { UNIMAP_F16,   UNIMAP_C,     UNIMAP_X,     UNIMAP_D,     UNIMAP_E,     UNIMAP_4,     UNIMAP_3,     UNIMAP_F5    }, /* 20-27 */
@@ -205,10 +207,10 @@ const uint8_t PROGMEM unimap_cs3[MATRIX_ROWS][MATRIX_COLS] = {
     { UNIMAP_F21,   UNIMAP_DOT,   UNIMAP_SLASH, UNIMAP_L,     UNIMAP_SCOLON,UNIMAP_P,     UNIMAP_MINUS, UNIMAP_F10   }, /* 48-4F */
     { UNIMAP_F22,   UNIMAP_RO,    UNIMAP_QUOTE, UNIMAP_NUHS,  UNIMAP_LBRC,  UNIMAP_EQUAL, UNIMAP_F11,   UNIMAP_F23   }, /* 50-57 */
     { UNIMAP_RCTL,  UNIMAP_RSHIFT,UNIMAP_ENTER, UNIMAP_RBRC,  UNIMAP_BSLASH,UNIMAP_JYEN,  UNIMAP_F12,   UNIMAP_F24   }, /* 58-5F */
-    { UNIMAP_DOWN,  UNIMAP_LEFT,  UNIMAP_APP,   UNIMAP_UP,    UNIMAP_DEL,   UNIMAP_END,   UNIMAP_BSPACE,UNIMAP_INS   }, /* 60-67 */
-    { UNIMAP_KANA,  UNIMAP_P1,    UNIMAP_RIGHT, UNIMAP_P4,    UNIMAP_P7,    UNIMAP_PGDN,  UNIMAP_HOME,  UNIMAP_PGUP  }, /* 68-6F */
-    { UNIMAP_P0,    UNIMAP_PDOT,  UNIMAP_P2,    UNIMAP_P5,    UNIMAP_P6,    UNIMAP_P8,    UNIMAP_NLCK,  UNIMAP_PSLS  }, /* 70-77 */
-    { UNIMAP_PEQL,  UNIMAP_PENT,  UNIMAP_P3,    UNIMAP_PCMM,  UNIMAP_PPLS,  UNIMAP_P9,    UNIMAP_PAST,  UNIMAP_PMNS  }, /* 78-7F */
+    { UNIMAP_DOWN,  UNIMAP_LEFT,  UNIMAP_HOME,  UNIMAP_UP,    UNIMAP_END,   UNIMAP_INS,   UNIMAP_BSPACE,UNIMAP_PSLS  }, /* 60-67 */
+    { UNIMAP_PCMM,  UNIMAP_P1,    UNIMAP_RIGHT, UNIMAP_P4,    UNIMAP_P7,    UNIMAP_DEL,   UNIMAP_PGUP,  UNIMAP_PGDN  }, /* 68-6F */
+    { UNIMAP_P0,    UNIMAP_PDOT,  UNIMAP_P2,    UNIMAP_P5,    UNIMAP_P6,    UNIMAP_P8,    UNIMAP_ESC,   UNIMAP_NLCK  }, /* 70-77 */
+    { UNIMAP_PEQL,  UNIMAP_PENT,  UNIMAP_P3,    UNIMAP_PMNS,  UNIMAP_PPLS,  UNIMAP_P9,    UNIMAP_SLCK,  UNIMAP_PAST  }, /* 78-7F */
 };
 
 
