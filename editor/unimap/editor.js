@@ -52,7 +52,7 @@ $(function() {
             for (var col in keymap[row]) {
                 var code = keymap[row][col];
                 var act = new Action(code);
-                $("#key-" + parseInt(row).toString(32) + parseInt(col).toString(32))
+                $("*#key-" + parseInt(row).toString(32) + parseInt(col).toString(32))
                     .text(act.name)
                     .attr({ title: act.desc });
             }
@@ -100,11 +100,11 @@ $(function() {
 
         // set text and tooltip to key button under editing
         var act = new Action(code);
-        $("#" + editing_key).text(act.name);
-        $("#" + editing_key).attr({ title: act.desc });
+        $("*#" + editing_key).text(act.name);
+        $("*#" + editing_key).attr({ title: act.desc });
 
         // to give back focus on editing_key for moving to next key with Tab
-        $("#" + editing_key).focus();
+        $("*#" + editing_key).focus();
     };
 
 
@@ -587,7 +587,7 @@ $(function() {
 
                 // grey-out key to indicate being under editing
                 $(".key").removeClass("key-editing");
-                $(this).addClass("key-editing");
+                $("*#" + editing_key).addClass("key-editing");
                 var pos = get_pos(editing_key);
                 var code = keymaps[editing_layer][pos.row][pos.col];
 
