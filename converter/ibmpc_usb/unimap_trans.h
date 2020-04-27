@@ -192,10 +192,9 @@ const uint8_t PROGMEM unimap_cs2[MATRIX_ROWS][MATRIX_COLS] = {
  * `-------' `-----'   `---------------------------------------'   `-----'     `---'     `---------------'
  * *: remapped 83->02, 84->7F
  * 51, 5C, 5D, 68, 78: Hidden keys in IBM 122-key terminal keyboard [7]
- * unused: UNIMAP_KANA
  */
 const uint8_t PROGMEM unimap_cs3[MATRIX_ROWS][MATRIX_COLS] = {
-    { UNIMAP_NO,    UNIMAP_LGUI,  UNIMAP_PSCR,  UNIMAP_VOLD,  UNIMAP_VOLU,  UNIMAP_MUTE,  UNIMAP_HENK,  UNIMAP_F1    }, /* 00-07 */
+    { UNIMAP_KANA,  UNIMAP_LGUI,  UNIMAP_PSCR,  UNIMAP_VOLD,  UNIMAP_VOLU,  UNIMAP_MUTE,  UNIMAP_HENK,  UNIMAP_F1    }, /* 00-07 */
     { UNIMAP_F13,   UNIMAP_RGUI,  UNIMAP_APP,   UNIMAP_MHEN,  UNIMAP_PAUS,  UNIMAP_TAB,   UNIMAP_GRV,   UNIMAP_F2    }, /* 08-0F */
     { UNIMAP_F14,   UNIMAP_LCTL,  UNIMAP_LSHIFT,UNIMAP_NUBS,  UNIMAP_CAPS,  UNIMAP_Q,     UNIMAP_1,     UNIMAP_F3    }, /* 10-17 */
     { UNIMAP_F15,   UNIMAP_LALT,  UNIMAP_Z,     UNIMAP_S,     UNIMAP_A,     UNIMAP_W,     UNIMAP_2,     UNIMAP_F4    }, /* 18-1F */

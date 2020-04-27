@@ -999,18 +999,36 @@ static int8_t process_cs3(void)
                 case 0xF0:
                     state = F0;
                     break;
-                case 0x83:
+                case 0x83:  // PrintScreen
                     matrix_make(0x02);
                     break;
-                case 0x84:
+                case 0x84:  // Keypad *
                     matrix_make(0x7F);
+                    break;
+                case 0x85:  // Muhenkan
+                    matrix_make(0x0B);
+                    break;
+                case 0x86:  // Henkan
+                    matrix_make(0x06);
+                    break;
+                case 0x87:  // Hiragana
+                    matrix_make(0x00);
+                    break;
+                case 0x8B:  // Left GUI
+                    matrix_make(0x01);
+                    break;
+                case 0x8C:  // Right GUI
+                    matrix_make(0x09);
+                    break;
+                case 0x8D:  // Application
+                    matrix_make(0x0A);
                     break;
                 default:    // normal key make
                     if (code < 0x80) {
                         matrix_make(code);
                     } else {
                         xprintf("!CS3_READY!\n");
-                        return -1;
+                        //return -1;
                     }
             }
             break;
@@ -1027,12 +1045,36 @@ static int8_t process_cs3(void)
                     state = READY;
                     return -1;
                     break;
-                case 0x83:
+                case 0x83:  // PrintScreen
                     matrix_break(0x02);
                     state = READY;
                     break;
-                case 0x84:
+                case 0x84:  // Keypad *
                     matrix_break(0x7F);
+                    state = READY;
+                    break;
+                case 0x85:  // Muhenkan
+                    matrix_break(0x0B);
+                    state = READY;
+                    break;
+                case 0x86:  // Henkan
+                    matrix_break(0x06);
+                    state = READY;
+                    break;
+                case 0x87:  // Hiragana
+                    matrix_break(0x00);
+                    state = READY;
+                    break;
+                case 0x8B:  // Left GUI
+                    matrix_break(0x01);
+                    state = READY;
+                    break;
+                case 0x8C:  // Right GUI
+                    matrix_break(0x09);
+                    state = READY;
+                    break;
+                case 0x8D:  // Application
+                    matrix_break(0x0A);
                     state = READY;
                     break;
                 default:
@@ -1041,7 +1083,7 @@ static int8_t process_cs3(void)
                         matrix_break(code);
                     } else {
                         xprintf("!CS3_F0!\n");
-                        return -1;
+                        //return -1;
                     }
             }
             break;
