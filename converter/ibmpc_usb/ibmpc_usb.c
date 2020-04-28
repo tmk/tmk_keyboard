@@ -68,6 +68,7 @@ static uint16_t read_keyboard_id(void)
     if (code == -1) { id = 0x0000; goto DONE; }     // AT
     id = (code & 0xFF)<<8;
 
+    // Mouse responds with one-byte 00, this returns 00FF [y] p.14
     code = read_wait(500);
     id |= code & 0xFF;
 
@@ -218,6 +219,12 @@ uint8_t matrix_scan(void)
         case READ_ID:
             xprintf("R%u ", timer_read());
 
+            // SKIDATA-2-DE(and some other keyboards?) stores 'Code Set' setting in nonvlatile memory
+            // and keeps it until receiving reset. Sending reset here may be useful to clear it, perhaps.
+            // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#select-alternate-scan-codesf0
+            //ibmpc_host_send(0xFF);  // reset command
+            //read_wait(500);         // BAT takes 600-900ms(84-key) or 300-500ms(101/102-key) [8] 4-7, 4-39
+
             keyboard_id = read_keyboard_id();
             if (ibmpc_error) {
                 xprintf("\nERR:%02X\n", ibmpc_error);
@@ -266,6 +273,7 @@ uint8_t matrix_scan(void)
                     led_set(host_keyboard_leds());
                     break;
                 case PC_TERMINAL:
+                    // Set all keys to make/break type
                     ibmpc_host_send(0xF8);
                     break;
                 default:
@@ -1056,6 +1064,9 @@ static int8_t process_cs3(void)
  *
  * [7] The IBM 6110344 Keyboard - Scan Code Set 3 of 122-key terminal keyboard
  * https://www.seasip.info/VintagePC/ibm_6110344.html
+ *
+ * [8] IBM PC AT Technical Reference 1986
+ * http://bitsavers.org/pdf/ibm/pc/at/6183355_PC_AT_Technical_Reference_Mar86.pdf
  *
  * [y] TrackPoint Engineering Specifications for version 3E
  * https://web.archive.org/web/20100526161812/http://wwwcssrv.almaden.ibm.com/trackpoint/download.html
