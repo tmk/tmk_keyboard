@@ -224,19 +224,31 @@ uint8_t matrix_scan(void)
                 ibmpc_error = IBMPC_ERR_NONE;
             }
 
-            if (0xAB00 == (keyboard_id & 0xFF00)) {         // CodeSet2 PS/2
+            if (0x0000 == keyboard_id) {            // CodeSet2 AT(IBM PC AT 84-key)
+                keyboard_kind = PC_AT;
+            } else if (0xFFFF == keyboard_id) {     // CodeSet1 XT
+                keyboard_kind = PC_XT;
+            } else if (0xFFFE == keyboard_id) {     // CodeSet2 PS/2 fails to response?
+                keyboard_kind = PC_AT;
+            } else if (0x00FF == keyboard_id) {     // Mouse is not supported
+                xprintf("Mouse: not supported\n");
+                keyboard_kind = NONE;
+#ifdef G80_2551_SUPPORT
+            } else if (0xAB86 == keyboard_id) {     // CodeSet2 PS/2 Terminal
+                // For G80-2551 and other 122-key terminal keyboards
+                // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#ab86
+                if ((0xFA == ibmpc_host_send(0xF0)) &&
+                    (0xFA == ibmpc_host_send(0x03))) {
+                    // switch to code set 3
+                    keyboard_kind = PC_TERMINAL;
+                } else {
+                    keyboard_kind = PC_AT;
+                }
+#endif
+            } else if (0xAB00 == (keyboard_id & 0xFF00)) {  // CodeSet2 PS/2
                 keyboard_kind = PC_AT;
             } else if (0xBF00 == (keyboard_id & 0xFF00)) {  // CodeSet3 Terminal
                 keyboard_kind = PC_TERMINAL;
-            } else if (0x0000 == keyboard_id) {             // CodeSet2 AT
-                keyboard_kind = PC_AT;
-            } else if (0xFFFF == keyboard_id) {             // CodeSet1 XT
-                keyboard_kind = PC_XT;
-            } else if (0xFFFE == keyboard_id) {             // CodeSet2 PS/2 fails to response?
-                keyboard_kind = PC_AT;
-            } else if (0x00FF == keyboard_id) {             // Mouse is not supported
-                xprintf("Mouse: not supported\n");
-                keyboard_kind = NONE;
             } else {
                 keyboard_kind = PC_AT;
             }
@@ -327,7 +339,7 @@ void matrix_clear(void)
 
 void led_set(uint8_t usb_led)
 {
-    if (keyboard_kind != PC_AT) return;
+    //if (keyboard_kind != PC_AT) return;
 
     uint8_t ibmpc_led = 0;
     if (usb_led &  (1<<USB_LED_SCROLL_LOCK))
@@ -977,6 +989,11 @@ static int8_t process_cs3(void)
     static enum {
         READY,
         F0,
+#ifdef G80_2551_SUPPORT
+        // G80-2551 four extra keys around cursor keys
+        G80,
+        G80_F0,
+#endif
     } state = READY;
 
     uint16_t code = ibmpc_host_recv();
@@ -1023,6 +1040,11 @@ static int8_t process_cs3(void)
                 case 0x8D:  // Application
                     matrix_make(0x0A);
                     break;
+#ifdef G80_2551_SUPPORT
+                case 0x80:  // G80-2551 four extra keys around cursor keys
+                    state = G80;
+                    break;
+#endif
                 default:    // normal key make
                     if (code < 0x80) {
                         matrix_make(code);
@@ -1087,6 +1109,58 @@ static int8_t process_cs3(void)
                     }
             }
             break;
+#ifdef G80_2551_SUPPORT
+        /*
+         * G80-2551 terminal keyboard support
+         * https://deskthority.net/wiki/Cherry_G80-2551
+         * https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#g80-2551-in-code-set-3
+         */
+        case G80:   // G80-2551 four extra keys around cursor keys
+            switch (code) {
+                case (0x26):    // TD= -> JYEN
+                    matrix_make(0x5D);
+                    break;
+                case (0x25):    // page with edge -> NUHS
+                    matrix_make(0x53);
+                    break;
+                case (0x16):    // two pages -> RO
+                    matrix_make(0x51);
+                    break;
+                case (0x1E):    // calc -> KANA
+                    matrix_make(0x00);
+                    break;
+                case (0xF0):
+                    state = G80_F0;
+                    return 0;
+                default:
+                    // Not supported
+                    matrix_clear();
+                    break;
+            }
+            state = READY;
+            break;
+        case G80_F0:
+            switch (code) {
+                case (0x26):    // TD= -> JYEN
+                    matrix_break(0x5D);
+                    break;
+                case (0x25):    // page with edge -> NUHS
+                    matrix_break(0x53);
+                    break;
+                case (0x16):    // two pages -> RO
+                    matrix_break(0x51);
+                    break;
+                case (0x1E):    // calc -> KANA
+                    matrix_break(0x00);
+                    break;
+                default:
+                    // Not supported
+                    matrix_clear();
+                    break;
+            }
+            state = READY;
+            break;
+#endif
     }
     return 0;
 }
