@@ -632,12 +632,12 @@ static uint8_t cs2_e0code(uint8_t code) {
         case 0x75: return 0x4F; // cursor up
         case 0x7A: return 0x56; // page down
         case 0x7D: return 0x5E; // page up
-        case 0x7C: return 0x6F; // Print Screen
+        case 0x7C: return 0x7F; // Print Screen
         case 0x7E: return 0x00; // Control'd Pause
 
         case 0x21: return 0x65; // volume down
         case 0x32: return 0x6E; // volume up
-        case 0x23: return 0x7F; // mute
+        case 0x23: return 0x6F; // mute
         case 0x10: return 0x08; // (WWW search)     -> F13
         case 0x18: return 0x10; // (WWW favourites) -> F14
         case 0x20: return 0x18; // (WWW refresh)    -> F15
@@ -718,7 +718,7 @@ static int8_t process_cs2(void)
                     state = INIT;
                     break;
                 case 0x84:  // Alt'd PrintScreen
-                    matrix_make(0x6F);
+                    matrix_make(0x7F);
                     state = INIT;
                     break;
                 case 0xAA:  // Self-test passed
@@ -765,7 +765,7 @@ static int8_t process_cs2(void)
                     state = INIT;
                     break;
                 case 0x84:  // Alt'd PrintScreen
-                    matrix_break(0x6F);
+                    matrix_break(0x7F);
                     state = INIT;
                     break;
                 default:
