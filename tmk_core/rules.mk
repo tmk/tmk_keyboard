@@ -411,6 +411,9 @@ gccversion :
 program: $(TARGET).hex $(TARGET).eep
 	$(PROGRAM_CMD)
 
+dude: $(TARGET).hex
+	avrdude -p$(MCU) -cavr109 -b57600 -Uflash:w:$(TARGET).hex -P$(DEV)
+
 teensy: $(TARGET).hex
 	teensy_loader_cli -mmcu=$(MCU) -w -v $(TARGET).hex
 
