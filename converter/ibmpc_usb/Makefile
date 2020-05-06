@@ -78,8 +78,8 @@ CONSOLE_ENABLE ?= yes	# Console for debug(+400)
 COMMAND_ENABLE ?= yes    # Commands for debug and configuration
 NKRO_ENABLE ?= yes	# USB Nkey Rollover
 
-KEYMAP_SECTION_ENABLE = yes
-UNIMAP_ENABLE = yes
+KEYMAP_SECTION_ENABLE ?= yes
+UNIMAP_ENABLE ?= yes
 
 
 # Optimize size but this may cause error "relocation truncated to fit"
