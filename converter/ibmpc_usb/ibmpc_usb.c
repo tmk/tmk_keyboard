@@ -241,9 +241,11 @@ uint8_t matrix_scan(void)
                 xprintf("Mouse: not supported\n");
                 keyboard_kind = NONE;
 #ifdef G80_2551_SUPPORT
-            } else if (0xAB86 == keyboard_id) {     // CodeSet2 PS/2 Terminal
-                // For G80-2551 and other 122-key terminal keyboards
+            } else if (0xAB86 == keyboard_id ||
+                       0xAB85 == keyboard_id) {     // For G80-2551 and other 122-key terminal
                 // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#ab86
+                // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#ab85
+
                 if ((0xFA == ibmpc_host_send(0xF0)) &&
                     (0xFA == ibmpc_host_send(0x03))) {
                     // switch to code set 3
@@ -252,6 +254,11 @@ uint8_t matrix_scan(void)
                     keyboard_kind = PC_AT;
                 }
 #endif
+            } else if (0xBFB0 == keyboard_id) {     // IBM RT Keyboard
+                // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#bfb0
+                // TODO: LED indicator fix
+                //keyboard_kind = PC_TERMINAL_IBM_RT;
+                keyboard_kind = PC_TERMINAL;
             } else if (0xAB00 == (keyboard_id & 0xFF00)) {  // CodeSet2 PS/2
                 keyboard_kind = PC_AT;
             } else if (0xBF00 == (keyboard_id & 0xFF00)) {  // CodeSet3 Terminal
@@ -850,9 +857,8 @@ static int8_t process_cs2(void)
 /*
  * Terminal: Scan Code Set 3
  *
- * See [3], [7]
- *
- * Scan code 0x83 and 0x84 are handled exceptioanally to fit into 1-byte range index.
+ * See [3], [7] and
+ * https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#scan-code-set-3
  */
 static int8_t process_cs3(void)
 {
