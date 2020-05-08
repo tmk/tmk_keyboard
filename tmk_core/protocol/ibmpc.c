@@ -336,6 +336,7 @@ NEXT:
 /* send LED state to keyboard */
 void ibmpc_host_set_led(uint8_t led)
 {
-    ibmpc_host_send(0xED);
-    ibmpc_host_send(led);
+    if (0xFA == ibmpc_host_send(0xED)) {
+        ibmpc_host_send(led);
+    }
 }
