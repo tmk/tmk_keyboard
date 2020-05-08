@@ -227,13 +227,6 @@ void led_set(uint8_t usb_led)
 }
 
 // We need to keep doing UHS2 USB::Task() to initialize keyboard
-// even before USB is not configured.
-void hook_usb_startup_wait_loop(void)
-{
-    matrix_scan();
-}
-
-// We need to keep doing UHS2 USB::Task() to initialize keyboard
 // even during USB bus is suspended and remote wakeup is not enabled yet on LUFA side.
 // This situation can happen just after pluging converter into USB port.
 void hook_usb_suspend_loop(void)

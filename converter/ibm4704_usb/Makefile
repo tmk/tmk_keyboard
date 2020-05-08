@@ -70,7 +70,8 @@ ARCH ?= AVR8
 #     CPU clock adjust registers or the clock division fuses), this will be equal to F_CPU.
 F_USB ?= $(F_CPU)
 
-# Interrupt driven control endpoint task(+60)
+# TODO: This can prevent converter ISR from handling signal instantly, better remove it.
+# Without this option debug prints from enable_break() won't be displayed comopletely.
 OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 
 

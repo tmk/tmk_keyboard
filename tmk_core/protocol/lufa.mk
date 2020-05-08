@@ -41,7 +41,8 @@ VPATH += $(TMK_DIR)/$(TMK_LUFA_PATH)
 TMK_LUFA_OPTS  = -DUSB_DEVICE_ONLY
 TMK_LUFA_OPTS += -DUSE_FLASH_DESCRIPTORS
 TMK_LUFA_OPTS += -DUSE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)"
-# Do not enable this for converters in particular, it blocks other tasks long.
+# Do not enable INTERRUPT_CONTROL_ENDPOINT for converters which requires ISR in particular,
+# it can block other ISRs long like 500-1000us for HID keyboard LED report.
 #TMK_LUFA_OPTS += -DINTERRUPT_CONTROL_ENDPOINT
 TMK_LUFA_OPTS += -DFIXED_CONTROL_ENDPOINT_SIZE=8
 TMK_LUFA_OPTS += -DFIXED_NUM_CONFIGURATIONS=1
