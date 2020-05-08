@@ -105,13 +105,13 @@ int16_t ibmpc_host_send(uint8_t data)
 
     /* terminate a transmission if we have */
     inhibit();
-    wait_us(100); // 100us [4]p.13, [5]p.50
+    wait_us(100);    // [5]p.54
 
     /* 'Request to Send' and Start bit */
     data_lo();
     wait_us(100);
-    clock_hi();
-    WAIT(clock_lo, 10000, 1);   // 10ms [5]p.50
+    clock_hi();     // [5]p.54 [clock low]>100us [5]p.50
+    WAIT(clock_lo, 10000, 1);   // [5]p.53, -10ms [5]p.50
 
     /* Data bit[2-9] */
     for (uint8_t i = 0; i < 8; i++) {
@@ -135,14 +135,15 @@ int16_t ibmpc_host_send(uint8_t data)
     /* Stop bit */
     wait_us(15);
     data_hi();
-
-    /* Ack */
-    WAIT(data_lo, 50, 6);
+    WAIT(clock_hi, 50, 6);
     WAIT(clock_lo, 50, 7);
 
+    /* Ack */
+    WAIT(data_lo, 50, 8);
+
     /* wait for idle state */
-    WAIT(clock_hi, 50, 8);
-    WAIT(data_hi, 50, 9);
+    WAIT(clock_hi, 50, 9);
+    WAIT(data_hi, 50, 10);
 
     // clear buffer to get response correctly
     recv_data = 0xFFFF;
