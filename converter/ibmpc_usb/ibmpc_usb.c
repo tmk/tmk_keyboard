@@ -367,6 +367,7 @@ void matrix_clear(void)
 
 void led_set(uint8_t usb_led)
 {
+    if (keyboard_kind == NONE) return;
     //if (keyboard_kind != PC_AT) return;
 
     uint8_t ibmpc_led = 0;
