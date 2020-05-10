@@ -33,9 +33,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static void matrix_make(uint8_t code);
 static void matrix_break(uint8_t code);
 
-static int8_t process_cs1(void);
-static int8_t process_cs2(void);
-static int8_t process_cs3(void);
+static int8_t process_cs1(uint8_t code);
+static int8_t process_cs2(uint8_t code);
+static int8_t process_cs3(uint8_t code);
 
 
 static uint8_t matrix[MATRIX_ROWS];
@@ -302,18 +302,45 @@ uint8_t matrix_scan(void)
             state = LOOP;
             xprintf("L%u ", timer_read());
         case LOOP:
-            switch (keyboard_kind) {
-                case PC_XT:
-                    if (process_cs1() == -1) state = INIT;
+            {
+                uint16_t code = ibmpc_host_recv();
+                if (code == -1) {
+                    // no code
                     break;
-                case PC_AT:
-                    if (process_cs2() == -1) state = INIT;
+                }
+
+                // Keyboard Error/Overrun([3]p.26) or Buffer full
+                // Scan Code Set 1: 0xFF
+                // Scan Code Set 2 and 3: 0x00
+                // Buffer full(IBMPC_ERR_FULL): 0xFF
+                if (code == 0x00 || code == 0xFF) {
+                    xprintf("\n!OVERRUN![");
+
+                    // read and ignore data
+                    do {
+                        wait_ms(10);
+                    } while ((code = ibmpc_host_recv()) != -1);
+                    xprintf("]\n");
+
+                    // clear stuck keys
+                    matrix_clear();
+                    clear_keyboard();
                     break;
-                case PC_TERMINAL:
-                    if (process_cs3() == -1) state = INIT;
-                    break;
-                default:
-                    break;
+                }
+
+                switch (keyboard_kind) {
+                    case PC_XT:
+                        if (process_cs1(code) == -1) state = INIT;
+                        break;
+                    case PC_AT:
+                        if (process_cs2(code) == -1) state = INIT;
+                        break;
+                    case PC_TERMINAL:
+                        if (process_cs3(code) == -1) state = INIT;
+                        break;
+                    default:
+                        break;
+                }
             }
             break;
         default:
@@ -458,7 +485,7 @@ static uint8_t cs1_e0code(uint8_t code) {
     return 0x00;
 }
 
-static int8_t process_cs1(void)
+static int8_t process_cs1(uint8_t code)
 {
     static enum {
         INIT,
@@ -468,11 +495,6 @@ static int8_t process_cs1(void)
         E1_1D,
         E1_9D,
     } state = INIT;
-
-    uint16_t code = ibmpc_host_recv();
-    if (code == -1) {
-        return 0;
-    }
 
     // Check invalid codes; 0x59-7F won't be used in real XT keyboards probably
     // 0x62 is used to handle escape code E0 and E1
@@ -485,11 +507,6 @@ static int8_t process_cs1(void)
     switch (state) {
         case INIT:
             switch (code) {
-                case 0x00:
-                case 0xFF:  // Error/Overrun [3]p.26
-                    xprintf("!CS1_ERR!\n");
-                    return -1;
-                    break;
                 case 0xE0:
                     state = E0;
                     break;
@@ -683,7 +700,7 @@ static uint8_t cs2_e0code(uint8_t code) {
     }
 }
 
-static int8_t process_cs2(void)
+static int8_t process_cs2(uint8_t code)
 {
     // scan code reading states
     static enum {
@@ -699,25 +716,9 @@ static int8_t process_cs2(void)
         E1_F0_14_F0,
     } state = INIT;
 
-    uint16_t code = ibmpc_host_recv();
-    if (code == -1) {
-        return 0;
-    }
-
     switch (state) {
         case INIT:
             switch (code) {
-                case 0x00:  // Error/Overrun [3]p.26
-                    xprintf("!CS2_OVR!\n");
-                    matrix_clear();
-                    clear_keyboard();
-                    break;
-                case 0xFF:
-                    matrix_clear();
-                    xprintf("!CS2_ERR!\n");
-                    state = INIT;
-                    return -1;
-                    break;
                 case 0xE0:
                     state = E0;
                     break;
@@ -874,7 +875,7 @@ static int8_t process_cs2(void)
  * See [3], [7] and
  * https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#scan-code-set-3
  */
-static int8_t process_cs3(void)
+static int8_t process_cs3(uint8_t code)
 {
     static enum {
         READY,
@@ -886,23 +887,9 @@ static int8_t process_cs3(void)
 #endif
     } state = READY;
 
-    uint16_t code = ibmpc_host_recv();
-    if (code == -1) {
-        return 0;
-    }
-
     switch (state) {
         case READY:
             switch (code) {
-                case 0x00:  // Error/Overrun [3]p.26
-                    xprintf("!CS3_OVR!\n");
-                    matrix_clear();
-                    clear_keyboard();
-                    break;
-                case 0xFF:
-                    xprintf("!CS3_ERR!\n");
-                    return -1;
-                    break;
                 case 0xF0:
                     state = F0;
                     break;
@@ -946,17 +933,6 @@ static int8_t process_cs3(void)
             break;
         case F0:    // Break code
             switch (code) {
-                case 0x00:
-                    xprintf("!CS3_F0_OVR!\n");
-                    matrix_clear();
-                    clear_keyboard();
-                    state = READY;
-                    break;
-                case 0xFF:
-                    xprintf("!CS3_F0_ERR!\n");
-                    state = READY;
-                    return -1;
-                    break;
                 case 0x83:  // PrintScreen
                     matrix_break(0x02);
                     state = READY;
