@@ -60,12 +60,13 @@ volatile uint16_t ibmpc_isr_debug = 0;
 volatile uint8_t ibmpc_protocol = IBMPC_PROTOCOL_NO;
 volatile uint8_t ibmpc_error = IBMPC_ERR_NONE;
 
-/* 2-byte buffer for data received from keyhboard
+/* 2-byte buffer for data received from keyboard
  * buffer states:
  *      FFFF: empty
  *      FFss: one data
- *      sstt: two data(full)
- *  0xFF can not be stored as data in buffer because it means empty or no data.
+ *      sstt: two data
+ *      eeFF: error
+ * where ss, tt and ee are 0x00-0xFE. 0xFF means empty or no data in buffer.
  */
 static volatile uint16_t recv_data = 0xFFFF;
 /* internal state of receiving data */
@@ -166,19 +167,49 @@ int16_t ibmpc_host_recv(void)
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         data = recv_data;
-        if ((data&0xFF00) != 0xFF00) {      // recv_data:sstt -> recv_data:FFtt, ret:ss
-            ret = (data>>8)&0x00FF;
-            recv_data = data | 0xFF00;
-        } else if (data != 0xFFFF) {        // recv_data:FFss -> recv_data:FFFF, ret:ss
-            ret = data&0x00FF;
-            recv_data = data | 0x00FF;
+
+        // remove data from buffer:
+        // FFFF(empty)      -> FFFF
+        // FFss(one data)   -> FFFF
+        // sstt(two data)   -> FFtt
+        // eeFF(errror)     -> FFFF
+        recv_data = data | (((data&0xFF00) == 0xFF00) ? 0x00FF : 0xFF00);
+    }
+
+    if ((data&0x00FF) == 0x00FF) {
+        // error: eeFF
+        switch (data>>8) {
+            case IBMPC_ERR_FF:
+                // 0xFF(Overrun/Error) from keyboard
+                dprintf("!FF! ");
+                ret = 0xFF;
+                break;
+            case IBMPC_ERR_FULL:
+                // buffer full
+                dprintf("!FULL! ");
+                ret = 0xFF;
+                break;
+            case 0xFF:
+                // empty: FFFF
+                return -1;
+            default:
+                // other errors
+                dprintf("e%02X ", data>>8);
+                return -1;
+        }
+    } else {
+        if ((data | 0x00FF) != 0xFFFF) {
+            // two data: sstt
+            dprintf("b:%04X ", data);
+            ret = (data>>8);
+        } else {
+            // one data: FFss
+            ret = (data&0x00FF);
         }
     }
 
-    if ((data | 0x00FF) != 0xFFFF) dprintf("b%04X ", data);
-    if (ret != 0xFF) dprintf("r%02X ", ret);
-    return ((ret != 0xFF) ? ret : -1);
-
+    dprintf("r%02X ", ret);
+    return ret;
 }
 
 int16_t ibmpc_host_recv_response(void)
@@ -336,22 +367,26 @@ ISR(IBMPC_INT_VECT)
     }
 
 ERROR:
-    ibmpc_isr_debug = isr_state;
-    isr_state = 0x8000;
-    recv_data = 0xFF00; // clear data and scancode of error 0x00
-    return;
+    // error: eeFF
+    recv_data = (ibmpc_error<<8) | 0x00FF;
+    goto CLEAR;
 DONE:
     if ((isr_state & 0x00FF) == 0x00FF) {
         // receive error code 0xFF
         ibmpc_error = IBMPC_ERR_FF;
+        goto ERROR;
     }
     if ((recv_data & 0xFF00) != 0xFF00) {
-        // buffer full and overwritten
+        // buffer full
         ibmpc_error = IBMPC_ERR_FULL;
+        goto ERROR;
     }
+    // store data
     recv_data = recv_data<<8;
     recv_data |= isr_state & 0xFF;
-    isr_state = 0x8000;  // clear to next data
+CLEAR:
+    // clear for next data
+    isr_state = 0x8000;
 NEXT:
     return;
 }
