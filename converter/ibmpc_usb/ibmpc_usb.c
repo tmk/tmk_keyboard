@@ -496,14 +496,6 @@ static int8_t process_cs1(uint8_t code)
         E1_9D,
     } state = INIT;
 
-    // Check invalid codes; 0x59-7F won't be used in real XT keyboards probably
-    // 0x62 is used to handle escape code E0 and E1
-    if ((code & 0x7F) >= 0x62) {
-        xprintf("!CS1_INV!\n");
-        state = INIT;
-        return -1;
-    }
-
     switch (state) {
         case INIT:
             switch (code) {
