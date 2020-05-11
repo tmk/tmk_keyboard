@@ -37,6 +37,10 @@ enum macro_id {
 #define AC_FRWD    ACTION_MODS_KEY(MOD_LALT, KC_RIGHT)
 #define AC_ENT_    ACTION_MODS_TAP_KEY(MOD_RCTL, KC_ENT)
 
+// Display Brightness Control
+// https://github.com/tmk/tmk_keyboard/issues/370#issuecomment-279113313
+// BRTI(increment) and BRTD(decrement) are defined in actionmap.h
+
 // Function: LShift with tap '('
 #define AC_LPRN     ACTION_FUNCTION_TAP(LSHIFT_LPAREN)
 // Macro: say hello
@@ -59,7 +63,7 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
     PWR, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,
     CAPS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,UP,  TRNS,     TRNS,
     TRNS,VOLD,VOLU,MUTE,TRNS,TRNS,PAST,PSLS,HOME,PGUP,LEFT,RGHT,          PENT,
-    TRNS,     TRNS,TRNS,TRNS,TRNS,TRNS,PPLS,PMNS,END, PGDN,DOWN,     TRNS,TRNS,
+    TRNS,     BRTD,BRTI,SLEP,WAKE,TRNS,PPLS,PMNS,END, PGDN,DOWN,     TRNS,TRNS,
          TRNS,TRNS,               TRNS,                    TRNS,TRNS),
 
     [2] = UNIMAP_HHKB(
