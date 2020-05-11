@@ -1,5 +1,5 @@
 /*
-Copyright 2013,2016 Jun Wako <wakojun@gmail.com>
+Copyright 2013,2016,2020 Jun Wako <wakojun@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ static action_t keycode_to_action(uint8_t keycode)
         case KC_SYSTEM_POWER ... KC_SYSTEM_WAKE:
             return (action_t)ACTION_USAGE_SYSTEM(KEYCODE2SYSTEM(keycode));
             break;
-        case KC_AUDIO_MUTE ... KC_WWW_FAVORITES:
+        case KC_AUDIO_MUTE ... KC_BRIGHTNESS_DEC:
             return (action_t)ACTION_USAGE_CONSUMER(KEYCODE2CONSUMER(keycode));
             break;
         case KC_MS_UP ... KC_MS_ACCEL2:
