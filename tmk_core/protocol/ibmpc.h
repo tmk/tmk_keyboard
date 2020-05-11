@@ -90,6 +90,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define IBMPC_LED_CAPS_LOCK   2
 
 
+extern volatile uint16_t ibmpc_isr_debug;
 extern volatile uint8_t ibmpc_protocol;
 extern volatile uint8_t ibmpc_error;
 

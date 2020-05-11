@@ -56,6 +56,7 @@ POSSIBILITY OF SUCH DAMAGE.
 } while (0)
 
 
+volatile uint16_t ibmpc_isr_debug = 0;
 volatile uint8_t ibmpc_protocol = IBMPC_PROTOCOL_NO;
 volatile uint8_t ibmpc_error = IBMPC_ERR_NONE;
 
@@ -286,6 +287,7 @@ ISR(IBMPC_INT_VECT)
             break;
         case 0b11100000:
             // XT_IBM-error-done
+            ibmpc_isr_debug = isr_state;
             isr_state = isr_state>>8;
             ibmpc_protocol = IBMPC_PROTOCOL_XT_ERROR;
             goto DONE;
@@ -327,12 +329,14 @@ ISR(IBMPC_INT_VECT)
         case 0b11110000:
         default:            // xxxx_oooo(any 1 in low nibble)
             // Illegal
+            ibmpc_isr_debug = isr_state;
             ibmpc_error = IBMPC_ERR_ILLEGAL;
             goto ERROR;
             break;
     }
 
 ERROR:
+    ibmpc_isr_debug = isr_state;
     isr_state = 0x8000;
     recv_data = 0xFF00; // clear data and scancode of error 0x00
     return;
