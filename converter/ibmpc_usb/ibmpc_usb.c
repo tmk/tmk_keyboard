@@ -105,6 +105,7 @@ void matrix_init(void)
  *      d. ID is BF BF: Terminal keyboard CodeSet3
  *      e. error on recv: maybe broken PS/2
  */
+uint8_t current_protocol = 0;
 uint16_t keyboard_id = 0x0000;
 keyboard_kind_t keyboard_kind = NONE;
 uint8_t matrix_scan(void)
@@ -139,6 +140,18 @@ uint8_t matrix_scan(void)
 
         // clear or process error
         ibmpc_error = IBMPC_ERR_NONE;
+    }
+
+    // check ISR state debug
+    if (ibmpc_isr_debug) {
+        xprintf("\nISR:%04X\n", ibmpc_isr_debug);
+        ibmpc_isr_debug = 0;
+    }
+
+    // check protocol AT/XT
+    if (ibmpc_protocol != current_protocol) {
+        xprintf("\nPROTO:%02X\n", ibmpc_protocol);
+        current_protocol = ibmpc_protocol;
     }
 
     switch (state) {
