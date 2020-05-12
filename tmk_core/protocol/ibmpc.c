@@ -229,6 +229,8 @@ void ibmpc_host_isr_clear(void)
     recv_data = 0xFFFF;
 }
 
+#define LO8(w)  (*((uint8_t *)&(w)))
+#define HI8(w)  (*(((uint8_t *)&(w))+1))
 // NOTE: With this ISR data line can be read within 2us after clock falling edge.
 // To read data line early as possible:
 // write naked ISR with asembly code to read the line and call C func to do other job?
@@ -379,7 +381,7 @@ DONE:
         ibmpc_error = IBMPC_ERR_FF;
         goto ERROR;
     }
-    if ((recv_data & 0xFF00) != 0xFF00) {
+    if (HI8(recv_data) != 0xFF && LO8(recv_data) != 0xFF) {
         // buffer full
         ibmpc_error = IBMPC_ERR_FULL;
         goto ERROR;
