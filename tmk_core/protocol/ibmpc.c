@@ -247,11 +247,14 @@ ISR(IBMPC_INT_VECT)
     } else {
         // should not take more than 1ms
         if (timer_start != t && (uint8_t)(timer_start + 1) != t) {
+            ibmpc_isr_debug = isr_state;
             ibmpc_error = IBMPC_ERR_TIMEOUT;
-            //goto ERROR;
-            // timeout error recovery by clearing isr_state?
-            timer_start = t;
-            isr_state = 0x8000;
+            goto ERROR;
+
+            // timeout error recovery - start receiving new data
+            // it seems to work somehow but may not under unstable situation
+            //timer_start = t;
+            //isr_state = 0x8000;
         }
     }
 
