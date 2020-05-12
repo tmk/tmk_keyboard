@@ -135,6 +135,7 @@ uint8_t matrix_scan(void)
         if (!(ibmpc_error & (IBMPC_ERR_SEND | IBMPC_ERR_FULL))) {
             // keyboard init again
             if (state == LOOP) {
+                xprintf("[RST] ");
                 state = INIT;
             }
         }
@@ -144,9 +145,21 @@ uint8_t matrix_scan(void)
         ibmpc_isr_debug = 0;
     }
 
-    // check protocol AT/XT
+    // check protocol change AT/XT
     if (ibmpc_protocol && ibmpc_protocol != current_protocol) {
-        xprintf("\nPROTO:%02X ISR:%04X ", ibmpc_protocol, ibmpc_isr_debug);
+        xprintf("\nPRT:%02X ISR:%04X ", ibmpc_protocol, ibmpc_isr_debug);
+
+        // protocol change between AT and XT indicates that
+        // keyboard is hotswapped or something goes wrong.
+        // This requires initializing keyboard again probably.
+        if (((current_protocol&IBMPC_PROTOCOL_XT) && (ibmpc_protocol&IBMPC_PROTOCOL_AT)) ||
+            ((current_protocol&IBMPC_PROTOCOL_AT) && (ibmpc_protocol&IBMPC_PROTOCOL_XT))) {
+            if (state == LOOP) {
+                xprintf("[CHG] ");
+                state = INIT;
+            }
+        }
+
         current_protocol = ibmpc_protocol;
         ibmpc_isr_debug = 0;
     }
@@ -328,17 +341,11 @@ uint8_t matrix_scan(void)
                 // Scan Code Set 2 and 3: 0x00
                 // Buffer full(IBMPC_ERR_FULL): 0xFF
                 if (code == 0x00 || code == 0xFF) {
-                    xprintf("\n!OVERRUN![");
-
-                    // read and ignore data
-                    do {
-                        wait_ms(10);
-                    } while ((code = ibmpc_host_recv()) != -1);
-                    xprintf("]\n");
-
                     // clear stuck keys
                     matrix_clear();
                     clear_keyboard();
+
+                    xprintf("\n[OVR] ");
                     break;
                 }
 
