@@ -129,31 +129,26 @@ uint8_t matrix_scan(void)
 
 
     if (ibmpc_error) {
-        xprintf("\nERR:%02X\n", ibmpc_error);
+        xprintf("\nERR:%02X ISR:%04X ", ibmpc_error, ibmpc_isr_debug);
 
         // when recv error, neither send error nor buffer full
         if (!(ibmpc_error & (IBMPC_ERR_SEND | IBMPC_ERR_FULL))) {
             // keyboard init again
             if (state == LOOP) {
-                xprintf("init\n");
                 state = INIT;
             }
         }
 
         // clear or process error
         ibmpc_error = IBMPC_ERR_NONE;
-    }
-
-    // check ISR state debug
-    if (ibmpc_isr_debug) {
-        xprintf("\nISR:%04X\n", ibmpc_isr_debug);
         ibmpc_isr_debug = 0;
     }
 
     // check protocol AT/XT
-    if (ibmpc_protocol != current_protocol) {
-        xprintf("\nPROTO:%02X\n", ibmpc_protocol);
+    if (ibmpc_protocol && ibmpc_protocol != current_protocol) {
+        xprintf("\nPROTO:%02X ISR:%04X ", ibmpc_protocol, ibmpc_isr_debug);
         current_protocol = ibmpc_protocol;
+        ibmpc_isr_debug = 0;
     }
 
     switch (state) {
@@ -297,7 +292,7 @@ uint8_t matrix_scan(void)
                 keyboard_kind = PC_AT;
             }
 
-            xprintf("ID:%04X(%d)\n", keyboard_id, keyboard_kind);
+            xprintf("\nID:%04X(%d) ", keyboard_id, keyboard_kind);
 
             state = SETUP;
             break;
