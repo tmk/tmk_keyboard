@@ -113,6 +113,8 @@ uint8_t matrix_scan(void)
     // scan code reading states
     static enum {
         INIT,
+        WAIT_SETTLE,
+        AT_RESET,
         XT_RESET,
         XT_RESET_WAIT,
         XT_RESET_DONE,
@@ -156,6 +158,8 @@ uint8_t matrix_scan(void)
 
     switch (state) {
         case INIT:
+            ibmpc_host_disable();
+
             xprintf("I%u ", timer_read());
             keyboard_kind = NONE;
             keyboard_id = 0x0000;
@@ -163,7 +167,31 @@ uint8_t matrix_scan(void)
             matrix_clear();
             clear_keyboard();
 
-            state = XT_RESET;
+            init_time = timer_read();
+            state = WAIT_SETTLE;
+            break;
+        case WAIT_SETTLE:
+            // wait for keyboard to settle after plugin
+            if (timer_elapsed(init_time) > 1000) {
+                state = AT_RESET;
+            }
+            break;
+        case AT_RESET:
+            ibmpc_host_isr_clear();
+            ibmpc_host_enable();
+            wait_ms(1); // keyboard can't respond to command without this
+
+            // SKIDATA-2-DE(and some other keyboards?) stores 'Code Set' setting in nonvlatile memory
+            // and keeps it until receiving reset. Sending reset here may be useful to clear it, perhaps.
+            // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#select-alternate-scan-codesf0
+
+            // reset command
+            if (0xFA == ibmpc_host_send(0xFF)) {
+                state = WAIT_AA;
+            } else {
+                state = XT_RESET;
+            }
+            xprintf("A%u ", timer_read());
             break;
         case XT_RESET:
             // Reset XT-initialize keyboard
@@ -230,19 +258,8 @@ uint8_t matrix_scan(void)
             }
             break;
         case READ_ID:
-            xprintf("R%u ", timer_read());
-
-            // SKIDATA-2-DE(and some other keyboards?) stores 'Code Set' setting in nonvlatile memory
-            // and keeps it until receiving reset. Sending reset here may be useful to clear it, perhaps.
-            // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#select-alternate-scan-codesf0
-            //ibmpc_host_send(0xFF);  // reset command
-            //read_wait(500);         // BAT takes 600-900ms(84-key) or 300-500ms(101/102-key) [8] 4-7, 4-39
-
             keyboard_id = read_keyboard_id();
-            if (ibmpc_error) {
-                xprintf("\nERR:%02X\n", ibmpc_error);
-                ibmpc_error = IBMPC_ERR_NONE;
-            }
+            xprintf("R%u ", timer_read());
 
             if (0x0000 == keyboard_id) {            // CodeSet2 AT(IBM PC AT 84-key)
                 keyboard_kind = PC_AT;
