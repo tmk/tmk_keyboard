@@ -208,6 +208,7 @@ int16_t ibmpc_host_recv(void)
         }
     }
 
+    //dprintf("i%04X ", ibmpc_isr_debug); ibmpc_isr_debug = 0;
     dprintf("r%02X ", ret);
     return ret;
 }
@@ -315,6 +316,7 @@ ISR(IBMPC_INT_VECT)
                     goto NEXT;
                 } else {
                     // XT_Clone-done
+                    ibmpc_isr_debug = isr_state;
                     isr_state = isr_state>>8;
                     ibmpc_protocol = IBMPC_PROTOCOL_XT_CLONE;
                     goto DONE;
@@ -340,6 +342,7 @@ ISR(IBMPC_INT_VECT)
                     goto NEXT;
                 } else {
                     // no stop bit: XT_IBM-done
+                    ibmpc_isr_debug = isr_state;
                     isr_state = isr_state>>8;
                     ibmpc_protocol = IBMPC_PROTOCOL_XT_IBM;
                     goto DONE;
@@ -354,6 +357,7 @@ ISR(IBMPC_INT_VECT)
             // DO NOT check stop bit. Zenith Z-150(AT) asserts stop bit as low for no reason.
             // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#zenith-z-150-beige
             // TODO: parity check?
+            ibmpc_isr_debug = isr_state;
             isr_state = isr_state>>6;
             ibmpc_protocol = IBMPC_PROTOCOL_AT;
             goto DONE;
