@@ -226,6 +226,9 @@ int16_t ibmpc_host_recv_response(void)
 
 void ibmpc_host_isr_clear(void)
 {
+    ibmpc_isr_debug = 0;
+    ibmpc_protocol = 0;
+    ibmpc_error = 0;
     isr_state = 0x8000;
     recv_data = 0xFFFF;
 }
