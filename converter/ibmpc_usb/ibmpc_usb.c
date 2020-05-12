@@ -754,10 +754,7 @@ static int8_t process_cs2(uint8_t code)
                     break;
                 case 0xAA:  // Self-test passed
                 case 0xFC:  // Self-test failed
-                    // reset or plugin-in new keyboard
-                    state = INIT;
-                    return -1;
-                    break;
+                    // replug or unstable connection probably
                 default:    // normal key make
                     state = INIT;
                     if (code < 0x80) {
@@ -943,7 +940,7 @@ static int8_t process_cs3(uint8_t code)
                         matrix_make(code);
                     } else {
                         xprintf("!CS3_READY!\n");
-                        //return -1;
+                        return -1;
                     }
             }
             break;
@@ -987,7 +984,7 @@ static int8_t process_cs3(uint8_t code)
                         matrix_break(code);
                     } else {
                         xprintf("!CS3_F0!\n");
-                        //return -1;
+                        return -1;
                     }
             }
             break;
