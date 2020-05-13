@@ -109,6 +109,7 @@ int16_t ibmpc_host_send(uint8_t data)
 
     /* 'Request to Send' and Start bit */
     data_lo();
+    wait_us(100);
     clock_hi();
     WAIT(clock_lo, 10000, 1);   // 10ms [5]p.50
 
