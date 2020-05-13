@@ -359,12 +359,17 @@ ISR(IBMPC_INT_VECT)
         case 0b01010000:
         case 0b11010000:
             // AT-done
-            // DO NOT check stop bit. Zenith Z-150(AT) asserts stop bit as low for no reason.
-            // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#zenith-z-150-beige
             // TODO: parity check?
             ibmpc_isr_debug = isr_state;
+            // stop bit check
+            if (isr_state & 0x8000) {
+                ibmpc_protocol = IBMPC_PROTOCOL_AT;
+            } else {
+                // Zenith Z-150 AT(beige/white lable) asserts stop bit as low
+                // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#zenith-z-150-beige
+                ibmpc_protocol = IBMPC_PROTOCOL_AT_Z150;
+            }
             isr_state = isr_state>>6;
-            ibmpc_protocol = IBMPC_PROTOCOL_AT;
             goto DONE;
             break;
         case 0b01100000:
