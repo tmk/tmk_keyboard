@@ -115,7 +115,7 @@ uint32_t timer_elapsed32(uint32_t last)
 }
 
 // excecuted once per 1ms.(excess for just timer count?)
-ISR(TIMER0_COMPA_vect)
+ISR(TIMER0_COMPA_vect, ISR_NOBLOCK)
 {
     timer_count++;
 }
