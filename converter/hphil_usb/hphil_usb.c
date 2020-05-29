@@ -71,22 +71,41 @@ static inline void queue_add(uint16_t frame) {
 #define LED_MASK (1 << 7)
 
 ISR(INT0_vect) {
+  // ISR latency: {1,2,3}(executing op) + 5(store PC)+ 3(jmp)
+  // prologue: push(2)*13,in,clr = 28clk
+
+  // ldi, ldi: 2clk
   uint16_t frame = 0;
+  // ldi, ldi: 2clk
   uint16_t mask = 1 << 14;
 
+  // internal counter: ldi, ldi: 2clk
+
+  // 5us = 80clk@16MHz, 80-10-28-2-2-2
   __builtin_avr_delay_cycles(36); // To center of first bit
 
   while (true) {
+    // sbis 2clk(if)/1clk(else)
     if ((SI_PIN & SI_MASK) != 0) {
+      // or, or, rjmp: 4clk
       frame |= mask;
     } else {
+      // rjmp: 2clk
       __builtin_avr_delay_cycles(3);
     }
+
+    // lsr, ror: 2clk
     mask >>= 1;
+
+    // subi, sbc, breq: 4clk(true)/3clk(false)
     if (mask == 0) {
       break;
     }
+
+    // 10us = 160clk@16MHz, 160-6-2-3-2
     __builtin_avr_delay_cycles(147);
+
+    // (while) rjmp: 2clk
   }
 
   if (!queue_is_full()) {
@@ -103,14 +122,24 @@ void frame_send_15(uint16_t frame) {
   uint16_t mask = 1 << 14;
   cli();
   while (mask != 0) {
+    // movw, and, and, or: 4
+    // breq 1(if)/2(else)
     if ((frame & mask) != 0) {
+      // sbi: 2
       SO_PORT |= SO_MASK;
+      // rjmp: 2
     } else {
+      // cbi: 2
       SO_PORT &= ~SO_MASK;
       __builtin_avr_delay_cycles(1);
     }
+    // 10us/loop = 160clk@16MHz
+    // 160-(4+5+2+2+2) = 145
     __builtin_avr_delay_cycles(145);
+    // lsr, ror: 2
     mask >>= 1;
+    // subi, sbc: 2
+    // brne 1(false)/2(true,loop)
   }
   sei();
   _delay_us(4);
