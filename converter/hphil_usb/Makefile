@@ -1,5 +1,5 @@
 # Target file name (without extension).
-TARGET ?= proj
+TARGET ?= hphil_usb
 
 # Directory common source filess exist
 TMK_DIR ?= ../../tmk_core
@@ -8,13 +8,13 @@ TMK_DIR ?= ../../tmk_core
 TARGET_DIR ?= .
 
 # project specific files
-SRC ?=	proj.c
+SRC ?=	hphil_usb.c
 
 CONFIG_H ?= config.h
 
 
 # MCU name
-MCU ?= atmega32u4
+MCU ?= atmega32u2
 
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the
@@ -68,14 +68,15 @@ OPT_DEFS += -DSUSPEND_MODE_STANDBY
 #   comment out to disable the options.
 #
 BOOTMAGIC_ENABLE ?= no	# Virtual DIP switch configuration
-MOUSEKEY_ENABLE ?= no	# Mouse keys
+MOUSEKEY_ENABLE ?= yes	# Mouse keys
 EXTRAKEY_ENABLE ?= yes	# Audio control and System control
 CONSOLE_ENABLE ?= yes	# Console for debug
 COMMAND_ENABLE ?= yes   # Commands for debug and configuration
-NKRO_ENABLE ?= yes	# USB Nkey Rollover
+#NKRO_ENABLE ?= yes	# USB Nkey Rollover
 
-KEYMAP_SECTION_ENABLE ?= yes
-UNIMAP_ENABLE ?= yes
+#KEYMAP_SECTION_ENABLE ?= yes
+#UNIMAP_ENABLE ?= yes
+ACTIONMAP_ENABLE ?= yes
 
 
 # Optimize size but this may cause error "relocation truncated to fit"
@@ -97,7 +98,7 @@ endif
 ifdef KEYMAP
     SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
 else
-    SRC := $(KEYMAP_FILE)_plain.c $(SRC)
+    SRC := $(KEYMAP_FILE).c $(SRC)
 endif
 
 

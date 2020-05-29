@@ -1,4 +1,7 @@
-
+/* This file was copied from MMcM's HP HIL converter.
+ * Original is matrix.c at commit 3acefd4 of
+ * https://github.com/MMcM/qmk_firmware/tree/mmcm/keyboards/converter/hp_hil
+ */
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
@@ -8,9 +11,11 @@
 #include "host.h"
 #include "print.h"
 #include "timer.h"
+#include "led.h"
 
 static matrix_row_t matrix[MATRIX_ROWS];
 
+/*
 __attribute__ ((weak))
 void matrix_init_kb(void) {
   matrix_init_user();
@@ -28,6 +33,7 @@ void matrix_init_user(void) {
 __attribute__ ((weak))
 void matrix_scan_user(void) {
 }
+*/
 
 #define QUEUE_SIZE 16
 static uint16_t frame_queue[QUEUE_SIZE];
@@ -329,6 +335,7 @@ bool data_record_add(uint16_t frame) {
     dprintln("Data record overflow");
     return false;
   }
+dprintf("R%d:[%02X] ", data_address, frame_data(frame));
   data_record[data_index++] = frame_data(frame);
   return true;
 }
@@ -519,6 +526,10 @@ void device_poll_record(void) {
     }
   } while (false);
 
+  if (x | y | z) {
+    dprintf("X:%d Y:%d Z:%d\n", x, y, z);
+  }
+
   uint8_t charset = (record_header >> 4) & 0x0F;
   uint8_t keyset = 0;
   switch (charset) {
@@ -547,8 +558,10 @@ void device_poll_record(void) {
     while (index < data_index) {
       uint8_t key_code = data_record[index++];
       uint8_t col = (key_code >> 1) & 0x0F;
-      uint8_t row = ((keyset - 1) << 3) | ((key_code >> 5) & 0x07);
+      //uint8_t row = ((keyset - 1) << 3) | ((key_code >> 5) & 0x07);
+      uint8_t row = ((key_code >> 5) & 0x07);
       if ((key_code & 1) == 0) {
+dprintf("%02X ", key_code);
         matrix[row] |= (1 << col);
       } else {
         matrix[row] &= ~(1 << col);
@@ -557,7 +570,7 @@ void device_poll_record(void) {
   }
 
 #ifdef MOUSE_ENABLE
-  if (p_device->device_id == 0x68) {
+  //if (p_device->device_id == 0x68) {
     // A mouse.
     static report_mouse_t mouse_report = {};
     // Translate BUTTON key states (80-8C) into mouse report button states and report if changed.
@@ -576,7 +589,7 @@ void device_poll_record(void) {
       dprintf("Mouse: %02X, %d, %d, %d\n", mouse_report.buttons, mouse_report.x, mouse_report.y, mouse_report.v);
       host_mouse_send(&mouse_report);
     }
-  }
+  //}
 #endif
 }
 
@@ -802,6 +815,8 @@ static void frame_loop(void) {
 }
 
 void matrix_init(void) {
+  debug_enable = true;
+
   SI_DDR &= ~SI_MASK;           // Input
   SI_PORT |= SI_MASK;           // Pullup to idle high
   SO_DDR |= SO_MASK;            // Output
@@ -820,10 +835,11 @@ void matrix_init(void) {
 
 uint8_t matrix_scan(void) {
   frame_loop();
-  matrix_scan_quantum();
+  //matrix_scan_quantum();
   return 1;
 }
 
+/*
 void matrix_print(void) {
   print("\nr/c 02468ACE\n");
   for (uint8_t row = 0; row < MATRIX_ROWS * 2; row++) {
@@ -834,14 +850,15 @@ void matrix_print(void) {
     print("\n");
   }
 }
+*/
 
 inline
 matrix_row_t matrix_get_row(uint8_t row) {
   return matrix[row];
 }
 
-void backlight_set(uint8_t level) {
-  prompt_on = (level != 0);
+void led_set(uint8_t usb_led) {
+  prompt_on = !!(usb_led & (1<<USB_LED_CAPS_LOCK));
   prompt_changed = true;
 }
 
@@ -864,10 +881,6 @@ void command_security_id(void) {
   } while (address != next_address);
   println("No devices with security id found.");
 }
-
-#ifndef MAGIC_KEY_SECURITY_ID
-#define MAGIC_KEY_SECURITY_ID KC_I
-#endif
 
 bool command_extra(uint8_t code) {
   switch (code) {
