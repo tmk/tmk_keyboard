@@ -74,19 +74,19 @@ ISR(INT0_vect) {
   uint16_t frame = 0;
   uint16_t mask = 1 << 14;
 
-  __builtin_avr_delay_cycles(31); // To center of first bit
+  __builtin_avr_delay_cycles(36); // To center of first bit
 
   while (true) {
     if ((SI_PIN & SI_MASK) != 0) {
       frame |= mask;
     } else {
-      __builtin_avr_delay_cycles(2);
+      __builtin_avr_delay_cycles(3);
     }
     mask >>= 1;
     if (mask == 0) {
       break;
     }
-    __builtin_avr_delay_cycles(148);
+    __builtin_avr_delay_cycles(147);
   }
 
   if (!queue_is_full()) {
@@ -107,8 +107,9 @@ void frame_send_15(uint16_t frame) {
       SO_PORT |= SO_MASK;
     } else {
       SO_PORT &= ~SO_MASK;
+      __builtin_avr_delay_cycles(1);
     }
-    __builtin_avr_delay_cycles(146);
+    __builtin_avr_delay_cycles(145);
     mask >>= 1;
   }
   sei();
