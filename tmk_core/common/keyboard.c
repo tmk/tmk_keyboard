@@ -182,3 +182,6 @@ void keyboard_set_leds(uint8_t leds)
 {
     led_set(leds);
 }
+
+__attribute__ ((weak))
+void led_set(uint8_t usb_led) {}
