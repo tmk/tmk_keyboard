@@ -48,21 +48,21 @@ __attribute__ ((weak))
 void matrix_print(void)
 {
 #if (MATRIX_COLS <= 8)
-    print("r/c 01234567\n");
+    print("\n  01234567\n");
 #elif (MATRIX_COLS <= 16)
-    print("r/c 0123456789ABCDEF\n");
+    print("\n  0123456789ABCDEF\n");
 #elif (MATRIX_COLS <= 32)
-    print("r/c 0123456789ABCDEF0123456789ABCDEF\n");
+    print("\n  0123456789ABCDEF0123456789ABCDEF\n");
 #endif
 
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
 
 #if (MATRIX_COLS <= 8)
-        xprintf("%02X: %08b%s\n", row, bitrev(matrix_get_row(row)),
+        xprintf("%X:%08b%s\n", row&0xF, bitrev(matrix_get_row(row)),
 #elif (MATRIX_COLS <= 16)
-        xprintf("%02X: %016b%s\n", row, bitrev16(matrix_get_row(row)),
+        xprintf("%X:%016b%s\n", row&0xF, bitrev16(matrix_get_row(row)),
 #elif (MATRIX_COLS <= 32)
-        xprintf("%02X: %032b%s\n", row, bitrev32(matrix_get_row(row)),
+        xprintf("%X:%032b%s\n", row&0xF, bitrev32(matrix_get_row(row)),
 #endif
 #ifdef MATRIX_HAS_GHOST
         matrix_has_ghost_in_row(row) ?  " <ghost" : ""
