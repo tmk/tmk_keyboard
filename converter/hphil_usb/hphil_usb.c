@@ -351,6 +351,10 @@ typedef struct {
   unsigned general_prompt:1;
   unsigned prompts:3;
   unsigned buttons:3;
+  uint16_t resolution;
+  uint16_t max_count_x;
+  uint16_t max_count_y;
+  uint16_t max_count_z;
 } device_info_t;
 
 static device_info_t device_infos[7];
@@ -375,9 +379,23 @@ bool device_describe(void) {
   p_device->absolute_position = (record_header & (1 << 6)) != 0;
   p_device->two_byte_position = (record_header & (1 << 5)) != 0;
   if (p_device->axes) {
+    p_device->resolution = (uint16_t)(data_record[index]|data_record[index+1]<<8);
+    //xprintf("res:%d ", p_device->resolution);
     index += 2;
   }
   if (p_device->absolute_position) {
+    switch (p_device->axes) {
+      case 3:
+        p_device->max_count_z = (uint16_t)(data_record[index+4]|data_record[index+5]<<8);
+        /* FALLTHRU */
+      case 2:
+        p_device->max_count_y = (uint16_t)(data_record[index+2]|data_record[index+3]<<8);
+        /* FALLTHRU */
+      case 1:
+        p_device->max_count_x = (uint16_t)(data_record[index]|data_record[index+1]<<8);
+        /* FALLTHRU */
+    }
+    //xprintf("max_x:%d max_y:%d max_z:%d ", p_device->resolution);
     index += p_device->axes * 2;
   }
   if (index >= data_index) {
