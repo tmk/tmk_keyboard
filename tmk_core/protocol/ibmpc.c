@@ -253,8 +253,8 @@ ISR(IBMPC_INT_VECT)
     if (isr_state == 0x8000) {
         timer_start = t;
     } else {
-        // should not take more than 1ms
-        if (timer_start != t && (uint8_t)(timer_start + 1) != t) {
+        // This gives 2.0ms at least before timeout
+        if ((uint8_t)(t - timer_start) >= 3) {
             ibmpc_isr_debug = isr_state;
             ibmpc_error = IBMPC_ERR_TIMEOUT;
             goto ERROR;
