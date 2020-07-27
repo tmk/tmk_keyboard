@@ -32,6 +32,9 @@ extern "C" {
 extern bool keyboard_nkro;
 #endif
 
+/* These parameters should be included into host driver also?
+ * keyboard_protocol: 0:Boot, 1:Report(default)
+ * keyboard_idle: idle rate in unit of 4ms */
 extern uint8_t keyboard_idle;
 extern uint8_t keyboard_protocol;
 
