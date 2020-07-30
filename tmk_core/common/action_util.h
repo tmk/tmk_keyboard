@@ -25,6 +25,9 @@ extern "C" {
 #endif
 
 extern report_keyboard_t *keyboard_report;
+extern uint8_t block_mods;
+#define MODS_SHIFT_MASK (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT))
+#define MODS_GUI_MASK   (MOD_BIT(KC_LGUI) | MOD_BIT(KC_RGUI))
 
 void send_keyboard_report(void);
 

@@ -81,12 +81,17 @@ void process_action(keyrecord_t *record)
                 uint8_t mods = (action.kind.id == ACT_LMODS) ?  action.key.mods :
                                                                 action.key.mods<<4;
                 if (event.pressed) {
+                     if ((get_mods() & MODS_SHIFT_MASK) && (mods & MODS_SHIFT_MASK)) {
+                        block_mods |= MODS_SHIFT_MASK;
+                        mods &= ~MODS_SHIFT_MASK;
+                    }
                     if (mods) {
                         add_weak_mods(mods);
                         send_keyboard_report();
                     }
                     register_code(action.key.code);
                 } else {
+                    block_mods &= ~MODS_SHIFT_MASK;
                     unregister_code(action.key.code);
                     if (mods) {
                         del_weak_mods(mods);
