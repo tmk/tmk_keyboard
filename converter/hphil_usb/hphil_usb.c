@@ -163,6 +163,8 @@ void frame_send(uint8_t addr, bool is_command, uint8_t data_or_op) {
       frame ^= 2;
     }
   }
+  if (!is_command || (data_or_op != 0x10))
+      dprintf("%d%s%02X ", addr, (is_command ? "C" : "D"), data_or_op);
   frame_send_15(frame);
 }
 
@@ -279,7 +281,7 @@ void send_command_and_wait(uint8_t address, uint8_t op, state_t new_state, uint8
 uint16_t recv_wait_frame(void) {
   if (queue_is_empty()) {
     if (timer_read() - wait_start_time > wait_timeout) {
-      dprintln("Timeout");
+      dprint("TO ");
       return TIMEOUT;
     } else {
       return WAITING;
@@ -307,6 +309,9 @@ uint16_t recv_wait_frame(void) {
 #if 0
     dprintf("Received frame: %04X\n", frame);
 #endif
+    if (((frame>>2)&0xFF) != POL_CMD)
+        dprintf("%d%s%02X ", (frame>>11)&0x7, (frame&(1<<10) ? "c" : "d"), (frame>>2)&0xFF);
+
     if (frame_is_command(frame)) {
       uint8_t op = frame_command_op(frame);
       if (wait_command == ACF_CMD) {
@@ -335,7 +340,7 @@ bool data_record_add(uint16_t frame) {
     dprintln("Data record overflow");
     return false;
   }
-dprintf("R%d:[%02X] ", data_address, frame_data(frame));
+//dprintf("R%d:[%02X] ", data_address, frame_data(frame));
   data_record[data_index++] = frame_data(frame);
   return true;
 }
@@ -380,7 +385,7 @@ bool device_describe(void) {
   p_device->two_byte_position = (record_header & (1 << 5)) != 0;
   if (p_device->axes) {
     p_device->resolution = (uint16_t)(data_record[index]|data_record[index+1]<<8);
-    //xprintf("res:%d ", p_device->resolution);
+    xprintf("res:%d ", p_device->resolution);
     index += 2;
   }
   if (p_device->absolute_position) {
@@ -395,7 +400,7 @@ bool device_describe(void) {
         p_device->max_count_x = (uint16_t)(data_record[index]|data_record[index+1]<<8);
         /* FALLTHRU */
     }
-    //xprintf("max_x:%d max_y:%d max_z:%d ", p_device->resolution);
+    xprintf("max_x:%d max_y:%d max_z:%d ", p_device->max_count_x, p_device->max_count_y, p_device->max_count_z);
     index += p_device->axes * 2;
   }
   if (index >= data_index) {
@@ -417,7 +422,7 @@ void device_print(void) {
     return;
   }
   device_info_t *p_device = device_infos + (data_address - 1);
-  xprintf("%d: %02X", data_address, p_device->device_id);
+  xprintf("Addr:%d ID:%02X", data_address, p_device->device_id);
   if (p_device->has_security_code) {
     print(", security code");
   }
@@ -545,7 +550,7 @@ void device_poll_record(void) {
   } while (false);
 
   if (x | y | z) {
-    dprintf("X:%d Y:%d Z:%d\n", x, y, z);
+    dprintf("[X:%d Y:%d Z:%d]\n", x, y, z);
   }
 
   uint8_t charset = (record_header >> 4) & 0x0F;
@@ -579,9 +584,10 @@ void device_poll_record(void) {
       //uint8_t row = ((keyset - 1) << 3) | ((key_code >> 5) & 0x07);
       uint8_t row = ((key_code >> 5) & 0x07);
       if ((key_code & 1) == 0) {
-dprintf("%02X ", key_code);
+dprintf("[D%02X] ", key_code);
         matrix[row] |= (1 << col);
       } else {
+dprintf("[U%02X] ", key_code);
         matrix[row] &= ~(1 << col);
       }
     }
@@ -604,7 +610,7 @@ dprintf("%02X ", key_code);
       mouse_report.x = range127(x);
       mouse_report.y = range127(- y); // Also reverse direction.
       mouse_report.v = range127(z);
-      dprintf("Mouse: %02X, %d, %d, %d\n", mouse_report.buttons, mouse_report.x, mouse_report.y, mouse_report.v);
+      //dprintf("[M: %02X, %d, %d, %d] ", mouse_report.buttons, mouse_report.x, mouse_report.y, mouse_report.v);
       host_mouse_send(&mouse_report);
     }
   //}
@@ -623,16 +629,16 @@ static void frame_loop(void) {
   switch (state) {
   case HARD_RESET:
     LED_PORT |= LED_MASK;
-    dprintln("Hard Reset");
     queue_clear();
+    dprint("DHR: ");
     send_command_and_wait(0, DHR_CMD, DHR_WAIT, SELF_TEST_TIMEOUT);
     num_devices = 1;
     return;
 
   case SOFT_RESET:
     LED_PORT |= LED_MASK;
-    dprintln("Soft Reset");
     queue_clear();
+    dprint("DSR: ");
     send_command_and_wait(0, DSR_CMD, DHR_WAIT, MULTI_DEVICE_TIMEOUT);
     num_devices = 0;
     return;
@@ -645,12 +651,15 @@ static void frame_loop(void) {
       state = SOFT_RESET;
     } else if (prompt_changed) {
       if (prompt_on) {
+        dprint("PRM: ");
         send_command_and_wait(0, PRM_CMD, PRM_WAIT, MULTI_DEVICE_TIMEOUT);
       } else {
+        dprint("ACK: ");
         send_command_and_wait(0, ACK_CMD, ACK_WAIT, MULTI_DEVICE_TIMEOUT);
       }
       prompt_changed = false;
     } else if (security_pending_address != 0) {
+      dprint("RSC: ");
       send_command_and_wait(security_pending_address, RSC_CMD, RSC_WAIT, ONE_DEVICE_DATA_TIMEOUT);
       security_pending_address = 0;
     }
@@ -661,6 +670,7 @@ static void frame_loop(void) {
     if (frame == WAITING) {
       return;
     } else if (frame == TIMEOUT) {
+      dprint("IFC: ");
       send_command_and_wait(0, IFC_CMD, IFC_WAIT, MULTI_DEVICE_TIMEOUT);
       return;
     } else if (is_frame(frame)) {
@@ -676,12 +686,14 @@ static void frame_loop(void) {
 #if 0
       // This is what the document describes, but I don't see how it can avoid failing to identify the first device.
       if (num_devices >= 1) {
+        dprint("ELB: ");
         send_command_and_wait(num_devices, ELB_CMD, ELB_WAIT, ONE_DEVICE_TIMEOUT);
         return;
       }
 #endif
       dprintln("No response to IFC");
     } else if (is_frame(frame) && frame_is_command(frame)) {
+      dprint("ACF: ");
       send_command_and_wait(0, ACF_CMD + 1, ACF_WAIT, MULTI_DEVICE_TIMEOUT);
       wait_command = ACF_CMD;
       return;
@@ -695,6 +707,7 @@ static void frame_loop(void) {
     } else if (is_frame(frame) && frame_is_command(frame)) {
       num_devices = frame_command_op(frame) - ACF_CMD - 1;
       dprintf("%d device(s)\n", num_devices);
+      dprint("IDD: ");
       send_command_and_wait(num_devices, IDD_CMD, IDD_WAIT, ONE_DEVICE_DATA_TIMEOUT);
       return;
     }
@@ -713,8 +726,10 @@ static void frame_loop(void) {
         }
         if (extended) {
           // Has extended describe.
+          dprint("EXD: ");
           send_command_and_wait(num_devices, EXD_CMD, EXD_WAIT, ONE_DEVICE_DATA_TIMEOUT);
         } else {
+          dprint("EPT: ");
           send_command_and_wait(num_devices, EPT_CMD, EPT_WAIT, ONE_DEVICE_TIMEOUT);
         }
         return;
@@ -732,6 +747,7 @@ static void frame_loop(void) {
     } else if (is_frame(frame)) {
       if (frame_is_command(frame)) {
         device_extended_describe();
+        dprint("EPT: ");
         send_command_and_wait(num_devices, EPT_CMD, EPT_WAIT, ONE_DEVICE_TIMEOUT);
         return;
       } else if (data_record_add(frame)) {
@@ -746,8 +762,10 @@ static void frame_loop(void) {
     if (frame == WAITING) {
       return;
     } else if (is_frame(frame) && frame_is_command(frame)) {
+      dprint("IFC: ");
       send_command_and_wait(0, IFC_CMD, IFC_WAIT, MULTI_DEVICE_TIMEOUT);
     } else {
+      dprint("ELB: ");
       send_command_and_wait(num_devices, ELB_CMD, ELB_WAIT, ONE_DEVICE_TIMEOUT);
     }
     return;
@@ -757,6 +775,7 @@ static void frame_loop(void) {
     if (frame == WAITING) {
       return;
     } else if (is_frame(frame) && frame_is_command(frame)) {
+      dprint("RPL: ");
       send_command_and_wait(0, RPL_CMD, RPL_WAIT, MULTI_DEVICE_DATA_TIMEOUT);
       return;
     }
