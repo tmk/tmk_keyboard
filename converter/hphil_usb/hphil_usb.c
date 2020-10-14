@@ -594,17 +594,21 @@ dprintf("[U%02X] ", key_code);
   }
 
 #ifdef MOUSE_ENABLE
-  //if (p_device->device_id == 0x68) {
-    // A mouse.
     static report_mouse_t mouse_report = {};
+    uint8_t buttons = 0;
+/*
+  if (p_device->device_id == 0x68) { // HP Mouse
+    // A mouse.
     // Translate BUTTON key states (80-8C) into mouse report button states and report if changed.
-    uint8_t buttons = (uint8_t)matrix[4];
+    buttons = (uint8_t)matrix[4];
     if (p_device->buttons > 2) {
       // The middle button is MOUSE_BTN3.
       if (((buttons >> 1) & 1) != ((buttons >> 2) & 1)) {
         buttons ^= 6;
       }
     }
+  }
+*/
     if (buttons != mouse_report.buttons || x != 0 || y != 0 || z != 0) {
       mouse_report.buttons = buttons;
       mouse_report.x = range127(x);
@@ -613,7 +617,6 @@ dprintf("[U%02X] ", key_code);
       //dprintf("[M: %02X, %d, %d, %d] ", mouse_report.buttons, mouse_report.x, mouse_report.y, mouse_report.v);
       host_mouse_send(&mouse_report);
     }
-  //}
 #endif
 }
 
