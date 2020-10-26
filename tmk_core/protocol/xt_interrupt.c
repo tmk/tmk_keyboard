@@ -65,7 +65,7 @@ void xt_host_init(void)
 #endif
 
     /* soft reset: pull clock line down for 20ms */
-    XT_DATA_LO();
+    XT_DATA_IN();
     XT_CLOCK_LO();
     _delay_ms(20);
 
