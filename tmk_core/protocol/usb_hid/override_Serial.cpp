@@ -7,15 +7,15 @@
 #include "USBAPI.h"
 
 
-void Serial_::begin(uint16_t baud_count)
+void Serial_::begin(unsigned long /* baud_count */)
+{
+}
+
+void Serial_::begin(unsigned long /* baud_count */, byte /* config */)
 {
 }
 
 void Serial_::end(void)
-{
-}
-
-void Serial_::accept(void)
 {
 }
 
@@ -34,6 +34,11 @@ int Serial_::read(void)
     return -1;
 }
 
+int Serial_::availableForWrite(void)
+{
+    return 1;
+}
+
 void Serial_::flush(void)
 {
 }
@@ -41,6 +46,12 @@ void Serial_::flush(void)
 size_t Serial_::write(uint8_t c)
 {
     sendchar(c);
+    return 1;
+}
+
+size_t Serial_::write(const uint8_t *buffer, size_t size)
+{
+    sendchar(*buffer);
     return 1;
 }
 
