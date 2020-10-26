@@ -188,11 +188,17 @@ static inline void idle(void)
     data_hi();
 }
 
-/* inhibit device to send */
+/* inhibit device to send(AT), soft reset(XT) */
 static inline void inhibit(void)
 {
     clock_lo();
     data_hi();
 }
 
+/* inhibit device to send(XT) */
+static inline void inhibit_xt(void)
+{
+    clock_hi();
+    data_lo();
+}
 #endif

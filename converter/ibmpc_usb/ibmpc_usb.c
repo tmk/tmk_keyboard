@@ -204,9 +204,10 @@ uint8_t matrix_scan(void)
         case XT_RESET:
             // Reset XT-initialize keyboard
             // XT: hard reset 500ms for IBM XT Type-1 keyboard and clones
-            // XT: soft reset 20ms min(clock Lo)
-            ibmpc_host_disable();   // soft reset: inihibit(clock Lo/Data Hi)
-            IBMPC_RST_LO();         // hard reset: reset pin Lo
+            // XT: soft reset 20ms min
+            // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-XT-Keyboard-Protocol#keyboard-soft-reset
+            ibmpc_host_disable();   // soft reset: Clock Lo/Data Hi
+            IBMPC_RST_LO();         // hard reset: Reset pin Lo
 
             init_time = timer_read();
             state = XT_RESET_WAIT;
@@ -217,9 +218,9 @@ uint8_t matrix_scan(void)
             }
             break;
         case XT_RESET_DONE:
-            IBMPC_RST_HIZ();        // hard reset: reset pin HiZ
+            IBMPC_RST_HIZ();        // hard reset: Reset pin HiZ
             ibmpc_host_isr_clear();
-            ibmpc_host_enable();    // soft reset: idle(clock Hi/Data Hi)
+            ibmpc_host_enable();    // soft reset: idle(Clock Hi/Data Hi)
 
             xprintf("X%u ", timer_read());
             init_time = timer_read();
