@@ -163,6 +163,13 @@ void process_action(keyrecord_t *record)
                                 } else {
                                     dprint("MODS_TAP: Tap: register_code\n");
                                     register_code(action.key.code);
+
+                                    // Delay for MacOS #659
+                                    if (action.key.code == KC_CAPSLOCK ||
+                                            action.key.code == KC_NUMLOCK ||
+                                            action.key.code == KC_SCROLLLOCK) {
+                                        wait_ms(100);
+                                    }
                                 }
                             } else {
                                 dprint("MODS_TAP: No tap: add_mods\n");
@@ -294,6 +301,13 @@ void process_action(keyrecord_t *record)
                         if (tap_count > 0) {
                             dprint("KEYMAP_TAP_KEY: Tap: register_code\n");
                             register_code(action.layer_tap.code);
+
+                            // Delay for MacOS #659
+                            if (action.layer_tap.code == KC_CAPSLOCK ||
+                                    action.layer_tap.code == KC_NUMLOCK ||
+                                    action.layer_tap.code == KC_SCROLLLOCK) {
+                                wait_ms(100);
+                            }
                         } else {
                             dprint("KEYMAP_TAP_KEY: No tap: On on press\n");
                             layer_on(action.layer_tap.val);
