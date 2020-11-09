@@ -85,6 +85,21 @@ typedef struct
     USB_HID_Descriptor_HID_t              NKRO_HID;
     USB_Descriptor_Endpoint_t             NKRO_INEndpoint;
 #endif
+
+#ifdef SERIAL_ENABLE
+    // CDC Command Interface
+    USB_Descriptor_Interface_t            CDC_CCI_Interface;
+    USB_CDC_Descriptor_FunctionalHeader_t CDC_Functional_Header;
+    USB_CDC_Descriptor_FunctionalACM_t    CDC_Functional_ACM;
+    USB_CDC_Descriptor_FunctionalUnion_t  CDC_Functional_Union;
+    USB_Descriptor_Endpoint_t             CDC_NotificationEndpoint;
+
+    // CDC Data Interface
+    USB_Descriptor_Interface_t            CDC_DCI_Interface;
+    USB_Descriptor_Endpoint_t             CDC_DataOutEndpoint;
+    USB_Descriptor_Endpoint_t             CDC_DataInEndpoint;
+#endif
+
 } USB_Descriptor_Configuration_t;
 
 
@@ -115,9 +130,15 @@ typedef struct
 #   define NKRO_INTERFACE           CONSOLE_INTERFACE
 #endif
 
+#ifdef SERIAL_ENABLE
+#   define SERIAL_CCI_INTERFACE     (NKRO_INTERFACE + 1)
+#   define SERIAL_DCI_INTERFACE     (NKRO_INTERFACE + 2)
+#else
+#   define SERIAL_DCI_INTERFACE     NKRO_INTERFACE
+#endif
 
 /* nubmer of interfaces */
-#define TOTAL_INTERFACES            (NKRO_INTERFACE + 1)
+#define TOTAL_INTERFACES            (SERIAL_DCI_INTERFACE + 1)
 
 
 // Endopoint number and size
@@ -148,6 +169,14 @@ typedef struct
 #   define NKRO_IN_EPNUM            CONSOLE_OUT_EPNUM
 #endif
 
+#ifdef SERIAL_ENABLE
+#   define SERIAL_NOTIF_EPNUM       (NKRO_IN_EPNUM + 1)
+#   define SERIAL_TX_EPNUM          (NKRO_IN_EPNUM + 2)
+#   define SERIAL_RX_EPNUM          (NKRO_IN_EPNUM + 3)
+#else
+#   define SERIAL_RX_EPNUM          NKRO_IN_EPNUM
+#endif
+
 /* Check number of endpoints. ATmega32u2 has only four except for control endpoint. */
 #if defined(__AVR_ATmega32U2__) && NKRO_IN_EPNUM > 4
 #   error "Endpoints are not available enough to support all functions. Disable some of build options in Makefile.(MOUSEKEY, EXTRAKEY, CONSOLE, NKRO)"
@@ -159,7 +188,8 @@ typedef struct
 #define EXTRAKEY_EPSIZE             8
 #define CONSOLE_EPSIZE              32
 #define NKRO_EPSIZE                 32
-
+#define SERIAL_NOTIF_EPSIZE         8
+#define SERIAL_TXRX_EPSIZE          16
 
 uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
                                     const uint16_t wIndex,

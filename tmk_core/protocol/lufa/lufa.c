@@ -60,6 +60,10 @@
 #include "uart.h"
 #endif
 
+#ifdef SERIAL_ENABLE
+#include <LUFA/Drivers/USB/Class/Device/CDCClassDevice.h>
+#endif
+
 #include "matrix.h"
 #include "descriptor.h"
 #include "lufa.h"
@@ -82,6 +86,7 @@ static void send_keyboard(report_keyboard_t *report);
 static void send_mouse(report_mouse_t *report);
 static void send_system(uint16_t data);
 static void send_consumer(uint16_t data);
+
 host_driver_t lufa_driver = {
     keyboard_leds,
     send_keyboard,
@@ -285,7 +290,7 @@ void EVENT_USB_Device_Disconnect(void)
 /* TODO: This doesn't work. After several plug in/outs can not be enumerated.
     if (USB_IsInitialized) {
         USB_Disable();  // Disable all interrupts
-	USB_Controller_Enable();
+        USB_Controller_Enable();
         USB_INT_Enable(USB_INT_VBUSTI);
     }
 */
@@ -313,6 +318,35 @@ void EVENT_USB_Device_WakeUp()
 #endif
     hook_usb_wakeup();
 }
+
+#ifdef SERIAL_ENABLE
+// Serial device info which mirrors descriptor data
+USB_ClassInfo_CDC_Device_t VirtualSerial_CDC_Interface =
+  {
+   .Config =
+   {
+    .ControlInterfaceNumber         = SERIAL_CCI_INTERFACE,
+    .DataINEndpoint                 =
+    {
+     .Address                = (ENDPOINT_DIR_IN | SERIAL_TX_EPNUM),
+     .Size                   = SERIAL_TXRX_EPSIZE,
+     .Banks                  = 1,
+    },
+    .DataOUTEndpoint                =
+    {
+     .Address                = (ENDPOINT_DIR_OUT | SERIAL_RX_EPNUM),
+     .Size                   = SERIAL_TXRX_EPSIZE,
+     .Banks                  = 1,
+    },
+    .NotificationEndpoint           =
+    {
+     .Address                = (ENDPOINT_DIR_IN | SERIAL_NOTIF_EPNUM),
+     .Size                   = SERIAL_NOTIF_EPSIZE,
+     .Banks                  = 1,
+    },
+   },
+  };
+#endif
 
 /** Event handler for the USB_ConfigurationChanged event.
  * This is fired when the host sets the current configuration of the USB device after enumeration.
@@ -357,6 +391,10 @@ void EVENT_USB_Device_ConfigurationChanged(void)
     /* Setup NKRO HID Report Endpoints */
     ConfigSuccess &= ENDPOINT_CONFIG(NKRO_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
                                      NKRO_EPSIZE, ENDPOINT_BANK_SINGLE);
+#endif
+
+#ifdef SERIAL_ENABLE
+    ConfigSuccess &= CDC_Device_ConfigureEndpoints(&VirtualSerial_CDC_Interface);
 #endif
 }
 
@@ -497,6 +535,9 @@ void EVENT_USB_Device_ControlRequest(void)
 
             break;
     }
+#ifdef SERIAL_ENABLE
+    CDC_Device_ProcessControlRequest(&VirtualSerial_CDC_Interface);
+#endif
 }
 
 /*******************************************************************************
@@ -616,6 +657,60 @@ static void send_consumer(uint16_t data)
 #endif
 }
 
+/**************************************************
+ * Control keyboard from host via serial commands *
+ **************************************************/
+
+uint8_t send_serial(uint8_t *buffer, uint8_t size) {
+#ifdef SERIAL_ENABLE
+  // send outgoing data if available
+  uint8_t sent = 0;
+  if (size > 0) {
+    uint8_t bytes_to_send = size < (SERIAL_TXRX_EPSIZE - 1) ? size : (SERIAL_TXRX_EPSIZE - 1);
+    if (CDC_Device_SendData(&VirtualSerial_CDC_Interface, (void*)buffer, bytes_to_send)
+        == ENDPOINT_RWSTREAM_NoError) {
+      sent = size;
+
+      // Endpoint is already selected by write
+      if (Endpoint_IsINReady() && Endpoint_BytesInEndpoint()) {
+        // pending bytes in endpoint need to flush
+        Endpoint_ClearIN();
+      }
+    }
+  }
+  return sent;
+#else
+  return 0;
+#endif
+}
+
+uint8_t receive_serial(uint8_t *buffer, uint8_t size) {
+#ifdef SERIAL_ENABLE
+  uint8_t received = 0;
+  uint16_t pending_bytes = CDC_Device_BytesReceived(&VirtualSerial_CDC_Interface);
+  if (pending_bytes > 0) {
+    uint8_t expected = pending_bytes < size? pending_bytes : size;
+    while(received < expected) {
+      int16_t received_byte = CDC_Device_ReceiveByte(&VirtualSerial_CDC_Interface);
+      if (received_byte >= 0) {
+        // process received data
+        buffer[received] = (uint8_t)received_byte;
+      }
+      ++received;
+    }
+  }
+
+  return received;
+#else
+  return 0;
+#endif
+}
+
+#ifdef SERIAL_ENABLE
+void serial_usb_task(void) {
+  CDC_Device_USBTask(&VirtualSerial_CDC_Interface);
+}
+#endif
 
 /*******************************************************************************
  * sendchar
@@ -716,6 +811,10 @@ int main(void)
 
 #ifdef CONSOLE_ENABLE
         console_task();
+#endif
+
+#ifdef SERIAL_ENABLE
+        serial_usb_task();
 #endif
 
 #if !defined(INTERRUPT_CONTROL_ENDPOINT)

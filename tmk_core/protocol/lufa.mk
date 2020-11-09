@@ -24,6 +24,10 @@ TMK_LUFA_SRC = $(TMK_LUFA_DIR)/lufa.c \
                $(TMK_LUFA_DIR)/descriptor.c \
                $(LUFA_SRC_USB_DEVICE)
 
+ifdef SERIAL_ENABLE
+TMK_LUFA_SRC += $(LUFA_SRC_USBCLASS)
+endif
+
 SRC += $(TMK_LUFA_SRC)
 
 # Search Path
@@ -69,6 +73,9 @@ ifeq (yes,$(strip $(TMK_LUFA_DEBUG_UART)))
     DEBUG_PRINT_AVAILABLE = yes
 endif
 
+ifdef SERIAL_ENABLE
+TMK_LUFA_OPTS += -DNO_CLASS_DRIVER_AUTOFLUSH
+endif
 
 OPT_DEFS += -DF_USB=$(F_USB)UL
 OPT_DEFS += -DARCH=ARCH_$(ARCH)
