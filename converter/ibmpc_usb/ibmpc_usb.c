@@ -55,6 +55,9 @@ static uint16_t read_keyboard_id(void)
     uint16_t id = 0;
     int16_t  code = 0;
 
+    // temporary fix Z-150 AT should response with ID
+    if (ibmpc_protocol == IBMPC_PROTOCOL_AT_Z150) return 0xFFFD;
+
     // Disable
     //code = ibmpc_host_send(0xF5);
 
@@ -276,6 +279,8 @@ uint8_t matrix_scan(void)
                 keyboard_kind = PC_XT;
             } else if (0xFFFE == keyboard_id) {     // CodeSet2 PS/2 fails to response?
                 keyboard_kind = PC_AT;
+            } else if (0xFFFD == keyboard_id) {     // Zenith Z-150 AT
+                keyboard_kind = PC_AT_Z150;
             } else if (0x00FF == keyboard_id) {     // Mouse is not supported
                 xprintf("Mouse: not supported\n");
                 keyboard_kind = NONE;
@@ -318,6 +323,9 @@ uint8_t matrix_scan(void)
                 case PC_AT:
                     led_set(host_keyboard_leds());
                     break;
+                case PC_AT_Z150:
+                    // TODO: do not set indicators temporarily for debug
+                    break;
                 case PC_TERMINAL:
                     // Set all keys to make/break type
                     ibmpc_host_send(0xF8);
@@ -355,6 +363,7 @@ uint8_t matrix_scan(void)
                         if (process_cs1(code) == -1) state = INIT;
                         break;
                     case PC_AT:
+                    case PC_AT_Z150:
                         if (process_cs2(code) == -1) state = INIT;
                         break;
                     case PC_TERMINAL:
