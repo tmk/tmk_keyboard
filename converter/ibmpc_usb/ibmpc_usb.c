@@ -174,6 +174,7 @@ uint8_t matrix_scan(void)
             xprintf("I%u ", timer_read());
             keyboard_kind = NONE;
             keyboard_id = 0x0000;
+            current_protocol = 0;
 
             matrix_clear();
             clear_keyboard();
@@ -311,7 +312,7 @@ uint8_t matrix_scan(void)
                 keyboard_kind = PC_AT;
             }
 
-            xprintf("\nID:%04X(%d) ", keyboard_id, keyboard_kind);
+            xprintf("\nID:%04X(%s) ", keyboard_id, KEYBOARD_KIND_STR(keyboard_kind));
 
             state = SETUP;
             break;
