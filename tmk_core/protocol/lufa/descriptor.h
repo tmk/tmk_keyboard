@@ -71,7 +71,7 @@ typedef struct
     USB_Descriptor_Endpoint_t             Extrakey_INEndpoint;
 #endif
 
-#ifdef CONSOLE_ENABLE
+#ifdef CONSOLE_HID
     // Console HID Interface
     USB_Descriptor_Interface_t            Console_Interface;
     USB_HID_Descriptor_HID_t              Console_HID;
@@ -86,7 +86,7 @@ typedef struct
     USB_Descriptor_Endpoint_t             NKRO_INEndpoint;
 #endif
 
-#ifdef SERIAL_ENABLE
+#ifdef CONSOLE_CDC
     // CDC Command Interface
     USB_Descriptor_Interface_t            CDC_CCI_Interface;
     USB_CDC_Descriptor_FunctionalHeader_t CDC_Functional_Header;
@@ -118,7 +118,7 @@ typedef struct
 #   define EXTRAKEY_INTERFACE       MOUSE_INTERFACE
 #endif 
 
-#ifdef CONSOLE_ENABLE
+#ifdef CONSOLE_HID
 #   define CONSOLE_INTERFACE        (EXTRAKEY_INTERFACE + 1)
 #else
 #   define CONSOLE_INTERFACE        EXTRAKEY_INTERFACE
@@ -130,7 +130,7 @@ typedef struct
 #   define NKRO_INTERFACE           CONSOLE_INTERFACE
 #endif
 
-#ifdef SERIAL_ENABLE
+#ifdef CONSOLE_CDC
 #   define SERIAL_CCI_INTERFACE     (NKRO_INTERFACE + 1)
 #   define SERIAL_DCI_INTERFACE     (NKRO_INTERFACE + 2)
 #else
@@ -156,7 +156,7 @@ typedef struct
 #   define EXTRAKEY_IN_EPNUM        MOUSE_IN_EPNUM 
 #endif
 
-#ifdef CONSOLE_ENABLE
+#ifdef CONSOLE_HID
 #   define CONSOLE_IN_EPNUM         (EXTRAKEY_IN_EPNUM + 1)
 #   define CONSOLE_OUT_EPNUM        (EXTRAKEY_IN_EPNUM + 1)
 #else
@@ -169,7 +169,7 @@ typedef struct
 #   define NKRO_IN_EPNUM            CONSOLE_OUT_EPNUM
 #endif
 
-#ifdef SERIAL_ENABLE
+#ifdef CONSOLE_CDC
 #   define SERIAL_NOTIF_EPNUM       (NKRO_IN_EPNUM + 1)
 #   define SERIAL_TX_EPNUM          (NKRO_IN_EPNUM + 2)
 #   define SERIAL_RX_EPNUM          (NKRO_IN_EPNUM + 3)

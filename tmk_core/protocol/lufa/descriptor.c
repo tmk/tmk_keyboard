@@ -164,7 +164,7 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM ExtrakeyReport[] =
 };
 #endif
 
-#ifdef CONSOLE_ENABLE
+#ifdef CONSOLE_HID
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM ConsoleReport[] =
 {
     HID_RI_USAGE_PAGE(16, 0xFF31), /* Vendor Page(PJRC Teensy compatible) */
@@ -394,9 +394,9 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 #endif
 
     /*
-     * Console
+     * Console HID
      */
-#ifdef CONSOLE_ENABLE
+#ifdef CONSOLE_HID
     .Console_Interface =
         {
             .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
@@ -488,9 +488,9 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 #endif
 
     /*
-     * Serial interface
+     * Console CDC
      */
-#ifdef SERIAL_ENABLE
+#ifdef CONSOLE_CDC
     .CDC_CCI_Interface =
         {
            .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
@@ -669,7 +669,7 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
                 Size    = sizeof(USB_HID_Descriptor_HID_t);
                 break;
 #endif
-#ifdef CONSOLE_ENABLE
+#ifdef CONSOLE_HID
             case CONSOLE_INTERFACE:
                 Address = &ConfigurationDescriptor.Console_HID;
                 Size    = sizeof(USB_HID_Descriptor_HID_t);
@@ -701,7 +701,7 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
                 Size    = sizeof(ExtrakeyReport);
                 break;
 #endif
-#ifdef CONSOLE_ENABLE
+#ifdef CONSOLE_HID
             case CONSOLE_INTERFACE:
                 Address = &ConsoleReport;
                 Size    = sizeof(ConsoleReport);

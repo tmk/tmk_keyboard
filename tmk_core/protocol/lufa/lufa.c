@@ -60,10 +60,6 @@
 #include "uart.h"
 #endif
 
-#ifdef SERIAL_ENABLE
-#include <LUFA/Drivers/USB/Class/Device/CDCClassDevice.h>
-#endif
-
 #include "matrix.h"
 #include "descriptor.h"
 #include "lufa.h"
@@ -97,9 +93,105 @@ host_driver_t lufa_driver = {
 
 
 /*******************************************************************************
- * Console
+ * Console CDC
  ******************************************************************************/
-#ifdef CONSOLE_ENABLE
+#ifdef CONSOLE_CDC
+USB_ClassInfo_CDC_Device_t VirtualSerial_CDC_Interface = {
+    .Config = {
+        .ControlInterfaceNumber = SERIAL_CCI_INTERFACE,
+        .DataINEndpoint = {
+            .Address = (ENDPOINT_DIR_IN | SERIAL_TX_EPNUM),
+            .Size = SERIAL_TXRX_EPSIZE,
+            .Banks = 1,
+        },
+        .DataOUTEndpoint = {
+            .Address = (ENDPOINT_DIR_OUT | SERIAL_RX_EPNUM),
+            .Size = SERIAL_TXRX_EPSIZE,
+            .Banks = 1,
+        },
+        .NotificationEndpoint = {
+            .Address = (ENDPOINT_DIR_IN | SERIAL_NOTIF_EPNUM),
+            .Size = SERIAL_NOTIF_EPSIZE,
+            .Banks = 1,
+        },
+    },
+};
+
+static FILE USBSerialStream;
+
+#define CONSOLE_INBUF_SIZE 256
+static uint8_t _inbuf[CONSOLE_INBUF_SIZE];
+static ringbuf_t inbuf = {
+    .buffer = _inbuf,
+    .head = 0,
+    .tail = 0,
+    .size_mask = CONSOLE_INBUF_SIZE - 1
+};
+
+static bool console_is_ready(void)
+{
+    if ((USB_DeviceState != DEVICE_STATE_Configured) || !(VirtualSerial_CDC_Interface.State.LineEncoding.BaudRateBPS))
+        return false;
+
+    // check if host port is ready with DTR(and RTS?)
+    if ((VirtualSerial_CDC_Interface.State.ControlLineStates.HostToDevice & CDC_CONTROL_LINE_OUT_DTR) == 0)
+        return false;
+
+    return true;
+}
+
+static bool console_putc(uint8_t c)
+{
+    // return immediately if called while interrupt
+    if (!(SREG & (1<<SREG_I)))
+        goto BUFFER;
+
+    if (!console_is_ready())
+        goto BUFFER;
+
+    // Host port is available hopefully but this may be still blocked in case of the port fails somehow?
+    if (ringbuf_is_empty(&inbuf)) {
+        if (CDC_Device_SendByte(&VirtualSerial_CDC_Interface, c) == 0)
+            return true;
+    }
+
+BUFFER:
+    return ringbuf_put(&inbuf, c);
+}
+
+static void console_flush(void)
+{
+    if (!console_is_ready())
+        return;
+
+    for (int16_t w; (w = ringbuf_get(&inbuf)) != -1; ) {
+        // Host port is available hopefully but this may be still blocked in case of the port fails somehow?
+        if (CDC_Device_SendByte(&VirtualSerial_CDC_Interface, (uint8_t)w) != 0) {
+            ringbuf_put(&inbuf, (uint8_t)w);
+            break;
+        }
+    }
+
+    // Host port is available hopefully but this may be still blocked in case of the port fails somehow?
+    CDC_Device_Flush(&VirtualSerial_CDC_Interface);
+}
+
+static void console_task(void)
+{
+    static uint16_t fn = 0;
+    if (fn == USB_Device_GetFrameNumber()) {
+        return;
+    }
+    fn = USB_Device_GetFrameNumber();
+
+    console_flush();
+}
+#endif
+
+/*******************************************************************************
+ * Console HID
+ ******************************************************************************/
+#ifdef CONSOLE_HID
 #define SENDBUF_SIZE 256
 static uint8_t sbuf[SENDBUF_SIZE];
 static ringbuf_t sendbuf = {
@@ -319,35 +411,6 @@ void EVENT_USB_Device_WakeUp()
     hook_usb_wakeup();
 }
 
-#ifdef SERIAL_ENABLE
-// Serial device info which mirrors descriptor data
-USB_ClassInfo_CDC_Device_t VirtualSerial_CDC_Interface =
-  {
-   .Config =
-   {
-    .ControlInterfaceNumber         = SERIAL_CCI_INTERFACE,
-    .DataINEndpoint                 =
-    {
-     .Address                = (ENDPOINT_DIR_IN | SERIAL_TX_EPNUM),
-     .Size                   = SERIAL_TXRX_EPSIZE,
-     .Banks                  = 1,
-    },
-    .DataOUTEndpoint                =
-    {
-     .Address                = (ENDPOINT_DIR_OUT | SERIAL_RX_EPNUM),
-     .Size                   = SERIAL_TXRX_EPSIZE,
-     .Banks                  = 1,
-    },
-    .NotificationEndpoint           =
-    {
-     .Address                = (ENDPOINT_DIR_IN | SERIAL_NOTIF_EPNUM),
-     .Size                   = SERIAL_NOTIF_EPSIZE,
-     .Banks                  = 1,
-    },
-   },
-  };
-#endif
-
 /** Event handler for the USB_ConfigurationChanged event.
  * This is fired when the host sets the current configuration of the USB device after enumeration.
  *
@@ -377,7 +440,7 @@ void EVENT_USB_Device_ConfigurationChanged(void)
                                      EXTRAKEY_EPSIZE, ENDPOINT_BANK_SINGLE);
 #endif
 
-#ifdef CONSOLE_ENABLE
+#ifdef CONSOLE_HID
     /* Setup Console HID Report Endpoints */
     ConfigSuccess &= ENDPOINT_CONFIG(CONSOLE_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
                                      CONSOLE_EPSIZE, ENDPOINT_BANK_SINGLE);
@@ -393,7 +456,7 @@ void EVENT_USB_Device_ConfigurationChanged(void)
                                      NKRO_EPSIZE, ENDPOINT_BANK_SINGLE);
 #endif
 
-#ifdef SERIAL_ENABLE
+#ifdef CONSOLE_CDC
     ConfigSuccess &= CDC_Device_ConfigureEndpoints(&VirtualSerial_CDC_Interface);
 #endif
 }
@@ -535,7 +598,7 @@ void EVENT_USB_Device_ControlRequest(void)
 
             break;
     }
-#ifdef SERIAL_ENABLE
+#ifdef CONSOLE_CDC
     CDC_Device_ProcessControlRequest(&VirtualSerial_CDC_Interface);
 #endif
 }
@@ -657,60 +720,6 @@ static void send_consumer(uint16_t data)
 #endif
 }
 
-/**************************************************
- * Control keyboard from host via serial commands *
- **************************************************/
-
-uint8_t send_serial(uint8_t *buffer, uint8_t size) {
-#ifdef SERIAL_ENABLE
-  // send outgoing data if available
-  uint8_t sent = 0;
-  if (size > 0) {
-    uint8_t bytes_to_send = size < (SERIAL_TXRX_EPSIZE - 1) ? size : (SERIAL_TXRX_EPSIZE - 1);
-    if (CDC_Device_SendData(&VirtualSerial_CDC_Interface, (void*)buffer, bytes_to_send)
-        == ENDPOINT_RWSTREAM_NoError) {
-      sent = size;
-
-      // Endpoint is already selected by write
-      if (Endpoint_IsINReady() && Endpoint_BytesInEndpoint()) {
-        // pending bytes in endpoint need to flush
-        Endpoint_ClearIN();
-      }
-    }
-  }
-  return sent;
-#else
-  return 0;
-#endif
-}
-
-uint8_t receive_serial(uint8_t *buffer, uint8_t size) {
-#ifdef SERIAL_ENABLE
-  uint8_t received = 0;
-  uint16_t pending_bytes = CDC_Device_BytesReceived(&VirtualSerial_CDC_Interface);
-  if (pending_bytes > 0) {
-    uint8_t expected = pending_bytes < size? pending_bytes : size;
-    while(received < expected) {
-      int16_t received_byte = CDC_Device_ReceiveByte(&VirtualSerial_CDC_Interface);
-      if (received_byte >= 0) {
-        // process received data
-        buffer[received] = (uint8_t)received_byte;
-      }
-      ++received;
-    }
-  }
-
-  return received;
-#else
-  return 0;
-#endif
-}
-
-#ifdef SERIAL_ENABLE
-void serial_usb_task(void) {
-  CDC_Device_USBTask(&VirtualSerial_CDC_Interface);
-}
-#endif
 
 /*******************************************************************************
  * sendchar
@@ -768,6 +777,13 @@ int main(void)
     uart_init(115200);
 #endif
 
+#ifdef CONSOLE_CDC
+    // Setup CDC stream for avr-libc <stdio.h>
+    CDC_Device_CreateStream(&VirtualSerial_CDC_Interface, &USBSerialStream);
+    stdin = &USBSerialStream;
+    stdout = &USBSerialStream;
+#endif
+
     // setup sendchar: DO NOT USE print functions before this line
     print_set_sendchar(sendchar);
     host_set_driver(&lufa_driver);
@@ -811,10 +827,6 @@ int main(void)
 
 #ifdef CONSOLE_ENABLE
         console_task();
-#endif
-
-#ifdef SERIAL_ENABLE
-        serial_usb_task();
 #endif
 
 #if !defined(INTERRUPT_CONTROL_ENDPOINT)
