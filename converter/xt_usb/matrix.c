@@ -144,6 +144,7 @@ uint8_t matrix_scan(void)
             switch (code) {
                 case 0x45:
                     matrix_make(0x55);
+                    state = INIT;
                     break;
                 default:
                     state = INIT;
@@ -152,8 +153,9 @@ uint8_t matrix_scan(void)
             break;
         case E1_9D:
             switch (code) {
-                case 0x45:
+                case 0xC5:
                     matrix_break(0x55);
+                    state = INIT;
                     break;
                 default:
                     state = INIT;
