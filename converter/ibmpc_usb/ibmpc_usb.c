@@ -522,7 +522,7 @@ static int8_t process_cs1(uint8_t code)
     static enum {
         INIT,
         E0,
-        // Pause: E1 1D 45, E1 9D C5 [a] (TODO: test)
+        // Pause: E1 1D 45, E1 9D C5 [a]
         E1,
         E1_1D,
         E1_9D,
@@ -579,7 +579,8 @@ static int8_t process_cs1(uint8_t code)
         case E1_1D:
             switch (code) {
                 case 0x45:
-                    matrix_make(0x55);
+                    matrix_make(0x55); // Pause
+                    state = INIT;
                     break;
                 default:
                     state = INIT;
@@ -588,8 +589,9 @@ static int8_t process_cs1(uint8_t code)
             break;
         case E1_9D:
             switch (code) {
-                case 0x45:
-                    matrix_break(0x55);
+                case 0xC5:
+                    matrix_break(0x55); // Pause
+                    state = INIT;
                     break;
                 default:
                     state = INIT;
