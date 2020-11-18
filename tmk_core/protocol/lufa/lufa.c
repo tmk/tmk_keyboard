@@ -802,10 +802,12 @@ int main(void)
 
 #ifndef NO_USB_STARTUP_WAIT_LOOP
     /* wait for USB startup */
-    while (USB_DeviceState != DEVICE_STATE_Configured) {
-#if defined(INTERRUPT_CONTROL_ENDPOINT)
-        ;
-#else
+    while (USB_DeviceState != DEVICE_STATE_Configured
+#ifdef CONSOLE_STARTUP_WAIT
+          || !console_is_ready()
+#endif
+    ) {
+#if !defined(INTERRUPT_CONTROL_ENDPOINT)
         USB_USBTask();
 #endif
         hook_usb_startup_wait_loop();

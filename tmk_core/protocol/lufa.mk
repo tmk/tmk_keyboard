@@ -68,6 +68,11 @@ ifeq (yes,$(strip $(CONSOLE_ENABLE)))
         # HID hid_listen
         OPT_DEFS += -DCONSOLE_HID
     endif
+
+    # Wait until console becomes available at startup
+    ifeq (yes,$(strip $(CONSOLE_STARTUP_WAIT)))
+        OPT_DEFS += -DCONSOLE_STARTUP_WAIT
+    endif
 endif
 
 
