@@ -231,7 +231,7 @@ void led_set(uint8_t usb_led)
 // This situation can happen just after pluging converter into USB port.
 void hook_usb_suspend_loop(void)
 {
-#ifndef TMK_LUFA_DEBUG_UART
+#ifndef CONSOLE_UART
     // This corrupts debug print when suspend
     suspend_power_down();
 #endif
