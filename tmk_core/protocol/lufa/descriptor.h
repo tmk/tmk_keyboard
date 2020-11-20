@@ -87,6 +87,9 @@ typedef struct
 #endif
 
 #ifdef CONSOLE_CDC
+    // Interface Association Descriptor
+    USB_Descriptor_Interface_Association_t  CDC_Assosciation;
+
     // CDC Command Interface
     USB_Descriptor_Interface_t            CDC_CCI_Interface;
     USB_CDC_Descriptor_FunctionalHeader_t CDC_Functional_Header;

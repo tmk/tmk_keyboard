@@ -230,10 +230,19 @@ const USB_Descriptor_Device_t PROGMEM DeviceDescriptor =
 {
     .Header                 = {.Size = sizeof(USB_Descriptor_Device_t), .Type = DTYPE_Device},
 
+#ifdef CONSOLE_CDC
+    // Interface Association Descriptor
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/usbcon/usb-interface-association-descriptor
+    .USBSpecification       = VERSION_BCD(2,0,0),
+    .Class                  = USB_CSCP_IADDeviceClass,
+    .SubClass               = USB_CSCP_IADDeviceSubclass,
+    .Protocol               = USB_CSCP_IADDeviceProtocol,
+#else
     .USBSpecification       = VERSION_BCD(1,1,0),
     .Class                  = USB_CSCP_NoDeviceClass,
     .SubClass               = USB_CSCP_NoDeviceSubclass,
     .Protocol               = USB_CSCP_NoDeviceProtocol,
+#endif
 
     .Endpoint0Size          = FIXED_CONTROL_ENDPOINT_SIZE,
 
@@ -491,6 +500,18 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
      * Console CDC
      */
 #ifdef CONSOLE_CDC
+    .CDC_Assosciation =
+        {
+            .Header                 = { .Size = sizeof(USB_Descriptor_Interface_Association_t),
+                                        .Type = DTYPE_InterfaceAssociation },
+            .FirstInterfaceIndex    = SERIAL_CCI_INTERFACE,
+            .TotalInterfaces        = 2,
+            .Class                  = CDC_CSCP_CDCClass,
+            .SubClass               = CDC_CSCP_ACMSubclass,
+            .Protocol               = CDC_CSCP_ATCommandProtocol,
+            .IADStrIndex            = NO_DESCRIPTOR
+        },
+
     .CDC_CCI_Interface =
         {
            .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
