@@ -2,7 +2,11 @@
  * Null implementation of Serial to dump debug print into blackhole
  */
 #include "Arduino.h"
-#include "sendchar.h"
+
+//#include <stdio.h>
+//#define sendchar(c)    putchar(c)
+#include "avr/xprintf.h"
+#define sendchar(c)    xputc(c)
 
 #include "USBAPI.h"
 
