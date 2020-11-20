@@ -50,12 +50,9 @@ endif
 ifeq (yes,$(strip $(CONSOLE_ENABLE)))
     OPT_DEFS += -DCONSOLE_ENABLE
 else
-    # Remove print functions when console is disabled and
-    # no other print method like UART is available
-    ifneq (yes, $(strip $(DEBUG_PRINT_AVAILABLE)))
-	OPT_DEFS += -DNO_PRINT
-	OPT_DEFS += -DNO_DEBUG
-    endif
+    # Remove print functions when console is disabled
+    OPT_DEFS += -DNO_PRINT
+    OPT_DEFS += -DNO_DEBUG
 endif
 
 ifeq (yes,$(strip $(NO_DEBUG)))

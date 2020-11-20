@@ -42,7 +42,6 @@
 #include "keyboard.h"
 #include "action.h"
 #include "led.h"
-#include "sendchar.h"
 #include "ringbuf.h"
 #include "debug.h"
 #ifdef SLEEP_LED_ENABLE
@@ -52,20 +51,10 @@
 #include "hook.h"
 #include "timer.h"
 
-#ifdef TMK_LUFA_DEBUG_SUART
-#include "avr/suart.h"
-#endif
-
-#ifdef TMK_LUFA_DEBUG_UART
-#include "uart.h"
-#endif
-
 #include "matrix.h"
 #include "descriptor.h"
+#include "console.h"
 #include "lufa.h"
-
-
-//#define TMK_LUFA_DEBUG
 
 
 uint8_t keyboard_idle = 0;
@@ -90,264 +79,6 @@ host_driver_t lufa_driver = {
     send_system,
     send_consumer
 };
-
-
-/*******************************************************************************
- * Console CDC
- ******************************************************************************/
-#ifdef CONSOLE_CDC
-USB_ClassInfo_CDC_Device_t VirtualSerial_CDC_Interface = {
-    .Config = {
-        .ControlInterfaceNumber = SERIAL_CCI_INTERFACE,
-        .DataINEndpoint = {
-            .Address = (ENDPOINT_DIR_IN | SERIAL_TX_EPNUM),
-            .Size = SERIAL_TXRX_EPSIZE,
-            .Banks = 1,
-        },
-        .DataOUTEndpoint = {
-            .Address = (ENDPOINT_DIR_OUT | SERIAL_RX_EPNUM),
-            .Size = SERIAL_TXRX_EPSIZE,
-            .Banks = 1,
-        },
-        .NotificationEndpoint = {
-            .Address = (ENDPOINT_DIR_IN | SERIAL_NOTIF_EPNUM),
-            .Size = SERIAL_NOTIF_EPSIZE,
-            .Banks = 1,
-        },
-    },
-};
-
-static FILE USBSerialStream;
-
-#define CONSOLE_INBUF_SIZE 256
-static uint8_t _inbuf[CONSOLE_INBUF_SIZE];
-static ringbuf_t inbuf = {
-    .buffer = _inbuf,
-    .head = 0,
-    .tail = 0,
-    .size_mask = CONSOLE_INBUF_SIZE - 1
-};
-
-static bool console_is_ready(void)
-{
-    if ((USB_DeviceState != DEVICE_STATE_Configured) || !(VirtualSerial_CDC_Interface.State.LineEncoding.BaudRateBPS))
-        return false;
-
-    // check if host port is ready with DTR(and RTS?)
-    if ((VirtualSerial_CDC_Interface.State.ControlLineStates.HostToDevice & CDC_CONTROL_LINE_OUT_DTR) == 0)
-        return false;
-
-    return true;
-}
-
-static bool console_putc(uint8_t c)
-{
-    // return immediately if called while interrupt
-    if (!(SREG & (1<<SREG_I)))
-        goto BUFFER;
-
-    if (!console_is_ready())
-        goto BUFFER;
-
-    // Host port is available hopefully but this may be still blocked in case of the port fails somehow?
-    if (ringbuf_is_empty(&inbuf)) {
-        if (CDC_Device_SendByte(&VirtualSerial_CDC_Interface, c) == 0)
-            return true;
-    }
-
-BUFFER:
-    return ringbuf_put(&inbuf, c);
-}
-
-static void console_flush(void)
-{
-    if (!console_is_ready())
-        return;
-
-    for (int16_t w; (w = ringbuf_get(&inbuf)) != -1; ) {
-        // Host port is available hopefully but this may be still blocked in case of the port fails somehow?
-        if (CDC_Device_SendByte(&VirtualSerial_CDC_Interface, (uint8_t)w) != 0) {
-            ringbuf_put(&inbuf, (uint8_t)w);
-            break;
-        }
-    }
-
-    // Host port is available hopefully but this may be still blocked in case of the port fails somehow?
-    CDC_Device_Flush(&VirtualSerial_CDC_Interface);
-}
-
-static void console_task(void)
-{
-    static uint16_t fn = 0;
-    if (fn == USB_Device_GetFrameNumber()) {
-        return;
-    }
-    fn = USB_Device_GetFrameNumber();
-
-    console_flush();
-}
-#endif
-
-/*******************************************************************************
- * Console HID
- ******************************************************************************/
-#ifdef CONSOLE_HID
-#define SENDBUF_SIZE 256
-static uint8_t sbuf[SENDBUF_SIZE];
-static ringbuf_t sendbuf = {
-    .buffer = sbuf,
-    .head = 0,
-    .tail = 0,
-    .size_mask = SENDBUF_SIZE - 1
-};
-
-// TODO: Around 2500ms delay often works anyhoo but proper startup would be better
-// 1000ms delay of hid_listen affects this probably
-/* wait for Console startup */
-static bool console_is_ready(void)
-{
-    static bool hid_listen_ready = false;
-    if (!hid_listen_ready) {
-        if (timer_read32() < 2500)
-            return false;
-        hid_listen_ready = true;
-    }
-    return true;
-}
-
-static bool console_putc(uint8_t c)
-{
-    // return immediately if called while interrupt
-    if (!(SREG & (1<<SREG_I)))
-        goto EXIT;
-
-    if (USB_DeviceState != DEVICE_STATE_Configured && !ringbuf_is_full(&sendbuf))
-        goto EXIT;
-
-    if (!console_is_ready() && !ringbuf_is_full(&sendbuf))
-        goto EXIT;
-
-    /* Data lost considerations:
-     * 1. When buffer is full at early satage of startup, we will have to start sending
-     * before console_is_ready() returns true. Data can be lost even if sending data
-     * seems to be successful on USB. hid_listen on host is not ready perhaps?
-     * Sometime first few packets are lost when buffer is full at startup.
-     * 2. When buffer is full and USB pipe is not ready, new coming data will be lost.
-     * 3. console_task() cannot send data in buffer while main loop is blocked.
-     */
-    /* retry timeout */
-    const uint8_t CONSOLE_TIMOUT = 5;   // 1 is too small, 2 seems to be enough for Linux
-    static uint8_t timeout = CONSOLE_TIMOUT;
-    uint16_t prev = timer_read();
-    bool done = false;
-
-    uint8_t ep = Endpoint_GetCurrentEndpoint();
-    Endpoint_SelectEndpoint(CONSOLE_IN_EPNUM);
-
-AGAIN:
-    if (Endpoint_IsStalled() || !Endpoint_IsEnabled() || !Endpoint_IsConfigured()) {
-        goto EXIT_RESTORE_EP;
-    }
-
-    // write from buffer to endpoint bank
-    while (!ringbuf_is_empty(&sendbuf) && Endpoint_IsReadWriteAllowed()) {
-        Endpoint_Write_8(ringbuf_get(&sendbuf));
-
-        // clear bank when it is full
-        if (!Endpoint_IsReadWriteAllowed() && Endpoint_IsINReady()) {
-            Endpoint_ClearIN();
-            timeout = CONSOLE_TIMOUT; // re-enable retry only when host can receive
-        }
-    }
-
-    // write c to bank directly if there is no others in buffer
-    if (ringbuf_is_empty(&sendbuf) && Endpoint_IsReadWriteAllowed()) {
-        Endpoint_Write_8(c);
-        done = true;
-    }
-
-    // clear bank when there are chars in bank
-    if (Endpoint_BytesInEndpoint() && Endpoint_IsINReady()) {
-        // Windows needs to fill packet with 0
-        while (Endpoint_IsReadWriteAllowed()) {
-                Endpoint_Write_8(0);
-        }
-        Endpoint_ClearIN();
-        timeout = CONSOLE_TIMOUT; // re-enable retry only when host can receive
-    }
-
-    if (done) {
-        Endpoint_SelectEndpoint(ep);
-        return true;
-    }
-
-    /* retry when buffer is full.
-     * once timeout this is disabled until host receives actually,
-     * otherwise this will block or make main loop execution sluggish.
-     */
-    if (ringbuf_is_full(&sendbuf) && timeout) {
-        uint16_t curr = timer_read();
-        if (curr != prev) {
-            timeout--;
-            prev = curr;
-        }
-        goto AGAIN;
-    }
-
-EXIT_RESTORE_EP:
-    Endpoint_SelectEndpoint(ep);
-EXIT:
-    return ringbuf_put(&sendbuf, c);
-}
-
-static void console_flush(void)
-{
-    if (!console_is_ready())
-        return;
-
-    if (USB_DeviceState != DEVICE_STATE_Configured)
-        return;
-
-    uint8_t ep = Endpoint_GetCurrentEndpoint();
-
-    Endpoint_SelectEndpoint(CONSOLE_IN_EPNUM);
-    if (!Endpoint_IsEnabled() || !Endpoint_IsConfigured()) {
-        Endpoint_SelectEndpoint(ep);
-        return;
-    }
-
-    // write from buffer to endpoint bank
-    while (!ringbuf_is_empty(&sendbuf) && Endpoint_IsReadWriteAllowed()) {
-        Endpoint_Write_8(ringbuf_get(&sendbuf));
-
-        // clear bank when it is full
-        if (!Endpoint_IsReadWriteAllowed() && Endpoint_IsINReady()) {
-            Endpoint_ClearIN();
-        }
-    }
-
-    // clear bank when there are chars in bank
-    if (Endpoint_BytesInEndpoint() && Endpoint_IsINReady()) {
-        // Windows needs to fill packet with 0
-        while (Endpoint_IsReadWriteAllowed()) {
-                Endpoint_Write_8(0);
-        }
-        Endpoint_ClearIN();
-    }
-
-    Endpoint_SelectEndpoint(ep);
-}
-
-static void console_task(void)
-{
-    static uint16_t fn = 0;
-    if (fn == USB_Device_GetFrameNumber()) {
-        return;
-    }
-    fn = USB_Device_GetFrameNumber();
-    console_flush();
-}
-#endif
 
 
 /*******************************************************************************
@@ -440,24 +171,14 @@ void EVENT_USB_Device_ConfigurationChanged(void)
                                      EXTRAKEY_EPSIZE, ENDPOINT_BANK_SINGLE);
 #endif
 
-#ifdef CONSOLE_HID
-    /* Setup Console HID Report Endpoints */
-    ConfigSuccess &= ENDPOINT_CONFIG(CONSOLE_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
-                                     CONSOLE_EPSIZE, ENDPOINT_BANK_SINGLE);
-#if 0
-    ConfigSuccess &= ENDPOINT_CONFIG(CONSOLE_OUT_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_OUT,
-                                     CONSOLE_EPSIZE, ENDPOINT_BANK_SINGLE);
-#endif
-#endif
-
 #ifdef NKRO_ENABLE
     /* Setup NKRO HID Report Endpoints */
     ConfigSuccess &= ENDPOINT_CONFIG(NKRO_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
                                      NKRO_EPSIZE, ENDPOINT_BANK_SINGLE);
 #endif
 
-#ifdef CONSOLE_CDC
-    ConfigSuccess &= CDC_Device_ConfigureEndpoints(&VirtualSerial_CDC_Interface);
+#ifdef CONSOLE_ENABLE
+    console_configure();
 #endif
 }
 
@@ -598,8 +319,8 @@ void EVENT_USB_Device_ControlRequest(void)
 
             break;
     }
-#ifdef CONSOLE_CDC
-    CDC_Device_ProcessControlRequest(&VirtualSerial_CDC_Interface);
+#ifdef CONSOLE_ENABLE
+    console_control_request();
 #endif
 }
 
@@ -722,27 +443,6 @@ static void send_consumer(uint16_t data)
 
 
 /*******************************************************************************
- * sendchar
- ******************************************************************************/
-int8_t sendchar(uint8_t c)
-{
-    #ifdef TMK_LUFA_DEBUG_SUART
-    xmit(c);
-    #endif
-
-    #ifdef TMK_LUFA_DEBUG_UART
-    uart_putchar(c);
-    #endif
-
-    #ifdef CONSOLE_ENABLE
-    console_putc(c);
-    #endif
-
-    return 0;
-}
-
-
-/*******************************************************************************
  * main
  ******************************************************************************/
 static void setup_mcu(void)
@@ -768,24 +468,11 @@ int main(void)
 {
     setup_mcu();
 
-#ifdef TMK_LUFA_DEBUG_SUART
-    SUART_OUT_DDR |= (1<<SUART_OUT_BIT);
-    SUART_OUT_PORT |= (1<<SUART_OUT_BIT);
+#ifdef CONSOLE_ENABLE
+    // setup xprintf and <stdio.h>: DO NOT USE print functions before this line
+    console_init();
 #endif
 
-#ifdef TMK_LUFA_DEBUG_UART
-    uart_init(115200);
-#endif
-
-#ifdef CONSOLE_CDC
-    // Setup CDC stream for avr-libc <stdio.h>
-    CDC_Device_CreateStream(&VirtualSerial_CDC_Interface, &USBSerialStream);
-    stdin = &USBSerialStream;
-    stdout = &USBSerialStream;
-#endif
-
-    // setup sendchar: DO NOT USE print functions before this line
-    print_set_sendchar(sendchar);
     host_set_driver(&lufa_driver);
 
     print("\n\nTMK:" STR(TMK_VERSION) "/LUFA\n\n");
@@ -866,7 +553,7 @@ void hook_usb_suspend_entry(void)
 __attribute__((weak))
 void hook_usb_suspend_loop(void)
 {
-#ifndef TMK_LUFA_DEBUG_UART
+#ifndef CONSOLE_UART
     // This corrupts debug print when suspend
     suspend_power_down();
 #endif
