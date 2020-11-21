@@ -31,15 +31,23 @@ USB_ClassInfo_CDC_Device_t CDC_device = {
 };
 
 
-#define CONSOLE_INBUF_SIZE 256
-static uint8_t _inbuf[CONSOLE_INBUF_SIZE];
-static ringbuf_t inbuf = {
-    .buffer = _inbuf,
+#define CONSOLE_SNDBUF_SIZE 256
+static uint8_t _sndbuf[CONSOLE_SNDBUF_SIZE];
+static ringbuf_t sndbuf = {
+    .buffer = _sndbuf,
     .head = 0,
     .tail = 0,
-    .size_mask = CONSOLE_INBUF_SIZE - 1
+    .size_mask = CONSOLE_SNDBUF_SIZE - 1
 };
 
+#define CONSOLE_RCVBUF_SIZE 32
+static uint8_t _rcvbuf[CONSOLE_RCVBUF_SIZE];
+static ringbuf_t rcvbuf = {
+    .buffer = _rcvbuf,
+    .head = 0,
+    .tail = 0,
+    .size_mask = CONSOLE_RCVBUF_SIZE - 1
+};
 
 static bool cdc_putchar(uint8_t c)
 {
@@ -51,24 +59,36 @@ static bool cdc_putchar(uint8_t c)
         goto BUFFER;
 
     // Host port is available hopefully but this may be still blocked in case of the port fails somehow?
-    if (ringbuf_is_empty(&inbuf)) {
+    if (ringbuf_is_empty(&sndbuf)) {
         if (CDC_Device_SendByte(&CDC_device, c) == 0)
             return true;
     }
 
 BUFFER:
-    return ringbuf_put(&inbuf, c);
+    return ringbuf_put(&sndbuf, c);
+}
+
+static int stdio_putchar(char c, FILE *stream)
+{
+    return cdc_putchar(c) ? 0 : -1;
+}
+
+static int stdio_getchar(FILE *stream)
+{
+    int16_t w = ringbuf_get(&rcvbuf);
+    if (w < 0) {
+        w = CDC_Device_ReceiveByte(&CDC_device);
+        if (w < 0) return _FDEV_EOF;
+    }
+    return w;
 }
 
 void console_init(void)
 {
     // <stdio.h> stream
-    static FILE CDC_stdio;
-
-    // Setup CDC stream for avr-libc <stdio.h>
-    CDC_Device_CreateStream(&CDC_device, &CDC_stdio);
-    stdin = &CDC_stdio;
-    stdout = &CDC_stdio;
+    static FILE stdio = (FILE)FDEV_SETUP_STREAM(stdio_putchar, stdio_getchar, _FDEV_SETUP_RW);
+    stdin = &stdio;
+    stdout = &stdio;
 
     // Setup xprintf
     xdev_out(cdc_putchar);
@@ -96,30 +116,27 @@ bool console_is_ready(void)
     return true;
 }
 
-static void console_flush(void)
-{
-    if (!console_is_ready())
-        return;
-
-    for (int16_t w; (w = ringbuf_get(&inbuf)) != -1; ) {
-        // Host port is available hopefully but this may be still blocked in case of the port fails somehow?
-        if (CDC_Device_SendByte(&CDC_device, (uint8_t)w) != 0) {
-            ringbuf_put(&inbuf, (uint8_t)w);
-            break;
-        }
-    }
-
-    // Host port is available hopefully but this may be still blocked in case of the port fails somehow?
-    CDC_Device_Flush(&CDC_device);
-}
-
 void console_task(void)
 {
     static uint16_t fn = 0;
-    if (fn == USB_Device_GetFrameNumber()) {
+    if (fn == USB_Device_GetFrameNumber())
         return;
-    }
     fn = USB_Device_GetFrameNumber();
 
-    console_flush();
+    if (!console_is_ready())
+        return;
+
+    // Flush buffer data
+    for (int16_t w; (w = ringbuf_get(&sndbuf)) != -1; ) {
+        if (CDC_Device_SendByte(&CDC_device, (uint8_t)w) != 0) {
+            ringbuf_put(&sndbuf, (uint8_t)w);
+            break;
+        }
+    }
+    CDC_Device_Flush(&CDC_device);
+
+    // Receive data into buffer
+    int16_t w = CDC_Device_ReceiveByte(&CDC_device);
+    if (w < 0) return;
+    ringbuf_put(&rcvbuf, (uint8_t)w);
 }
