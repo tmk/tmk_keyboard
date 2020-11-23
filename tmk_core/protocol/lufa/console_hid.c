@@ -1,10 +1,14 @@
 /*******************************************************************************
  * Console HID
  ******************************************************************************/
-#include <stdio.h>
+#ifdef CONSOLE_STDIO
+#   include <stdio.h>
+#else
+#   include "avr/xprintf.h"
+#endif
+
 #include "ringbuf.h"
 #include "timer.h"
-#include "avr/xprintf.h"
 #include "lufa.h"
 #include "descriptor.h"
 #include "console.h"
@@ -22,6 +26,7 @@ static ringbuf_t sendbuf = {
 
 static bool hid_putchar(uint8_t c);
 
+#ifdef CONSOLE_STDIO
 static int stdio_putchar(char c, FILE *stream)
 {
     return hid_putchar(c) ? 0 : -1;
@@ -31,16 +36,19 @@ static int stdio_getchar(FILE *stream)
 {
     return _FDEV_EOF;
 }
+#endif
 
 void console_init(void)
 {
+#ifdef CONSOLE_STDIO
     // <stdio.h> stream
     static FILE HID_stdio = (FILE)FDEV_SETUP_STREAM(stdio_putchar, stdio_getchar, _FDEV_SETUP_RW);
     stdin = &HID_stdio;
     stdout = &HID_stdio;
-
+#else
     // Setup xprintf
     xdev_out(hid_putchar);
+#endif
 }
 
 bool console_configure(void)

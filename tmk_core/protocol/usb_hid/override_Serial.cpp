@@ -3,10 +3,13 @@
  */
 #include "Arduino.h"
 
-//#include <stdio.h>
-//#define sendchar(c)    putchar(c)
-#include "avr/xprintf.h"
-#define sendchar(c)    xputc(c)
+#ifdef CONSOLE_STDIO
+#   include <stdio.h>
+#   define sendchar(c)    putchar(c)
+#else
+#   include "avr/xprintf.h"
+#   define sendchar(c)    xputc(c)
+#endif
 
 #include "USBAPI.h"
 

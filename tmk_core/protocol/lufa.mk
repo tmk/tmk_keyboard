@@ -69,6 +69,11 @@ ifeq (yes,$(strip $(CONSOLE_ENABLE)))
     ifeq (yes,$(strip $(CONSOLE_STARTUP_WAIT)))
         OPT_DEFS += -DCONSOLE_STARTUP_WAIT
     endif
+
+    # Use avr-libc <stdio.h>
+    ifeq (yes,$(strip $(CONSOLE_STDIO)))
+        OPT_DEFS += -DCONSOLE_STDIO
+    endif
 endif
 
 

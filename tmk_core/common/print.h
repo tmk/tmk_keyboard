@@ -37,9 +37,21 @@
 
 #if defined(__AVR__)
 
+#ifdef CONSOLE_STDIO
+
+#include <stdio.h>
+#include <avr/pgmspace.h>
+#define xprintf(format, ...)    printf_P(PSTR(format), ##__VA_ARGS__)
+#define print(s)                printf_P(PSTR(s))
+#define println(s)              printf_P(PSTR(s "\r\n"))
+
+#else
+
 #include "avr/xprintf.h"
 #define print(s)    xputs(PSTR(s))
 #define println(s)  xputs(PSTR(s "\r\n"))
+
+#endif
 
 #ifdef __cplusplus
 extern "C"

@@ -1,9 +1,13 @@
 /*******************************************************************************
  * Console CDC
  ******************************************************************************/
-#include <stdio.h>
+#ifdef CONSOLE_STDIO
+#   include <stdio.h>
+#else
+#   include "avr/xprintf.h"
+#endif
+
 #include "ringbuf.h"
-#include "avr/xprintf.h"
 #include "lufa.h"
 #include "descriptor.h"
 #include "console.h"
@@ -68,6 +72,7 @@ BUFFER:
     return ringbuf_put(&sndbuf, c);
 }
 
+#ifdef CONSOLE_STDIO
 static int stdio_putchar(char c, FILE *stream)
 {
     return cdc_putchar(c) ? 0 : -1;
@@ -82,16 +87,19 @@ static int stdio_getchar(FILE *stream)
     }
     return w;
 }
+#endif
 
 void console_init(void)
 {
+#ifdef CONSOLE_STDIO
     // <stdio.h> stream
     static FILE stdio = (FILE)FDEV_SETUP_STREAM(stdio_putchar, stdio_getchar, _FDEV_SETUP_RW);
     stdin = &stdio;
     stdout = &stdio;
-
+#else
     // Setup xprintf
     xdev_out(cdc_putchar);
+#endif
 }
 
 bool console_configure(void)
