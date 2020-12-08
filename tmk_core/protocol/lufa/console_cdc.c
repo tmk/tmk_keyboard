@@ -148,3 +148,20 @@ void console_task(void)
     if (w < 0) return;
     ringbuf_put(&rcvbuf, (uint8_t)w);
 }
+
+// Host-to-Device Line Encoding Changed event
+void EVENT_CDC_Device_ControLineStateChanged(USB_ClassInfo_CDC_Device_t* const CDCInterfaceInfo)
+{
+	/* You can get changes to the virtual CDC lines in this callback; a common
+	   use-case is to use the Data Terminal Ready (DTR) flag to enable and
+	   disable CDC communications in your application when set to avoid the
+	   application blocking while waiting for a host to become ready and read
+	   in the pending data from the USB endpoints.
+	*/
+        DDRD |= (1<<6);
+	if (CDCInterfaceInfo->State.ControlLineStates.HostToDevice & CDC_CONTROL_LINE_OUT_DTR) {
+            PORTD |= (1<<6);
+        } else {
+            PORTD &= ~(1<<6);
+        }
+}
