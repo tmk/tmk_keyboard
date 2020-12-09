@@ -1,4 +1,4 @@
-TARGET ?= pc98_usb_32u4
+TARGET ?= pc98_usb_atmega32u4
 MCU ?= atmega32u4
 
 include Makefile

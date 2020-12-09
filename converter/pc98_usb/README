@@ -40,24 +40,31 @@ Frame format: 1-Start bit(Lo), 8-Data bits, Odd-Parity, 1-Stop bit
 
 
 
+Prebilt Firmware
+----------------
+Prebuilt firmware HEX files are available under 'binary' directory.
+
+
+
 Build Firmware
 --------------
-Just use 'make' to bild firmware for TMK PC98 converter.
+Just use 'make' to bild firmware for TMK PC98 converter(ATMega32u2).
 
     $ make clean
     $ make
 
-To flash firmware
+To flash firmware run this command
 
     $ make dfu
 
 then push button on converter to flash firmware.
 
-If you are using ATMega32u4 based board instead of premade TMK PC98 converter(ATMega32u2) use following commands.
+If you are using ATMega32u4 based board use following commands to get firmware HEX file.
 
     $ make -f Makefile.32u4 clean
     $ make -f Makefile.32u4
-    $ make -f Makefile.32u4 dfu
+
+And flash it on your board using specific program method.
 
 
 

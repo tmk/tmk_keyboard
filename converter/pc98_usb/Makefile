@@ -1,5 +1,5 @@
 # Target file name (without extension).
-TARGET ?= pc98_usb
+TARGET ?= pc98_usb_atmega32u2
 
 # Directory common source filess exist
 TMK_DIR ?= ../../tmk_core
