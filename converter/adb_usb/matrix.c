@@ -387,10 +387,12 @@ uint8_t matrix_scan(void)
         tick_ms = timer_read();
 
         codes = adb_host_kbd_recv(ADB_ADDR_KEYBOARD);
+        if (codes) xprintf("%04X ", codes);
 
         // Adjustable keybaord media keys
         if (codes == 0 && has_media_keys &&
                 (codes = adb_host_kbd_recv(ADB_ADDR_APPLIANCE))) {
+            xprintf("m:%04X ", codes);
             // key1
             switch (codes & 0x7f ) {
             case 0x00:  // Mic
@@ -433,10 +435,6 @@ uint8_t matrix_scan(void)
     }
     key0 = codes>>8;
     key1 = codes&0xFF;
-
-    if (debug_matrix && codes) {
-        print("adb_host_kbd_recv: "); phex16(codes); print("\n");
-    }
 
     if (codes == 0) {                           // no keys
         return 0;
