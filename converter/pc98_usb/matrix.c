@@ -50,6 +50,7 @@ static uint8_t matrix[MATRIX_ROWS];
 
 static void pc98_send(uint8_t data)
 {
+    xprintf("s%02X ", data);
     PC98_RDY_PORT |= (1<<PC98_RDY_BIT);
     _delay_ms(1);
     serial_send(data);
@@ -62,6 +63,7 @@ static int16_t pc98_wait_response(void)
     int16_t code = -1;
     uint8_t timeout = 255;
     while (timeout-- && (code = serial_recv2()) == -1) _delay_ms(1);
+    xprintf("r%04X ", code);
     return code;
 }
 
@@ -143,7 +145,7 @@ uint8_t matrix_scan(void)
         return 0;
     }
 
-    dprintf("%02X ", code);
+    xprintf("r%02X ", code);
 
     if (code&0x80) {
         // break code
