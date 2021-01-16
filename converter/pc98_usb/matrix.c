@@ -63,6 +63,13 @@ static int16_t pc98_wait_response(void)
     int16_t code = -1;
     uint8_t timeout = 255;
     while (timeout-- && (code = serial_recv2()) == -1) _delay_ms(1);
+
+    // Keyboards require RDY pulse >=37us to send next data
+    // https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n157
+    PC98_RDY_PORT |=  (1<<PC98_RDY_BIT);
+    _delay_us(40);
+    PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
+
     xprintf("r%04X ", code);
     return code;
 }
@@ -176,11 +183,12 @@ uint8_t matrix_scan(void)
         }
     }
 
-    // PC-9801V keyboard requires RDY pulse.
-    // This is not optimal place though, it works.
-    PC98_RDY_PORT |=  (1<<PC98_RDY_BIT);    // RDY: high
-    _delay_us(20);
-    PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);    // RDY: low
+    // Keyboards require RDY pulse >=37us to send next data
+    // https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n157
+    PC98_RDY_PORT |=  (1<<PC98_RDY_BIT);
+    _delay_us(40);
+    PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
+
     return code;
 }
 
