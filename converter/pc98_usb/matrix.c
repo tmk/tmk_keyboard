@@ -82,6 +82,22 @@ RETRY:
     if (code != 0xFA) goto RETRY;
 }
 
+static bool pc98_is_newtype(void)
+{
+    uint16_t code;
+    pc98_send(0x9F);
+    code = pc98_wait_response();
+    if (code != 0xFA) return false;
+
+    code = pc98_wait_response();
+    if (code != 0xA0) return false;
+
+    code = pc98_wait_response();
+    if (code != 0x80) return false;
+
+    return true;
+}
+
 static uint8_t pc98_led = 0;
 static void pc98_led_set(void)
 {
@@ -118,6 +134,7 @@ void matrix_init(void)
     PC98_RST_PORT |= (1<<PC98_RST_BIT);     // RST: high
 
     _delay_ms(50);
+    if (pc98_is_newtype()) xprintf("new type\n"); else xprintf("old type\n");
     pc98_inhibit_repeat();
 
     // initialize matrix state: all keys off
