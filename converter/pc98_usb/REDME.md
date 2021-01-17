@@ -2,6 +2,9 @@ PC98 to USB keyboard protocol converter
 =======================================
 Target MCU is ATMega32u2 but other USB capable AVR will also work.
 
+To initialize keyboard correctly you have to connect keyboard with converter first and then plug them into USB port.
+Otherwise, keyboard may not work.
+
 
 Connector
 ---------
@@ -193,5 +196,10 @@ Dboard has LEDs but replys with FA to 9D command but ignore it. The LED indicate
 PC-9801V has no LEDs and doesn't accept LED command. It replys with 9D to 9D command. PC-9801V doesn't accept repeat setting command. It replys with 9C to 9C command.
 
 
-## PC-9801V
+### PC-9801V
 Note that you have to connect this keyboard with converter before plug in USB port. It seems this keyboard requires for host to send any command before starting to send scan code.
+
+
+### Connection order
+Converter doesn't support hotplugging due to limitation of PC-9801 keyboard.
+You will have to plug keyboard into converter during without power first, and then plug them into USB port.
