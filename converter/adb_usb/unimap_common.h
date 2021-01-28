@@ -71,7 +71,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     K30,K0C,K0D,K0E,K0F,K10,K11,K20,K22,K1F,K23,K21,K1E,    K2A,  K75,K77,K79,  K59,K5B,K5C,K4E, \
     K39,K00,K01,K02,K03,K05,K04,K26,K28,K25,K29,K27,    K70,K24,                K56,K57,K58,K45, \
     K38,K0A,K06,K07,K08,K09,K0B,K2D,K2E,K2B,K2F,K2C,    NO, K7B,      K3E,      K53,K54,K55,K4C, \
-    K36,K3A,K37,NO,         K31,        NO, NO, K7C,NO, NO, K7D,  K3B,K3D,K3C,      K52,K41,NO   \
+    K36,K37,K3A,NO,         K31,        NO, NO, K7C,NO, NO, K7D,  K3B,K3D,K3C,      K52,K41,NO   \
 )
 
 
