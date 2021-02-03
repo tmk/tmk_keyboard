@@ -169,8 +169,6 @@ uint8_t matrix_scan(void)
 
     switch (state) {
         case INIT:
-            ibmpc_host_disable();
-
             xprintf("I%u ", timer_read());
             keyboard_kind = NONE;
             keyboard_id = 0x0000;
@@ -183,17 +181,20 @@ uint8_t matrix_scan(void)
             state = WAIT_SETTLE;
             break;
         case WAIT_SETTLE:
+            // Reset when keyboad sends something
+            if (ibmpc_host_recv() != -1) {
+                state = AT_RESET;
+            }
+
             // wait for keyboard to settle after plugin
-            if (timer_elapsed(init_time) > 1000) {
+            if (timer_elapsed(init_time) > 3000) {
                 state = AT_RESET;
             }
             break;
         case AT_RESET:
-            ibmpc_host_isr_clear();
-            ibmpc_host_enable();
-            wait_ms(1); // keyboard can't respond to command without this
+            xprintf("A%u ", timer_read());
 
-            // SKIDATA-2-DE(and some other keyboards?) stores 'Code Set' setting in nonvlatile memory
+            // SKIDATA-2-DE(and some other keyboards?) stores 'Code Set' setting in nonvolatile memory
             // and keeps it until receiving reset. Sending reset here may be useful to clear it, perhaps.
             // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#select-alternate-scan-codesf0
 
@@ -203,7 +204,6 @@ uint8_t matrix_scan(void)
             } else {
                 state = XT_RESET;
             }
-            xprintf("A%u ", timer_read());
             break;
         case XT_RESET:
             // Reset XT-initialize keyboard
