@@ -135,18 +135,12 @@ int16_t ibmpc_host_send(uint8_t data)
     /* Stop bit */
     wait_us(15);
     data_hi();
-    WAIT(clock_hi, 50, 6);
-    if (ibmpc_protocol == IBMPC_PROTOCOL_AT_Z150) { goto RECV; }
-    WAIT(clock_lo, 50, 7);
 
     /* Ack */
-    WAIT(data_lo, 50, 8);
+    WAIT(data_lo, 300, 6);
+    WAIT(data_hi, 300, 7);
+    WAIT(clock_hi, 300, 8);
 
-    /* wait for idle state */
-    WAIT(clock_hi, 50, 9);
-    WAIT(data_hi, 50, 10);
-
-RECV:
     // clear buffer to get response correctly
     recv_data = 0xFFFF;
     ibmpc_host_isr_clear();
@@ -156,6 +150,8 @@ RECV:
     return ibmpc_host_recv_response();
 ERROR:
     ibmpc_error |= IBMPC_ERR_SEND;
+    inhibit();
+    wait_ms(2);
     idle();
     IBMPC_INT_ON();
     return -1;
