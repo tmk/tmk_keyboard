@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define AC_FN0  ACTION_LAYER_TAP_KEY(1, KC_GRV)
 #define AC_FN1  ACTION_LAYER_TAP_KEY(2, KC_BSLS)
-#define AC_PKEY ACTION_MODS_TAP_KEY(MOD_NONE, KC_POWER)
+#define AC_PKEY ACTION_MODS_TAP_KEY(MOD_NONE, KC_PWR)
 
 #ifdef KEYMAP_SECTION_ENABLE
 const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] __attribute__ ((section (".keymap.keymaps"))) = {
