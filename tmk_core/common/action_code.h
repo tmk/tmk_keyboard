@@ -36,8 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 001r|mods|0000 0000    Modifiers with OneShot[TAP]
  * 001r|mods|0000 0001    Modifiers with tap toggle[TAP]
  * 001r|mods|0000 00xx    (reserved)            (0x02-03)
- * 001r|mods| keycode     Modifiers with tap key(0x04-A4, E0-E7)[TAP]
- *                        (reserved)            (0xA5-DF, E8-FF)
+ * 001r|mods| keycode     Modifiers with tap key[TAP]
  *
  *
  * Other Keys(01xx)
@@ -71,10 +70,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 1001|oopp|BBBB BBBB   8-bit Bitwise Operation???
  *
  * ACT_LAYER_TAP(101x):
- * 101E|LLLL| keycode    On/Off with tap key    (0x04-A4, E0-E7)[TAP]
+ * 101E|LLLL| keycode    On/Off with tap key    [TAP]
  * 101E|LLLL|110r mods   On/Off with modifiers  (0xC0-DF)[NOT TAP]
  *                       r: Left/Right flag(Left:0, Right:1)
- *                       (reserved)             (0xA5-BF, E8-EF)
  * 101E|LLLL|1111 0000   Invert with tap toggle (0xF0)   [TAP]
  * 101E|LLLL|1111 0001   On/Off                 (0xF1)   [NOT TAP]
  * 101E|LLLL|1111 0010   Off/On                 (0xF2)   [NOT TAP]

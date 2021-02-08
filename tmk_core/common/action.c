@@ -555,18 +555,19 @@ bool is_tap_key(keyevent_t event)
             switch (action.key.code) {
                 case MODS_ONESHOT:
                 case MODS_TAP_TOGGLE:
-                case KC_A ... KC_EXSEL:                 // tap key
-                case KC_LCTRL ... KC_RGUI:              // tap key
+                default:                    // tap key
                     return true;
             }
         case ACT_LAYER_TAP:
         case ACT_LAYER_TAP_EXT:
             switch (action.layer_tap.code) {
+                case OP_ON_OFF:
+                case OP_OFF_ON:
+                case OP_SET_CLEAR:
                 case 0xc0 ... 0xdf:         // with modifiers
                     return false;
-                case KC_A ... KC_EXSEL:     // tap key
-                case KC_LCTRL ... KC_RGUI:  // tap key
                 case OP_TAP_TOGGLE:
+                default:                    // tap key
                     return true;
             }
             return false;

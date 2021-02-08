@@ -26,7 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define IS_ERROR(code)           (KC_ROLL_OVER <= (code) && (code) <= KC_UNDEFINED)
 #define IS_ANY(code)             (KC_A         <= (code) && (code) <= 0xFF)
 
-#ifndef ACTIONMAP_ENABLE
+// Use original HID usages on B0-DD instead of TMK specific codes
+#ifndef USE_ORIGINAL_HID_USAGE
 #define IS_KEY(code)             (KC_A         <= (code) && (code) <= KC_EXSEL)
 #else
 #define IS_KEY(code)             ((KC_A         <= (code) && (code) <= KC_EXSEL) || \
