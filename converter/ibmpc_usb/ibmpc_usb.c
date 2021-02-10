@@ -50,6 +50,11 @@ static int16_t read_wait(uint16_t wait_ms)
     return code;
 }
 
+#define ID_STR(id)  (id == 0xFFFE ? "_????" : \
+                    (id == 0xFFFD ? "_Z150" : \
+                    (id == 0x0000 ? "_AT84" : \
+                     "")))
+
 static uint16_t read_keyboard_id(void)
 {
     uint16_t id = 0;
@@ -281,7 +286,7 @@ uint8_t matrix_scan(void)
             } else if (0xFFFE == keyboard_id) {     // CodeSet2 PS/2 fails to response?
                 keyboard_kind = PC_AT;
             } else if (0xFFFD == keyboard_id) {     // Zenith Z-150 AT
-                keyboard_kind = PC_AT_Z150;
+                keyboard_kind = PC_AT;
             } else if (0x00FF == keyboard_id) {     // Mouse is not supported
                 xprintf("Mouse: not supported\n");
                 keyboard_kind = NONE;
@@ -340,7 +345,7 @@ uint8_t matrix_scan(void)
                 }
             }
 
-            xprintf("\nID:%04X(%s) ", keyboard_id, KEYBOARD_KIND_STR(keyboard_kind));
+            xprintf("\nID:%04X(%s%s) ", keyboard_id, KEYBOARD_KIND_STR(keyboard_kind), ID_STR(keyboard_id));
 
             state = SETUP;
             break;
@@ -351,9 +356,6 @@ uint8_t matrix_scan(void)
                     break;
                 case PC_AT:
                     led_set(host_keyboard_leds());
-                    break;
-                case PC_AT_Z150:
-                    // TODO: do not set indicators temporarily for debug
                     break;
                 case PC_TERMINAL:
                     // Set all keys to make/break type
@@ -392,7 +394,6 @@ uint8_t matrix_scan(void)
                         if (process_cs1(code) == -1) state = INIT;
                         break;
                     case PC_AT:
-                    case PC_AT_Z150:
                         if (process_cs2(code) == -1) state = INIT;
                         break;
                     case PC_TERMINAL:
