@@ -62,7 +62,7 @@ To compile firmware you need AVR GCC. You can edit *Makefile* and *config.h* to 
     $ make -f Makefile.rev2 clean
     $ make -f Makefile.rev2 [KEYMAP={intl|spacefn}]
 
-Use `Maefile.rev1` for TMK converter rev.1 and Teensy(ATMega32u4), instead.
+Use `Makefile.rev1` for TMK converter rev.1 and Teensy(ATMega32u4), instead.
 
 
 
