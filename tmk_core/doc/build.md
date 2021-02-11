@@ -14,6 +14,7 @@ Download and Install
 
 If you use a PJRC Teensy you don't need step 2 and 3 above, just get the [Teensy loader][teensy-loader].
 
+If you use NixOS or the Nix package manager, just run `nix-shell`.
 
 ### 2. Download Source
 You can find the firmware source on github:
