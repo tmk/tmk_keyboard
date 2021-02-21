@@ -47,10 +47,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 0100|10| usage(10)     (reserved)
  * 0100|11| usage(10)     (reserved)
  *
- * ACT_MOUSEKEY(0101): TODO: Not needed?
- * 0101|xxxx| keycode     Mouse key
- *
- * 011x|xxxx xxxx xxxx    (reseved)
+ * 0101|xxxx xxxx xxxx    (reserved)
+ * 011x|xxxx xxxx xxxx    (reserved)
  *
  *
  * Layer Actions(10xx)
@@ -73,11 +71,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 101E|LLLL| keycode    On/Off with tap key    [TAP]
  * 101E|LLLL|110r mods   On/Off with modifiers  (0xC0-DF)[NOT TAP]
  *                       r: Left/Right flag(Left:0, Right:1)
- * 101E|LLLL|1111 0000   Invert with tap toggle (0xF0)   [TAP]
- * 101E|LLLL|1111 0001   On/Off                 (0xF1)   [NOT TAP]
- * 101E|LLLL|1111 0010   Off/On                 (0xF2)   [NOT TAP]
- * 101E|LLLL|1111 0011   Set/Clear              (0xF3)   [NOT TAP]
- * 101E|LLLL|1111 xxxx   (reserved)             (0xF4-FF)
+ * 101E|LLLL|1110 1000   Invert with tap toggle (0xE8)   [TAP]
+ * 101E|LLLL|1110 1001   On/Off                 (0xE9)   [NOT TAP]
+ * 101E|LLLL|1110 1010   Off/On                 (0xEA)   [NOT TAP]
+ * 101E|LLLL|1110 1011   Set/Clear              (0xEB)   [NOT TAP]
+ * 101E|LLLL|1110 11xx   (reserved)             (0xEC-EF)
  *   ELLLL: layer 0-31(E: extra bit for layer 16-31)
  *
  *
@@ -107,7 +105,6 @@ enum action_kind_id {
     ACT_RMODS_TAP       = 0b0011,
     /* Other Keys */
     ACT_USAGE           = 0b0100,
-    ACT_MOUSEKEY        = 0b0101,
     /* Layer Actions */
     ACT_LAYER           = 0b1000,
     ACT_LAYER_TAP       = 0b1010, /* Layer  0-15 */
@@ -229,7 +226,6 @@ enum usage_pages {
 };
 #define ACTION_USAGE_SYSTEM(id)         ACTION(ACT_USAGE, PAGE_SYSTEM<<10 | (id))
 #define ACTION_USAGE_CONSUMER(id)       ACTION(ACT_USAGE, PAGE_CONSUMER<<10 | (id))
-#define ACTION_MOUSEKEY(key)            ACTION(ACT_MOUSEKEY, key)
 
 
 
@@ -248,7 +244,7 @@ enum layer_param_bit_op {
     OP_BIT_SET = 3,
 };
 enum layer_pram_tap_op {
-    OP_TAP_TOGGLE = 0xF0,
+    OP_TAP_TOGGLE = 0xE8,
     OP_ON_OFF,
     OP_OFF_ON,
     OP_SET_CLEAR,

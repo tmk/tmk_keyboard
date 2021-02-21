@@ -210,18 +210,6 @@ void process_action(keyrecord_t *record)
             }
             break;
 #endif
-#ifdef MOUSEKEY_ENABLE
-        /* Mouse key */
-        case ACT_MOUSEKEY:
-            if (event.pressed) {
-                mousekey_on(action.key.code);
-                mousekey_send();
-            } else {
-                mousekey_off(action.key.code);
-                mousekey_send();
-            }
-            break;
-#endif
 #ifndef NO_ACTION_LAYER
         case ACT_LAYER:
             if (action.layer_bitop.on == 0) {
@@ -454,6 +442,12 @@ void register_code(uint8_t code)
         wait_ms(50);
         bootloader_jump();
     }
+#ifdef MOUSEKEY_ENABLE
+    else if IS_MOUSEKEY(code) {
+        mousekey_on(code);
+        mousekey_send();
+    }
+#endif
 }
 
 void unregister_code(uint8_t code)
@@ -503,6 +497,12 @@ void unregister_code(uint8_t code)
     else if IS_CONSUMER(code) {
         host_consumer_send(0);
     }
+#ifdef MOUSEKEY_ENABLE
+    else if IS_MOUSEKEY(code) {
+        mousekey_off(code);
+        mousekey_send();
+    }
+#endif
 }
 
 void type_code(uint8_t code)
@@ -609,7 +609,6 @@ void debug_action(action_t action)
         case ACT_LMODS_TAP:         dprint("ACT_LMODS_TAP");         break;
         case ACT_RMODS_TAP:         dprint("ACT_RMODS_TAP");         break;
         case ACT_USAGE:             dprint("ACT_USAGE");             break;
-        case ACT_MOUSEKEY:          dprint("ACT_MOUSEKEY");          break;
         case ACT_LAYER:             dprint("ACT_LAYER");             break;
         case ACT_LAYER_TAP:         dprint("ACT_LAYER_TAP");         break;
         case ACT_LAYER_TAP_EXT:     dprint("ACT_LAYER_TAP_EXT");     break;
