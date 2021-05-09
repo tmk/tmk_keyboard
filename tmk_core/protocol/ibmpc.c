@@ -98,18 +98,30 @@ int16_t ibmpc_host_send(uint8_t data)
 {
     bool parity = true;
     ibmpc_error = IBMPC_ERR_NONE;
+    uint8_t retry = 0;
 
     dprintf("w%02X ", data);
 
+    // Not receiving data
+    if (isr_state != 0x8000) dprintf("isr:%04X ", isr_state);
+    while (isr_state != 0x8000) ;
+
+    // Not clock Lo
+    if (!clock_in()) dprintf("c:%u ", wait_clock_hi(1000));
+
+    // Not data Lo
+    if (!data_in()) dprintf("d:%u ", wait_data_hi(1000));
+
     IBMPC_INT_OFF();
 
+RETRY:
     /* terminate a transmission if we have */
     inhibit();
-    wait_us(100);    // [5]p.54
+    wait_us(200);    // [5]p.54
 
     /* 'Request to Send' and Start bit */
     data_lo();
-    wait_us(100);
+    wait_us(200);
     clock_hi();     // [5]p.54 [clock low]>100us [5]p.50
     WAIT(clock_lo, 10000, 1);   // [5]p.53, -10ms [5]p.50
 
@@ -149,6 +161,13 @@ int16_t ibmpc_host_send(uint8_t data)
     IBMPC_INT_ON();
     return ibmpc_host_recv_response();
 ERROR:
+    // Retry for Z-150 AT start bit error
+    if (ibmpc_error == 1 && retry++ < 10) {
+        ibmpc_error = IBMPC_ERR_NONE;
+        dprintf("R ");
+        goto RETRY;
+    }
+
     ibmpc_error |= IBMPC_ERR_SEND;
     inhibit();
     wait_ms(2);
