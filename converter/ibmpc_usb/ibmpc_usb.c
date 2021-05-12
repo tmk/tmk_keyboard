@@ -132,7 +132,7 @@ uint8_t matrix_scan(void)
 
 
     if (ibmpc_error) {
-        xprintf("\nERR:%02X ISR:%04X ", ibmpc_error, ibmpc_isr_debug);
+        xprintf("\n%u ERR:%02X ISR:%04X ", timer_read(), ibmpc_error, ibmpc_isr_debug);
 
         // when recv error, neither send error nor buffer full
         if (!(ibmpc_error & (IBMPC_ERR_SEND | IBMPC_ERR_FULL))) {
@@ -150,7 +150,7 @@ uint8_t matrix_scan(void)
 
     // check protocol change AT/XT
     if (ibmpc_protocol && ibmpc_protocol != current_protocol) {
-        xprintf("\nPRT:%02X ISR:%04X ", ibmpc_protocol, ibmpc_isr_debug);
+        xprintf("\n%u PRT:%02X ISR:%04X ", timer_read(), ibmpc_protocol, ibmpc_isr_debug);
 
         // protocol change between AT and XT indicates that
         // keyboard is hotswapped or something goes wrong.
