@@ -176,6 +176,7 @@ $(function() {
         $("#layer_mods_dropdown").val(act.layer_tap_code & 0x1f);
         $("#layer_on_dropdown").val(act.layer_bitop_op);
         $("#command_ids_dropdown").val(act.command_id);
+        $("#code_hex").val(('000' + code.toString(16)).substr(-4).toUpperCase());
     };
 
     // compile action code from editor
