@@ -323,8 +323,21 @@ uint8_t matrix_scan(void)
                 keyboard_kind = PC_AT;
             } else if (0xBF00 == (keyboard_id & 0xFF00)) {  // CodeSet3 Terminal
                 keyboard_kind = PC_TERMINAL;
+            } else if (0x7F00 == (keyboard_id & 0xFF00)) {  // CodeSet3 Terminal 1394204
+                keyboard_kind = PC_TERMINAL;
             } else {
-                keyboard_kind = PC_AT;
+                xprintf("\nUnknown ID: Report to TMK ");
+                if ((0xFA == ibmpc_host_send(0xF0)) &&
+                    (0xFA == ibmpc_host_send(0x02))) {
+                    // switch to code set 2
+                    keyboard_kind = PC_AT;
+                } else if ((0xFA == ibmpc_host_send(0xF0)) &&
+                           (0xFA == ibmpc_host_send(0x03))) {
+                    // switch to code set 3
+                    keyboard_kind = PC_TERMINAL;
+                } else {
+                    keyboard_kind = PC_AT;
+                }
             }
 
             xprintf("\nID:%04X(%s) ", keyboard_id, KEYBOARD_KIND_STR(keyboard_kind));
