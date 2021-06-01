@@ -751,6 +751,30 @@ static uint8_t cs2_e0code(uint8_t code) {
     }
 }
 
+// IBM 5576-002/003 Scan code translation
+// https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#ibm-5576-code-set-82h
+static uint8_t translate_5576_cs2(uint8_t code) {
+    switch (code) {
+        case 0x11: return 0x0F; // Zenmen   -> RALT
+        case 0x13: return 0x11; // Kanji    -> LALT
+        case 0x0E: return 0x54; // @
+        case 0x54: return 0x5B; // [
+        case 0x5B: return 0x5D; // ]
+        case 0x5C: return 0x6A; // JYEN
+        case 0x5D: return 0x6A; // JYEN
+        case 0x62: return 0x0E; // Han/Zen  -> `~
+        case 0x7C: return 0x77; // Keypad *
+    }
+    return code;
+}
+static uint8_t translate_5576_cs2_e0(uint8_t code) {
+    switch (code) {
+        case 0x11: return 0x13; // Hiragana -> KANA
+        case 0x41: return 0x7C; // Keypad '
+    }
+    return code;
+}
+
 static int8_t process_cs2(uint8_t code)
 {
     // scan code reading states
@@ -769,6 +793,9 @@ static int8_t process_cs2(uint8_t code)
 
     switch (state) {
         case INIT:
+            if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id) {
+                code = translate_5576_cs2(code);
+            }
             switch (code) {
                 case 0xE0:
                     state = E0;
@@ -802,6 +829,9 @@ static int8_t process_cs2(uint8_t code)
             }
             break;
         case E0:    // E0-Prefixed
+            if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id) {
+                code = translate_5576_cs2_e0(code);
+            }
             switch (code) {
                 case 0x12:  // to be ignored
                 case 0x59:  // to be ignored
@@ -822,6 +852,9 @@ static int8_t process_cs2(uint8_t code)
             }
             break;
         case F0:    // Break code
+            if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id) {
+                code = translate_5576_cs2(code);
+            }
             switch (code) {
                 case 0x83:  // F7
                     matrix_break(0x02);
@@ -843,6 +876,9 @@ static int8_t process_cs2(uint8_t code)
             }
             break;
         case E0_F0: // Break code of E0-prefixed
+            if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id) {
+                code = translate_5576_cs2_e0(code);
+            }
             switch (code) {
                 case 0x12:  // to be ignored
                 case 0x59:  // to be ignored
@@ -917,12 +953,15 @@ static int8_t process_cs2(uint8_t code)
     return 0;
 }
 
+
 /*
  * Terminal: Scan Code Set 3
  *
  * See [3], [7] and
  * https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#scan-code-set-3
  */
+// IBM 5576-001 Scan code translation
+// https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#ibm-5576-code-set-3
 static uint8_t translate_5576_cs3(uint8_t code) {
     switch (code) {
         // Fix positon of keys to fit 122-key layout
@@ -933,6 +972,7 @@ static uint8_t translate_5576_cs3(uint8_t code) {
     }
     return code;
 }
+
 static int8_t process_cs3(uint8_t code)
 {
     static enum {
