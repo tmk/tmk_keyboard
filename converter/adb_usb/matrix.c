@@ -351,15 +351,8 @@ void adb_mouse_task(void)
     x = xx * mouseacc;
     y = yy * mouseacc;
 
-    // TODO: Fix HID report descriptor for mouse to support finer resolution
-    // Cap our two bytes per axis to one byte.
-    // Easier with a MIN-function, but since -MAX(-a,-b) = MIN(a,b)...
-    // I.E. MIN(MAX(x,-127),127) = -MAX(-MAX(x, -127), -127) = MIN(-MIN(-x,127),127)
-    x = -MAX(-MAX(x, -127), -127);
-    y = -MAX(-MAX(y, -127), -127);
-
     if (scroll_enable) {
-        scroll_state += -y;
+        scroll_state -= y;
         mouse_report.v = scroll_state / scroll_speed;
         scroll_state %= scroll_speed;
 

@@ -159,10 +159,10 @@ typedef struct {
 
 typedef struct {
     uint8_t buttons;
-    int8_t x;
-    int8_t y;
-    int8_t v;
-    int8_t h;
+    int16_t x;
+    int16_t y;
+    int16_t v;
+    int16_t h;
 } __attribute__ ((packed)) report_mouse_t;
 
 
