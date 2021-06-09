@@ -255,12 +255,10 @@ detect_again:
     goto again;
 }
 
-#ifdef MAX
-#undef MAX
-#endif
-#define MAX(X, Y) ((X) > (Y) ? (X) : (Y))
-
 static report_mouse_t mouse_report = {};
+static int32_t scroll_state = 0;
+static uint8_t scroll_speed = ADB_MOUSE_SCROLL_SPEED;
+static uint8_t scroll_button_mask = (1 << ADB_MOUSE_SCROLL_BUTTON) >> 1;
 
 void adb_mouse_task(void)
 {
@@ -332,6 +330,12 @@ void adb_mouse_task(void)
     if (!(buf[2] & 0x80)) buttons |= MOUSE_BTN3;
     if (!(buf[1] & 0x80)) buttons |= MOUSE_BTN2;
     if (!(buf[0] & 0x80)) buttons |= MOUSE_BTN1;
+
+    // check if the scroll enable button is pressed
+    bool scroll_enable = (bool)(buttons & scroll_button_mask);
+    // mask out the scroll button so it isn't reported
+    buttons &= ~scroll_button_mask;
+
     mouse_report.buttons = buttons;
 
     int16_t xx, yy;
@@ -342,12 +346,23 @@ void adb_mouse_task(void)
     x = xx * mouseacc;
     y = yy * mouseacc;
 
-    // TODO: Fix HID report descriptor for mouse to support finer resolution
-    // Cap our two bytes per axis to one byte.
-    // Easier with a MIN-function, but since -MAX(-a,-b) = MIN(a,b)...
-    // I.E. MIN(MAX(x,-127),127) = -MAX(-MAX(x, -127), -127) = MIN(-MIN(-x,127),127)
-    mouse_report.x = -MAX(-MAX(x, -127), -127);
-    mouse_report.y = -MAX(-MAX(y, -127), -127);
+    x = (x > 127) ? 127 : ((x < -127) ? -127 : x);
+    y = (y > 127) ? 127 : ((y < -127) ? -127 : y);
+
+    if (scroll_enable) {
+        scroll_state -= y;
+        mouse_report.v = scroll_state / scroll_speed;
+        scroll_state %= scroll_speed;
+
+        mouse_report.x = 0;
+        mouse_report.y = 0;
+    } else {
+        scroll_state = 0;
+        mouse_report.v = 0;
+
+        mouse_report.x = x;
+        mouse_report.y = y;
+    }
 
     dmprintf("[B:%02X X:%d(%d) Y:%d(%d) A:%d]\n", mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouseacc);
 
