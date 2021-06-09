@@ -255,13 +255,8 @@ detect_again:
     goto again;
 }
 
-#ifdef MAX
-#undef MAX
-#endif
-#define MAX(X, Y) ((X) > (Y) ? (X) : (Y))
-
 static report_mouse_t mouse_report = {};
-static int16_t scroll_state = 0;
+static int32_t scroll_state = 0;
 static uint8_t scroll_speed = ADB_MOUSE_SCROLL_SPEED;
 static uint8_t scroll_button_mask = (1 << ADB_MOUSE_SCROLL_BUTTON) >> 1;
 
