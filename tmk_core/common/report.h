@@ -157,6 +157,7 @@ typedef struct {
 } __attribute__ ((packed)) report_keyboard_t;
 */
 
+#ifdef ENABLE_16_BIT_MOUSE_REPORT
 typedef struct {
     uint8_t buttons;
     int16_t x;
@@ -164,6 +165,15 @@ typedef struct {
     int16_t v;
     int16_t h;
 } __attribute__ ((packed)) report_mouse_t;
+#else
+typedef struct {
+    uint8_t buttons;
+    int8_t x;
+    int8_t y;
+    int8_t v;
+    int8_t h;
+} __attribute__ ((packed)) report_mouse_t;
+#endif
 
 
 /* keycode to system usage */
