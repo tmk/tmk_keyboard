@@ -346,6 +346,20 @@ void adb_mouse_task(void)
     x = xx * mouseacc;
     y = yy * mouseacc;
 
+    #ifndef ENABLE_16_BIT_MOUSE_REPORT
+        #ifdef MAX
+        #undef MAX
+        #endif
+        #define MAX(X, Y) ((X) > (Y) ? (X) : (Y))
+
+        // Cap our two bytes per axis to one byte.
+        // Easier with a MIN-function, but since -MAX(-a,-b) = MIN(a,b)...
+        // I.E. MIN(MAX(x,-127),127) = -MAX(-MAX(x, -127), -127) = MIN(-MIN(-x,127),127)
+
+        x = -MAX(-MAX(x, -127), -127);
+        y = -MAX(-MAX(y, -127), -127);
+    #endif
+
     if (scroll_enable) {
         scroll_state -= y;
         mouse_report.v = scroll_state / scroll_speed;

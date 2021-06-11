@@ -100,7 +100,12 @@ ADB_MOUSE_SCROLL_SPEED ?= 10	# 1 (fastest) to 127 (slowest)
 # ADB Classic Mouse Protocol supports 7-bit mouse x,y precision (i.e. Original Apple Mouse)
 # ADB Extended Mouse Protocol supports 7, 10, 13, and 16-bit precisions
 # i.e. Kensington Turbo Mouse 5 uses 10-bit precision
-ADB_MOUSE_PRECISION ?= 10	# Sets bit precision of the mouse
+ADB_MOUSE_PRECISION ?= 10	    # Sets bit precision of the mouse
+
+# UEFI, embedded devices, and old OSes may not support 16-bit mouse reports
+# Disable this option if you see issues with these devices
+# ADB_MOUSE_PRECISION should be <= 8 when this is disabled
+ENABLE_16_BIT_MOUSE_REPORT = yes
 
 # Optimize size but this may cause error "relocation truncated to fit"
 #EXTRALDFLAGS = -Wl,--relax
@@ -109,7 +114,10 @@ OPT_DEFS += -DADB_MOUSE_SCROLL_BUTTON=$(ADB_MOUSE_SCROLL_BUTTON)
 OPT_DEFS += -DADB_MOUSE_SCROLL_SPEED=$(ADB_MOUSE_SCROLL_SPEED)
 OPT_DEFS += -DMOUSE_PRECISION=$(ADB_MOUSE_PRECISION)
 OPT_DEFS += -DMOUSE_WHEEL_PRECISION=$(ADB_MOUSE_PRECISION)
-OPT_DEFS += -DENABLE_16_BIT_MOUSE_REPORT=yes
+
+ifeq (yes,$(strip $(ENABLE_16_BIT_MOUSE_REPORT)))
+    OPT_DEFS += -DENABLE_16_BIT_MOUSE_REPORT=$(ENABLE_16_BIT_MOUSE_REPORT)
+endif
 
 #
 # Keymap file
