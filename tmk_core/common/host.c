@@ -65,6 +65,11 @@ void host_keyboard_send(report_keyboard_t *report)
 void host_mouse_send(report_mouse_t *report)
 {
     if (!driver) return;
+#ifdef ENABLE_16_BIT_MOUSE_REPORT
+    // clip and copy to Boot protocol XY
+    report->boot_x = (report->x > 127) ? 127 : ((report->x < -127) ? -127 : report->x);
+    report->boot_y = (report->y > 127) ? 127 : ((report->y < -127) ? -127 : report->y);
+#endif
     (*driver->send_mouse)(report);
 }
 

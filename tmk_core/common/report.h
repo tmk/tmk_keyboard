@@ -160,6 +160,8 @@ typedef struct {
 #ifdef ENABLE_16_BIT_MOUSE_REPORT
 typedef struct {
     uint8_t buttons;
+    int8_t boot_x;
+    int8_t boot_y;
     int16_t x;
     int16_t y;
     int16_t v;
