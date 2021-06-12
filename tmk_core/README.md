@@ -2,7 +2,7 @@ TMK Keyboard Firmware Core Library
 ==================================
 This is a keyboard firmware library with some useful features for Atmel AVR and Cortex-M.
 
-Source code is available here: <https://github.com/tmk/tmk_keyboard/tree/core>
+Source code is available here: <https://github.com/tmk/tmk_keyboard/tree/master/tmk_core>
 
 
 Updates
