@@ -104,6 +104,8 @@ uint8_t  adb_host_talk_buf(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len)
 void     adb_host_listen(uint8_t addr, uint8_t reg, uint8_t data_h, uint8_t data_l);
 void     adb_host_listen_buf(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len);
 void     adb_host_flush(uint8_t addr);
+void     adb_host_reset(void);
+void     adb_host_reset_hard(void);
 void     adb_host_kbd_led(uint8_t addr, uint8_t led);
 void     adb_mouse_task(void);
 void     adb_mouse_init(void);

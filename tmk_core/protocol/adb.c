@@ -254,6 +254,23 @@ void adb_host_flush(uint8_t addr)
     sei();
 }
 
+void adb_host_reset(void)
+{
+    cli();
+    attention();
+    send_byte(ADB_CMD_RESET);
+    place_bit0();               // Stopbit(0)
+    _delay_us(200);             // Tlt/Stop to Start
+    sei();
+}
+
+void adb_host_reset_hard(void)
+{
+    data_lo();
+    _delay_us(3000);
+    data_hi();
+}
+
 // send state of LEDs
 void adb_host_kbd_led(uint8_t addr, uint8_t led)
 {
