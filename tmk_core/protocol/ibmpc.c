@@ -203,8 +203,8 @@ int16_t ibmpc_host_recv(void)
                 ret = 0xFF;
                 break;
             case IBMPC_ERR_FULL:
-                // buffer full
-                dprintf("!FULL! ");
+                // buffer overflow
+                dprintf("!OVF! ");
                 ret = 0xFF;
                 break;
             case 0xFF:
@@ -226,6 +226,12 @@ int16_t ibmpc_host_recv(void)
         }
     }
 
+    // Enable ISR if recv_data is not full
+    if ((recv_data | 0x00FF) == 0xFFFF) {
+        ibmpc_host_isr_clear();
+        IBMPC_INT_ON();
+        idle();
+    }
     //dprintf("i%04X ", ibmpc_isr_debug); ibmpc_isr_debug = 0;
     dprintf("r%02X ", ret);
     return ret;
@@ -412,7 +418,7 @@ DONE:
         goto ERROR;
     }
     if (HI8(recv_data) != 0xFF && LO8(recv_data) != 0xFF) {
-        // buffer full
+        // buffer overflow
         ibmpc_error = IBMPC_ERR_FULL;
         goto ERROR;
     }
@@ -420,6 +426,13 @@ DONE:
     recv_data = recv_data<<8;
     recv_data |= isr_state & 0xFF;
 CLEAR:
+    // Disable ISR if recv_data is full
+    if ((recv_data | 0x00FF) != 0xFFFF) {
+        IBMPC_INT_OFF();
+        // inhibit: clock_lo
+        IBMPC_CLOCK_PORT &= ~(1<<IBMPC_CLOCK_BIT);
+        IBMPC_CLOCK_DDR  |=  (1<<IBMPC_CLOCK_BIT);
+    }
     // clear for next data
     isr_state = 0x8000;
 NEXT:
