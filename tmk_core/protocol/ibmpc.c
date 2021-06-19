@@ -153,19 +153,12 @@ RETRY:
     WAIT(data_hi, 300, 7);
     WAIT(clock_hi, 300, 8);
 
-    uint16_t d = recv_data;
-
     // clear buffer to get response correctly
     ibmpc_host_isr_clear();
 
     idle();
     IBMPC_INT_ON();
-    int16_t r = ibmpc_host_recv_response();
-    if (d != 0xFFFF) dprintf("r:%04X ", d);
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-        recv_data = d;
-    }
-    return r;
+    return ibmpc_host_recv_response();
 ERROR:
     // Retry for Z-150 AT start bit error
     if (ibmpc_error == 1 && retry++ < 10) {
