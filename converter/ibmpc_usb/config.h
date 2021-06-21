@@ -43,7 +43,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define G80_2551_SUPPORT
 
 // PS/2 Mouse support
-#define IBMPC_MOUSE_ENABLE
+//#define IBMPC_MOUSE_ENABLE
+
+// Mouse Extended Report
+//#define MOUSE_EXT_REPORT
 
 
 /*

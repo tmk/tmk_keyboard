@@ -574,10 +574,15 @@ MOUSE_DONE:
                         #define CHOP8(a)    (((a) > 127) ? 127 : (((a) < -127) ? -127 : (a)))
                         report_mouse_t mouse_report = {};
                         mouse_report.buttons = mouse_btn;
-                        mouse_report.x = CHOP8(x);
-                        mouse_report.y = -(CHOP8(y));
-                        mouse_report.v = -(CHOP8(v));
-                        mouse_report.h = CHOP8(h);
+                        #ifdef MOUSE_EXT_REPORT
+                        mouse_report.x =  x;
+                        mouse_report.y = -y;
+                        #else
+                        mouse_report.x =  CHOP8(x);
+                        mouse_report.y = -CHOP8(y);
+                        #endif
+                        mouse_report.v = -CHOP8(v);
+                        mouse_report.h =  CHOP8(h);
                         host_mouse_send(&mouse_report);
                         xprintf("M[x:%d y:%d v:%d h:%d b:%02X]\n", mouse_report.x, mouse_report.y,
                                 mouse_report.v, mouse_report.h, mouse_report.buttons);
