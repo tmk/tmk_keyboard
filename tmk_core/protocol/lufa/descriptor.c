@@ -84,35 +84,6 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM KeyboardReport[] =
 };
 
 #ifdef MOUSE_ENABLE
-
-#ifdef ENABLE_16_BIT_MOUSE_REPORT
-    #define REPORT_SIZE 16
-
-    #ifndef MOUSE_PRECISION
-        #define MOUSE_PRECISION 16
-    #endif
-
-    #ifndef MOUSE_WHEEL_PRECISION
-        #define MOUSE_WHEEL_PRECISION 16
-    #endif
-#else
-    #define REPORT_SIZE 8
-
-    #ifndef MOUSE_PRECISION
-        #define MOUSE_PRECISION 8
-    #endif
-
-    #ifndef MOUSE_WHEEL_PRECISION
-        #define MOUSE_WHEEL_PRECISION 8
-    #endif
-#endif
-
-#define HID_MOUSE_REPORT_SIZE HID_RI_REPORT_SIZE(8, REPORT_SIZE)
-#define HID_MOUSE_LOGICAL_MINIMUM HID_RI_LOGICAL_MINIMUM(REPORT_SIZE, (-1 << (MOUSE_PRECISION - 1)) + 1)
-#define HID_MOUSE_LOGICAL_MAXIMUM HID_RI_LOGICAL_MAXIMUM(REPORT_SIZE, (1 << (MOUSE_PRECISION - 1)) - 1)
-#define HID_MOUSE_WHEEL_LOGICAL_MINIMUM HID_RI_LOGICAL_MINIMUM(REPORT_SIZE, (-1 << (MOUSE_WHEEL_PRECISION - 1)) + 1)
-#define HID_MOUSE_WHEEL_LOGICAL_MAXIMUM HID_RI_LOGICAL_MAXIMUM(REPORT_SIZE, (1 << (MOUSE_WHEEL_PRECISION - 1)) - 1)
-
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM MouseReport[] =
 {
     HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
@@ -123,38 +94,55 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM MouseReport[] =
 
             HID_RI_USAGE_PAGE(8, 0x09), /* Button */
             HID_RI_USAGE_MINIMUM(8, 0x01),  /* Button 1 */
-            HID_RI_USAGE_MAXIMUM(8, 0x05),  /* Button 5 */
+            HID_RI_USAGE_MAXIMUM(8, 0x08),  /* Button 8 */
             HID_RI_LOGICAL_MINIMUM(8, 0x00),
             HID_RI_LOGICAL_MAXIMUM(8, 0x01),
-            HID_RI_REPORT_COUNT(8, 0x05),
+            HID_RI_REPORT_COUNT(8, 0x08),
             HID_RI_REPORT_SIZE(8, 0x01),
             HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
-            HID_RI_REPORT_COUNT(8, 0x01),
-            HID_RI_REPORT_SIZE(8, 0x03),
-            HID_RI_INPUT(8, HID_IOF_CONSTANT),
+
+#ifndef MOUSE_EXT_REPORT
+            HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
+            HID_RI_USAGE(8, 0x30), /* Usage X */
+            HID_RI_USAGE(8, 0x31), /* Usage Y */
+            HID_RI_LOGICAL_MINIMUM(8, -127),
+            HID_RI_LOGICAL_MAXIMUM(8, 127),
+            HID_RI_REPORT_COUNT(8, 0x02),
+            HID_RI_REPORT_SIZE(8, 0x08),
+            HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_RELATIVE),
+#else
+            /* Boot protocol XY ignored in Report protocol */
+            HID_RI_USAGE_PAGE(8, 0xff), /* Vendor */
+            HID_RI_USAGE(8, 0xff), /* Vendor  */
+            HID_RI_LOGICAL_MINIMUM(8, -127),
+            HID_RI_LOGICAL_MAXIMUM(8, 127),
+            HID_RI_REPORT_COUNT(8, 0x02),
+            HID_RI_REPORT_SIZE(8, 0x08),
+            HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_RELATIVE),
 
             HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
             HID_RI_USAGE(8, 0x30), /* Usage X */
             HID_RI_USAGE(8, 0x31), /* Usage Y */
-            HID_MOUSE_LOGICAL_MINIMUM,
-            HID_MOUSE_LOGICAL_MAXIMUM,
+            HID_RI_LOGICAL_MINIMUM(16, -32767),
+            HID_RI_LOGICAL_MAXIMUM(16,  32767),
             HID_RI_REPORT_COUNT(8, 0x02),
-            HID_MOUSE_REPORT_SIZE,
+            HID_RI_REPORT_SIZE(8, 16),
             HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_RELATIVE),
+#endif
 
             HID_RI_USAGE(8, 0x38), /* Wheel */
-            HID_MOUSE_WHEEL_LOGICAL_MINIMUM,
-            HID_MOUSE_WHEEL_LOGICAL_MAXIMUM,
+            HID_RI_LOGICAL_MINIMUM(8, -127),
+            HID_RI_LOGICAL_MAXIMUM(8, 127),
             HID_RI_REPORT_COUNT(8, 0x01),
-            HID_MOUSE_REPORT_SIZE,
+            HID_RI_REPORT_SIZE(8, 0x08),
             HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_RELATIVE),
 
             HID_RI_USAGE_PAGE(8, 0x0C), /* Consumer */
             HID_RI_USAGE(16, 0x0238), /* AC Pan (Horizontal wheel) */
-            HID_MOUSE_WHEEL_LOGICAL_MINIMUM,
-            HID_MOUSE_WHEEL_LOGICAL_MAXIMUM,
+            HID_RI_LOGICAL_MINIMUM(8, -127),
+            HID_RI_LOGICAL_MAXIMUM(8, 127),
             HID_RI_REPORT_COUNT(8, 0x01),
-            HID_MOUSE_REPORT_SIZE,
+            HID_RI_REPORT_SIZE(8, 0x08),
             HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_RELATIVE),
 
         HID_RI_END_COLLECTION(0),
