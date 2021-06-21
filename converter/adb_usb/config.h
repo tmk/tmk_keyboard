@@ -39,6 +39,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Locking resynchronize hack */
 #define LOCKING_RESYNC_ENABLE
 
+// Mouse Extended Report
+#define MOUSE_EXT_REPORT
+
 
 /* ADB port setting */
 #define ADB_PORT        PORTD

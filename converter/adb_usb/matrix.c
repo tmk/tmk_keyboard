@@ -346,8 +346,10 @@ void adb_mouse_task(void)
     x = xx * mouseacc;
     y = yy * mouseacc;
 
+    #ifndef MOUSE_EXT_REPORT
     x = (x > 127) ? 127 : ((x < -127) ? -127 : x);
     y = (y > 127) ? 127 : ((y < -127) ? -127 : y);
+    #endif
 
     if (scroll_enable) {
         scroll_state -= y;
@@ -364,7 +366,7 @@ void adb_mouse_task(void)
         mouse_report.y = y;
     }
 
-    dmprintf("[B:%02X X:%d(%d) Y:%d(%d) A:%d]\n", mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouseacc);
+    dmprintf("[B:%02X X:%d(%d) Y:%d(%d) V:%d A:%d]\n", mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouse_report.v, mouseacc);
 
     // Send result by usb.
     host_mouse_send(&mouse_report);
