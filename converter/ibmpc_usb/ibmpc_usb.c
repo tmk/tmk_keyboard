@@ -135,6 +135,15 @@ uint8_t matrix_scan(void)
     } state = INIT;
     static uint16_t init_time;
 
+#ifdef IBMPC_MOUSE_ENABLE
+    static enum {
+        MOUSE_DEFAULT  = 0, // Default three-button
+        MOUSE_INTELLI  = 3, // Intellimouse Explorer 3-button & wheel
+        MOUSE_EXPLORER = 4, // Intellimouse Explorer 5-button & wheel
+        MOUSE_LOGITECH = 9  // Logitech PS/2++
+    } mouse_id = MOUSE_DEFAULT;
+    static uint8_t mouse_btn = 0;
+#endif
 
     if (ibmpc_error) {
         xprintf("\n%u ERR:%02X ISR:%04X ", timer_read(), ibmpc_error, ibmpc_isr_debug);
@@ -288,8 +297,7 @@ uint8_t matrix_scan(void)
             } else if (0xFFFD == keyboard_id) {     // Zenith Z-150 AT
                 keyboard_kind = PC_AT;
             } else if (0x00FF == keyboard_id) {     // Mouse is not supported
-                xprintf("Mouse: not supported\n");
-                keyboard_kind = NONE;
+                keyboard_kind = PC_MOUSE;
             } else if (0xAB85 == keyboard_id || // IBM 122-key Model M, NCD N-97
                        0xAB86 == keyboard_id || // Cherry G80-2551, IBM 1397000
                        0xAB92 == keyboard_id) { // IBM 5576-001
@@ -363,6 +371,83 @@ uint8_t matrix_scan(void)
                     // This should not be harmful
                     led_set(host_keyboard_leds());
                     break;
+#ifdef IBMPC_MOUSE_ENABLE
+                case PC_MOUSE: {
+                    uint8_t s[3];
+                    void read_status(void) {
+                        ibmpc_host_send(0xE9);
+                        s[0] = ibmpc_host_recv_response();
+                        s[1] = ibmpc_host_recv_response();
+                        s[2] = ibmpc_host_recv_response();
+                        xprintf("S[%02X %02X %02X] ", s[0], s[1], s[2]);
+                    }
+
+                    ibmpc_host_send(0xF5);  // Disable
+                    ibmpc_host_send(0xEA);  // Set Stream Mode
+                    read_status();
+
+                    // Logitech Magic Status
+                    // https://github.com/torvalds/linux/blob/master/drivers/input/mouse/logips2pp.c#L352
+                    xprintf("\nLMS: ");
+                    ibmpc_host_send(0xE8); ibmpc_host_send(0x00);
+                    ibmpc_host_send(0xE6); ibmpc_host_send(0xE6); ibmpc_host_send(0xE6);
+                    read_status();
+                    if (s[0] == 0 || s[1] == 0) {
+                        // Not Logitech
+                        goto MOUSE_INTELLI;
+                    }
+
+                    // Logitech Magic Knock
+                    // https://www.win.tue.nl/~aeb/linux/kbd/scancodes-13.html
+                    // https://web.archive.org/web/20030714000535/www.dqcs.com/logitech/ps2ppspec.htm
+                    // https://github.com/torvalds/linux/blob/5bfc75d92efd494db37f5c4c173d3639d4772966/drivers/input/serio/libps2.c#L347
+                    xprintf("\nLOG: ");
+                    // sliced magic byte: 0x39
+                    ibmpc_host_send(0xE6);
+                    ibmpc_host_send(0xE8); ibmpc_host_send(0x00);
+                    ibmpc_host_send(0xE8); ibmpc_host_send(0x03);
+                    ibmpc_host_send(0xE8); ibmpc_host_send(0x02);
+                    ibmpc_host_send(0xE8); ibmpc_host_send(0x01);
+                    // sliced magic byte: 0xDB
+                    ibmpc_host_send(0xE6);
+                    ibmpc_host_send(0xE8); ibmpc_host_send(0x03);
+                    ibmpc_host_send(0xE8); ibmpc_host_send(0x01);
+                    ibmpc_host_send(0xE8); ibmpc_host_send(0x02);
+                    ibmpc_host_send(0xE8); ibmpc_host_send(0x03);
+                    mouse_id = MOUSE_LOGITECH;  // 9
+                    goto MOUSE_DONE;
+
+MOUSE_INTELLI:
+                    // Intellimouse protocol: 3
+                    xprintf("\nINT: ");
+                    ibmpc_host_send(0xF3); ibmpc_host_send(0xC8);
+                    ibmpc_host_send(0xF3); ibmpc_host_send(0x64);
+                    ibmpc_host_send(0xF3); ibmpc_host_send(0x50);
+                    mouse_id = read_keyboard_id() >> 8;
+
+                    // Intellimouse Explorer protocol: 4
+                    xprintf("\nEXP: ");
+                    ibmpc_host_send(0xF3); ibmpc_host_send(0xC8);
+                    ibmpc_host_send(0xF3); ibmpc_host_send(0xC8);
+                    ibmpc_host_send(0xF3); ibmpc_host_send(0x50);
+                    mouse_id = read_keyboard_id() >> 8;
+
+                    // Not Intellimouse
+                    if (mouse_id == 0) {
+                        xprintf("\nDEF: ");
+                        ibmpc_host_send(0xF6);  // Set Default
+                    }
+
+MOUSE_DONE:
+                    //ibmpc_host_send(0xEA);  // Set Stream Mode
+                    ibmpc_host_send(0xF4);  // Enable
+                    read_status();
+                    xprintf("\nMouse: %s\n", ((mouse_id == MOUSE_LOGITECH) ? "LOGITECH" :
+                                             ((mouse_id == MOUSE_INTELLI)  ? "INTELLI" :
+                                             ((mouse_id == MOUSE_EXPLORER) ? "EXPLORER" :
+                                             ((mouse_id == MOUSE_DEFAULT)  ? "DEFAULT" : "???")))));
+                    break; }
+#endif
                 default:
                     break;
             }
@@ -380,12 +465,12 @@ uint8_t matrix_scan(void)
                 // Scan Code Set 1: 0xFF
                 // Scan Code Set 2 and 3: 0x00
                 // Buffer full(IBMPC_ERR_FULL): 0xFF
-                if (code == 0x00 || code == 0xFF) {
+                if (keyboard_kind != PC_MOUSE && (code == 0x00 || code == 0xFF)) {
                     // clear stuck keys
                     matrix_clear();
                     clear_keyboard();
 
-                    xprintf("\n[OVR] ");
+                    xprintf("\n[CLR] ");
                     break;
                 }
 
@@ -399,6 +484,108 @@ uint8_t matrix_scan(void)
                     case PC_TERMINAL:
                         if (process_cs3(code) == -1) state = INIT;
                         break;
+#ifdef IBMPC_MOUSE_ENABLE
+                    case PC_MOUSE: {
+                        // Logitec Mouse Data:
+                        // https://github.com/torvalds/linux/blob/d2912cb15bdda8ba4a5dd73396ad62641af2f520/drivers/input/mouse/logips2pp.c#L41
+                        // Intellimouse Data:
+                        // https://www.win.tue.nl/~aeb/linux/kbd/scancodes-13.html
+                        int16_t b0, b1, b2, b3;
+                        int16_t x = 0, y = 0;
+                        int8_t  v = 0, h = 0;
+
+                        b0 = code;
+                        b1 = ibmpc_host_recv_response();
+                        if (b1 == -1) break;
+                        b2 = ibmpc_host_recv_response();
+                        if (b2 == -1) break;
+
+                        switch (mouse_id) {
+                            case MOUSE_DEFAULT:
+                            case MOUSE_INTELLI:
+                            case MOUSE_EXPLORER:
+                                mouse_btn = (mouse_btn & 0xF8) | (b0 & 0x07);
+                                x = (b0 & 0x10) ? (b1 | 0xFF00) : b1;
+                                y = (b0 & 0x20) ? (b2 | 0xFF00) : b2;
+                                break;
+                            case MOUSE_LOGITECH:
+                                if ((b0 & 0x48) == 0x48 && (b1 & 0x02) == 0x02) {
+                                    switch (((b0 & 0x30) >> 2) | ((b1 & 0x30) >> 4)) {
+                                        case 1: // C8 Dx xx
+                                            // Ignored while Scroll-Up/Down is pressed
+                                            if (!(b2 & 0x40)) {
+                                                if (b2 & 0x80)
+                                                    h = ((b2 & 0x08) ? 0xF0 : 0x00) | (b2 & 0x0F);
+                                                else
+                                                    v = ((b2 & 0x08) ? 0xF0 : 0x00) | (b2 & 0x0F);
+                                            }
+                                            // Back
+                                            if (b2 & 0x10) mouse_btn |= (1 << 3); else mouse_btn &= ~(1 << 3);
+                                            // Forward
+                                            if (b2 & 0x20) mouse_btn |= (1 << 4); else mouse_btn &= ~(1 << 4);
+                                            break;
+                                        case 2: // C8 Ex xx
+                                            if (b2 & 0x01) mouse_btn |= (1 << 6); else mouse_btn &= ~(1 << 6);
+                                            if (b2 & 0x02) mouse_btn |= (1 << 7); else mouse_btn &= ~(1 << 7);
+                                            // Task
+                                            if (b2 & 0x04) mouse_btn |= (1 << 5); else mouse_btn &= ~(1 << 5);
+                                            // Scroll-Up
+                                            if (b2 & 0x08) mouse_btn |= (1 << 6); else mouse_btn &= ~(1 << 6);
+                                            // Scroll-Down
+                                            if (b2 & 0x10) mouse_btn |= (1 << 7); else mouse_btn &= ~(1 << 7);
+                                            break;
+                                        case 3: // TouchPad?
+                                            if (b2 & 0x80)
+                                                h = ((b2 & 0x80) ? 0xF0 : 0x00) | ((b2 >> 4) & 0x0F);
+                                            else
+                                                v = ((b2 & 0x80) ? 0xF0 : 0x00) | ((b2 >> 4) & 0x0F);
+
+                                            mouse_btn = (mouse_btn & 0xF8) | (b2 & 0x07);
+                                            break;
+                                    }
+                                } else {
+                                    mouse_btn = (mouse_btn & 0xF8) | (b0 & 0x07);
+                                    x = (b0 & 0x10) ? (b1 | 0xFF00) : b1;
+                                    y = (b0 & 0x20) ? (b2 | 0xFF00) : b2;
+                                }
+                                break;
+                        }
+
+                        // Extra byte
+                        switch (mouse_id) {
+                            case MOUSE_INTELLI:
+                                b3 = ibmpc_host_recv_response();
+                                if (b3 == -1) break;
+                                v = b3 & 0xFF;
+                                break;
+                            case MOUSE_EXPLORER:
+                                b3 = ibmpc_host_recv_response();
+                                if (b3 == -1) break;
+                                // sign extension
+                                v = ((b3 & 0x08) ? 0xF0 : 0x00) | (b3 & 0x0F);
+
+                                // Back/Forward
+                                if (b3 & 0x10) mouse_btn |= (1 << 3); else mouse_btn &= ~(1 << 3);
+                                if (b3 & 0x20) mouse_btn |= (1 << 4); else mouse_btn &= ~(1 << 4);
+                                break;
+                            default:
+				break;
+                        }
+
+
+                        // chop to 8-bit
+                        #define CHOP8(a)    (((a) > 127) ? 127 : (((a) < -127) ? -127 : (a)))
+                        report_mouse_t mouse_report = {};
+                        mouse_report.buttons = mouse_btn;
+                        mouse_report.x = CHOP8(x);
+                        mouse_report.y = -(CHOP8(y));
+                        mouse_report.v = -(CHOP8(v));
+                        mouse_report.h = CHOP8(h);
+                        host_mouse_send(&mouse_report);
+                        xprintf("M[x:%d y:%d v:%d h:%d b:%02X]\n", mouse_report.x, mouse_report.y,
+                                mouse_report.v, mouse_report.h, mouse_report.buttons);
+                        break; }
+#endif
                     default:
                         break;
                 }
@@ -461,6 +648,7 @@ void led_set(uint8_t usb_led)
     // XT keyobard doesn't support any command and it is harmful perhaps
     // https://github.com/tmk/tmk_keyboard/issues/635#issuecomment-626993437
     if (keyboard_kind == PC_XT) return;
+    if (keyboard_kind == PC_MOUSE) return;
 
     // It should be safe to send the command to keyboards with AT protocol
     // - IBM Terminal doesn't support the command and response with 0xFE but it is not harmful.

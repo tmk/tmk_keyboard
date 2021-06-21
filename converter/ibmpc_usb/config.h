@@ -42,6 +42,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // G80-2551 terminal keyboard support
 #define G80_2551_SUPPORT
 
+// PS/2 Mouse support
+#define IBMPC_MOUSE_ENABLE
+
 
 /*
  * Pin and interrupt configuration
