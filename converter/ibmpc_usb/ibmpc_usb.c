@@ -90,7 +90,6 @@ DONE:
 void hook_early_init(void)
 {
     ibmpc_host_init();
-    ibmpc_host_enable();
 }
 
 void matrix_init(void)
@@ -193,12 +192,10 @@ uint8_t matrix_scan(void)
 
             init_time = timer_read();
             state = WAIT_SETTLE;
+            ibmpc_host_enable();
             break;
         case WAIT_SETTLE:
-            // Reset when keyboad sends something
-            if (ibmpc_host_recv() != -1) {
-                state = AT_RESET;
-            }
+            while (ibmpc_host_recv() != -1) ; // read data
 
             // wait for keyboard to settle after plugin
             if (timer_elapsed(init_time) > 3000) {
