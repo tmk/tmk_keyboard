@@ -71,6 +71,8 @@ void matrix_init(void)
     DDRD |= (1<<6); PORTD |= (1<<6);
 
     adb_host_init();
+    adb_host_reset_hard();
+    //adb_host_reset(); // some of devices done't recognize
 
     // AEK/AEKII(ANSI/ISO) startup is slower. Without proper delay
     // it would fail to recognize layout and enable Extended protocol.
