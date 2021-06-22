@@ -75,6 +75,10 @@ ifeq (yes,$(strip $(NKRO_ENABLE)))
     OPT_DEFS += -DNKRO_ENABLE
 endif
 
+ifeq (yes,$(strip $(NKRO_6KRO_ENABLE)))
+    OPT_DEFS += -DNKRO_6KRO_ENABLE
+endif
+
 ifeq (yes,$(strip $(USB_6KRO_ENABLE)))
     OPT_DEFS += -DUSB_6KRO_ENABLE
 endif
