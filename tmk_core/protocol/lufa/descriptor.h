@@ -57,18 +57,11 @@ typedef struct
     USB_HID_Descriptor_HID_t              Keyboard_HID;
     USB_Descriptor_Endpoint_t             Keyboard_INEndpoint;
 
-#ifdef MOUSE_ENABLE
+#if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
     // Mouse HID Interface
     USB_Descriptor_Interface_t            Mouse_Interface;
     USB_HID_Descriptor_HID_t              Mouse_HID;
     USB_Descriptor_Endpoint_t             Mouse_INEndpoint;
-#endif
-
-#ifdef EXTRAKEY_ENABLE
-    // Extrakey HID Interface
-    USB_Descriptor_Interface_t            Extrakey_Interface;
-    USB_HID_Descriptor_HID_t              Extrakey_HID;
-    USB_Descriptor_Endpoint_t             Extrakey_INEndpoint;
 #endif
 
 #ifdef CONSOLE_ENABLE
@@ -91,22 +84,16 @@ typedef struct
 /* index of interface */
 #define KEYBOARD_INTERFACE          0
 
-#ifdef MOUSE_ENABLE
+#if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
 #   define MOUSE_INTERFACE          (KEYBOARD_INTERFACE + 1)
 #else
 #   define MOUSE_INTERFACE          KEYBOARD_INTERFACE
 #endif 
 
-#ifdef EXTRAKEY_ENABLE
-#   define EXTRAKEY_INTERFACE       (MOUSE_INTERFACE + 1)
-#else
-#   define EXTRAKEY_INTERFACE       MOUSE_INTERFACE
-#endif 
-
 #ifdef CONSOLE_ENABLE
-#   define CONSOLE_INTERFACE        (EXTRAKEY_INTERFACE + 1)
+#   define CONSOLE_INTERFACE        (MOUSE_INTERFACE + 1)
 #else
-#   define CONSOLE_INTERFACE        EXTRAKEY_INTERFACE
+#   define CONSOLE_INTERFACE        MOUSE_INTERFACE
 #endif
 
 #ifdef NKRO_6KRO_ENABLE
@@ -123,23 +110,17 @@ typedef struct
 // Endopoint number and size
 #define KEYBOARD_IN_EPNUM           1
 
-#ifdef MOUSE_ENABLE
+#if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
 #   define MOUSE_IN_EPNUM           (KEYBOARD_IN_EPNUM + 1) 
 #else
 #   define MOUSE_IN_EPNUM           KEYBOARD_IN_EPNUM
 #endif
 
-#ifdef EXTRAKEY_ENABLE
-#   define EXTRAKEY_IN_EPNUM        (MOUSE_IN_EPNUM + 1)
-#else
-#   define EXTRAKEY_IN_EPNUM        MOUSE_IN_EPNUM 
-#endif
-
 #ifdef CONSOLE_ENABLE
-#   define CONSOLE_IN_EPNUM         (EXTRAKEY_IN_EPNUM + 1)
-#   define CONSOLE_OUT_EPNUM        (EXTRAKEY_IN_EPNUM + 1)
+#   define CONSOLE_IN_EPNUM         (MOUSE_IN_EPNUM + 1)
+#   define CONSOLE_OUT_EPNUM        (MOUSE_IN_EPNUM + 1)
 #else
-#   define CONSOLE_OUT_EPNUM        EXTRAKEY_IN_EPNUM
+#   define CONSOLE_OUT_EPNUM        MOUSE_IN_EPNUM
 #endif
 
 #ifdef NKRO_6KRO_ENABLE
@@ -150,13 +131,18 @@ typedef struct
 
 /* Check number of endpoints. ATmega32u2 has only four except for control endpoint. */
 #if defined(__AVR_ATmega32U2__) && NKRO_IN_EPNUM > 4
-#   error "Endpoints are not available enough to support all functions. Disable some of build options in Makefile.(MOUSEKEY, EXTRAKEY, CONSOLE, NKRO)"
+#   error "Endpoints are not available enough to support all functions. Disable some of build options in Makefile.(MOUSEKEY, CONSOLE, NKRO)"
 #endif
 
 
 #define KEYBOARD_EPSIZE             8
+
+#if defined(MOUSE_EXT_REPORT)
+#define MOUSE_EPSIZE                10
+#else
 #define MOUSE_EPSIZE                8
-#define EXTRAKEY_EPSIZE             8
+#endif
+
 #define CONSOLE_EPSIZE              32
 #define NKRO_EPSIZE                 32
 

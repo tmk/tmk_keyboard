@@ -336,16 +336,10 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 #endif
                                      ENDPOINT_BANK_SINGLE);
 
-#ifdef MOUSE_ENABLE
+#if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
     /* Setup Mouse HID Report Endpoint */
     ConfigSuccess &= ENDPOINT_CONFIG(MOUSE_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
                                      MOUSE_EPSIZE, ENDPOINT_BANK_SINGLE);
-#endif
-
-#ifdef EXTRAKEY_ENABLE
-    /* Setup Extra HID Report Endpoint */
-    ConfigSuccess &= ENDPOINT_CONFIG(EXTRAKEY_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
-                                     EXTRAKEY_EPSIZE, ENDPOINT_BANK_SINGLE);
 #endif
 
 #ifdef CONSOLE_ENABLE
@@ -572,6 +566,7 @@ static void send_mouse(report_mouse_t *report)
     if (!Endpoint_IsReadWriteAllowed()) return;
 
     /* Write Mouse Report Data */
+    Endpoint_Write_8(REPORT_ID_MOUSE);
     Endpoint_Write_Stream_LE(report, sizeof(report_mouse_t), NULL);
 
     /* Finalize the stream transfer to send the last packet */
@@ -591,7 +586,7 @@ static void send_system(uint16_t data)
         .report_id = REPORT_ID_SYSTEM,
         .usage = data - SYSTEM_POWER_DOWN + 1
     };
-    Endpoint_SelectEndpoint(EXTRAKEY_IN_EPNUM);
+    Endpoint_SelectEndpoint(MOUSE_IN_EPNUM);
 
     /* Check if write ready for a polling interval around 10ms */
     while (timeout-- && !Endpoint_IsReadWriteAllowed()) _delay_us(40);
@@ -614,7 +609,7 @@ static void send_consumer(uint16_t data)
         .report_id = REPORT_ID_CONSUMER,
         .usage = data
     };
-    Endpoint_SelectEndpoint(EXTRAKEY_IN_EPNUM);
+    Endpoint_SelectEndpoint(MOUSE_IN_EPNUM);
 
     /* Check if write ready for a polling interval around 10ms */
     while (timeout-- && !Endpoint_IsReadWriteAllowed()) _delay_us(40);
