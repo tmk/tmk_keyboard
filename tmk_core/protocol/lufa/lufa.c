@@ -329,7 +329,12 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 
     /* Setup Keyboard HID Report Endpoints */
     ConfigSuccess &= ENDPOINT_CONFIG(KEYBOARD_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
-                                     KEYBOARD_EPSIZE, ENDPOINT_BANK_SINGLE);
+#ifdef NKRO_ENABLE
+                                     NKRO_EPSIZE,
+#else
+                                     KEYBOARD_EPSIZE,
+#endif
+                                     ENDPOINT_BANK_SINGLE);
 
 #ifdef MOUSE_ENABLE
     /* Setup Mouse HID Report Endpoint */
@@ -353,7 +358,7 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 #endif
 #endif
 
-#ifdef NKRO_ENABLE
+#ifdef NKRO_6KRO_ENABLE
     /* Setup NKRO HID Report Endpoints */
     ConfigSuccess &= ENDPOINT_CONFIG(NKRO_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
                                      NKRO_EPSIZE, ENDPOINT_BANK_SINGLE);
@@ -414,7 +419,7 @@ void EVENT_USB_Device_ControlRequest(void)
                 // Interface
                 switch (USB_ControlRequest.wIndex) {
                 case KEYBOARD_INTERFACE:
-#ifdef NKRO_ENABLE
+#ifdef NKRO_6KRO_ENABLE
                 case NKRO_INTERFACE:
 #endif
                     Endpoint_ClearSETUP();
@@ -515,10 +520,14 @@ static void send_keyboard(report_keyboard_t *report)
         return;
 
     /* Select the Keyboard Report Endpoint */
-#ifdef NKRO_ENABLE
+#if defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE)
     if (keyboard_protocol && keyboard_nkro) {
         /* Report protocol - NKRO */
+        #if defined(NKRO_6KRO_ENABLE)
         Endpoint_SelectEndpoint(NKRO_IN_EPNUM);
+        #else
+        Endpoint_SelectEndpoint(KEYBOARD_IN_EPNUM);
+        #endif
 
         /* Check if write ready for a polling interval around 1ms */
         while (timeout-- && !Endpoint_IsReadWriteAllowed()) _delay_us(8);

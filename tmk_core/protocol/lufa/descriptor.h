@@ -79,7 +79,7 @@ typedef struct
     USB_Descriptor_Endpoint_t             Console_OUTEndpoint;
 #endif
 
-#ifdef NKRO_ENABLE
+#ifdef NKRO_6KRO_ENABLE
     // NKRO HID Interface
     USB_Descriptor_Interface_t            NKRO_Interface;
     USB_HID_Descriptor_HID_t              NKRO_HID;
@@ -109,7 +109,7 @@ typedef struct
 #   define CONSOLE_INTERFACE        EXTRAKEY_INTERFACE
 #endif
 
-#ifdef NKRO_ENABLE
+#ifdef NKRO_6KRO_ENABLE
 #   define NKRO_INTERFACE           (CONSOLE_INTERFACE + 1)
 #else
 #   define NKRO_INTERFACE           CONSOLE_INTERFACE
@@ -142,7 +142,7 @@ typedef struct
 #   define CONSOLE_OUT_EPNUM        EXTRAKEY_IN_EPNUM
 #endif
 
-#ifdef NKRO_ENABLE
+#ifdef NKRO_6KRO_ENABLE
 #   define NKRO_IN_EPNUM            (CONSOLE_OUT_EPNUM + 1)
 #else
 #   define NKRO_IN_EPNUM            CONSOLE_OUT_EPNUM
