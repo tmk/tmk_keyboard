@@ -30,6 +30,8 @@ static inline void del_key_bit(uint8_t code);
 static uint8_t real_mods = 0;
 static uint8_t weak_mods = 0;
 
+uint8_t block_mods = 0;
+
 #ifdef USB_6KRO_ENABLE
 #define RO_ADD(a, b) ((a + b) % KEYBOARD_REPORT_KEYS)
 #define RO_SUB(a, b) ((a - b + KEYBOARD_REPORT_KEYS) % KEYBOARD_REPORT_KEYS)
@@ -55,6 +57,7 @@ static int16_t oneshot_time = 0;
 void send_keyboard_report(void) {
     keyboard_report->mods  = real_mods;
     keyboard_report->mods |= weak_mods;
+    keyboard_report->mods &= ~block_mods;
 #ifndef NO_ACTION_ONESHOT
     if (oneshot_mods) {
 #if (defined(ONESHOT_TIMEOUT) && (ONESHOT_TIMEOUT > 0))
