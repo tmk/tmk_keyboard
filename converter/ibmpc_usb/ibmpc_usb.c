@@ -131,6 +131,7 @@ uint8_t matrix_scan(void)
         READ_ID,
         SETUP,
         LOOP,
+        ERROR,
     } state = INIT;
     static uint16_t init_time;
 
@@ -152,7 +153,7 @@ uint8_t matrix_scan(void)
             // keyboard init again
             if (state == LOOP) {
                 xprintf("[RST] ");
-                state = INIT;
+                state = ERROR;
             }
         }
 
@@ -172,7 +173,7 @@ uint8_t matrix_scan(void)
             ((current_protocol&IBMPC_PROTOCOL_AT) && (ibmpc_protocol&IBMPC_PROTOCOL_XT))) {
             if (state == LOOP) {
                 xprintf("[CHG] ");
-                state = INIT;
+                state = ERROR;
             }
         }
 
@@ -188,7 +189,6 @@ uint8_t matrix_scan(void)
             current_protocol = 0;
 
             matrix_clear();
-            clear_keyboard();
 
             init_time = timer_read();
             state = WAIT_SETTLE;
@@ -473,13 +473,13 @@ MOUSE_DONE:
 
                 switch (keyboard_kind) {
                     case PC_XT:
-                        if (process_cs1(code) == -1) state = INIT;
+                        if (process_cs1(code) == -1) state = ERROR;
                         break;
                     case PC_AT:
-                        if (process_cs2(code) == -1) state = INIT;
+                        if (process_cs2(code) == -1) state = ERROR;
                         break;
                     case PC_TERMINAL:
-                        if (process_cs3(code) == -1) state = INIT;
+                        if (process_cs3(code) == -1) state = ERROR;
                         break;
 #ifdef IBMPC_MOUSE_ENABLE
                     case PC_MOUSE: {
@@ -592,6 +592,11 @@ MOUSE_DONE:
                         break;
                 }
             }
+            break;
+        case ERROR:
+            // something goes wrong
+            clear_keyboard();
+            state = INIT;
             break;
         default:
             break;
