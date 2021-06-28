@@ -71,6 +71,7 @@
 uint8_t keyboard_idle = 0;
 /* 0: Boot Protocol, 1: Report Protocol(default) */
 uint8_t keyboard_protocol = 1;
+uint8_t mouse_protocol = 1;
 static uint8_t keyboard_led_stats = 0;
 
 static report_keyboard_t keyboard_report_sent;
@@ -449,6 +450,13 @@ void EVENT_USB_Device_ControlRequest(void)
                     print("[p]");
 #endif
                 }
+                if (USB_ControlRequest.wIndex == MOUSE_INTERFACE) {
+                    Endpoint_ClearSETUP();
+                    while (!(Endpoint_IsINReady()));
+                    Endpoint_Write_8(mouse_protocol);
+                    Endpoint_ClearIN();
+                    Endpoint_ClearStatusStage();
+                }
             }
 
             break;
@@ -464,6 +472,13 @@ void EVENT_USB_Device_ControlRequest(void)
 #ifdef TMK_LUFA_DEBUG
                     print("[P]");
 #endif
+                }
+                if (USB_ControlRequest.wIndex == MOUSE_INTERFACE) {
+                    Endpoint_ClearSETUP();
+                    Endpoint_ClearStatusStage();
+
+                    mouse_protocol = (USB_ControlRequest.wValue & 0xFF);
+                    clear_keyboard();
                 }
             }
 
@@ -566,8 +581,14 @@ static void send_mouse(report_mouse_t *report)
     if (!Endpoint_IsReadWriteAllowed()) return;
 
     /* Write Mouse Report Data */
-    Endpoint_Write_8(REPORT_ID_MOUSE);
-    Endpoint_Write_Stream_LE(report, sizeof(report_mouse_t), NULL);
+    if (mouse_protocol) {
+        // Report
+        Endpoint_Write_8(REPORT_ID_MOUSE);
+        Endpoint_Write_Stream_LE(report, sizeof(report_mouse_t), NULL);
+    } else {
+        // Boot
+        Endpoint_Write_Stream_LE(report, 3, NULL);
+    }
 
     /* Finalize the stream transfer to send the last packet */
     Endpoint_ClearIN();
