@@ -94,7 +94,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   define KEYBOARD_REPORT_KEYS (KBD2_SIZE - 2)
 #   define KEYBOARD_REPORT_BITS (KBD2_SIZE - 1)
 
-#elif defined(PROTOCOL_LUFA) && defined(NKRO_ENABLE)
+#elif defined(PROTOCOL_LUFA) && (defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE))
 #   include "protocol/lufa/descriptor.h"
 #   define KEYBOARD_REPORT_SIZE NKRO_EPSIZE
 #   define KEYBOARD_REPORT_KEYS (NKRO_EPSIZE - 2)
@@ -142,7 +142,7 @@ typedef union {
         uint8_t reserved;
         uint8_t keys[KEYBOARD_REPORT_KEYS];
     };
-#ifdef NKRO_ENABLE
+#if defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE)
     struct {
         uint8_t mods;
         uint8_t bits[KEYBOARD_REPORT_BITS];

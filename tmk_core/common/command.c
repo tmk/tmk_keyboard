@@ -134,7 +134,7 @@ static void command_common_help(void)
           "e:	eeprom\n"
 #endif
 
-#ifdef NKRO_ENABLE
+#if defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE)
           "n:	NKRO\n"
 #endif
 
@@ -314,7 +314,7 @@ static bool command_common(uint8_t code)
 #ifdef COMMAND_ENABLE
             " COMMAND"
 #endif
-#ifdef NKRO_ENABLE
+#if defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE)
             " NKRO"
 #endif
 #ifdef KEYMAP_SECTION_ENABLE
@@ -336,7 +336,7 @@ static bool command_common(uint8_t code)
             print_val_hex8(host_keyboard_leds());
             print_val_hex8(keyboard_protocol);
             print_val_hex8(keyboard_idle);
-#ifdef NKRO_ENABLE
+#if defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE)
             print_val_hex8(keyboard_nkro);
 #endif
             print_val_hex32(timer_read32());
@@ -355,7 +355,7 @@ static bool command_common(uint8_t code)
 #   endif
 #endif
             break;
-#ifdef NKRO_ENABLE
+#if defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE)
         case KC_N:
             clear_keyboard(); //Prevents stuck keys.
             keyboard_nkro = !keyboard_nkro;

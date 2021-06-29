@@ -46,6 +46,8 @@
  ******************************************************************************/
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM KeyboardReport[] =
 {
+#ifndef NKRO_ENABLE
+    /* 6KRO - Boot protocol */
     HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
     HID_RI_USAGE(8, 0x06), /* Keyboard */
     HID_RI_COLLECTION(8, 0x01), /* Application */
@@ -81,16 +83,53 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM KeyboardReport[] =
         HID_RI_REPORT_SIZE(8, 0x08),
         HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_ARRAY | HID_IOF_ABSOLUTE),
     HID_RI_END_COLLECTION(0),
+#else
+    /* NKRO - Report protocol */
+    HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
+    HID_RI_USAGE(8, 0x06), /* Keyboard */
+    HID_RI_COLLECTION(8, 0x01), /* Application */
+        HID_RI_USAGE_PAGE(8, 0x07), /* Key Codes */
+        HID_RI_USAGE_MINIMUM(8, 0xE0), /* Keyboard Left Control */
+        HID_RI_USAGE_MAXIMUM(8, 0xE7), /* Keyboard Right GUI */
+        HID_RI_LOGICAL_MINIMUM(8, 0x00),
+        HID_RI_LOGICAL_MAXIMUM(8, 0x01),
+        HID_RI_REPORT_COUNT(8, 0x08),
+        HID_RI_REPORT_SIZE(8, 0x01),
+        HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+
+        HID_RI_USAGE_PAGE(8, 0x08), /* LEDs */
+        HID_RI_USAGE_MINIMUM(8, 0x01), /* Num Lock */
+        HID_RI_USAGE_MAXIMUM(8, 0x05), /* Kana */
+        HID_RI_REPORT_COUNT(8, 0x05),
+        HID_RI_REPORT_SIZE(8, 0x01),
+        HID_RI_OUTPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE | HID_IOF_NON_VOLATILE),
+        HID_RI_REPORT_COUNT(8, 0x01),
+        HID_RI_REPORT_SIZE(8, 0x03),
+        HID_RI_OUTPUT(8, HID_IOF_CONSTANT),
+
+        HID_RI_USAGE_PAGE(8, 0x07), /* Key Codes */
+        HID_RI_USAGE_MINIMUM(8, 0x00), /* Keyboard 0 */
+        HID_RI_USAGE_MAXIMUM(8, (NKRO_EPSIZE-1)*8-1), /* Keyboard Right GUI */
+        HID_RI_LOGICAL_MINIMUM(8, 0x00),
+        HID_RI_LOGICAL_MAXIMUM(8, 0x01),
+        HID_RI_REPORT_COUNT(8, (NKRO_EPSIZE-1)*8),
+        HID_RI_REPORT_SIZE(8, 0x01),
+        HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+    HID_RI_END_COLLECTION(0),
+#endif
 };
 
-#ifdef MOUSE_ENABLE
+#if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM MouseReport[] =
 {
+#ifdef MOUSE_ENABLE
     HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
     HID_RI_USAGE(8, 0x02), /* Mouse */
     HID_RI_COLLECTION(8, 0x01), /* Application */
         HID_RI_USAGE(8, 0x01), /* Pointer */
         HID_RI_COLLECTION(8, 0x00), /* Physical */
+
+            HID_RI_REPORT_ID(8, REPORT_ID_MOUSE),
 
             HID_RI_USAGE_PAGE(8, 0x09), /* Button */
             HID_RI_USAGE_MINIMUM(8, 0x01),  /* Button 1 */
@@ -147,12 +186,9 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM MouseReport[] =
 
         HID_RI_END_COLLECTION(0),
     HID_RI_END_COLLECTION(0),
-};
 #endif
 
 #ifdef EXTRAKEY_ENABLE
-const USB_Descriptor_HIDReport_Datatype_t PROGMEM ExtrakeyReport[] =
-{
     HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
     HID_RI_USAGE(8, 0x80), /* System Control */
     HID_RI_COLLECTION(8, 0x01), /* Application */
@@ -178,6 +214,7 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM ExtrakeyReport[] =
         HID_RI_REPORT_COUNT(8, 1),
         HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_ARRAY | HID_IOF_ABSOLUTE),
     HID_RI_END_COLLECTION(0),
+#endif
 };
 #endif
 
@@ -203,7 +240,7 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM ConsoleReport[] =
 };
 #endif
 
-#ifdef NKRO_ENABLE
+#ifdef NKRO_6KRO_ENABLE
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM NKROReport[] =
 {
     HID_RI_USAGE_PAGE(8, 0x01), /* Generic Desktop */
@@ -322,14 +359,19 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 
             .EndpointAddress        = (ENDPOINT_DIR_IN | KEYBOARD_IN_EPNUM),
             .Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
+#ifdef NKRO_ENABLE
+            .EndpointSize           = NKRO_EPSIZE,
+            .PollingIntervalMS      = 0x01
+#else
             .EndpointSize           = KEYBOARD_EPSIZE,
             .PollingIntervalMS      = 0x0A
+#endif
         },
 
     /*
      * Mouse
      */
-#ifdef MOUSE_ENABLE
+#if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
     .Mouse_Interface =
         {
             .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
@@ -340,8 +382,13 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
             .TotalEndpoints         = 1,
 
             .Class                  = HID_CSCP_HIDClass,
+#if defined(MOUSE_ENABLE)
             .SubClass               = HID_CSCP_BootSubclass,
             .Protocol               = HID_CSCP_MouseBootProtocol,
+#else
+            .SubClass               = HID_CSCP_NonBootSubclass,
+            .Protocol               = HID_CSCP_NonBootProtocol,
+#endif
 
             .InterfaceStrIndex      = NO_DESCRIPTOR
         },
@@ -364,49 +411,7 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
             .EndpointAddress        = (ENDPOINT_DIR_IN | MOUSE_IN_EPNUM),
             .Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
             .EndpointSize           = MOUSE_EPSIZE,
-            .PollingIntervalMS      = 0x0A
-        },
-#endif
-
-    /*
-     * Extra
-     */
-#ifdef EXTRAKEY_ENABLE
-    .Extrakey_Interface =
-        {
-            .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
-
-            .InterfaceNumber        = EXTRAKEY_INTERFACE,
-            .AlternateSetting       = 0x00,
-
-            .TotalEndpoints         = 1,
-
-            .Class                  = HID_CSCP_HIDClass,
-            .SubClass               = HID_CSCP_NonBootSubclass,
-            .Protocol               = HID_CSCP_NonBootProtocol,
-
-            .InterfaceStrIndex      = NO_DESCRIPTOR
-        },
-
-    .Extrakey_HID =
-        {
-            .Header                 = {.Size = sizeof(USB_HID_Descriptor_HID_t), .Type = HID_DTYPE_HID},
-
-            .HIDSpec                = VERSION_BCD(1,1,1),
-            .CountryCode            = 0x00,
-            .TotalReportDescriptors = 1,
-            .HIDReportType          = HID_DTYPE_Report,
-            .HIDReportLength        = sizeof(ExtrakeyReport)
-        },
-
-    .Extrakey_INEndpoint =
-        {
-            .Header                 = {.Size = sizeof(USB_Descriptor_Endpoint_t), .Type = DTYPE_Endpoint},
-
-            .EndpointAddress        = (ENDPOINT_DIR_IN | EXTRAKEY_IN_EPNUM),
-            .Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
-            .EndpointSize           = EXTRAKEY_EPSIZE,
-            .PollingIntervalMS      = 0x0A
+            .PollingIntervalMS      = 0x01
         },
 #endif
 
@@ -465,7 +470,7 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
     /*
      * NKRO
      */
-#ifdef NKRO_ENABLE
+#ifdef NKRO_6KRO_ENABLE
     .NKRO_Interface =
         {
             .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
@@ -582,15 +587,9 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
                 Address = &ConfigurationDescriptor.Keyboard_HID;
                 Size    = sizeof(USB_HID_Descriptor_HID_t);
                 break;
-#ifdef MOUSE_ENABLE
+#if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
             case MOUSE_INTERFACE:
                 Address = &ConfigurationDescriptor.Mouse_HID;
-                Size    = sizeof(USB_HID_Descriptor_HID_t);
-                break;
-#endif
-#ifdef EXTRAKEY_ENABLE
-            case EXTRAKEY_INTERFACE:
-                Address = &ConfigurationDescriptor.Extrakey_HID;
                 Size    = sizeof(USB_HID_Descriptor_HID_t);
                 break;
 #endif
@@ -600,7 +599,7 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
                 Size    = sizeof(USB_HID_Descriptor_HID_t);
                 break;
 #endif
-#ifdef NKRO_ENABLE
+#ifdef NKRO_6KRO_ENABLE
             case NKRO_INTERFACE:
                 Address = &ConfigurationDescriptor.NKRO_HID;
                 Size    = sizeof(USB_HID_Descriptor_HID_t);
@@ -614,16 +613,10 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
                 Address = &KeyboardReport;
                 Size    = sizeof(KeyboardReport);
                 break;
-#ifdef MOUSE_ENABLE
+#if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
             case MOUSE_INTERFACE:
                 Address = &MouseReport;
                 Size    = sizeof(MouseReport);
-                break;
-#endif
-#ifdef EXTRAKEY_ENABLE
-            case EXTRAKEY_INTERFACE:
-                Address = &ExtrakeyReport;
-                Size    = sizeof(ExtrakeyReport);
                 break;
 #endif
 #ifdef CONSOLE_ENABLE
@@ -632,7 +625,7 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
                 Size    = sizeof(ConsoleReport);
                 break;
 #endif
-#ifdef NKRO_ENABLE
+#ifdef NKRO_6KRO_ENABLE
             case NKRO_INTERFACE:
                 Address = &NKROReport;
                 Size    = sizeof(NKROReport);

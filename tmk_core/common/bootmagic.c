@@ -88,7 +88,7 @@ void bootmagic(void)
     }
     eeconfig_write_keymap(keymap_config.raw);
 
-#ifdef NKRO_ENABLE
+#if defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE)
     keyboard_nkro = keymap_config.nkro;
 #endif
 
