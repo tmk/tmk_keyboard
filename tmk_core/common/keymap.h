@@ -23,6 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.h"
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef BOOTMAGIC_ENABLE
 /* NOTE: Not portable. Bit field order depends on implementation */
 typedef union {
@@ -40,6 +44,8 @@ typedef union {
 } keymap_config_t;
 #endif
 
+extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
+extern const action_t fn_actions[];
 
 /* translates key to keycode */
 uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key);
@@ -54,6 +60,10 @@ action_t keymap_fn_to_action(uint8_t keycode);
  * Legacy keymap
  *      Consider using new keymap API above instead.
  */
+extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
+extern const uint8_t fn_layer[];
+extern const uint8_t fn_keycode[];
+
 /* keycode of key */
 __attribute__ ((deprecated))
 uint8_t keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t col);
@@ -65,6 +75,16 @@ uint8_t keymap_fn_layer(uint8_t fn_bits);
 /* keycode to send when release Fn key without using */
 __attribute__ ((deprecated))
 uint8_t keymap_fn_keycode(uint8_t fn_bits);
+
+#else
+
+/* user keymaps should be defined somewhere */
+extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
+extern const action_t fn_actions[];
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

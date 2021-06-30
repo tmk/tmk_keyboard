@@ -171,10 +171,6 @@ static action_t keycode_to_action(uint8_t keycode)
  * Legacy keymap support
  *      Consider using new keymap API instead.
  */
-extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-extern const uint8_t fn_layer[];
-extern const uint8_t fn_keycode[];
-
 __attribute__ ((weak))
 uint8_t keymap_get_keycode(uint8_t layer, uint8_t row, uint8_t col)
 {
@@ -222,10 +218,6 @@ action_t keymap_fn_to_action(uint8_t keycode)
 }
 
 #else
-
-/* user keymaps should be defined somewhere */
-extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-extern const action_t fn_actions[];
 
 __attribute__ ((weak))
 uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
