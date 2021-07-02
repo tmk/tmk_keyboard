@@ -334,10 +334,10 @@ MSG_CREATING_LIBRARY = Creating library:
 
 
 # Define all object files.
-OBJ = $(patsubst %.c,$(OBJDIR)/%.o,$(patsubst %.cpp,$(OBJDIR)/%.o,$(patsubst %.S,$(OBJDIR)/%.o,$(SRC))))
+OBJ = $(patsubst %.c,$(OBJDIR)/%.o,$(patsubst %.cpp,$(OBJDIR)/%.cpp.o,$(patsubst %.S,$(OBJDIR)/%.o,$(SRC))))
 
 # Define all listing files.
-LST = $(patsubst %.c,$(OBJDIR)/%.lst,$(patsubst %.cpp,$(OBJDIR)/%.lst,$(patsubst %.S,$(OBJDIR)/%.lst,$(SRC))))
+LST = $(patsubst %.c,$(OBJDIR)/%.lst,$(patsubst %.cpp,$(OBJDIR)/%.cpp.lst,$(patsubst %.S,$(OBJDIR)/%.lst,$(SRC))))
 
 
 # Compiler flags to generate dependency files.
@@ -561,7 +561,7 @@ $(OBJDIR)/%.o : %.c
 
 
 # Compile: create object files from C++ source files.
-$(OBJDIR)/%.o : %.cpp
+$(OBJDIR)/%.cpp.o : %.cpp
 	@echo
 	mkdir -p $(@D)
 	@echo $(MSG_COMPILING_CPP) $<
