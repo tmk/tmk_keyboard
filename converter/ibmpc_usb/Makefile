@@ -69,7 +69,7 @@ OPT_DEFS += -DSUSPEND_MODE_STANDBY
 #   comment out to disable the options.
 #
 BOOTMAGIC_ENABLE ?= no	# Virtual DIP switch configuration(+1000)
-MOUSEKEY_ENABLE ?= no	# Mouse keys(+4700)
+MOUSEKEY_ENABLE ?= yes	# Mouse keys(+4700)
 EXTRAKEY_ENABLE ?= yes	# Audio control and System control(+450)
 CONSOLE_ENABLE ?= yes	# Console for debug(+400)
 COMMAND_ENABLE ?= yes    # Commands for debug and configuration
@@ -77,6 +77,10 @@ NKRO_ENABLE ?= yes	# USB Nkey Rollover
 
 KEYMAP_SECTION_ENABLE ?= yes
 UNIMAP_ENABLE ?= yes
+
+# IBMPC Options
+IBMPC_SECONDARY ?= no		# enable secondary interface
+IBMPC_MOUSE_ENABLE ?= no	# enable mouse support
 
 
 # Optimize size but this may cause error "relocation truncated to fit"
@@ -99,6 +103,16 @@ ifdef KEYMAP
     SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
 else
     SRC := $(KEYMAP_FILE)_plain.c $(SRC)
+endif
+
+
+ifeq (yes,$(strip $(IBMPC_SECONDARY)))
+    OPT_DEFS += -DIBMPC_SECONDARY
+endif
+
+ifeq (yes,$(strip $(IBMPC_MOUSE_ENABLE)))
+    OPT_DEFS += -DIBMPC_MOUSE_ENABLE
+    OPT_DEFS += -DMOUSE_ENABLE
 endif
 
 
