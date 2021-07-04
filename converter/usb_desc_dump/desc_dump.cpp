@@ -113,7 +113,7 @@ void scanConfigDesc(UsbDevice *pdev, uint16_t tl, uint8_t* pB)
                 }
             case HID_DESCRIPTOR_HID: {
                 USB_HID_DESCRIPTOR *pH = (USB_HID_DESCRIPTOR *)pB;
-                xprintf("\r\nReport%d: len:%04X\r\n", iface, pH->wDescriptorLength);
+                xprintf("\r\n// Report%d: len:%04X\r\n", iface, pH->wDescriptorLength);
                 if (pH->bDescrType == HID_DESCRIPTOR_REPORT) {
                     dumpReportDesc(pdev, iface, pH->wDescriptorLength);
                 } else {
@@ -133,7 +133,7 @@ uint8_t dumpConfigDesc(UsbDevice *pdev, uint8_t numConf)
 {
     uint8_t rcode = 0;
     for (uint8_t i = 0; i < numConf; i++) {
-        xprintf("\r\nConfig%d:", i);
+        xprintf("\r\n// Config%d:", i);
 
         rcode = Usb.getConfDescr(pdev->address.devAddress, 0, sizeof(USB_CONFIGURATION_DESCRIPTOR), i, buf);
         if (rcode) return rcode;
@@ -154,8 +154,8 @@ void dumpDescriptors(UsbDevice *pdev)
 {
     uint8_t rcode = 0;
 
-    xprintf("\r\nAddress:%02X\r\n", pdev->address.devAddress);
-    xprintf("lowspeed:%02X\r\n", pdev->lowspeed);
+    xprintf("\r\n// Address:%02X\r\n", pdev->address.devAddress);
+    xprintf("// lowspeed:%02X\r\n", pdev->lowspeed);
 
     //
     // Device Descriptor
@@ -163,9 +163,9 @@ void dumpDescriptors(UsbDevice *pdev)
     rcode = Usb.getDevDescr(pdev->address.devAddress, 0, sizeof(USB_DEVICE_DESCRIPTOR), buf);
     if (rcode) { printError(rcode); }
     USB_DEVICE_DESCRIPTOR *pD = (USB_DEVICE_DESCRIPTOR *)&buf;
-    printVal("idVendor", pD->idVendor);
-    printVal("idProduct", pD->idProduct);
-    print("\r\nDevice Descriptor:\r\n");
+    printVal("// idVendor", pD->idVendor);
+    printVal("// idProduct", pD->idProduct);
+    print("\r\n// Device Descriptor:\r\n");
     dumpBuf(sizeof(USB_DEVICE_DESCRIPTOR), buf);
 
 
