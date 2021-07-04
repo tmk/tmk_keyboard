@@ -9,8 +9,4 @@ typedef enum { NONE, PC_XT, PC_AT, PC_TERMINAL, PC_MOUSE } keyboard_kind_t;
      kind == PC_MOUSE ? "MOUSE" :   \
      "NONE")
 
-
-extern uint16_t keyboard_id;
-extern keyboard_kind_t keyboard_kind;
-
 #endif

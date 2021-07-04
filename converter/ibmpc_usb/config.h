@@ -29,8 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /* matrix size */
-#define MATRIX_ROWS 16  // keycode bit: 6-3
-#define MATRIX_COLS 8   // keycode bit: 2-0
+#define MATRIX_ROWS 8
+#define MATRIX_COLS 16
 
 
 /* key combination for command */

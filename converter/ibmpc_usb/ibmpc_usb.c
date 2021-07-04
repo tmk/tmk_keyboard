@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <avr/pgmspace.h>
 #include "print.h"
 #include "util.h"
 #include "debug.h"
@@ -26,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "matrix.h"
 #include "timer.h"
 #include "action.h"
+#include "unimap.h"
+#include "unimap_trans.h"
 #include "ibmpc_usb.h"
 #include "ibmpc.h"
 
@@ -38,9 +41,9 @@ static int8_t process_cs2(uint8_t code);
 static int8_t process_cs3(uint8_t code);
 
 
-static uint8_t matrix[MATRIX_ROWS];
-#define ROW(code)      ((code>>3)&0x0F)
-#define COL(code)      (code&0x07)
+static matrix_row_t matrix[MATRIX_ROWS];
+#define ROW(code)      ((code>>4)&0x07)
+#define COL(code)      (code&0x0F)
 
 static int16_t read_wait(uint16_t wait_ms)
 {
@@ -611,7 +614,7 @@ bool matrix_is_on(uint8_t row, uint8_t col)
 }
 
 inline
-uint8_t matrix_get_row(uint8_t row)
+matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
 }
@@ -625,20 +628,44 @@ uint8_t matrix_key_count(void)
     return count;
 }
 
+extern const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS];
+action_t action_for_key(uint8_t layer, keypos_t key)
+{
+    return (action_t){ .code = pgm_read_word(&actionmaps[(layer)][key.row & 0x07][key.col & 0x0F]) };
+}
+
+static uint8_t to_unimap(uint8_t code) {
+    uint8_t row = ROW(code);
+    uint8_t col = COL(code);
+    switch (keyboard_kind) {
+        case PC_XT:
+            return pgm_read_byte(&unimap_cs1[row][col]);
+        case PC_AT:
+            return pgm_read_byte(&unimap_cs2[row][col]);
+        case PC_TERMINAL:
+            return pgm_read_byte(&unimap_cs3[row][col]);
+        default:
+            return UNIMAP_NO;
+    }
+}
 
 inline
 static void matrix_make(uint8_t code)
 {
-    if (!matrix_is_on(ROW(code), COL(code))) {
-        matrix[ROW(code)] |= 1<<COL(code);
+    uint8_t u = to_unimap(code);
+    if (u > 0x7F) return;
+    if (!matrix_is_on(ROW(u), COL(u))) {
+        matrix[ROW(u)] |= 1<<COL(u);
     }
 }
 
 inline
 static void matrix_break(uint8_t code)
 {
-    if (matrix_is_on(ROW(code), COL(code))) {
-        matrix[ROW(code)] &= ~(1<<COL(code));
+    uint8_t u = to_unimap(code);
+    if (u > 0x7F) return;
+    if (matrix_is_on(ROW(u), COL(u))) {
+        matrix[ROW(u)] &= ~(1<<COL(u));
     }
 }
 
