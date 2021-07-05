@@ -260,7 +260,7 @@ inline void IBMPC::isr(void)
     //      b7 b6 b5 b4   b3 b2 b1 b0 |  1  0 *1  0    0  0  0  0     XT_IBM-done ^2
     //      pr b7 b6 b5   b4 b3 b2 b1 |  1  0 *1  0    0  0  0  0     AT-midway[b0=1] ^2
     //      b7 b6 b5 b4   b3 b2 b1 b0 |  1  1 *1  0    0  0  0  0     XT_IBM-error-done
-    //       x  x  x  x    x  x  x  x |  x  1  1  0    0  0  0  0     illegal
+    //       x  x  x  x    x  x  x  x |  0  1 *1  0    0  0  0  0     illegal
     //      st pr b7 b6   b5 b4 b3 b2 | b1 b0  0 *1    0  0  0  0     AT-done
     //       x  x  x  x    x  x  x  x |  x  x  1 *1    0  0  0  0     illegal
     //                                all other states than above     illegal
@@ -280,8 +280,12 @@ inline void IBMPC::isr(void)
             {
                 uint8_t us = 100;
                 // wait for rising and falling edge of b7 of XT_IBM
-                while (!(IBMPC_CLOCK_PIN&(1<<clock_bit)) && us) { wait_us(1); us--; }
-                while (  IBMPC_CLOCK_PIN&(1<<clock_bit)  && us) { wait_us(1); us--; }
+                if (!protocol) {
+                    while (!(IBMPC_CLOCK_PIN&(1<<clock_bit)) && us) { wait_us(1); us--; }
+                    while (  IBMPC_CLOCK_PIN&(1<<clock_bit)  && us) { wait_us(1); us--; }
+                } else if (protocol == IBMPC_PROTOCOL_XT_CLONE) {
+                    us = 0;
+                }
 
                 if (us) {
                     // XT_IBM-error: read start(0) as 1
@@ -306,8 +310,12 @@ inline void IBMPC::isr(void)
             {
                 uint8_t us = 100;
                 // wait for rising and falling edge of AT stop bit to discriminate between XT and AT
-                while (!(IBMPC_CLOCK_PIN&(1<<clock_bit)) && us) { wait_us(1); us--; }
-                while (  IBMPC_CLOCK_PIN&(1<<clock_bit)  && us) { wait_us(1); us--; }
+                if (!protocol) {
+                    while (!(IBMPC_CLOCK_PIN&(1<<clock_bit)) && us) { wait_us(1); us--; }
+                    while (  IBMPC_CLOCK_PIN&(1<<clock_bit)  && us) { wait_us(1); us--; }
+                } else if (protocol == IBMPC_PROTOCOL_XT_IBM) {
+                    us = 0;
+                }
 
                 if (us) {
                     // found stop bit: AT-midway - process the stop bit in next ISR
@@ -346,6 +354,7 @@ inline void IBMPC::isr(void)
         case 0b11110000:
         default:            // xxxx_oooo(any 1 in low nibble)
             // Illegal
+            protocol = 0;
             isr_debug = isr_state;
             error = IBMPC_ERR_ILLEGAL;
             goto ERROR;
