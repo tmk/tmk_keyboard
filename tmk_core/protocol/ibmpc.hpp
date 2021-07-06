@@ -40,7 +40,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdbool.h>
 #include "wait.h"
-#include "ringbuf.h"
 
 /*
  * IBM PC keyboard protocol
@@ -91,8 +90,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define IBMPC_LED_NUM_LOCK    1
 #define IBMPC_LED_CAPS_LOCK   2
 
-#define RINGBUF_SIZE    16
-
 
 class IBMPC
 {
@@ -127,8 +124,14 @@ class IBMPC
     private:
     volatile uint16_t isr_state;
     uint8_t timer_start;
-    ringbuf_t rb;
-    uint8_t rbuf[RINGBUF_SIZE];
+
+    /* ring buffer */
+    // Size should be power of 2
+    #define RINGBUF_SIZE    16
+    uint8_t rb_head;
+    uint8_t rb_tail;
+    uint8_t rb_buffer[RINGBUF_SIZE];
+
     const uint8_t clock_bit, data_bit;
     const uint8_t clock_mask, data_mask;
 
@@ -236,6 +239,37 @@ class IBMPC
     inline void int_off(void) __attribute__((__always_inline__)) // needed for ISR optimization
     {
         EIMSK &= ~clock_mask;
+    }
+
+    /*
+     * ring buffer
+     */
+    inline int16_t ringbuf_get(void) __attribute__((__always_inline__))
+    {
+        if (ringbuf_is_empty()) return -1;
+        uint8_t data = rb_buffer[rb_tail];
+        rb_tail++;
+        rb_tail &= (RINGBUF_SIZE - 1);
+        return  data;
+    }
+    inline void ringbuf_put(uint8_t data) __attribute__((__always_inline__))
+    {
+        rb_buffer[rb_head] = data;
+        rb_head++;
+        rb_head &= (RINGBUF_SIZE - 1);
+    }
+    inline bool ringbuf_is_empty(void) __attribute__((__always_inline__))
+    {
+        return (rb_head == rb_tail);
+    }
+    inline bool ringbuf_is_full(void) __attribute__((__always_inline__))
+    {
+        return (((rb_head + 1) & (RINGBUF_SIZE - 1)) == rb_tail);
+    }
+    inline void ringbuf_reset(void) __attribute__((__always_inline__))
+    {
+        rb_head = 0;
+        rb_tail = 0;
     }
 };
 

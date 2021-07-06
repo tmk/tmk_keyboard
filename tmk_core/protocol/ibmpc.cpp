@@ -69,7 +69,6 @@ void IBMPC::host_init(void)
     inhibit();
     int_init();
     int_off();
-    ringbuf_init(&rb, rbuf, RINGBUF_SIZE);
     host_isr_clear();
 }
 
@@ -174,14 +173,14 @@ int16_t IBMPC::host_recv(void)
     int16_t ret = -1;
 
     // Enable ISR if buffer was full
-    if (ringbuf_is_full(&rb)) {
+    if (ringbuf_is_full()) {
         host_isr_clear();
         int_on();
         idle();
     }
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-        ret = ringbuf_get(&rb);
+        ret = ringbuf_get();
     }
     if (ret != -1) dprintf("r%02X ", ret&0xFF);
     return ret;
@@ -204,7 +203,7 @@ void IBMPC::host_isr_clear(void)
     protocol = 0;
     error = 0;
     isr_state = 0x8000;
-    ringbuf_reset(&rb);
+    ringbuf_reset();
 }
 
 inline void IBMPC::isr(void)
@@ -281,8 +280,8 @@ inline void IBMPC::isr(void)
                 uint8_t us = 100;
                 // wait for rising and falling edge of b7 of XT_IBM
                 if (!protocol) {
-                    while (!(IBMPC_CLOCK_PIN&(1<<clock_bit)) && us) { wait_us(1); us--; }
-                    while (  IBMPC_CLOCK_PIN&(1<<clock_bit)  && us) { wait_us(1); us--; }
+                    while (!(IBMPC_CLOCK_PIN & clock_mask) && us) { wait_us(1); us--; }
+                    while ( (IBMPC_CLOCK_PIN & clock_mask) && us) { wait_us(1); us--; }
                 } else if (protocol == IBMPC_PROTOCOL_XT_CLONE) {
                     us = 0;
                 }
@@ -311,8 +310,8 @@ inline void IBMPC::isr(void)
                 uint8_t us = 100;
                 // wait for rising and falling edge of AT stop bit to discriminate between XT and AT
                 if (!protocol) {
-                    while (!(IBMPC_CLOCK_PIN&(1<<clock_bit)) && us) { wait_us(1); us--; }
-                    while (  IBMPC_CLOCK_PIN&(1<<clock_bit)  && us) { wait_us(1); us--; }
+                    while (!(IBMPC_CLOCK_PIN & clock_mask) && us) { wait_us(1); us--; }
+                    while ( (IBMPC_CLOCK_PIN & clock_mask) && us) { wait_us(1); us--; }
                 } else if (protocol == IBMPC_PROTOCOL_XT_IBM) {
                     us = 0;
                 }
@@ -363,14 +362,16 @@ inline void IBMPC::isr(void)
 
 DONE:
     // store data
-    if (!ringbuf_put(&rb, isr_state & 0xFF)) {
-        // buffer overflow
-        error = IBMPC_ERR_FULL;
-
+    ringbuf_put(isr_state & 0xFF);
+    if (ringbuf_is_full()) {
         // Disable ISR if buffer is full
         int_off();
         // inhibit: clock_lo() instead of inhibit() for ISR optimization
         clock_lo();
+    }
+    if (ringbuf_is_empty()) {
+        // buffer overflow
+        error = IBMPC_ERR_FULL;
     }
 ERROR:
     // clear for next data
@@ -388,9 +389,9 @@ void IBMPC::host_set_led(uint8_t led)
 }
 
 
-// NOTE: With this ISR data line can be read within 2us after clock falling edge.
-// To read data line early as possible:
-// write naked ISR with asembly code to read the line and call C func to do other job?
+// NOTE: With this ISR data line should be read within 5us after clock falling edge.
+// Confirmed that ATmega32u4 can read data line in 2.5us from interrupt after
+// ISR prologue pushs r18, r19, r20, r21, r24, r25 r30 and r31 with GCC 5.4.0
 ISR(IBMPC_INT_VECT)
 {
     IBMPC::interface0.isr();
