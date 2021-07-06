@@ -115,14 +115,11 @@ class IBMPC
     void host_isr_clear(void);
     void host_set_led(uint8_t led);
 
-    IBMPC() : isr_debug(IBMPC_ERR_NONE), protocol(IBMPC_PROTOCOL_NO), error(IBMPC_ERR_NONE),
-              isr_state(0x8000), timer_start(0),
-              clock_bit(IBMPC_CLOCK_BIT), data_bit(IBMPC_DATA_BIT) {
+    IBMPC(uint8_t clock, uint8_t data) :
+            isr_debug(IBMPC_ERR_NONE), protocol(IBMPC_PROTOCOL_NO), error(IBMPC_ERR_NONE),
+            isr_state(0x8000), timer_start(0), clock_bit(clock), data_bit(data),
+            clock_mask(1 << clock), data_mask(1 << data) {
     };
-    IBMPC(uint8_t clock, uint8_t data) : IBMPC() {
-        clock_bit = clock;
-        data_bit = data;
-    }
 
     inline void isr(void) __attribute__((__always_inline__));
 
@@ -132,50 +129,50 @@ class IBMPC
     uint8_t timer_start;
     ringbuf_t rb;
     uint8_t rbuf[RINGBUF_SIZE];
+    const uint8_t clock_bit, data_bit;
+    const uint8_t clock_mask, data_mask;
 
-    uint8_t clock_bit, data_bit;
 
-
-    inline void clock_lo(void)
+    inline void clock_lo(void) __attribute__((__always_inline__)) // needed for ISR optimization
     {
-        IBMPC_CLOCK_PORT &= ~(1<<clock_bit);
-        IBMPC_CLOCK_DDR  |=  (1<<clock_bit);
+        IBMPC_CLOCK_PORT &= ~clock_mask;
+        IBMPC_CLOCK_DDR  |=  clock_mask;
     }
 
     inline void clock_hi(void)
     {
         /* input with pull up */
-        IBMPC_CLOCK_DDR  &= ~(1<<clock_bit);
-        IBMPC_CLOCK_PORT |=  (1<<clock_bit);
+        IBMPC_CLOCK_DDR  &= ~clock_mask;
+        IBMPC_CLOCK_PORT |=  clock_mask;
     }
 
     inline bool clock_in(void)
     {
-        IBMPC_CLOCK_DDR  &= ~(1<<clock_bit);
-        IBMPC_CLOCK_PORT |=  (1<<clock_bit);
+        IBMPC_CLOCK_DDR  &= ~clock_mask;
+        IBMPC_CLOCK_PORT |=  clock_mask;
         wait_us(1);
-        return IBMPC_CLOCK_PIN&(1<<clock_bit);
+        return IBMPC_CLOCK_PIN & clock_mask;
     }
 
     inline void data_lo(void)
     {
-        IBMPC_DATA_PORT &= ~(1<<data_bit);
-        IBMPC_DATA_DDR  |=  (1<<data_bit);
+        IBMPC_DATA_PORT &= ~data_mask;
+        IBMPC_DATA_DDR  |=  data_mask;
     }
 
     inline void data_hi(void)
     {
         /* input with pull up */
-        IBMPC_DATA_DDR  &= ~(1<<data_bit);
-        IBMPC_DATA_PORT |=  (1<<data_bit);
+        IBMPC_DATA_DDR  &= ~data_mask;
+        IBMPC_DATA_PORT |=  data_mask;
     }
 
     inline bool data_in(void)
     {
-        IBMPC_DATA_DDR  &= ~(1<<data_bit);
-        IBMPC_DATA_PORT |=  (1<<data_bit);
+        IBMPC_DATA_DDR  &= ~data_mask;
+        IBMPC_DATA_PORT |=  data_mask;
         wait_us(1);
-        return IBMPC_DATA_PIN&(1<<data_bit);
+        return IBMPC_DATA_PIN & data_mask;
     }
 
     inline uint16_t wait_clock_lo(uint16_t us)
@@ -232,13 +229,13 @@ class IBMPC
 
     void int_on(void)
     {
-        EIFR  |= (1 << (clock_bit & 0x7));
-        EIMSK |= (1 << (clock_bit & 0x7));
+        EIFR  |= clock_mask;
+        EIMSK |= clock_mask;
     }
 
-    void int_off(void)
+    inline void int_off(void) __attribute__((__always_inline__)) // needed for ISR optimization
     {
-        EIMSK &= ~(1 << (clock_bit & 0x7));
+        EIMSK &= ~clock_mask;
     }
 };
 

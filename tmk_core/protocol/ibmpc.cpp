@@ -369,9 +369,8 @@ DONE:
 
         // Disable ISR if buffer is full
         int_off();
-        // inhibit: clock_lo
-        IBMPC_CLOCK_PORT &= ~(1<<clock_bit);
-        IBMPC_CLOCK_DDR  |=  (1<<clock_bit);
+        // inhibit: clock_lo() instead of inhibit() for ISR optimization
+        clock_lo();
     }
 ERROR:
     // clear for next data
