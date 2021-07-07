@@ -506,9 +506,9 @@ MOUSE_DONE:
 
                         b0 = code;
                         b1 = ibmpc.host_recv_response();
-                        if (b1 == -1) break;
+                        if (b1 == -1) { state = ERROR; break; }
                         b2 = ibmpc.host_recv_response();
-                        if (b2 == -1) break;
+                        if (b2 == -1) { state = ERROR; break; }
 
                         switch (mouse_id) {
                             case MOUSE_DEFAULT:
