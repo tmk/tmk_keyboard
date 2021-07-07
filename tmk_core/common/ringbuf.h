@@ -19,6 +19,7 @@ static inline void ringbuf_write(ringbuf_t *buf, uint8_t data);
 static inline bool ringbuf_is_empty(ringbuf_t *buf);
 static inline bool ringbuf_is_full(ringbuf_t *buf);
 static inline void ringbuf_reset(ringbuf_t *buf);
+static inline void ringbuf_push(ringbuf_t *buf, uint8_t data);
 
 static inline void ringbuf_init(ringbuf_t *buf, uint8_t *array, uint8_t size)
 {
@@ -69,5 +70,11 @@ static inline void ringbuf_reset(ringbuf_t *buf)
 {
     buf->head = 0;
     buf->tail = 0;
+}
+static inline void ringbuf_push(ringbuf_t *buf, uint8_t data)
+{
+    buf->buffer[buf->head] = data;
+    buf->head++;
+    buf->head &= buf->size_mask;
 }
 #endif

@@ -214,11 +214,10 @@ void ibmpc_host_isr_clear(void)
     ringbuf_reset(&rb);
 }
 
-#define LO8(w)  (*((uint8_t *)&(w)))
-#define HI8(w)  (*(((uint8_t *)&(w))+1))
-// NOTE: With this ISR data line can be read within 2us after clock falling edge.
-// To read data line early as possible:
-// write naked ISR with asembly code to read the line and call C func to do other job?
+
+// NOTE: With this ISR data line should be read within 5us after clock falling edge.
+// Confirmed that ATmega32u4 can read data line in 2.5us from interrupt after
+// ISR prologue pushs r18, r19, r20, r21, r24, r25 r30 and r31 with GCC 5.4.0
 ISR(IBMPC_INT_VECT)
 {
     uint8_t dbit;
@@ -366,15 +365,18 @@ ISR(IBMPC_INT_VECT)
 
 DONE:
     // store data
-    if (!ringbuf_put(&rb, isr_state & 0xFF)) {
-        // buffer overflow
-        ibmpc_error = IBMPC_ERR_FULL;
-
+    ringbuf_push(&rb, isr_state & 0xFF);
+    if (ringbuf_is_full(&rb)) {
+        // just became full
         // Disable ISR if buffer is full
         IBMPC_INT_OFF();
         // inhibit: clock_lo
         IBMPC_CLOCK_PORT &= ~(1<<IBMPC_CLOCK_BIT);
         IBMPC_CLOCK_DDR  |=  (1<<IBMPC_CLOCK_BIT);
+    }
+    if (ringbuf_is_empty(&rb)) {
+        // buffer overflow
+        ibmpc_error = IBMPC_ERR_FULL;
     }
 ERROR:
     // clear for next data
