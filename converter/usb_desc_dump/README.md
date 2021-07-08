@@ -1,6 +1,6 @@
 USB Descriptor Dumper
 =====================
-2021-06-30
+2021-07-08
 
 `usb_desc_dump` read USB descriptors and shows in HEX dump.
 This works on TMK USB-USB converter and USB Host Shield with Arduino Leonardo.
@@ -14,6 +14,7 @@ Following descriptors are supported.
     - Endpoint Descriptor
     - HID Descriptor
 - HID Report descriptor
+- String Descriptor
 
 
 

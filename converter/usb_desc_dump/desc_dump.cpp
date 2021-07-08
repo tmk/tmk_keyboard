@@ -44,6 +44,11 @@ uint8_t buf[BUF_SIZE];
 #define RBUF_SIZE 256
 uint8_t rbuf[RBUF_SIZE];
 
+#define SBUF_SIZE 64
+uint8_t sbuf[SBUF_SIZE];
+
+uint16_t langid = 0;
+
 
 void printHEX(uint8_t hex)
 {
@@ -71,16 +76,43 @@ void printError(uint8_t rcode)
     xprintf("\r\nERROR:%02X\r\n", rcode);
 }
 
-void dumpBuf(int len, uint8_t* buf)
+void dumpBuf(int len, uint8_t* buf, bool commented = false)
 {
     for (int i = 0; i < len; i++) {
         if (i % 16)
             print(" ");
-        else if (i != 0)
-            print("\r\n");
+        else {
+            if (i != 0) print("\r\n");
+            if (commented) print("// ");
+        }
+
         xprintf("%02X ", buf[i]);
     }
     print("\r\n");
+}
+
+void printStringDescriptor(UsbDevice *pdev, uint8_t index, uint16_t langid)
+{
+    uint8_t rcode, len;
+    if (index == 0) return;
+
+    rcode = Usb.getStrDescr(pdev->address.devAddress, 0, 1, index, langid, sbuf);
+    if (rcode) { printVal("rcode", rcode); return; }
+    len = (sbuf[0] > sizeof(sbuf) ? sizeof(sbuf) : sbuf[0]);
+
+    rcode = Usb.getStrDescr(pdev->address.devAddress, 0, len, index, langid, sbuf);
+    if (rcode) { printVal("rcode", rcode); return; }
+
+    xprintf("String%d: ", index);
+
+    for (uint8_t i = 2; (i + 1) < len; i += 2) {
+        if (sbuf[i + 1] != 0) continue;
+        //xputc(sbuf[i + 1]);
+        xputc(sbuf[i]);
+    }
+    print("\r\n");
+
+    dumpBuf(sbuf[0], sbuf, true);
 }
 
 uint8_t dumpReportDesc(UsbDevice *pdev, uint16_t iface, uint16_t len)
@@ -109,6 +141,12 @@ void scanConfigDesc(UsbDevice *pdev, uint16_t tl, uint8_t* pB)
             case USB_DESCRIPTOR_INTERFACE: {
                 USB_INTERFACE_DESCRIPTOR *pI = (USB_INTERFACE_DESCRIPTOR *)pB;
                 iface = pI->bInterfaceNumber;
+
+                // String Descriptor
+                if (pI->iInterface) {
+                  print("\r\n// iInterface: ");
+                  printStringDescriptor(pdev, pI->iInterface, langid);
+                }
                 break;
                 }
             case HID_DESCRIPTOR_HID: {
@@ -117,12 +155,12 @@ void scanConfigDesc(UsbDevice *pdev, uint16_t tl, uint8_t* pB)
                 if (pH->bDescrType == HID_DESCRIPTOR_REPORT) {
                     dumpReportDesc(pdev, iface, pH->wDescriptorLength);
                 } else {
-                    printVal("Unknown HID Desc Type:", pH->bDescrType);
+                    printVal("// Unknown HID Desc Type:", pH->bDescrType);
                 }
                 break;
             }
             default:
-                printVal("Unknown Desc Type:", *(pB+1));
+                printVal("// Unknown Desc Type:", *(pB+1));
                 return;
         }
         pB += *pB;
@@ -145,6 +183,12 @@ uint8_t dumpConfigDesc(UsbDevice *pdev, uint8_t numConf)
         if (rcode) return rcode;
         dumpBuf(tl, buf);
 
+        // String Descriptor
+        if (pC->iConfiguration) {
+            print("\r\n// iConfiguration: ");
+            printStringDescriptor(pdev, pC->iConfiguration, langid);
+        }
+
         scanConfigDesc(pdev, tl, buf);
     }
     return rcode;
@@ -165,6 +209,31 @@ void dumpDescriptors(UsbDevice *pdev)
     USB_DEVICE_DESCRIPTOR *pD = (USB_DEVICE_DESCRIPTOR *)&buf;
     printVal("// idVendor", pD->idVendor);
     printVal("// idProduct", pD->idProduct);
+
+    // String Descriptor
+    if (pD->iManufacturer || pD->iProduct || pD->iSerialNumber) {
+        rcode = Usb.getStrDescr(pdev->address.devAddress, 0, 4, 0, 0, sbuf);
+        if (rcode == 0) {
+            langid = (sbuf[3] << 8) | sbuf[2];
+            printVal("// langid", langid);
+
+            println("\r\n// String0:");
+            dumpBuf(sbuf[0], sbuf, true);
+        }
+    }
+    if (pD->iManufacturer) {
+        print("\r\n// iManufacturer: ");
+        printStringDescriptor(pdev, pD->iManufacturer, langid);
+    }
+    if (pD->iProduct) {
+        print("\r\n// iProduct: ");
+        printStringDescriptor(pdev, pD->iProduct, langid);
+    }
+    if (pD->iSerialNumber) {
+        print("\r\n// iSerialNumber: ");
+        printStringDescriptor(pdev, pD->iSerialNumber, langid);
+    }
+
     print("\r\n// Device Descriptor:\r\n");
     dumpBuf(sizeof(USB_DEVICE_DESCRIPTOR), buf);
 
@@ -177,6 +246,8 @@ void dumpDescriptors(UsbDevice *pdev)
     if (rcode) { printError(rcode); }
 
     Usb.GetAddressPool().FreeAddress(pdev->address.devAddress);
+
+    println("\r\n// Parse data here: http://eleccelerator.com/usbdescreqparser/");
     return;
 }
 
