@@ -175,8 +175,8 @@ Mechanical Locking support
 --------------------------
 This feature makes it possible for you to use mechanical locking switch for `CapsLock`, `NumLock`
 or `ScrollLock`. To enable this feature define these macros in `config.h` and use `KC_LCAP`, `KC_LN
-UM` or `KC_LSCR` in keymap for locking key instead of normal `KC_CAPS`, `KC_NLCK` or `KC_SLCK`. Res
-ync option tries to keep switch state consistent with keyboard LED state.
+UM` or `KC_LSCR` in keymap for locking key instead of normal `KC_CAPS`, `KC_NLCK` or `KC_SLCK`. 
+Resync option tries to keep switch state consistent with keyboard LED state.
 
     #define LOCKING_SUPPORT_ENABLE
     #define LOCKING_RESYNC_ENABLE
