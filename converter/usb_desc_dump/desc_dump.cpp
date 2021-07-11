@@ -34,20 +34,17 @@ SOFTWARE.
 #include "print.h"
 
 
+#define AUDIO_CLASS_INTERFACE               0x24
+#define AUDIO_CLASS_ENDPOINT                0x25
+
+
 USB Usb;
 USBHub hub1(&Usb);
 
-
-#define BUF_SIZE 256
+#define BUF_SIZE 512
 uint8_t buf[BUF_SIZE];
-
-#define RBUF_SIZE 256
-uint8_t rbuf[RBUF_SIZE];
-
-#define SBUF_SIZE 64
-uint8_t sbuf[SBUF_SIZE];
-
 uint16_t langid = 0;
+EpInfo epInfo[1];
 
 
 void printHEX(uint8_t hex)
@@ -91,17 +88,34 @@ void dumpBuf(int len, uint8_t* buf, bool commented = false)
     print("\r\n");
 }
 
+class dumpCallback : public USBReadParser {
+public:
+  void Parse(const uint16_t len, const uint8_t *pbuf, const uint16_t &offset) {
+    for (int i = 0; i < len; i++) {
+      if ((offset + i) % 16)
+        print(" ");
+      else {
+        if ((offset + i) != 0) print("\r\n");
+      }
+
+      printHEX(pbuf[i]);
+    }
+  }
+} dumper;
+
 void printStringDescriptor(UsbDevice *pdev, uint8_t index, uint16_t langid)
 {
+    uint8_t sbuf[256];
     uint8_t rcode, len;
+
     if (index == 0) return;
 
     rcode = Usb.getStrDescr(pdev->address.devAddress, 0, 1, index, langid, sbuf);
-    if (rcode) { printVal("rcode", rcode); return; }
+    if (rcode) { printError(rcode); return; }
     len = (sbuf[0] > sizeof(sbuf) ? sizeof(sbuf) : sbuf[0]);
 
     rcode = Usb.getStrDescr(pdev->address.devAddress, 0, len, index, langid, sbuf);
-    if (rcode) { printVal("rcode", rcode); return; }
+    if (rcode) { printError(rcode); return; }
 
     xprintf("String%d: ", index);
 
@@ -117,11 +131,12 @@ void printStringDescriptor(UsbDevice *pdev, uint8_t index, uint16_t langid)
 
 uint8_t dumpReportDesc(UsbDevice *pdev, uint16_t iface, uint16_t len)
 {
+    uint8_t rbuf[64];
     uint8_t rcode = 0;
-    Usb.ctrlReq(pdev->address.devAddress, 0x00, bmREQ_HID_REPORT, USB_REQUEST_GET_DESCRIPTOR, 0x00,
-                HID_DESCRIPTOR_REPORT, iface, len, RBUF_SIZE, rbuf, NULL);
-    if (rcode) return rcode;
-    dumpBuf(len, rbuf);
+    rcode = Usb.ctrlReq(pdev->address.devAddress, 0x00, bmREQ_HID_REPORT, USB_REQUEST_GET_DESCRIPTOR, 0x00,
+                HID_DESCRIPTOR_REPORT, iface, len, sizeof(rbuf), rbuf, &dumper);
+    print("\r\n");
+    if (rcode) { printError(rcode); }
     return rcode;
 }
 
@@ -148,7 +163,8 @@ void scanConfigDesc(UsbDevice *pdev, uint16_t tl, uint8_t* pB)
                   printStringDescriptor(pdev, pI->iInterface, langid);
                 }
                 break;
-                }
+            }
+
             case HID_DESCRIPTOR_HID: {
                 USB_HID_DESCRIPTOR *pH = (USB_HID_DESCRIPTOR *)pB;
                 xprintf("\r\n// Report%d: len:%04X\r\n", iface, pH->wDescriptorLength);
@@ -159,9 +175,20 @@ void scanConfigDesc(UsbDevice *pdev, uint16_t tl, uint8_t* pB)
                 }
                 break;
             }
+
+            case USB_DESCRIPTOR_DEBUG:
+            case USB_DESCRIPTOR_INTERFACE_ASSOCIATION:
+            case USB_DESCRIPTOR_BOS:
+            case USB_DESCRIPTOR_DEVICE_CAPABILITY:
+            case USB_DESCRIPTOR_SS_USB_EP_COMPANION:
+            case USB_DESCRIPTOR_SSP_ISO_EP_COMPANION:
+            // Class specific
+            case AUDIO_CLASS_INTERFACE:
+            case AUDIO_CLASS_ENDPOINT:
+                break;
             default:
                 printVal("// Unknown Desc Type:", *(pB+1));
-                return;
+                break;
         }
         pB += *pB;
     }
@@ -176,12 +203,13 @@ uint8_t dumpConfigDesc(UsbDevice *pdev, uint8_t numConf)
         rcode = Usb.getConfDescr(pdev->address.devAddress, 0, sizeof(USB_CONFIGURATION_DESCRIPTOR), i, buf);
         if (rcode) return rcode;
         USB_CONFIGURATION_DESCRIPTOR *pC = (USB_CONFIGURATION_DESCRIPTOR *)&buf;
-        uint16_t tl = pC->wTotalLength;
-        printVal(" len", tl);
+        printVal(" len", pC->wTotalLength);
+        uint16_t conf_len = (pC->wTotalLength < BUF_SIZE ? pC->wTotalLength : BUF_SIZE);
 
-        rcode = Usb.getConfDescr(pdev->address.devAddress, 0, (tl < BUF_SIZE ? tl : BUF_SIZE), i, buf);
+        rcode = Usb.getConfDescr(pdev->address.devAddress, 0, conf_len, i, buf);
         if (rcode) return rcode;
-        dumpBuf(tl, buf);
+        dumpBuf(conf_len, buf);
+        if (pC->wTotalLength > BUF_SIZE) println("Buffer is not enough!");
 
         // String Descriptor
         if (pC->iConfiguration) {
@@ -189,7 +217,10 @@ uint8_t dumpConfigDesc(UsbDevice *pdev, uint8_t numConf)
             printStringDescriptor(pdev, pC->iConfiguration, langid);
         }
 
-        scanConfigDesc(pdev, tl, buf);
+        // Set Configuration
+        Usb.setConf(pdev->address.devAddress, 0, pC->bConfigurationValue);
+
+        scanConfigDesc(pdev, conf_len, buf);
     }
     return rcode;
 }
@@ -210,8 +241,16 @@ void dumpDescriptors(UsbDevice *pdev)
     printVal("// idVendor", pD->idVendor);
     printVal("// idProduct", pD->idProduct);
 
+    // set maxpacketsize0
+    epInfo[0].epAddr = 0;
+    epInfo[0].maxPktSize = pD->bMaxPacketSize0;
+    epInfo[0].bmNakPower = USB_NAK_MAX_POWER;
+    UsbDevice *p = Usb.GetAddressPool().GetUsbDevicePtr(pdev->address.devAddress);
+    p->epinfo = epInfo;
+
     // String Descriptor
     if (pD->iManufacturer || pD->iProduct || pD->iSerialNumber) {
+        uint8_t sbuf[4];
         rcode = Usb.getStrDescr(pdev->address.devAddress, 0, 4, 0, 0, sbuf);
         if (rcode == 0) {
             langid = (sbuf[3] << 8) | sbuf[2];
