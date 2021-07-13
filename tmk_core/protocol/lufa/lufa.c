@@ -450,6 +450,7 @@ void EVENT_USB_Device_ControlRequest(void)
                     print("[p]");
 #endif
                 }
+#if defined(MOUSE_ENABLE)
                 if (USB_ControlRequest.wIndex == MOUSE_INTERFACE) {
                     Endpoint_ClearSETUP();
                     while (!(Endpoint_IsINReady()));
@@ -457,6 +458,7 @@ void EVENT_USB_Device_ControlRequest(void)
                     Endpoint_ClearIN();
                     Endpoint_ClearStatusStage();
                 }
+#endif
             }
 
             break;
@@ -473,6 +475,7 @@ void EVENT_USB_Device_ControlRequest(void)
                     print("[P]");
 #endif
                 }
+#if defined(MOUSE_ENABLE)
                 if (USB_ControlRequest.wIndex == MOUSE_INTERFACE) {
                     Endpoint_ClearSETUP();
                     Endpoint_ClearStatusStage();
@@ -480,6 +483,7 @@ void EVENT_USB_Device_ControlRequest(void)
                     mouse_protocol = (USB_ControlRequest.wValue & 0xFF);
                     clear_keyboard();
                 }
+#endif
             }
 
             break;
