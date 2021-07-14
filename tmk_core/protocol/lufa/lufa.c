@@ -603,10 +603,12 @@ static void send_system(uint16_t data)
     if (USB_DeviceState != DEVICE_STATE_Configured)
         return;
 
-    report_extra_t r = {
-        .report_id = REPORT_ID_SYSTEM,
-        .usage = data - SYSTEM_POWER_DOWN + 1
-    };
+    report_extra_t r = { .report_id = REPORT_ID_SYSTEM };
+    if (data < SYSTEM_POWER_DOWN) {
+        r.usage = 0;
+    } else {
+        r.usage = data - SYSTEM_POWER_DOWN + 1;
+    }
     Endpoint_SelectEndpoint(MOUSE_IN_EPNUM);
 
     /* Check if write ready for a polling interval around 10ms */
