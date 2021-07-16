@@ -52,10 +52,12 @@ typedef struct
 {
     USB_Descriptor_Configuration_Header_t Config;
 
+#ifndef NO_KEYBOARD
     // Keyboard HID Interface
     USB_Descriptor_Interface_t            Keyboard_Interface;
     USB_HID_Descriptor_HID_t              Keyboard_HID;
     USB_Descriptor_Endpoint_t             Keyboard_INEndpoint;
+#endif
 
 #if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
     // Mouse HID Interface
@@ -72,7 +74,7 @@ typedef struct
     USB_Descriptor_Endpoint_t             Console_OUTEndpoint;
 #endif
 
-#ifdef NKRO_6KRO_ENABLE
+#if !defined(NO_KEYBOARD) && defined(NKRO_6KRO_ENABLE)
     // NKRO HID Interface
     USB_Descriptor_Interface_t            NKRO_Interface;
     USB_HID_Descriptor_HID_t              NKRO_HID;
@@ -82,7 +84,11 @@ typedef struct
 
 
 /* index of interface */
-#define KEYBOARD_INTERFACE          0
+#ifndef NO_KEYBOARD
+#   define KEYBOARD_INTERFACE          0
+#else
+#   define KEYBOARD_INTERFACE          -1
+#endif
 
 #if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
 #   define MOUSE_INTERFACE          (KEYBOARD_INTERFACE + 1)
@@ -96,7 +102,7 @@ typedef struct
 #   define CONSOLE_INTERFACE        MOUSE_INTERFACE
 #endif
 
-#ifdef NKRO_6KRO_ENABLE
+#if !defined(NO_KEYBOARD) && defined(NKRO_6KRO_ENABLE)
 #   define NKRO_INTERFACE           (CONSOLE_INTERFACE + 1)
 #else
 #   define NKRO_INTERFACE           CONSOLE_INTERFACE
@@ -108,7 +114,11 @@ typedef struct
 
 
 // Endopoint number and size
-#define KEYBOARD_IN_EPNUM           1
+#ifndef NO_KEYBOARD
+#   define KEYBOARD_IN_EPNUM           1
+#else
+#   define KEYBOARD_IN_EPNUM           0
+#endif
 
 #if defined(MOUSE_ENABLE) || defined(EXTRAKEY_ENABLE)
 #   define MOUSE_IN_EPNUM           (KEYBOARD_IN_EPNUM + 1) 
@@ -123,7 +133,7 @@ typedef struct
 #   define CONSOLE_OUT_EPNUM        MOUSE_IN_EPNUM
 #endif
 
-#ifdef NKRO_6KRO_ENABLE
+#if !defined(NO_KEYBOARD) && defined(NKRO_6KRO_ENABLE)
 #   define NKRO_IN_EPNUM            (CONSOLE_OUT_EPNUM + 1)
 #else
 #   define NKRO_IN_EPNUM            CONSOLE_OUT_EPNUM

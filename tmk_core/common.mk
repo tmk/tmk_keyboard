@@ -17,7 +17,10 @@ SRC +=	$(COMMON_DIR)/host.c \
 	$(COMMON_DIR)/avr/bootloader.c
 
 
-# Option modules
+ifeq (yes,$(strip $(NO_KEYBOARD)))
+    OPT_DEFS += -DNO_KEYBOARD
+endif
+
 ifeq (yes,$(strip $(UNIMAP_ENABLE)))
     SRC += $(COMMON_DIR)/unimap.c
     OPT_DEFS += -DUNIMAP_ENABLE

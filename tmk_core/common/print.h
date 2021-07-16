@@ -100,6 +100,12 @@ void print_set_sendchar(int8_t (*print_sendchar_func)(uint8_t));
 #else   /* NO_PRINT */
 
 #define xprintf(s,...)              ((void)0)
+#define xsprintf(s,...)             ((void)0)
+#define xfprintf(s,...)             ((void)0)
+#define xputs(s)                    ((void)0)
+#define xputc(c)                    ((void)0)
+#define xitoa(v, r, w)              ((void)0)
+#define xatoi(s, r)                 ((void)0)
 #define print(s)                    ((void)0)
 #define println(s)                  ((void)0)
 #define print_set_sendchar(func)    ((void)0)

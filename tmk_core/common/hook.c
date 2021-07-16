@@ -23,6 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * ------------------------------------------------- */
 
 __attribute__((weak))
+void hook_main_loop(void) {}
+
+__attribute__((weak))
 void hook_keyboard_loop(void) {}
 
 __attribute__((weak))
