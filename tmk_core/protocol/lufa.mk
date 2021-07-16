@@ -4,6 +4,10 @@ TMK_LUFA_DIR = protocol/lufa
 TMK_LUFA_PATH ?= $(TMK_LUFA_DIR)/lufa-abcminiuser
 
 
+# Version string
+TMK_LUFA_VERSION := $(shell (cd $(TMK_DIR)/$(TMK_LUFA_PATH); git rev-parse --short=6 HEAD || echo 'unknown') 2> /dev/null)
+OPT_DEFS += -DTMK_LUFA_VERSION=$(TMK_LUFA_VERSION)
+
 # Create the LUFA source path variables by including the LUFA makefile
 ifneq (, $(wildcard $(TMK_DIR)/$(TMK_LUFA_PATH)/LUFA/Build/LUFA/lufa-sources.mk))
         LUFA_PATH = $(TMK_LUFA_PATH)/LUFA

@@ -12,6 +12,10 @@ USB_HOST_SHIELD_SRC = \
 	$(USB_HOST_SHIELD_DIR)/parsetools.cpp \
 	$(USB_HOST_SHIELD_DIR)/message.cpp 
 
+# Version string
+TMK_USB_HOST_SHIELD_VERSION := $(shell (cd $(TMK_DIR)/$(USB_HOST_SHIELD_DIR); git rev-parse --short=6 HEAD || echo 'unknown') 2> /dev/null)
+OPT_DEFS += -DTMK_USB_HOST_SHIELD_VERSION=$(TMK_USB_HOST_SHIELD_VERSION)
+
 
 
 #

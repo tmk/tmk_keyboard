@@ -708,7 +708,11 @@ int main(void)
     print_set_sendchar(sendchar);
     host_set_driver(&lufa_driver);
 
-    print("\n\nTMK:" STR(TMK_VERSION) "/LUFA\n\n");
+    print("\nTMK:" STR(TMK_VERSION) "/LUFA:" STR(TMK_LUFA_VERSION)
+#ifdef TMK_USB_HOST_SHIELD_VERSION
+            "/UHS2:" STR(TMK_USB_HOST_SHIELD_VERSION)
+#endif
+            "\n");
     hook_early_init();
     keyboard_setup();
     setup_usb();

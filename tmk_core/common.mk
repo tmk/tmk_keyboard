@@ -113,7 +113,7 @@ ifeq (yes,$(strip $(KEYMAP_SECTION_ENABLE)))
 endif
 
 # Version string
-TMK_VERSION := $(shell (git describe --always --dirty=+ || echo 'unknown') 2> /dev/null)
+TMK_VERSION := $(shell (git rev-parse --short=6 HEAD || echo 'unknown') 2> /dev/null)
 OPT_DEFS += -DTMK_VERSION=$(TMK_VERSION)
 
 
