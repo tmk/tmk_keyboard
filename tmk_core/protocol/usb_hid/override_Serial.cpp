@@ -51,8 +51,10 @@ size_t Serial_::write(uint8_t c)
 
 size_t Serial_::write(const uint8_t *buffer, size_t size)
 {
-    sendchar(*buffer);
-    return 1;
+    for (int i = 0; i < size; i++) {
+        sendchar(buffer[i]);
+    }
+    return size;
 }
 
 Serial_::operator bool() {
