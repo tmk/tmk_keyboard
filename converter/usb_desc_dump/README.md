@@ -1,10 +1,10 @@
 USB Descriptor Dumper
 =====================
-2021-07-08
+2021-07-20
 
-`usb_desc_dump` read USB descriptors and shows in HEX dump.
+`Usb_desc_dump` gets USB descriptors and shows in HEX dump and human readable form.
 This works on TMK USB-USB converter and USB Host Shield with Arduino Leonardo.
-USB hub is not supported. Device should be plugged directly.
+
 
 Following descriptors are supported.
 
@@ -15,6 +15,15 @@ Following descriptors are supported.
     - HID Descriptor
 - HID Report descriptor
 - String Descriptor
+- Device Qualifier*
+- Other Speed*
+- Audio/MIDI Class*
+*: partly supported
+
+
+See source code for the detail.
+
+- https://github.com/tmk/USB_Host_Shield_2.0/tree/master/examples/USB_desc_dump
 
 
 
@@ -23,35 +32,91 @@ Example optput:
 ```
 usb_state: 90
 
-Address:01
-lowspeed:01
-idVendor:046A
-idProduct:0011
+//////////////////////////////////////////////////////////////////////
+// USB_desc_dump
+// Address: 01
+// Lowspeed: 00
 
-Device Descriptor:
-12  01  00  02  00  00  00  08  6A  04  11  00  00  01  00  00
-00  01
+// Devicer dump:
+12 01 00 02 00 00 00 08 6A 04 11 00 00 01 00 00
+00 01
 
-Config0: len:0022
-09  02  22  00  01  01  00  A0  32  09  04  00  00  01  03  01
-01  00  09  21  11  01  00  01  22  40  00  07  05  81  03  08
-00  0A
+// Device:
+bLength:                12
+bDescriptorType:        01
+bcdUSB:                 0200
+bDeviceClass:           00
+bDeviceSubClass:        00
+bDeviceProtocol:        00
+bMaxPacketSize0:        08
+idVendor:               046A
+idProduct:              0011
+bcdDevice:              0100
+iManufacturer:          00
+iProduct:               00
+iSerialNumber:          00
+bNumConfigurations:     01
 
-Report0: len:0040
-05  01  09  06  A1  01  05  07  19  E0  29  E7  15  00  25  01
-75  01  95  08  81  02  95  01  75  08  81  01  95  03  75  01
-05  08  19  01  29  03  91  02  95  05  75  01  91  01  95  06
-75  08  15  00  26  DD  00  05  07  19  00  29  DD  81  00  C0
+// Config0 dump:        len: 0022
+09 02 22 00 01 01 00 A0 32 09 04 00 00 01 03 01
+01 00 09 21 11 01 00 01 22 40 00 07 05 81 03 08
+00 0A
+
+// Config:
+bLength:                09
+bDescriptorType:        02
+wTotalLength:           0022
+bNumInterfaces:         01
+bConfigurationValue:    01
+iConfiguration:         00
+bmAttributes:           A0
+bMaxPower:              32
+
+// Interface0.0:
+bLength:                09
+bDescriptorType:        04
+bInterfaceNumber:       00
+bAlternateSetting:      00
+bNumEndpoints:          01
+bInterfaceClass:        03
+bInterfaceSubClass:     01
+bInterfaceProtocol:     01
+iInterface:             00
+
+// HID:
+bLength:                09
+bDescriptorType:        21
+bcdHID:                 0111
+bCountryCode:           00
+bNumDescriptors:        01
+bDescrType:             22
+wDescriptorLength:      0040
+
+// Report0 dump:        len: 0040
+05 01 09 06 A1 01 05 07 19 E0 29 E7 15 00 25 01
+75 01 95 08 81 02 95 01 75 08 81 01 95 03 75 01
+05 08 19 01 29 03 91 02 95 05 75 01 91 01 95 06
+75 08 15 00 26 DD 00 05 07 19 00 29 DD 81 00 C0
+
+// Endpoint:
+bLength:                07
+bDescriptorType:        05
+bEndpointAddress:       81
+bmAttributes:           03
+wMaxPacketSize:         0008
+bInterval:              0A
+
+// Parse data here: http://eleccelerator.com/usbdescreqparser/
 ```
 
 
 
-To check descriptor content use 'USB Descriptor and Request Parser' on line.
+To inspect descriptor content closely use 'USB Descriptor and Request Parser' on line.
 
 - https://eleccelerator.com/usbdescreqparser/
 
 
-Or you can use command line tool like hidrd.
+Also you can use command line tool `hidrd-convert` like below.
 
 - https://github.com/DIGImend/hidrd
 
@@ -61,6 +126,8 @@ $ cat | hidrd-convert -i hex -o spec
 75  01  95  08  81  02  95  01  75  08  81  01  95  03  75  01
 05  08  19  01  29  03  91  02  95  05  75  01  91  01  95  06
 75  08  15  00  26  DD  00  05  07  19  00  29  DD  81  00  C0
+^D
+
 Usage Page (Desktop),               ; Generic desktop controls (01h)
 Usage (Keyboard),                   ; Keyboard (06h, application collection)
 Collection (Application),
