@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
  * Scan Code Set 1:
- * 83-key:
+ * IBM XT 83-key:
  * ,-------.  ,--------------------------------------------------------------------------.
  * | F1| F2|  |Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|  BS  |NumLck |ScrLck |
  * |-------|  |--------------------------------------------------------------------------|
@@ -60,7 +60,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * |-----------------------------------------------------------| `-----------' |---------------|
  * |CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  #|Entr|               |  4|  5|  6|KP,|
  * |-----------------------------------------------------------|     ,---.     |---------------|
- * |Shft| ^a|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift |     |Up |     |  1|  2|  3|Ent|
+ * |Shft|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift |     |Up |     |  1|  2|  3|Ent|
  * |-----------------------------------------------------------| ,-----------. |---------------|
  * |Ctl|Gui|Alt|MHEN|     Space      |HENK|KANA|Alt|Gui|App|Ctl| |Lef|Dow|Rig| |      0|  .|KP=|
  * `-----------------------------------------------------------' `-----------' `---------------'
@@ -74,17 +74,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * |-----------------------------------------------------------| |-----------| |---------------|
  * | 0F  | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 1A| 1B|  2B | |*53|*4F|*51| | 47| 48| 49| 4E|
  * |-----------------------------------------------------------| `-----------' |---------------|
- * | 3A   | 1E| 1F| 20| 21| 22| 23| 24| 25| 26| 27| 28| 56| 1C |               | 4B| 4C| 4D| 7E|
+ * | 3A   | 1E| 1F| 20| 21| 22| 23| 24| 25| 26| 27| 28| ^a| 1C |               | 4B| 4C| 4D| 7E|
  * |-----------------------------------------------------------|     ,---.     |---------------|
- * | 2A | ^a| 2C| 2D| 2E| 2F| 30| 31| 32| 33| 34| 35| 73|  36  |     |*48|     | 4F| 50| 51|*1C|
+ * | 2A | 56| 2C| 2D| 2E| 2F| 30| 31| 32| 33| 34| 35| 73|  36  |     |*48|     | 4F| 50| 51|*1C|
  * |-----------------------------------------------------------| ,-----------. |---------------|
  * | 1D|*5B| 38| 7B |      39        | 79 | 70 |*38|*5C|*5D|*1D| |*4B|*50|*4D| |     52| 53| 59|
  * `-----------------------------------------------------------' `-----------' `---------------'
  * *: E0-prefixed codes. See cs1_e0code() for remapping to unimap array.
  * PrintScreen: E0 37 or 54(with Alt) -> 54
  * Pause: E1 1D 45 or E0 46(with Ctrl) -> 55
- * ^a: ISO backslash and US backslash use identical code 2B. [3], [a]
- * Unsupported codes or error -> 00. UNIMAP_NUBS is unused.
+ * ^a: 2B(ISO XT) is handled as BSLASH. NUHS is unused.
+ * Unsupported codes or error -> 00.
  */
 const uint8_t PROGMEM unimap_cs1[MATRIX_ROWS][MATRIX_COLS] = {
     { UNIMAP_NO,    UNIMAP_ESC,   UNIMAP_1,     UNIMAP_2,     UNIMAP_3,     UNIMAP_4,     UNIMAP_5,     UNIMAP_6,       /* 00-07 */
@@ -97,7 +97,7 @@ const uint8_t PROGMEM unimap_cs1[MATRIX_ROWS][MATRIX_COLS] = {
       UNIMAP_LALT,  UNIMAP_SPACE, UNIMAP_CAPS,  UNIMAP_F1,    UNIMAP_F2,    UNIMAP_F3,    UNIMAP_F4,    UNIMAP_F5    }, /* 38-3F */
     { UNIMAP_F6,    UNIMAP_F7,    UNIMAP_F8,    UNIMAP_F9,    UNIMAP_F10,   UNIMAP_NLCK,  UNIMAP_SLCK,  UNIMAP_P7,      /* 40-47 */
       UNIMAP_P8,    UNIMAP_P9,    UNIMAP_PMNS,  UNIMAP_P4,    UNIMAP_P5,    UNIMAP_P6,    UNIMAP_PPLS,  UNIMAP_P1    }, /* 48-4F */
-    { UNIMAP_P2,    UNIMAP_P3,    UNIMAP_P0,    UNIMAP_PDOT,  UNIMAP_PSCR,  UNIMAP_PAUSE, UNIMAP_NUHS,  UNIMAP_F11,     /* 50-57 */
+    { UNIMAP_P2,    UNIMAP_P3,    UNIMAP_P0,    UNIMAP_PDOT,  UNIMAP_PSCR,  UNIMAP_PAUSE, UNIMAP_NUBS,  UNIMAP_F11,     /* 50-57 */
       UNIMAP_F12,   UNIMAP_PEQL,  UNIMAP_LGUI,  UNIMAP_RGUI,  UNIMAP_APP,   UNIMAP_MUTE,  UNIMAP_VOLD,  UNIMAP_VOLU  }, /* 58-5F */
     { UNIMAP_UP,    UNIMAP_LEFT,  UNIMAP_DOWN,  UNIMAP_RIGHT, UNIMAP_F13,   UNIMAP_F14,   UNIMAP_F15,   UNIMAP_F16,     /* 60-67 */
       UNIMAP_F17,   UNIMAP_F18,   UNIMAP_F19,   UNIMAP_F20,   UNIMAP_F21,   UNIMAP_F22,   UNIMAP_F23,   UNIMAP_PENT  }, /* 68-6F */
