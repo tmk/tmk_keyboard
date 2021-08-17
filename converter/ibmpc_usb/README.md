@@ -51,6 +51,8 @@ Firmware
 
 
 ### Build Options
+Secondary interface and PS/2 mouses can be supported.
+
 In Makefiile:
 
     # IBMPC Options
@@ -88,21 +90,22 @@ Pull up resistors of 1-4.7K Ohm on both Data and Clock line are recommended, wit
 
 - Data    PD0
 - Clock   PD1
-- Reset   PB6 or PB7 (For some of XT keyboards. Not needed for AT, PS/2 and Terminal)
+- Reset   PB6 or PB7
 
-For optional secondary interface use these pins.
-- Data    PD2
-- Clock   PD3
+For optional secondary interface use these pins. See PS/2 connector pinouts below.
+
+- Data2   PD2
+- Clock2  PD3
 
 
 ### Reset
-Old Type-1 IBM XT keyboard and some of XT clones need Reset pin to starup its controller.
-Connect Reset pin to pin3 of DIN-5(180-degree) connector. This should not harm keyboards which don't require reset,
-it is safe and recommended to have Reset pin on AT/XT converter.
+Use pin3 of DIN-5(180-degree) connector for Reset.
 
-Zenith Z-150 XT and Leading Edge DC-2014 are also known to need this.
+Reset should not harm keyboards even if they don't require it. It is safe and recommended to have Reset pin on AT/XT converter.
 
-See this for IBM XT Type-1 vs Type-2: https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-XT-Keyboard-Protocol#type-1-vs-type-2
+Old Type-1 IBM XT keyboard and some of XT clones including Zenith Z-150 XT and Leading Edge DC-2014 are known to need Reset pin. AT, PS/2 and Terminal keyboards don't need it.
+
+See this for details: https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-XT-Keyboard-Protocol#keyboard-hard-reset
 
 
 ### Connector pinouts
@@ -123,6 +126,15 @@ See this for IBM XT Type-1 vs Type-2: https://github.com/tmk/tmk_keyboard/wiki/I
 
 #### PS/2 - Mini-DIN-6
 - https://pinouts.ru/InputCables/KeyboardPC6_pinout.shtml
+
+PS/2 female socket from the front:
+
+      ,--_--.       1: Data
+     / o6 5o \      2: Data2
+    | o4   3o |     3: GND
+     - 2o o1 -      4: VCC
+      `-___-'       5: Clock
+                    6: Clock2
 
 For secondary interface use pin2 and pin6 for data and clock respectively.
 You can use PS/2 Y-splitter cable to access secondary interface.

@@ -8,8 +8,10 @@ TMK_DIR ?= ../../tmk_core
 TARGET_DIR ?= .
 
 # project specific files
-SRC ?=	protocol/ibmpc.c \
-	ibmpc_usb.c
+#SRC ?=	protocol/ibmpc.c \
+#	ibmpc_usb.c
+SRC ?=	protocol/ibmpc.cpp \
+	ibmpc_usb.cpp
 
 CONFIG_H ?= config.h
 
@@ -68,19 +70,19 @@ OPT_DEFS += -DSUSPEND_MODE_STANDBY
 # Build Options
 #   comment out to disable the options.
 #
-BOOTMAGIC_ENABLE ?= no	# Virtual DIP switch configuration(+1000)
-MOUSEKEY_ENABLE ?= yes	# Mouse keys(+4700)
-EXTRAKEY_ENABLE ?= yes	# Audio control and System control(+450)
-CONSOLE_ENABLE ?= yes	# Console for debug(+400)
-COMMAND_ENABLE ?= yes    # Commands for debug and configuration
-NKRO_ENABLE ?= yes	# USB Nkey Rollover
+BOOTMAGIC_ENABLE ?= no	# Virtual DIP switch configuration(+1150)
+MOUSEKEY_ENABLE ?= yes	# Mouse keys(+2200)
+EXTRAKEY_ENABLE ?= yes	# Audio control and System control(+400)
+CONSOLE_ENABLE ?= yes	# Console for debug(+4150)
+COMMAND_ENABLE ?= no	# Commands for debug and configuration(+3600)
+NKRO_ENABLE ?= yes	# USB Nkey Rollover(+350)
 
 KEYMAP_SECTION_ENABLE ?= yes
 UNIMAP_ENABLE ?= yes
 
 # IBMPC Options
-IBMPC_SECONDARY ?= no		# enable secondary interface
-IBMPC_MOUSE_ENABLE ?= no	# enable mouse support
+IBMPC_SECONDARY ?= yes		# enable secondary interface(+800)
+IBMPC_MOUSE_ENABLE ?= yes	# enable mouse support(+2000)
 
 
 # Optimize size but this may cause error "relocation truncated to fit"
