@@ -1,9 +1,15 @@
 PC98 to USB keyboard protocol converter
 =======================================
-Target MCU is ATMega32u2 but other USB capable AVR will also work.
+Main target is TMK prebuilt converter(ATMega32u2) but it will work on dev boards with ATMega32u4.
 
 To initialize keyboard correctly you have to connect keyboard with converter first and then plug them into USB port.
 Otherwise, keyboard may not work.
+
+
+See for the TMK prebuilt converter.
+
+https://geekhack.org/index.php?topic=72052.0
+
 
 
 Connector
@@ -60,7 +66,7 @@ To flash firmware run this command
 
     $ make dfu
 
-then push button on converter to flash firmware.
+then push button on the converter to flash firmware.
 
 If you are using ATMega32u4 based board use following commands to get firmware HEX file.
 
@@ -156,6 +162,9 @@ Its scan code map is very different from standard types. This is not tested.
 
 Other PC98 converter projects and resource
 ------------------------------------------
+TMK wiki
+https://github.com/tmk/tmk_keyboard/wiki/PC-9801-Keyboard
+
 PC-9800シリーズ テクニカルデータブック HARDWARE 編 1993年 p139, p343
 https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n151
 https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n355
