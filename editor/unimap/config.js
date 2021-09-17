@@ -285,5 +285,20 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-122key_terminal.html",
         },
+        /*
+         * PC98
+         */
+        pc98_usb: {
+            desc: "PC98-USB Converter(ATmega32U2)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/pc98_usb/binary/pc98_usb_atmega32u2.hex",
+            firmware_format: "ihex",
+            layout: "layout-pc9801.html",
+        },
+        pc98_usb_32u4: {
+            desc: "PC98-USB Converter(ATmega32U4)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/pc98_usb/binary/pc98_usb_atmega32u4.hex",
+            firmware_format: "ihex",
+            layout: "layout-pc9801.html",
+        },
     },
 };

@@ -155,3 +155,5 @@ textarea {
         resize: both;
         overflow: auto;
 }
+
+.center { text-align: center; }
