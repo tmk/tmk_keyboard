@@ -6,9 +6,9 @@ To initialize keyboard correctly you have to connect keyboard with converter fir
 Otherwise, keyboard may not work.
 
 
-See for the TMK prebuilt converter.
+You can buy [TMK prebuilt converter](https://geekhack.org/index.php?topic=72052.0) here to support this project.
 
-https://geekhack.org/index.php?topic=72052.0
+Discuss or report issue on github or [this thread](https://geekhack.org/index.php?topic=110094.0).
 
 
 
@@ -38,7 +38,6 @@ Wiring: You can change this with editing config.h.
     6   NC
     7   NC
     8   5V              VCC
-
 
 
 
@@ -162,22 +161,22 @@ Its scan code map is very different from standard types. This is not tested.
 
 Other PC98 converter projects and resource
 ------------------------------------------
-TMK wiki
-https://github.com/tmk/tmk_keyboard/wiki/PC-9801-Keyboard
+### TMK wiki
+- https://github.com/tmk/tmk_keyboard/wiki/PC-9801-Keyboard
 
-PC-9800シリーズ テクニカルデータブック HARDWARE 編 1993年 p139, p343
-https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n151
-https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n355
+### PC-9800シリーズ テクニカルデータブック HARDWARE 編 1993年 p139, p343
+- https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n151
+- https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n355
 
-PC98 to USB
-http://davy.nyacom.net/kbd98usb/
+### PC98 to USB
+- http://davy.nyacom.net/kbd98usb/
 
-PC98 to PS/2
-http://www.tsp.ne.jp/~sawada/mago/c_gka98at.htm
-http://www.tsp.ne.jp/~sawada/mago/src/gka98at.asm
+### PC98 to PS/2
+- http://www.tsp.ne.jp/~sawada/mago/c_gka98at.htm
+- http://www.tsp.ne.jp/~sawada/mago/src/gka98at.asm
 
-scan code:
-http://ixsvr.dyndns.org/usb2pc98
+### Scan code
+- http://ixsvr.dyndns.org/usb2pc98
 
 
 
@@ -191,9 +190,9 @@ NOTES
 ### RDY
 PC98 host keeps RDY line high to prevent keyboard from sending data while processing.
 
-https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n359
+- https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n359
 
-PC-9801V keyboard requires RDY pulse as acknowledgement from host, it doesn't next data without this. Dboard doens't need this.
+PC-9801V keyboard requires RDY pulse as acknowledgement from host, it doesn't next data without this. Dboard doesn't need this.
 
 
 ### Inhibit key repeating
