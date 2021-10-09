@@ -25,6 +25,9 @@ ifeq (yes,$(strip $(UNIMAP_ENABLE)))
     SRC += $(COMMON_DIR)/unimap.c
     OPT_DEFS += -DUNIMAP_ENABLE
     OPT_DEFS += -DACTIONMAP_ENABLE
+    ifndef KEYMAP_SECTION_ENABLE
+	KEYMAP_SECTION_ENABLE = yes
+    endif
 else
     ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
 	SRC += $(COMMON_DIR)/actionmap.c
