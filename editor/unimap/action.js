@@ -248,7 +248,7 @@ function Action(code) {
                             return $.extend({}, action_kinds.LAYER_TOGGLE,
                                     {
                                         name: "T" + _layer,
-                                        desc: "Toggle on Layer " + _layer
+                                        desc: "Toggle on/off Layer " + _layer
                                     });
                         }
                         return action_kinds.LAYER_BIT_XOR;
@@ -266,13 +266,13 @@ function Action(code) {
                         return $.extend({}, action_kinds.LAYER_TAP_TOGGLE,
                                 {
                                     name: "Lt" + this.layer_tap_val,
-                                    desc: "Switch Layer " + this.layer_tap_val + " with Tap toggle"
+                                    desc: "Turn on Layer " + this.layer_tap_val + " with Tap toggle"
                                 });
                     case OP_ON_OFF:
                         return $.extend({}, action_kinds.LAYER_MOMENTARY,
                                 {
                                     name: "L" + this.layer_tap_val,
-                                    desc: "Change to Layer " + this.layer_tap_val + "(Momentary)"
+                                    desc: "Turn on Layer " + this.layer_tap_val + "while pressing"
                                 });
                     case OP_OFF_ON:
                         return action_kinds.LAYER_OFF_ON;
@@ -285,14 +285,14 @@ function Action(code) {
                             return $.extend({}, action_kinds.LAYER_MODS,
                                     {
                                         name: "LM" + this.layer_tap_val + " " + _mods_str.name,
-                                        desc: "Change to Layer " + this.layer_tap_val + " with " + _mods_str.desc
+                                        desc: "Turn on Layer " + this.layer_tap_val + " with " + _mods_str.desc
                                     });
                         }
                         else {
                             return $.extend({}, action_kinds.LAYER_TAP_KEY,
                                     {
                                         name: "LT" + this.layer_tap_val + " " + keycodes[this.layer_tap_code].name,
-                                        desc: "Change to Layer " + this.layer_tap_val + " and " + keycodes[this.layer_tap_code].name + "(tap)"
+                                        desc: "Turn on Layer " + this.layer_tap_val + " and " + keycodes[this.layer_tap_code].name + "(tap)"
                                     });
                         }
                 }
@@ -362,9 +362,9 @@ function Action(code) {
 var action_kinds = {
     KEY:                { id: "KEY",                    name: "ACTION_KEY",                 desc: "Normal key" },
     MODS_KEY:           { id: "MODS_KEY",               name: "ACTION_MODS_KEY",            desc: "Modified key" },
-    MODS_TAP_KEY:       { id: "MODS_TAP_KEY",           name: "ACTION_MODS_TAP_KEY",        desc: "Tap key / Hold modifiers" },
+    MODS_TAP_KEY:       { id: "MODS_TAP_KEY",           name: "ACTION_MODS_TAP_KEY",        desc: "Modifiers on hold and a type a key on tap" },
     MODS_ONESHOT:       { id: "MODS_ONESHOT",           name: "ACTION_MODS_ONESHOT",        desc: "Oneshot modifiers" },
-    MODS_TAP_TOGGLE:    { id: "MODS_TAP_TOGGLE",        name: "ACTION_MODS_TAP_TOGGLE",     desc: "Tap toggle modifiers" },
+    MODS_TAP_TOGGLE:    { id: "MODS_TAP_TOGGLE",        name: "ACTION_MODS_TAP_TOGGLE",     desc: "Modifiers and tap toggle" },
     USAGE_SYSTEM:       { id: "USAGE_SYSTEM",           name: "ACTION_USAGE_SYSTEM",        desc: "System control key" },
     USAGE_CONSUMER:     { id: "USAGE_CONSUMER",         name: "ACTION_USAGE_CONSUMER",      desc: "Consumer key" },
     MOUSEKEY:           { id: "MOUSEKEY",               name: "ACTION_MOUSEKEY",            desc: "Mouse key" },
@@ -374,19 +374,19 @@ var action_kinds = {
     FUNCTION:           { id: "FUNCTION",               name: "ACTION_FUNCTION",            desc: "Function" },
     FUNCTION_TAP:       { id: "FUNCTION_TAP",           name: "ACTION_FUNCTION_TAP",        desc: "Function for tap key" },
     FUNCTION_OPT:       { id: "FUNCTION_OPT",           name: "ACTION_FUNCTION_OPT",        desc: "Function with option" },
-    LAYER_CLEAR:        { id: "LAYER_CLEAR",            name: "ACTION_LAYER_CLEAR",         desc: "Clear all layer state" },
-    LAYER_MOMENTARY:    { id: "LAYER_MOMENTARY",        name: "ACTION_LAYER_MOMENTARY",     desc: "Momentary layer switch" },
-    LAYER_TOGGLE:       { id: "LAYER_TOGGLE",           name: "ACTION_LAYER_TOGGLE",        desc: "Toggle a layer" },
-    LAYER_INVERT:       { id: "LAYER_INVERT",           name: "ACTION_LAYER_INVERT",        desc: "Invert a layer" },
+    LAYER_CLEAR:        { id: "LAYER_CLEAR",            name: "ACTION_LAYER_CLEAR",         desc: "Trun off all layers" },
+    LAYER_MOMENTARY:    { id: "LAYER_MOMENTARY",        name: "ACTION_LAYER_MOMENTARY",     desc: "Turn on a layer while pressing" },
+    LAYER_TOGGLE:       { id: "LAYER_TOGGLE",           name: "ACTION_LAYER_TOGGLE",        desc: "Toggle a layer between on and off" },
+    LAYER_INVERT:       { id: "LAYER_INVERT",           name: "ACTION_LAYER_INVERT",        desc: "Invert state of a layer" },
     LAYER_ON:           { id: "LAYER_ON",               name: "ACTION_LAYER_ON",            desc: "Turn on a layer" },
     LAYER_OFF:          { id: "LAYER_OFF",              name: "ACTION_LAYER_OFF",           desc: "Turn off a layer" },
-    LAYER_SET:          { id: "LAYER_SET",              name: "ACTION_LAYER_SET",           desc: "Set a layer" },
-    LAYER_ON_OFF:       { id: "LAYER_ON_OFF",           name: "ACTION_LAYER_ON_OFF",        desc: "Turn on with press and off with release" },
-    LAYER_OFF_ON:       { id: "LAYER_OFF_ON",           name: "ACTION_LAYER_OFF_ON",        desc: "Turn off with press and on with release" },
-    LAYER_SET_CLEAR:    { id: "LAYER_SET_CLEAR",        name: "ACTION_LAYER_SET_CLEAR",     desc: "Turn on only a layer with press clear with release" },
-    LAYER_MODS:         { id: "LAYER_MODS",             name: "ACTION_LAYER_MODS",          desc: "Momentary layer switch with modifiers" },
-    LAYER_TAP_KEY:      { id: "LAYER_TAP_KEY",          name: "ACTION_LAYER_TAP_KEY",       desc: "Momentary layer switch / Tap key" },
-    LAYER_TAP_TOGGLE:   { id: "LAYER_TAP_TOGGLE",       name: "ACTION_LAYER_TAP_TOGGLE",    desc: "Momentary layer switch / Tap toggle" },
+    LAYER_SET:          { id: "LAYER_SET",              name: "ACTION_LAYER_SET",           desc: "Turn on a layer solely" },
+    LAYER_ON_OFF:       { id: "LAYER_ON_OFF",           name: "ACTION_LAYER_ON_OFF",        desc: "Turn on a layer, then off" },
+    LAYER_OFF_ON:       { id: "LAYER_OFF_ON",           name: "ACTION_LAYER_OFF_ON",        desc: "Turn off a layer, then on" },
+    LAYER_SET_CLEAR:    { id: "LAYER_SET_CLEAR",        name: "ACTION_LAYER_SET_CLEAR",     desc: "Turn on a layer solely, then off all layers" },
+    LAYER_MODS:         { id: "LAYER_MODS",             name: "ACTION_LAYER_MODS",          desc: "Turn on a layer with modifiers" },
+    LAYER_TAP_KEY:      { id: "LAYER_TAP_KEY",          name: "ACTION_LAYER_TAP_KEY",       desc: "Turn on a layer on hold and type a key on tap" },
+    LAYER_TAP_TOGGLE:   { id: "LAYER_TAP_TOGGLE",       name: "ACTION_LAYER_TAP_TOGGLE",    desc: "Turn on a layer on hold and tap toggle" },
     LAYER_BIT_AND:      { id: "LAYER_BIT_AND",          name: "ACTION_LAYER_BIT_AND",       desc: "Layer Bit AND" },
     LAYER_BIT_OR:       { id: "LAYER_BIT_OR",           name: "ACTION_LAYER_BIT_OR",        desc: "Layer Bit OR" },
     LAYER_BIT_XOR:      { id: "LAYER_BIT_XOR",          name: "ACTION_LAYER_BIT_XOR",       desc: "Layer Bit XOR" },
