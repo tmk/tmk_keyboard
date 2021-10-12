@@ -326,15 +326,39 @@ inline void IBMPC::isr(void)
                     protocol = IBMPC_PROTOCOL_XT_IBM;
                     goto DONE;
                 }
-             }
+            }
             break;
         case 0b00010000:
         case 0b10010000:
         case 0b01010000:
         case 0b11010000:
             // AT-done
-            // TODO: parity check?
             isr_debug = isr_state;
+
+            // Detect AA with parity error for AT/XT Auto-Switching support
+            // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-Keyboard-Converter#atxt-auto-switching
+            // isr_state: st pr b7 b6   b5 b4 b3 b2 | b1 b0  0 *1    0  0  0  0
+            //            1 '0' 1  0    1  0  1  0  | 1  0   0 *1    0  0  0  0
+            if (isr_state == 0xAA90) {
+                error = IBMPC_ERR_PARITY_AA;
+                goto ERROR;
+            }
+
+            // parit bit check
+            {
+                // isr_state: st pr b7 b6   b5 b4 b3 b2 | b1 b0  0 *1    0  0  0  0
+                uint8_t p = (isr_state & 0x4000) ? 1 : 0;
+                p ^= (isr_state >> 6);
+                while (p & 0xFE) {
+                    p = (p >> 1) ^ (p & 0x01);
+                }
+
+                if (p == 0) {
+                    error = IBMPC_ERR_PARITY;
+                    goto ERROR;
+                }
+            }
+
             // stop bit check
             if (isr_state & 0x8000) {
                 protocol = IBMPC_PROTOCOL_AT;
@@ -373,7 +397,11 @@ DONE:
         // buffer overflow
         error = IBMPC_ERR_FULL;
     }
+    goto END;
 ERROR:
+    // inhibit: Use clock_lo() instead of inhibit() for ISR optimization
+    clock_lo();
+END:
     // clear for next data
     isr_state = 0x8000;
 NEXT:

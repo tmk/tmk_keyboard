@@ -79,7 +79,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 // Error numbers
 #define IBMPC_ERR_NONE        0
-#define IBMPC_ERR_RECV        0x00
+#define IBMPC_ERR_PARITY      0x01
+#define IBMPC_ERR_PARITY_AA   0x02
 #define IBMPC_ERR_SEND        0x10
 #define IBMPC_ERR_TIMEOUT     0x20
 #define IBMPC_ERR_FULL        0x40
