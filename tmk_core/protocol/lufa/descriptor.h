@@ -71,7 +71,7 @@ typedef struct
     USB_Descriptor_Interface_t            Console_Interface;
     USB_HID_Descriptor_HID_t              Console_HID;
     USB_Descriptor_Endpoint_t             Console_INEndpoint;
-    USB_Descriptor_Endpoint_t             Console_OUTEndpoint;
+//    USB_Descriptor_Endpoint_t             Console_OUTEndpoint;
 #endif
 
 #if !defined(NO_KEYBOARD) && defined(NKRO_6KRO_ENABLE)
