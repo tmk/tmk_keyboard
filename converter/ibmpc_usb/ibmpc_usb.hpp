@@ -28,6 +28,10 @@ class IBMPCConverter {
     }
 
     void init(void) {
+        keyboard_id = 0x0000;
+        keyboard_kind = NONE;
+        current_protocol = 0;
+        matrix_clear();
         ibmpc.host_init();
     }
 
@@ -64,6 +68,7 @@ class IBMPCConverter {
         SETUP,
         LOOP,
         ERROR,
+        ERROR_PARITY_AA,
     } state = INIT;
 
     enum CS1_state {
