@@ -92,16 +92,6 @@ int16_t IBMPC::host_send(uint8_t data)
 
     dprintf("w%02X ", data);
 
-    // Not receiving data
-    if (isr_state != 0x8000) dprintf("isr:%04X ", isr_state);
-    while (isr_state != 0x8000) ;
-
-    // Not clock Lo
-    if (!clock_in()) dprintf("c:%u ", wait_clock_hi(1000));
-
-    // Not data Lo
-    if (!data_in()) dprintf("d:%u ", wait_data_hi(1000));
-
     int_off();
 
 RETRY:
@@ -113,7 +103,7 @@ RETRY:
     data_lo();
     wait_us(200);
     clock_hi();     // [5]p.54 [clock low]>100us [5]p.50
-    WAIT(clock_lo, 10000, 1);   // [5]p.53, -10ms [5]p.50
+    WAIT(clock_lo, 15000, 1);   // [5]p.54 T13M, -10ms [5]p.50
 
     /* Data bit[2-9] */
     for (uint8_t i = 0; i < 8; i++) {
