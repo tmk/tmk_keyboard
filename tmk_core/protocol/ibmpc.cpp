@@ -92,6 +92,13 @@ int16_t IBMPC::host_send(uint8_t data)
 
     dprintf("w%02X ", data);
 
+    // Return when receiving data
+    //if (isr_state & 0x0FFF) {
+    if (isr_state != 0x8000) {
+        dprintf("isr:%04X ", isr_state);
+        return -1;
+    }
+
     int_off();
 
 RETRY:
