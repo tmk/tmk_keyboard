@@ -137,7 +137,8 @@ uint16_t IBMPCConverter::read_keyboard_id(void)
     uint16_t id = 0;
     int16_t  code = 0;
 
-    // temporary fix Z-150 AT should response with ID
+    // Z-150 AT doesn't response to ID commnd at all.
+    // https://deskthority.net/viewtopic.php?p=495196#p495196
     if (ibmpc.protocol == IBMPC_PROTOCOL_AT_Z150) return 0xFFFD;
 
     // Disable
