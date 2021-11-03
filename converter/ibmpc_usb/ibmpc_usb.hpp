@@ -111,6 +111,7 @@ class IBMPCConverter {
     uint8_t translate_5576_cs2(uint8_t code);
     uint8_t translate_5576_cs2_e0(uint8_t code);
     uint8_t translate_5576_cs3(uint8_t code);
+    uint8_t translate_televideo_dec_cs3(uint8_t code);
 
     int16_t read_wait(uint16_t wait_ms);
     uint16_t read_keyboard_id(void);
