@@ -925,20 +925,20 @@ uint8_t IBMPCConverter::translate_5576_cs2(uint8_t code) {
     switch (code) {
         case 0x11: return 0x0F; // Zenmen   -> RALT
         case 0x13: return 0x11; // Kanji    -> LALT
-        case 0x0E: return 0x54; // @
-        case 0x54: return 0x5B; // [
-        case 0x5B: return 0x5D; // ]
-        case 0x5C: return 0x6A; // JYEN
-        case 0x5D: return 0x6A; // JYEN
-        case 0x62: return 0x0E; // Han/Zen  -> `~
-        case 0x7C: return 0x77; // Keypad *
+        case 0x0E: return 0x54; // @        -> [
+        case 0x54: return 0x5B; // [        -> ]
+        case 0x5B: return 0x5D; // ]        -> Backslash
+        case 0x5C: return 0x6A; //          -> JPY
+        case 0x5D: return 0x6A; // ￥       -> JPY
+        case 0x62: return 0x0E; // Han/Zen  -> Grave
+        case 0x7C: return 0x77; // Keypad * -> NumLock
     }
     return code;
 }
 uint8_t IBMPCConverter::translate_5576_cs2_e0(uint8_t code) {
     switch (code) {
         case 0x11: return 0x13; // Hiragana -> KANA
-        case 0x41: return 0x7C; // Keypad '
+        case 0x41: return 0x7C; // Keypad , -> Keypad *
     }
     return code;
 }
