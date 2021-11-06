@@ -1152,7 +1152,8 @@ uint8_t IBMPCConverter::translate_televideo_dec_cs3(uint8_t code) {
         case 0x91: return 0x01; // LGUI
         case 0x92: return 0x09; // RGUI
         case 0x77: return 0x58; // RCTRL
-        case 0x57: return 0x18; // F15 (key next to backspace)
+        case 0x57: return 0x66; // Backspace
+        case 0x66: return 0x5D; // JPY
         case 0x7c: return 0x68; // Kp Comma
     }
     return code;
