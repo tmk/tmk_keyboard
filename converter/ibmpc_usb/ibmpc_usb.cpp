@@ -330,11 +330,12 @@ uint8_t IBMPCConverter::process_interface(void)
                     keyboard_kind = PC_AT;
                 }
             } else if (0xAB90 == keyboard_id || // IBM 5576-002
-                       0xAB91 == keyboard_id) { // IBM 5576-003
+                       0xAB91 == keyboard_id) { // IBM 5576-003 or Televideo DEC
                 // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#ab90
                 // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#ab91
 
                 xprintf("\n5576_CS82h:");
+                keyboard_kind = PC_AT;
                 if ((0xFA == ibmpc.host_send(0xF0)) &&
                     (0xFA == ibmpc.host_send(0x82))) {
                     // switch to code set 82h
@@ -342,8 +343,18 @@ uint8_t IBMPCConverter::process_interface(void)
                     xprintf("OK ");
                 } else {
                     xprintf("NG ");
+                    if (0xAB91 == keyboard_id) {
+                        // This must be a Televideo DEC keyboard, which piggybacks on the same keyboard_id as IBM 5576-003
+                        // This keyboard normally starts up using code set 1, but we request code set 2 here:
+                        if ((0xFA == ibmpc.host_send(0xF0)) &&
+                            (0xFA == ibmpc.host_send(0x03))) {
+                            xprintf("OK ");
+                            keyboard_kind = PC_TERMINAL;
+                        } else {
+                            xprintf("NG ");
+                        }
+                    }
                 }
-                keyboard_kind = PC_AT;
             } else if (0xBFB0 == keyboard_id) {     // IBM RT Keyboard
                 // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#bfb0
                 // TODO: LED indicator fix
@@ -1116,6 +1127,38 @@ uint8_t IBMPCConverter::translate_5576_cs3(uint8_t code) {
     return code;
 }
 
+// Televideo DEC Scan code translation
+uint8_t IBMPCConverter::translate_televideo_dec_cs3(uint8_t code) {
+    switch (code) {
+        case 0x08: return 0x76; // Esc
+        case 0x8D: return 0x77; // Num Lock
+        case 0x8E: return 0x67; // Numeric Keypad Slash
+        case 0x8F: return 0x7F; // Numeric Keypad Asterisk
+        case 0x90: return 0x7B; // Numeric Keypad Minus
+        case 0x6E: return 0x65; // Insert
+        case 0x65: return 0x6d; // Delete
+        case 0x67: return 0x62; // Home
+        case 0x6d: return 0x64; // End
+        case 0x64: return 0x6e; // PageUp
+        case 0x84: return 0x7c; // Numeric Keypad Plus (Legend says minus)
+        case 0x87: return 0x02; // Print Screen
+        case 0x88: return 0x7e; // Scroll Lock
+        case 0x89: return 0x0c; // Pause
+        case 0x8A: return 0x03; // VOLD
+        case 0x8B: return 0x04; // VOLU
+        case 0x8C: return 0x05; // MUTE
+        case 0x85: return 0x08; // F13
+        case 0x86: return 0x10; // F14
+        case 0x91: return 0x01; // LGUI
+        case 0x92: return 0x09; // RGUI
+        case 0x77: return 0x58; // RCTRL
+        case 0x57: return 0x66; // Backspace
+        case 0x66: return 0x5D; // JPY
+        case 0x7c: return 0x68; // Kp Comma
+    }
+    return code;
+}
+
 int8_t IBMPCConverter::process_cs3(uint8_t code)
 {
     switch (code) {
@@ -1132,6 +1175,10 @@ int8_t IBMPCConverter::process_cs3(uint8_t code)
         case CS3_READY:
             if (0xAB92 == keyboard_id) {
                 code = translate_5576_cs3(code);
+            }
+            if (0xAB91 == keyboard_id) {
+                // This must be the Televideo DEC keyboard. (For 5576-003 we don't use scan code set 3)
+                code = translate_televideo_dec_cs3(code);
             }
             switch (code) {
                 case 0xF0:
@@ -1178,6 +1225,10 @@ int8_t IBMPCConverter::process_cs3(uint8_t code)
             state_cs3 = CS3_READY;
             if (0xAB92 == keyboard_id) {
                 code = translate_5576_cs3(code);
+            }
+            if (0xAB91 == keyboard_id) {
+                // This must be the Televideo DEC keyboard. (For 5576-003 we don't use scan code set 3)
+                code = translate_televideo_dec_cs3(code);
             }
             switch (code) {
                 case 0x83:  // PrintScreen
