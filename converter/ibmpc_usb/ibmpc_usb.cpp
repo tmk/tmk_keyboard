@@ -866,13 +866,13 @@ uint8_t IBMPCConverter::cs2_e0code(uint8_t code) {
     switch(code) {
         // E0 prefixed codes translation See [a].
         case 0x11: return 0x0F; // right alt
-        case 0x14: return 0x17; // right control
-        case 0x1F: return 0x19; // left GUI
+        case 0x14: return 0x19; // right control
+        case 0x1F: return 0x17; // left GUI
         case 0x27: return 0x1F; // right GUI
-        case 0x2F: return 0x5C; // apps
+        case 0x2F: return 0x27; // apps
         case 0x4A: return 0x60; // keypad /
         case 0x5A: return 0x62; // keypad enter
-        case 0x69: return 0x27; // end
+        case 0x69: return 0x5C; // end
         case 0x6B: return 0x53; // cursor left
         case 0x6C: return 0x2F; // home
         case 0x70: return 0x39; // insert
