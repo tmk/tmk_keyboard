@@ -29,5 +29,6 @@ static inline uint8_t serial_mouse_init(void)
 }
 
 void serial_mouse_task(void);
+uint8_t serial_mouse_buttons(void);
 
 #endif

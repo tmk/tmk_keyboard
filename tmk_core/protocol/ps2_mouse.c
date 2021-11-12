@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 static report_mouse_t mouse_report = {};
+static uint8_t last_buttons;
 
 
 static void print_usb_data(void);
@@ -161,6 +162,7 @@ void ps2_mouse_task(void)
 
 
         host_mouse_send(&mouse_report);
+        last_buttons = mouse_report.buttons;
         print_usb_data();
     }
     // clear report
@@ -169,6 +171,11 @@ void ps2_mouse_task(void)
     mouse_report.v = 0;
     mouse_report.h = 0;
     mouse_report.buttons = 0;
+}
+
+uint8_t ps2_mouse_buttons(void)
+{
+    return last_buttons;
 }
 
 static void print_usb_data(void)

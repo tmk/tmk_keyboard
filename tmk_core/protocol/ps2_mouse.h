@@ -62,5 +62,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 uint8_t ps2_mouse_init(void);
 void ps2_mouse_task(void);
+uint8_t ps2_mouse_buttons(void);
 
 #endif

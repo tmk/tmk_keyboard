@@ -16,6 +16,10 @@
 #define ROW(code)      ((code>>4)&0x07)
 #define COL(code)      (code&0x0F)
 
+#ifdef IBMPC_MOUSE_ENABLE
+extern "C" uint8_t ibmpc_mouse_buttons(void);
+#endif
+
 
 class IBMPCConverter {
     public:

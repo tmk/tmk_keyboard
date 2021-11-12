@@ -414,6 +414,11 @@ void adb_mouse_task(void)
 
     return;
 }
+
+uint8_t adb_mouse_buttons(void)
+{
+    return mouse_report.buttons;
+}
 #endif
 
 uint8_t matrix_scan(void)
