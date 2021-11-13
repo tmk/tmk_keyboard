@@ -38,6 +38,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     keyboard_report->mods == (MOD_BIT(KC_LALT) | MOD_BIT(KC_RALT)) \
 )
 
+
+// CS2 80-prefixed codes support
+#define CS2_80CODE_SUPPORT
+
 // G80-2551 terminal keyboard support
 #define G80_2551_SUPPORT
 

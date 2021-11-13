@@ -95,6 +95,10 @@ class IBMPCConverter {
         CS2_E1_F0,
         CS2_E1_F0_14,
         CS2_E1_F0_14_F0,
+#ifdef CS2_80CODE_SUPPORT
+        CS2_80,
+        CS2_80_F0,
+#endif
     } state_cs2 = CS2_INIT;
 
     enum CS3_state {
@@ -112,6 +116,9 @@ class IBMPCConverter {
     int8_t process_cs3(uint8_t code);
     uint8_t cs1_e0code(uint8_t code);
     uint8_t cs2_e0code(uint8_t code);
+#ifdef CS2_80CODE_SUPPORT
+    uint8_t cs2_80code(uint8_t code);
+#endif
     uint8_t translate_5576_cs2(uint8_t code);
     uint8_t translate_5576_cs2_e0(uint8_t code);
     uint8_t translate_5576_cs3(uint8_t code);
