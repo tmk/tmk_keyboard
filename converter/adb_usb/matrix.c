@@ -225,51 +225,49 @@ again:
 
     // Kensington Turbo Mouse 5: setup
     if (mouse_handler == ADB_HANDLER_TURBO_MOUSE) {
-        xprintf("TM5: ext\n");
+        xprintf("TM5: setup\n");
 
-        /* byte0: speed
-         *        0xa0, 0xa5, 0xb0 and 0xb5 seem to work
-         *        uppper nibble:
-         *          0x00-70, 0xc0-f0  no movement and button event
-         *          0x80  enables mouse output    speed slow
-         *          0x90  enables mouse output
-         *          0xa0  enables mouse output
-         *          0xb0  enables mouse output    speed fast -126 to 126
-         *        lower nibble:
-         *          0x08  makes cursor not smooth, bit4 should be 0
-         *          0x02  disables button4, bit1 should be 0
-         *          how other bits work is not clear.
-         * byte1: button mapping    - upper nibble for button1 and lower for button2
-         *        0x14  button1 and button2 mapped as themselves
-         *          0x0   disabled
-         *          0x1   button1
-         *          0x2   button1 toggle
-         *          0x3   no effect key event FFFF
-         *          0x4   button2
-         *          0x5   button2 toggle
-         *          0x6   button3
-         *          0x7   button3 toggle
-         *          0x8   ?toggle weirdly?
-         *          0x9   button4
-         *          0xa   button4 toggle
-         *          0xb   ?disabled?
-         *          0xc   Left
-         *          0xd   Right
-         *          0xe   Alt+Left
-         *          0xf   Alt+Right
+        /* byte0: 0xb5  speed - 0xa0, 0xa5, 0xb0 and 0xb5 seem to work
+         *              uppper nibble:
+         *                  0x00-70, 0xc0-f0  no movement and button event
+         *                  0x80  enables mouse output    speed slow
+         *                  0x90  enables mouse output
+         *                  0xa0  enables mouse output
+         *                  0xb0  enables mouse output    speed fast -126 to 126
+         *              lower nibble:
+         *                  0x08  makes cursor not smooth, bit3 should be 0
+         *                  0x02  disables button4, bit1 should be 0
+         *                  how other bits work is not clear.
+         * byte1: 0x14  button mapping - upper nibble for button1 and lower for button2
+         *              button1 and button2 mapped as themselves
+         *                  0x0   disabled
+         *                  0x1   button1
+         *                  0x2   button1 toggle
+         *                  0x3   no effect key event FFFF
+         *                  0x4   button2
+         *                  0x5   button2 toggle
+         *                  0x6   button3
+         *                  0x7   button3 toggle
+         *                  0x8   ?toggle weirdly?
+         *                  0x9   button4
+         *                  0xa   button4 toggle
+         *                  0xb   ?disabled?
+         *                  0xc   Left
+         *                  0xd   Right
+         *                  0xe   Alt+Left
+         *                  0xf   Alt+Right
          * byte2: 0x00  - 0x40 on powerup, seems to do nothing
          * byte3: 0x00  - 0x01 on powerup, seems to do nothing
-         * byte4: button mapping    - upper nibble for button3 and lower for button4
-         *        0x69  button3 and button4 mapped as themselves(see byte1)
+         * byte4: 0x69  button mapping - upper nibble for button3 and lower for button4
+         *              button3 and button4 mapped as themselves(see byte1)
          * byte5: 0xff  unknown
          * byte6: 0xff  unknown
-         * byte7: 0xff  checksum  - must be 0xff before calculating
+         * byte7: 0x??  checksum
+         *              byte7 = byte0 ^ byte1 ^ byte2 ^ byte3 ^ byte4 ^ byte5 ^ byte6 ^ 0xFF;
          * https://github.com/NetBSD/src/blob/8966d5b1cf335756dd9bba3331e84c659bf917e1/sys/dev/adb/adb_ktm.c#L181
          */
-        //static uint8_t cmd[] = { 0xA5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0xFF };
-        static uint8_t cmd[] = { 0xB5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0xFF };
-        cmd[7] = cmd[0] ^ cmd[1] ^ cmd[2] ^ cmd[3] ^ cmd[4] ^ cmd[5] ^ cmd[6] ^ cmd[7];
-
+        const uint8_t cmd[] = { 0xB5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0x37 };
+        // cmd[7] = cmd[0] ^ cmd[1] ^ cmd[2] ^ cmd[3] ^ cmd[4] ^ cmd[5] ^ cmd[6] ^ 0xFF;
         adb_host_flush(ADB_ADDR_TMP);
         adb_host_listen_buf(ADB_ADDR_TMP, ADB_REG_2, cmd, sizeof(cmd));
     }
