@@ -61,6 +61,64 @@ static void device_scan(void)
     xprintf("\n");
 }
 
+static void keyboard_init(void)
+{
+    uint16_t reg3;
+    uint8_t handler;
+
+    // Check if there is keyboard at default address
+    reg3 = adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
+    if (!reg3) return;
+    if (reg3) {
+        xprintf("K:found: addr:" xstr(ADB_ADDR_KEYBOARD) " reg3:%04X\n", reg3);
+        adb_host_listen(ADB_ADDR_KEYBOARD, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_KBD_TMP, 0xFE);
+    }
+
+    // Check if there is device to setup at temporary address
+    reg3 = adb_host_talk(ADB_ADDR_KBD_TMP, ADB_REG_3);
+    if (!reg3) {
+        xprintf("K:fail: move\n");
+        return;
+    }
+
+    // Determine ISO keyboard by handler id
+    // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c?v=4.4#L815
+    handler = reg3 & 0xFF;
+    switch (handler) {
+    case 0x04: case 0x05: case 0x07: case 0x09: case 0x0D:
+    case 0x11: case 0x14: case 0x19: case 0x1D: case 0xC1:
+    case 0xC4: case 0xC7:
+        is_iso_layout = true;
+        break;
+    default:
+        is_iso_layout = false;
+        break;
+    }
+
+    // Adjustable keyboard media keys: address=0x07 and handlerID=0x02
+    has_media_keys = (0x02 == (adb_host_talk(ADB_ADDR_APPLIANCE, ADB_REG_3) & 0xff));
+    if (has_media_keys) {
+        xprintf("K:Media keys\n");
+    }
+
+    // Enable keyboard left/right modifier distinction
+    // Listen Register3
+    //  upper byte: reserved bits 0000, keyboard address 0010
+    //  lower byte: device handler 00000011
+    adb_host_listen(ADB_ADDR_KBD_TMP, ADB_REG_3, ADB_ADDR_KBD_TMP, ADB_HANDLER_EXTENDED_KEYBOARD);
+    reg3 = adb_host_talk(ADB_ADDR_KBD_TMP, ADB_REG_3);
+
+    adb_host_kbd_led(ADB_ADDR_KBD_TMP, ~(host_keyboard_leds()));
+
+    // Move to keyboard polling address
+    adb_host_listen(ADB_ADDR_KBD_TMP, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_KBD_POLL, 0xFE);
+    if (adb_host_talk(ADB_ADDR_KBD_TMP, ADB_REG_3)) {
+        xprintf("K:fail: move\n");
+    }
+    xprintf("K:setup: addr:" xstr(ADB_ADDR_KBD_POLL) " reg3:%04X, ISO:%s\n",
+            reg3, (is_iso_layout ? "yes" : "no"));
+}
+
 void matrix_init(void)
 {
     debug_enable = true;
@@ -82,46 +140,12 @@ void matrix_init(void)
     // M0115J(AEK), M3501(AEKII), M0116(Standard), M1242(Adjustable),
     // G5431(Mouse), 64210(Kensington Trubo Mouse 5)
     wait_ms(1000);
-
     device_scan();
-
-    //
-    // Keyboard
-    //
-    xprintf("\nKeyboard:\n");
-    // Determine ISO keyboard by handler id
-    // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c?v=4.4#L815
-    uint8_t handler_id = (uint8_t) adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
-    switch (handler_id) {
-    case 0x04: case 0x05: case 0x07: case 0x09: case 0x0D:
-    case 0x11: case 0x14: case 0x19: case 0x1D: case 0xC1:
-    case 0xC4: case 0xC7:
-        is_iso_layout = true;
-        break;
-    default:
-        is_iso_layout = false;
-        break;
-    }
-    xprintf("handler: %02X, ISO: %s\n", handler_id, (is_iso_layout ? "yes" : "no"));
-
-    // Adjustable keyboard media keys: address=0x07 and handlerID=0x02
-    has_media_keys = (0x02 == (adb_host_talk(ADB_ADDR_APPLIANCE, ADB_REG_3) & 0xff));
-    if (has_media_keys) {
-        xprintf("Media keys\n");
-    }
-
-    // Enable keyboard left/right modifier distinction
-    // Listen Register3
-    //  upper byte: reserved bits 0000, keyboard address 0010
-    //  lower byte: device handler 00000011
-    adb_host_listen(ADB_ADDR_KEYBOARD, ADB_REG_3, ADB_ADDR_KEYBOARD, ADB_HANDLER_EXTENDED_KEYBOARD);
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
 
     led_set(host_keyboard_leds());
-
-    device_scan();
 
     // LED off
     DDRD |= (1<<6); PORTD &= ~(1<<6);
@@ -144,12 +168,12 @@ again:
         // initialization of mouse can fail. To recover this you may have to replug mouse or converter.
         // It is safe to have just one mouse device, but more than one device can be handled somehow.
         adb_host_flush(ADB_ADDR_MOUSE);
-        adb_host_listen(ADB_ADDR_MOUSE, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_TMP, 0xFE);
-        adb_host_flush(ADB_ADDR_TMP);
+        adb_host_listen(ADB_ADDR_MOUSE, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_MOUSE_TMP, 0xFE);
+        adb_host_flush(ADB_ADDR_MOUSE_TMP);
     }
 
     // Check if there is mouse device to setup at temporary address 15
-    mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3)) & 0xFF;
+    mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
     if (!reg3) {
         return;
     }
@@ -158,14 +182,14 @@ again:
 
     // Try to escalate into extended/classic2 protocol
     if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE || mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
-        adb_host_flush(ADB_ADDR_TMP);
-        adb_host_listen(ADB_ADDR_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_EXTENDED_MOUSE);
-        mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3)) & 0xFF;
+        adb_host_flush(ADB_ADDR_MOUSE_TMP);
+        adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_EXTENDED_MOUSE);
+        mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
 
         if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
-            adb_host_flush(ADB_ADDR_TMP);
-            adb_host_listen(ADB_ADDR_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_CLASSIC2_MOUSE);
-            mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3)) & 0xFF;
+            adb_host_flush(ADB_ADDR_MOUSE_TMP);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_CLASSIC2_MOUSE);
+            mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
         }
         dmprintf("EXT: reg3:%04X\n", reg3);
     }
@@ -191,7 +215,7 @@ again:
         // 7  : num of buttons
         uint8_t len;
         uint8_t buf[8];
-        len = adb_host_talk_buf(ADB_ADDR_TMP, ADB_REG_1, buf, sizeof(buf));
+        len = adb_host_talk_buf(ADB_ADDR_MOUSE_TMP, ADB_REG_1, buf, sizeof(buf));
 
         if (len > 5) {
             mouse_cpi = (buf[4]<<8) | buf[5];
@@ -215,8 +239,8 @@ again:
             // The mouse has the two devices at same time transiently in the result. The default device is
             // removed automatically after the another device receives command sequence.
             // NOTE: The mouse hangs if you try moving the two deivces to same address.
-            adb_host_flush(ADB_ADDR_TMP);
-            adb_host_listen(ADB_ADDR_TMP, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_0, 0xFE);
+            adb_host_flush(ADB_ADDR_MOUSE_TMP);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_0, 0xFE);
             goto again;
         } else {
             dmprintf("Unknown\n");
@@ -268,16 +292,16 @@ again:
          */
         uint8_t cmd[] = { 0xB5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0x37 };
         // cmd[7] = cmd[0] ^ cmd[1] ^ cmd[2] ^ cmd[3] ^ cmd[4] ^ cmd[5] ^ cmd[6] ^ 0xFF;
-        adb_host_flush(ADB_ADDR_TMP);
-        adb_host_listen_buf(ADB_ADDR_TMP, ADB_REG_2, cmd, sizeof(cmd));
+        adb_host_flush(ADB_ADDR_MOUSE_TMP);
+        adb_host_listen_buf(ADB_ADDR_MOUSE_TMP, ADB_REG_2, cmd, sizeof(cmd));
     }
 
 
     // Move to address 10 for mouse polling
-    adb_host_flush(ADB_ADDR_TMP);
-    adb_host_listen(ADB_ADDR_TMP, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_MOUSE_POLL, 0xFE);
+    adb_host_flush(ADB_ADDR_MOUSE_TMP);
+    adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_MOUSE_POLL, 0xFE);
     adb_host_flush(ADB_ADDR_MOUSE_POLL);
-    reg3 = adb_host_talk(ADB_ADDR_TMP, ADB_REG_3);
+    reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3);
     if (reg3) {
         dmprintf("POL: fail reg3:%04X\n", reg3);
     } else {
@@ -441,7 +465,7 @@ uint8_t matrix_scan(void)
         if (timer_elapsed(tick_ms) < 12) return 0;
         tick_ms = timer_read();
 
-        codes = adb_host_kbd_recv(ADB_ADDR_KEYBOARD);
+        codes = adb_host_kbd_recv(ADB_ADDR_KBD_POLL);
         if (codes) xprintf("%04X ", codes);
 
         // Adjustable keybaord media keys
@@ -491,7 +515,13 @@ uint8_t matrix_scan(void)
     key0 = codes>>8;
     key1 = codes&0xFF;
 
-    if (codes == 0) {                           // no keys
+    if (codes == 0) {               // no keys
+        static uint16_t detect_ms;
+        if (timer_elapsed(detect_ms) > 1000) {
+            detect_ms = timer_read();
+            // check new device on addr2
+            keyboard_init();
+        }
         return 0;
     } else if (codes == 0x7F7F) {   // power key press
         register_key(0x7F);
@@ -577,5 +607,5 @@ static void register_key(uint8_t key)
 
 void led_set(uint8_t usb_led)
 {
-    adb_host_kbd_led(ADB_ADDR_KEYBOARD, ~usb_led);
+    adb_host_kbd_led(ADB_ADDR_KBD_POLL, ~usb_led);
 }

@@ -30,6 +30,9 @@
 #include "util.h"
 
 
+// https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html
+#define xstr(s) str(s)
+#define str(s) #s
 
 
 #ifndef NO_PRINT
