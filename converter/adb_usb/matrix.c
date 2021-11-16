@@ -266,7 +266,7 @@ again:
          *              byte7 = byte0 ^ byte1 ^ byte2 ^ byte3 ^ byte4 ^ byte5 ^ byte6 ^ 0xFF;
          * https://github.com/NetBSD/src/blob/8966d5b1cf335756dd9bba3331e84c659bf917e1/sys/dev/adb/adb_ktm.c#L181
          */
-        const uint8_t cmd[] = { 0xB5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0x37 };
+        uint8_t cmd[] = { 0xB5, 0x14, 0x00, 0x00, 0x69, 0xFF, 0xFF, 0x37 };
         // cmd[7] = cmd[0] ^ cmd[1] ^ cmd[2] ^ cmd[3] ^ cmd[4] ^ cmd[5] ^ cmd[6] ^ 0xFF;
         adb_host_flush(ADB_ADDR_TMP);
         adb_host_listen_buf(ADB_ADDR_TMP, ADB_REG_2, cmd, sizeof(cmd));
