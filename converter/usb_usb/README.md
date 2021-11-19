@@ -44,6 +44,14 @@ In case of Leonardo push reset button then run command. Serial port name(COM17) 
     or
     $ avrdude -patmega32u4 -cavr109 -b57600 -Uflash:w:usb_usb.hex -PCOM17
 
+To build debug firmware use `master_debug` branch of `USB_Host_Shield_2.0-tmk` submodule
+
+    $ cd tmk_keyboard/tmk_core/protocol/usb_hid/USB_Host_Shield_2.0-tmk
+    $ git chceckout master_debug
+    $ cd tmk_keyboard/converter/usb_usb
+    $ make -f Makefile.debug
+    $ make -f Makefile.debug dfu
+
 
 
 Limitation
