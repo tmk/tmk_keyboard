@@ -103,6 +103,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_JPY  KC_INT3
 #define KC_HENK KC_INT4
 #define KC_MHEN KC_INT5
+#define KC_MACJ KC_LANG1
+#define KC_MACE KC_LANG2
 /* Korean specific */
 #define KC_HAEN KC_LANG1
 #define KC_HANJ KC_LANG2

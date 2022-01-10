@@ -353,8 +353,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AC_RO  			ACTION_KEY(KC_INT1)
 #define AC_KANA			ACTION_KEY(KC_INT2)
 #define AC_JYEN			ACTION_KEY(KC_INT3)
+#define AC_JPY			ACTION_KEY(KC_INT3)
 #define AC_HENK			ACTION_KEY(KC_INT4)
 #define AC_MHEN			ACTION_KEY(KC_INT5)
+#define AC_MACJ			ACTION_KEY(KC_LANG1)
+#define AC_MACE			ACTION_KEY(KC_LANG2)
+/* Korean specific */
+#define AC_HAEN			ACTION_KEY(KC_LANG1)
+#define AC_HANJ			ACTION_KEY(KC_LANG2)
 /* Keypad */
 #define AC_P1  			ACTION_KEY(KC_KP_1)
 #define AC_P2  			ACTION_KEY(KC_KP_2)
@@ -376,6 +382,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AC_PPLS			ACTION_KEY(KC_KP_PLUS)
 #define AC_PEQL			ACTION_KEY(KC_KP_EQUAL)
 #define AC_PENT			ACTION_KEY(KC_KP_ENTER)
+/* Unix function key */
+#define AC_EXEC			ACTION_KEY(KC_EXECUTE)
+#define AC_SLCT			ACTION_KEY(KC_SELECT)
+#define AC_AGIN			ACTION_KEY(KC_AGAIN)
+#define AC_PSTE			ACTION_KEY(KC_PASTE)
 /* Mousekey */
 #define AC_MS_U			ACTION_MOUSEKEY(KC_MS_UP)
 #define AC_MS_D			ACTION_MOUSEKEY(KC_MS_DOWN)
