@@ -154,6 +154,7 @@ ERROR:
         goto RETRY;
     }
 
+    isr_debug = isr_state;
     error |= IBMPC_ERR_SEND;
     inhibit();
     wait_ms(2);
