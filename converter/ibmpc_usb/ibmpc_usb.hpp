@@ -4,9 +4,17 @@
 #include <avr/pgmspace.h>
 #include "matrix.h"
 #include "unimap_trans.h"
-#include "ibmpc_usb.h"
 
 
+
+typedef enum { NONE, PC_XT, PC_AT, PC_TERMINAL, PC_MOUSE } keyboard_kind_t;
+
+#define KEYBOARD_KIND_STR(kind) \
+    (kind == PC_XT ? "XT" :   \
+     kind == PC_AT ? "AT" :   \
+     kind == PC_TERMINAL ? "TERMINAL" :   \
+     kind == PC_MOUSE ? "MOUSE" :   \
+     "NONE")
 
 #define ID_STR(id)  (id == 0xFFFE ? "_????" : \
                     (id == 0xFFFD ? "_Z150" : \
