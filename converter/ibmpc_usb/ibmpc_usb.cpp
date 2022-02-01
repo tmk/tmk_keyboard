@@ -458,7 +458,7 @@ MOUSE_INTELLI:
                     ibmpc.host_send(0xF3); ibmpc.host_send(0xC8);
                     ibmpc.host_send(0xF3); ibmpc.host_send(0xC8);
                     ibmpc.host_send(0xF3); ibmpc.host_send(0x50);
-                    mouse_id = ((read_keyboard_id() >> 8) == MOUSE_EXPLORER ? MOUSE_EXPLORER : MOUSE_DEFAULT);
+                    mouse_id = ((read_keyboard_id() >> 8) == MOUSE_EXPLORER ? MOUSE_EXPLORER : mouse_id);
 
                     // Not Intellimouse
                     if (mouse_id == 0) {
