@@ -762,7 +762,7 @@ int main(void)
 
 #ifndef NO_USB_STARTUP_WAIT_LOOP
     /* wait for USB startup */
-    while (USB_DeviceState != DEVICE_STATE_Configured) {
+    while (USB_DeviceState != DEVICE_STATE_Configured || !console_is_ready()) {
 #if defined(INTERRUPT_CONTROL_ENDPOINT)
         ;
 #else
