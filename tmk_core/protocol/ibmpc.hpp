@@ -90,6 +90,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #define IBMPC_LED_NUM_LOCK    1
 #define IBMPC_LED_CAPS_LOCK   2
 
+// IO address to store pin state temprarily(DDRA: not exist on 32u2 and 32u4)
+#define STORED_PIN    _SFR_IO8(0x01)
 
 class IBMPC
 {

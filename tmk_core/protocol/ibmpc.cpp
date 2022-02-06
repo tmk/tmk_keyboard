@@ -206,9 +206,6 @@ void IBMPC::host_isr_clear(void)
 
 void IBMPC::isr(void)
 {
-    uint8_t dbit;
-    dbit = IBMPC_DATA_PIN&(1<<data_bit);
-
     // Timeout check
     uint8_t t;
     // use only the least byte of millisecond timer
@@ -231,7 +228,7 @@ void IBMPC::isr(void)
     }
 
     isr_state = isr_state>>1;
-    if (dbit) isr_state |= 0x8000;
+    if (STORED_PIN & data_mask) isr_state |= 0x8000;
 
     // isr_state: state of receiving data from keyboard
     //
@@ -392,17 +389,44 @@ void IBMPC::host_set_led(uint8_t led)
 }
 
 
-// NOTE: With this ISR data line should be read within 5us after clock falling edge.
-// Confirmed that ATmega32u4 can read data line in 2.5us from interrupt after
-// ISR prologue pushs r18, r19, r20, r21, r24, r25 r30 and r31 with GCC 5.4.0
-ISR(IBMPC_INT_VECT)
+extern "C" void ibmpc_isr(void) __attribute__ ((signal,__INTR_ATTRS));
+void ibmpc_isr(void)
 {
     IBMPC::interface0.isr();
 }
 
+ISR(IBMPC_INT_VECT, ISR_NAKED)
+{
+    asm volatile (
+        "push   r0"                     "\n\t"
+        "in     r0,     %[pin]"         "\n\t"
+        "out    %[sto], r0"             "\n\t"
+        "pop    r0"                     "\n\t"
+        "rjmp   ibmpc_isr"              "\n\t"
+        :
+        : [pin] "I" (_SFR_IO_ADDR(IBMPC_DATA_PIN)),
+          [sto] "I" (_SFR_IO_ADDR(STORED_PIN))
+    );
+}
+
 #if defined(IBMPC_CLOCK_BIT1) && defined(IBMPC_DATA_BIT1) && defined(IBMPC_INT_VECT1)
-ISR(IBMPC_INT_VECT1)
+extern "C" void ibmpc_isr1(void) __attribute__ ((signal,__INTR_ATTRS));
+void ibmpc_isr1(void)
 {
     IBMPC::interface1.isr();
+}
+
+ISR(IBMPC_INT_VECT1, ISR_NAKED)
+{
+    asm volatile (
+        "push   r0"                     "\n\t"
+        "in     r0,     %[pin]"         "\n\t"
+        "out    %[sto], r0"             "\n\t"
+        "pop    r0"                     "\n\t"
+        "rjmp   ibmpc_isr1"             "\n\t"
+        :
+        : [pin] "I" (_SFR_IO_ADDR(IBMPC_DATA_PIN)),
+          [sto] "I" (_SFR_IO_ADDR(STORED_PIN))
+    );
 }
 #endif
