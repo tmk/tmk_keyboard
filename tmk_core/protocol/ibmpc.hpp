@@ -90,7 +90,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define IBMPC_LED_NUM_LOCK    1
 #define IBMPC_LED_CAPS_LOCK   2
 
-
 class IBMPC
 {
     public:

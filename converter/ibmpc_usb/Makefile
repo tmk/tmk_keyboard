@@ -88,6 +88,9 @@ IBMPC_MOUSE_ENABLE ?= yes	# enable mouse support(+2000)
 # Optimize size but this may cause error "relocation truncated to fit"
 #EXTRALDFLAGS = -Wl,--relax
 
+# Fixed register r2 for reading data line
+EXTRAFLAGS ?= -ffixed-r2
+
 
 #
 # Keymap file
