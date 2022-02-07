@@ -204,7 +204,7 @@ void IBMPC::host_isr_clear(void)
     ringbuf_reset();
 }
 
-inline void IBMPC::isr(void)
+void IBMPC::isr(void)
 {
     uint8_t dbit;
     dbit = IBMPC_DATA_PIN&(1<<data_bit);

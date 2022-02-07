@@ -118,7 +118,7 @@ class IBMPC
             clock_mask(1 << clock), data_mask(1 << data) {
     };
 
-    inline void isr(void) __attribute__((__always_inline__));
+    void isr(void);
 
 
     private:
