@@ -123,15 +123,12 @@ RETRY:
 
 void matrix_init(void)
 {
-    PC98_RST_DDR |= (1<<PC98_RST_BIT);
-    PC98_RDY_DDR |= (1<<PC98_RDY_BIT);
-    PC98_RTY_DDR |= (1<<PC98_RTY_BIT);
     PC98_RST_PORT |= (1<<PC98_RST_BIT);
+    PC98_RST_DDR |= (1<<PC98_RST_BIT);
     PC98_RDY_PORT |= (1<<PC98_RDY_BIT);
+    PC98_RDY_DDR |= (1<<PC98_RDY_BIT);
     PC98_RTY_PORT |= (1<<PC98_RTY_BIT);
-
-
-    serial_init();
+    PC98_RTY_DDR |= (1<<PC98_RTY_BIT);
 
     // PC98 reset
     // https://archive.org/stream/PC9800TechnicalDataBookHARDWARE1993/PC-9800TechnicalDataBook_HARDWARE1993#page/n359
@@ -139,6 +136,8 @@ void matrix_init(void)
     PC98_RST_PORT &= ~(1<<PC98_RST_BIT);    // RST: low
     _delay_us(15);                          // > 13us
     PC98_RST_PORT |= (1<<PC98_RST_BIT);     // RST: high
+
+    serial_init();
 
     _delay_ms(50);
     if (pc98_is_newtype()) xprintf("new type\n"); else xprintf("old type\n");
