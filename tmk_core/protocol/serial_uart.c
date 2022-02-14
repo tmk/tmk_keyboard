@@ -63,7 +63,9 @@ void serial_init(void)
 }
 
 // RX ring buffer
+#ifndef RBUF_SIZE
 #define RBUF_SIZE   256
+#endif
 static uint8_t rbuf[RBUF_SIZE];
 static uint8_t rbuf_head = 0;
 static uint8_t rbuf_tail = 0;
