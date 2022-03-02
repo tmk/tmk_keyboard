@@ -342,7 +342,7 @@ uint8_t IBMPCConverter::process_interface(void)
                 // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#ab90
                 // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#ab91
 
-                xprintf("\n5576_CS82h:");
+                xprintf("\n5576_CS82h: ");
                 keyboard_kind = PC_AT;
                 if ((0xFA == ibmpc.host_send(0xF0)) &&
                     (0xFA == ibmpc.host_send(0x82))) {
@@ -350,7 +350,7 @@ uint8_t IBMPCConverter::process_interface(void)
                     // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-AT-Keyboard-Protocol#ibm-5576-scan-codes-set
                     xprintf("OK ");
                 } else {
-                    xprintf("NG ");
+                    xprintf("NG \nTelevideo: ");
                     if (0xAB91 == keyboard_id) {
                         // This must be a Televideo DEC keyboard, which piggybacks on the same keyboard_id as IBM 5576-003
                         // This keyboard normally starts up using code set 1, but we request code set 2 here:
