@@ -153,10 +153,10 @@ void matrix_init(void)
 }
 
 #ifdef ADB_MOUSE_ENABLE
+static uint8_t mouse_handler;
 static void mouse_init(void)
 {
     uint16_t reg3;
-    uint8_t mouse_handler;
 
 again:
     // Check if there is mouse device at default address 3
@@ -173,11 +173,12 @@ again:
     }
 
     // Check if there is mouse device to setup at temporary address 15
-    mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
+    reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3);
     if (!reg3) {
         return;
     }
     dmprintf("TMP: reg3:%04X\n", reg3);
+    mouse_handler = reg3 & 0xFF;
 
 
     // Try to escalate into extended/classic2 protocol
@@ -242,6 +243,13 @@ again:
             adb_host_flush(ADB_ADDR_MOUSE_TMP);
             adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_0, 0xFE);
             goto again;
+        } else if (buf[0] == 0x4B && buf[1] == 0x4F && buf[2] == 0x49 && buf[3] == 0x54) {
+            // https://elixir.bootlin.com/linux/v5.17/source/drivers/macintosh/adbhid.c#L1068
+            adb_host_flush(ADB_ADDR_MOUSE_TMP);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_MACALLY2_MOUSE);
+            mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
+            xprintf("M: reg3:%04X\n", reg3);
+            dmprintf("Macally2: found: %02X\n", mouse_handler);
         } else {
             dmprintf("Unknown\n");
         }
@@ -357,7 +365,11 @@ void adb_mouse_task(void)
         mouseacc = 1;
         return;
     };
-    dmprintf("[%02X %02X %02X %02X %02X]\n", buf[0], buf[1], buf[2], buf[3], buf[4]);
+
+    xprintf("M:[ ");
+    for (uint8_t i = 0; i < len; i++)
+        xprintf("%02X ", buf[i]);
+    xprintf("] mh:%02X\n", mouse_handler);
 
     // Store off-buttons and 0-movements in unused bytes
     bool xneg = false;
@@ -365,16 +377,33 @@ void adb_mouse_task(void)
     if (len == 2) {
         if (buf[0] & 0x40) yneg = true;
         if (buf[1] & 0x40) xneg = true;
+    } else if (mouse_handler == ADB_HANDLER_MACALLY2_MOUSE) {
+        // Macally 2-button mouse:
+        //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: b01 x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: 1   0   0   0   1   0   0   0
+        //   Byte3: 1   0   0   0   1   0   0   0
+        //     b--: button state(0:pressed, 1:released)
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        // Ignore Byte2 and 3
+        len = 2;
     } else {
         if (buf[len - 1] & 0x40) yneg = true;
         if (buf[len - 1] & 0x04) xneg = true;
     }
 
+    // Make unused buf bytes compatible with Extended Mouse Protocol
     for (int8_t i = len; i < sizeof(buf); i++) {
         buf[i] = 0x88;
         if (yneg) buf[i] |= 0x70;
         if (xneg) buf[i] |= 0x07;
     }
+
+    xprintf("M:[ ");
+    for (uint8_t i = 0; i < sizeof(buf); i++)
+        xprintf("%02X ", buf[i]);
+    xprintf("]\n");
 
     // 8 buttons at max
     // TODO: Fix HID report descriptor for mouse to support button6-8
