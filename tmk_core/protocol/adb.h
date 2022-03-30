@@ -96,6 +96,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #define ADB_HANDLER_EXTENDED_MOUSE      0x04
 #define ADB_HANDLER_TURBO_MOUSE         0x32
 #define ADB_HANDLER_MACALLY2_MOUSE      0x42
+// pseudo handler
+#define ADB_HANDLER_LOGITECH            0x4C
 
 
 // ADB host

@@ -225,8 +225,8 @@ again:
         }
 
         if (len) {
-            dmprintf("EXT: [%02X %02X %02X %02X %02X %02X %02X %02X] cpi=%d\n",
-                    buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], mouse_cpi);
+            dmprintf("EXT: [%02X %02X %02X %02X %02X %02X %02X %02X] cpi=%d btn=%d len=%d\n",
+                    buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], mouse_cpi, buf[7], len);
         }
 
         // Kensington Turbo Mouse 5: default device
@@ -250,6 +250,19 @@ again:
             mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
             xprintf("M: reg3:%04X\n", reg3);
             dmprintf("Macally2: found: %02X\n", mouse_handler);
+        } else if (buf[0] == 0x9A && (buf[1] == 0x20 || buf[1] == 0x21)) {
+            if (buf[1] == 0x20) {
+                xprintf("M:MouseMan\n");
+            } else {
+                xprintf("M:TrackMan\n");
+            }
+            // https://elixir.bootlin.com/linux/v5.17/source/drivers/macintosh/adbhid.c#L1047
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_1, 0x00, 0x81);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_1, 0x01, 0x81);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_1, 0x02, 0x81);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_1, 0x03, 0x38);
+            // set pseudo handler for Logitech
+            mouse_handler = ADB_HANDLER_LOGITECH;
         } else {
             dmprintf("Unknown\n");
         }
@@ -377,7 +390,22 @@ void adb_mouse_task(void)
     if (len == 2) {
         if (buf[0] & 0x40) yneg = true;
         if (buf[1] & 0x40) xneg = true;
-    } else if (mouse_handler == ADB_HANDLER_MACALLY2_MOUSE) {
+    } else if (mouse_handler == ADB_HANDLER_LOGITECH) {
+        // Logitech:
+        //   Byte0: bbb y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: 1   x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: 0   0   0   0   0   BL  BM  BR
+        //     Bx: button state(1:pressed, 1:released)
+        //     bbb: 0 when either BL, BR or BM is pressed
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        if (buf[2] & 0x04) buf[0] &= 0x7F; else buf[0] |= 0x80;
+        if (buf[2] & 0x01) buf[1] &= 0x7F; else buf[1] |= 0x80;
+        if (buf[2] & 0x02) buf[2] = 0x08;  else buf[2] = 0x88;
+        if (yneg) buf[2] |= 0x70;
+        if (xneg) buf[2] |= 0x07;
+        len = 3;
+    } else if (mouse_handler == ADB_HANDLER_MACALLY2_MOUSE && len == 4) {
         // Macally 2-button mouse:
         //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
         //   Byte1: b01 x06 x05 x04 x03 x02 x01 x00
