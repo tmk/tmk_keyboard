@@ -507,6 +507,13 @@ void adb_mouse_task(void)
         if (buf[0] & 0x40) yneg = true;
         if (buf[1] & 0x40) xneg = true;
         len = 2;
+
+        #ifdef ADB_MOUSE_2ND_BUTTON_QUIRK
+        // Ignore b01('optional second button') as OSX/MacOS9 does.
+        // Some mouses misuse the bit and make it unusable.
+        // https://github.com/tmk/tmk_keyboard/issues/724
+        buf[1] |= 0x80;
+        #endif
     }
 
     // Make unused buf bytes compatible with Extended Mouse Protocol
