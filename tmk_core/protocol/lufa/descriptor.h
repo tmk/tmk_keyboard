@@ -159,7 +159,7 @@ typedef struct
 #define MOUSE_EPSIZE                8
 #endif
 
-#define CONSOLE_EPSIZE              64
+#define CONSOLE_EPSIZE              32
 #define NKRO_EPSIZE                 32
 
 
