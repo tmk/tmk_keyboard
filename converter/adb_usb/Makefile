@@ -79,7 +79,7 @@ ACTIONMAP_ENABLE ?= no          # Use 16bit actionmap instead of 8bit keymap
 KEYMAP_SECTION_ENABLE ?= yes	# fixed address keymap for keymap editor
 
 # ADB Mice need acceleration for todays much bigger screens. 
-ADB_MOUSE_MAXACC ?= 8
+ADB_MOUSE_MAXACC ?= 1
 OPT_DEFS += -DADB_MOUSE_MAXACC=$(ADB_MOUSE_MAXACC)
 
 # Enable scroll wheel functionality using the y-axis of the mouse
