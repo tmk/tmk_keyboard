@@ -202,6 +202,16 @@ again:
         adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_EXTENDED_MOUSE);
         mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
 
+        if (mouse_handler != ADB_HANDLER_EXTENDED_MOUSE) {
+            adb_host_flush(ADB_ADDR_MOUSE_TMP);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_MOUSESYSTEMS_A3);
+            mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
+
+            if (mouse_handler == ADB_HANDLER_MOUSESYSTEMS_A3) {
+                adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_2, 0x00, 0x07);
+            }
+        }
+
         if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
             adb_host_flush(ADB_ADDR_MOUSE_TMP);
             adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_CLASSIC2_MOUSE);
@@ -462,6 +472,18 @@ void adb_mouse_task(void)
         buf[0] = (((buf[2] & 4) << 5) & ((buf[2] & 8) << 4)) | (buf[0] & 0x7F);
         buf[1] = ((buf[2] & 2) << 6) | (buf[1] & 0x7F) ;
         buf[2] = ((buf[2] & 1) << 7) | (yneg ? 0x70 : 0x00) | (xneg ? 0x0F : 0x08);
+        len = 3;
+    } else if (mouse_handler == ADB_HANDLER_MOUSESYSTEMS_A3) {
+        // Mouse Systems A3: 3-button mouse/trackball:
+        //   Byte0: ??? y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: ??? x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: ??? ??? ??? ??? ??? bR  bM  bL
+        //     b--: button state(0:pressed, 1:released)
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        buf[0] = ((buf[2] & 1) << 7) | (buf[0] & 0x7F);
+        buf[1] = ((buf[2] & 4) << 5) | (buf[1] & 0x7F) ;
+        buf[2] = ((buf[2] & 2) << 6) | (yneg ? 0x70 : 0x00) | (xneg ? 0x0F : 0x08);
         len = 3;
     } else {
         if (buf[len - 1] & 0x40) yneg = true;
