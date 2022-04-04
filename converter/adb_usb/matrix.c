@@ -181,6 +181,21 @@ again:
     mouse_handler = reg3 & 0xFF;
 
 
+    if (mouse_handler == ADB_HANDLER_MICROSPEED_MACTRAC ||
+        mouse_handler == ADB_HANDLER_MICROSPEED_UNKNOWN ||
+        mouse_handler == ADB_HANDLER_CONTOUR_MOUSE ||
+        mouse_handler == ADB_HANDLER_CHPRODUCTS_PRO) {
+        // https://github.com/NetBSD/src/blob/netbsd-9/sys/arch/macppc/dev/ams.c#L226-L255
+        // https://github.com/torvalds/linux/blob/v5.17/drivers/macintosh/adbhid.c#L1007-L1018
+        // https://github.com/torvalds/linux/blob/v5.17/drivers/macintosh/adbhid.c#L1204-L1239
+        uint8_t cmd[] = { 0x00,     // alt speed max
+                          0x00,     // speed max
+                          0x10,     // ext protocol enabled
+                          0x07 };   // buttons without locking
+        //adb_host_flush(ADB_ADDR_MOUSE_TMP);
+        adb_host_listen_buf(ADB_ADDR_MOUSE_TMP, ADB_REG_1, cmd, sizeof(cmd));
+    }
+
     // Try to escalate into extended/classic2 protocol
     if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE || mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
         adb_host_flush(ADB_ADDR_MOUSE_TMP);
@@ -416,6 +431,38 @@ void adb_mouse_task(void)
         if (buf[1] & 0x40) xneg = true;
         // Ignore Byte2 and 3
         len = 2;
+    } else if (mouse_handler == ADB_HANDLER_MICROSPEED_MACTRAC ||
+               mouse_handler == ADB_HANDLER_MICROSPEED_UNKNOWN ||
+               mouse_handler == ADB_HANDLER_CONTOUR_MOUSE) {
+        // Microspeed:
+        //   Byte0: ??? y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: ??? x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: ??? ??? ??? ??? ??? bM  bR  bL
+        // Contour Mouse:
+        //   Byte0: bbb y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: 1   x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: 0   0   0   0   1   bM  bR  bL
+        //   Byte3: 0   0   0   0   1   bM  bR  bL
+        //     b--: button state(0:pressed, 1:released)
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        buf[0] = ((buf[2] & 1) << 7) | (buf[0] & 0x7F);
+        buf[1] = ((buf[2] & 2) << 6) | (buf[1] & 0x7F) ;
+        buf[2] = ((buf[2] & 4) << 5) | (buf[2] & 8) | (yneg ? 0x70 : 0x00) | (xneg ? 0x07 : 0x00);
+        len = 3;
+    } else if (mouse_handler == ADB_HANDLER_CHPRODUCTS_PRO) {
+        // CH Products Trackball Pro:
+        //   Byte0: ??? y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: ??? x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: ??? ??? ??? ??? bL0 bL1 bR  bM
+        //     b--: button state(0:pressed, 1:released)
+        //     L=(bL0 & bL1)
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        buf[0] = (((buf[2] & 4) << 5) & ((buf[2] & 8) << 4)) | (buf[0] & 0x7F);
+        buf[1] = ((buf[2] & 2) << 6) | (buf[1] & 0x7F) ;
+        buf[2] = ((buf[2] & 1) << 7) | (yneg ? 0x70 : 0x00) | (xneg ? 0x0F : 0x08);
+        len = 3;
     } else {
         if (buf[len - 1] & 0x40) yneg = true;
         if (buf[len - 1] & 0x04) xneg = true;
