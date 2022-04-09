@@ -103,6 +103,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define ADB_HANDLER_MOUSESYSTEMS_A3     0x03
 // pseudo handler
 #define ADB_HANDLER_LOGITECH            0x4C
+#define ADB_HANDLER_LOGITECH_EXT        0x4D
 
 
 // ADB host

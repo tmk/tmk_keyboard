@@ -288,6 +288,13 @@ again:
             adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_1, 0x03, 0x38);
             // set pseudo handler for Logitech
             mouse_handler = ADB_HANDLER_LOGITECH;
+        } else if (buf[0] == 0x4C && buf[1] == 0x54) {
+            // Logitech Extended
+            // MouseMan - FCCID:DZLMAH32 'LT01'
+            // MouseMan Cordless - FCCID:DZLMRC33T 'LTW1'
+            xprintf("M:Logitech-Ext\n");
+            // set pseudo handler
+            mouse_handler = ADB_HANDLER_LOGITECH_EXT;
         } else {
             dmprintf("Unknown\n");
         }
@@ -430,6 +437,17 @@ void adb_mouse_task(void)
         if (yneg) buf[2] |= 0x70;
         if (xneg) buf[2] |= 0x07;
         len = 3;
+    } else if (mouse_handler == ADB_HANDLER_LOGITECH_EXT) {
+        // Logitech Extended:
+        //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: b02 x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: b01 y09 y08 y07 b03 x09 x08 x07
+        //     L=b00, R=b01, M=b02
+        uint8_t tmp = buf[2];
+        if (buf[1] & 0x80) buf[2] |= 0x80; else buf[2] &= 0x7F;
+        if (tmp    & 0x80) buf[1] |= 0x80; else buf[1] &= 0x7F;
+        if (buf[len - 1] & 0x40) yneg = true;
+        if (buf[len - 1] & 0x04) xneg = true;
     } else if (mouse_handler == ADB_HANDLER_MACALLY2_MOUSE && len == 4) {
         // Macally 2-button mouse:
         //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
