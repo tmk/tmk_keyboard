@@ -296,7 +296,7 @@ again:
             // set pseudo handler
             mouse_handler = ADB_HANDLER_LOGITECH_EXT;
         } else {
-            dmprintf("Unknown\n");
+            dmprintf("Extended\n");
         }
     }
 
@@ -391,18 +391,6 @@ void adb_mouse_task(void)
         mouse_init();
     }
 
-    // Extended Mouse Protocol data can be 2-5 bytes
-    // https://developer.apple.com/library/archive/technotes/hw/hw_01.html#Extended
-    //
-    //   Byte 0: b00 y06 y05 y04 y03 y02 y01 y00
-    //   Byte 1: b01 x06 x05 x04 x03 x02 x01 x00
-    //   Byte 2: b02 y09 y08 y07 b03 x09 x08 x07
-    //   Byte 3: b04 y12 y11 y10 b05 x12 x11 x10
-    //   Byte 4: b06 y15 y14 y13 b07 x15 x14 x13
-    //
-    //   b--: Button state.(0: on, 1: off)
-    //   x--: X axis movement.
-    //   y--: Y axis movement.
     len = adb_host_talk_buf(ADB_ADDR_MOUSE_POLL, ADB_REG_0, buf, sizeof(buf));
 
     // If nothing received reset mouse acceleration, and quit.
@@ -416,13 +404,9 @@ void adb_mouse_task(void)
         xprintf("%02X ", buf[i]);
     xprintf("] mh:%02X\n", mouse_handler);
 
-    // Store off-buttons and 0-movements in unused bytes
     bool xneg = false;
     bool yneg = false;
-    if (len == 2) {
-        if (buf[0] & 0x40) yneg = true;
-        if (buf[1] & 0x40) xneg = true;
-    } else if (mouse_handler == ADB_HANDLER_LOGITECH) {
+    if (mouse_handler == ADB_HANDLER_LOGITECH) {
         // Logitech:
         //   Byte0: bbb y06 y05 y04 y03 y02 y01 y00
         //   Byte1: 1   x06 x05 x04 x03 x02 x01 x00
@@ -503,9 +487,26 @@ void adb_mouse_task(void)
         buf[1] = ((buf[2] & 4) << 5) | (buf[1] & 0x7F) ;
         buf[2] = ((buf[2] & 2) << 6) | (yneg ? 0x70 : 0x00) | (xneg ? 0x0F : 0x08);
         len = 3;
-    } else {
+    } else if (mouse_handler == ADB_HANDLER_EXTENDED_MOUSE ||
+               mouse_handler == ADB_HANDLER_TURBO_MOUSE) {
+        // Apple Extended Mouse:
+        //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: b01 x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: b02 y09 y08 y07 b03 x09 x08 x07
+        //   Byte3: b04 y12 y11 y10 b05 x12 x11 x10
+        //   Byte4: b06 y15 y14 y13 b07 x15 x14 x13
+        //     b--: button state(0:pressed, 1:released)
+        //     Data can be 2-5 bytes.
+        //     L=b00, R=b01, M=b02
         if (buf[len - 1] & 0x40) yneg = true;
         if (buf[len - 1] & 0x04) xneg = true;
+    } else {
+        // Apple Classic Mouse and Unknown devices:
+        //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: b01 x06 x05 x04 x03 x02 x01 x00
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        len = 2;
     }
 
     // Make unused buf bytes compatible with Extended Mouse Protocol
@@ -520,17 +521,15 @@ void adb_mouse_task(void)
         xprintf("%02X ", buf[i]);
     xprintf("]\n");
 
-    // 8 buttons at max
-    // TODO: Fix HID report descriptor for mouse to support button6-8
     uint8_t buttons = 0;
     if (!(buf[4] & 0x08)) buttons |= MOUSE_BTN8;
     if (!(buf[4] & 0x80)) buttons |= MOUSE_BTN7;
     if (!(buf[3] & 0x08)) buttons |= MOUSE_BTN6;
     if (!(buf[3] & 0x80)) buttons |= MOUSE_BTN5;
     if (!(buf[2] & 0x08)) buttons |= MOUSE_BTN4;
-    if (!(buf[2] & 0x80)) buttons |= MOUSE_BTN3;
-    if (!(buf[1] & 0x80)) buttons |= MOUSE_BTN2;
-    if (!(buf[0] & 0x80)) buttons |= MOUSE_BTN1;
+    if (!(buf[2] & 0x80)) buttons |= MOUSE_BTN3;    // Middle
+    if (!(buf[1] & 0x80)) buttons |= MOUSE_BTN2;    // Right
+    if (!(buf[0] & 0x80)) buttons |= MOUSE_BTN1;    // Left
 
     // check if the scroll enable button is pressed
     bool scroll_enable = (bool)(buttons & scroll_button_mask);
