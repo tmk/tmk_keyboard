@@ -153,10 +153,10 @@ void matrix_init(void)
 }
 
 #ifdef ADB_MOUSE_ENABLE
+static uint8_t mouse_handler;
 static void mouse_init(void)
 {
     uint16_t reg3;
-    uint8_t mouse_handler;
 
 again:
     // Check if there is mouse device at default address 3
@@ -173,18 +173,44 @@ again:
     }
 
     // Check if there is mouse device to setup at temporary address 15
-    mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
+    reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3);
     if (!reg3) {
         return;
     }
     dmprintf("TMP: reg3:%04X\n", reg3);
+    mouse_handler = reg3 & 0xFF;
 
+
+    if (mouse_handler == ADB_HANDLER_MICROSPEED_MACTRAC ||
+        mouse_handler == ADB_HANDLER_MICROSPEED_UNKNOWN ||
+        mouse_handler == ADB_HANDLER_CONTOUR_MOUSE ||
+        mouse_handler == ADB_HANDLER_CHPRODUCTS_PRO) {
+        // https://github.com/NetBSD/src/blob/netbsd-9/sys/arch/macppc/dev/ams.c#L226-L255
+        // https://github.com/torvalds/linux/blob/v5.17/drivers/macintosh/adbhid.c#L1007-L1018
+        // https://github.com/torvalds/linux/blob/v5.17/drivers/macintosh/adbhid.c#L1204-L1239
+        uint8_t cmd[] = { 0x00,     // alt speed max
+                          0x00,     // speed max
+                          0x10,     // ext protocol enabled
+                          0x07 };   // buttons without locking
+        //adb_host_flush(ADB_ADDR_MOUSE_TMP);
+        adb_host_listen_buf(ADB_ADDR_MOUSE_TMP, ADB_REG_1, cmd, sizeof(cmd));
+    }
 
     // Try to escalate into extended/classic2 protocol
     if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE || mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
         adb_host_flush(ADB_ADDR_MOUSE_TMP);
         adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_EXTENDED_MOUSE);
         mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
+
+        if (mouse_handler != ADB_HANDLER_EXTENDED_MOUSE) {
+            adb_host_flush(ADB_ADDR_MOUSE_TMP);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_MOUSESYSTEMS_A3);
+            mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
+
+            if (mouse_handler == ADB_HANDLER_MOUSESYSTEMS_A3) {
+                adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_2, 0x00, 0x07);
+            }
+        }
 
         if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
             adb_host_flush(ADB_ADDR_MOUSE_TMP);
@@ -224,8 +250,8 @@ again:
         }
 
         if (len) {
-            dmprintf("EXT: [%02X %02X %02X %02X %02X %02X %02X %02X] cpi=%d\n",
-                    buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], mouse_cpi);
+            dmprintf("EXT: [%02X %02X %02X %02X %02X %02X %02X %02X] cpi=%d btn=%d len=%d\n",
+                    buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], mouse_cpi, buf[7], len);
         }
 
         // Kensington Turbo Mouse 5: default device
@@ -242,8 +268,35 @@ again:
             adb_host_flush(ADB_ADDR_MOUSE_TMP);
             adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_0, 0xFE);
             goto again;
+        } else if (buf[0] == 0x4B && buf[1] == 0x4F && buf[2] == 0x49 && buf[3] == 0x54) {
+            // https://elixir.bootlin.com/linux/v5.17/source/drivers/macintosh/adbhid.c#L1068
+            adb_host_flush(ADB_ADDR_MOUSE_TMP);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_MACALLY2_MOUSE);
+            mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
+            xprintf("M: reg3:%04X\n", reg3);
+            dmprintf("Macally2: found: %02X\n", mouse_handler);
+        } else if (buf[0] == 0x9A && (buf[1] == 0x20 || buf[1] == 0x21)) {
+            if (buf[1] == 0x20) {
+                xprintf("M:MouseMan\n");
+            } else {
+                xprintf("M:TrackMan\n");
+            }
+            // https://elixir.bootlin.com/linux/v5.17/source/drivers/macintosh/adbhid.c#L1047
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_1, 0x00, 0x81);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_1, 0x01, 0x81);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_1, 0x02, 0x81);
+            adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_1, 0x03, 0x38);
+            // set pseudo handler for Logitech
+            mouse_handler = ADB_HANDLER_LOGITECH;
+        } else if (buf[0] == 0x4C && buf[1] == 0x54) {
+            // Logitech Extended
+            // MouseMan - FCCID:DZLMAH32 'LT01'
+            // MouseMan Cordless - FCCID:DZLMRC33T 'LTW1'
+            xprintf("M:Logitech-Ext\n");
+            // set pseudo handler
+            mouse_handler = ADB_HANDLER_LOGITECH_EXT;
         } else {
-            dmprintf("Unknown\n");
+            dmprintf("Extended\n");
         }
     }
 
@@ -338,18 +391,6 @@ void adb_mouse_task(void)
         mouse_init();
     }
 
-    // Extended Mouse Protocol data can be 2-5 bytes
-    // https://developer.apple.com/library/archive/technotes/hw/hw_01.html#Extended
-    //
-    //   Byte 0: b00 y06 y05 y04 y03 y02 y01 y00
-    //   Byte 1: b01 x06 x05 x04 x03 x02 x01 x00
-    //   Byte 2: b02 y09 y08 y07 b03 x09 x08 x07
-    //   Byte 3: b04 y12 y11 y10 b05 x12 x11 x10
-    //   Byte 4: b06 y15 y14 y13 b07 x15 x14 x13
-    //
-    //   b--: Button state.(0: on, 1: off)
-    //   x--: X axis movement.
-    //   y--: Y axis movement.
     len = adb_host_talk_buf(ADB_ADDR_MOUSE_POLL, ADB_REG_0, buf, sizeof(buf));
 
     // If nothing received reset mouse acceleration, and quit.
@@ -357,36 +398,145 @@ void adb_mouse_task(void)
         mouseacc = 1;
         return;
     };
-    dmprintf("[%02X %02X %02X %02X %02X]\n", buf[0], buf[1], buf[2], buf[3], buf[4]);
 
-    // Store off-buttons and 0-movements in unused bytes
+    xprintf("M:[ ");
+    for (uint8_t i = 0; i < len; i++)
+        xprintf("%02X ", buf[i]);
+    xprintf("] mh:%02X\n", mouse_handler);
+
     bool xneg = false;
     bool yneg = false;
-    if (len == 2) {
+    if (mouse_handler == ADB_HANDLER_LOGITECH) {
+        // Logitech:
+        //   Byte0: bbb y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: 1   x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: 0   0   0   0   0   BL  BM  BR
+        //     Bx: button state(1:pressed, 1:released)
+        //     bbb: 0 when either BL, BR or BM is pressed
         if (buf[0] & 0x40) yneg = true;
         if (buf[1] & 0x40) xneg = true;
-    } else {
+        if (buf[2] & 0x04) buf[0] &= 0x7F; else buf[0] |= 0x80;
+        if (buf[2] & 0x01) buf[1] &= 0x7F; else buf[1] |= 0x80;
+        if (buf[2] & 0x02) buf[2] = 0x08;  else buf[2] = 0x88;
+        if (yneg) buf[2] |= 0x70;
+        if (xneg) buf[2] |= 0x07;
+        len = 3;
+    } else if (mouse_handler == ADB_HANDLER_LOGITECH_EXT) {
+        // Logitech Extended:
+        //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: b02 x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: b01 y09 y08 y07 b03 x09 x08 x07
+        //     L=b00, R=b01, M=b02
+        uint8_t tmp = buf[2];
+        if (buf[1] & 0x80) buf[2] |= 0x80; else buf[2] &= 0x7F;
+        if (tmp    & 0x80) buf[1] |= 0x80; else buf[1] &= 0x7F;
         if (buf[len - 1] & 0x40) yneg = true;
         if (buf[len - 1] & 0x04) xneg = true;
+    } else if (mouse_handler == ADB_HANDLER_MACALLY2_MOUSE && len == 4) {
+        // Macally 2-button mouse:
+        //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: b01 x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: 1   0   0   0   1   0   0   0
+        //   Byte3: 1   0   0   0   1   0   0   0
+        //     b--: button state(0:pressed, 1:released)
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        // Ignore Byte2 and 3
+        len = 2;
+    } else if (mouse_handler == ADB_HANDLER_MICROSPEED_MACTRAC ||
+               mouse_handler == ADB_HANDLER_MICROSPEED_UNKNOWN ||
+               mouse_handler == ADB_HANDLER_CONTOUR_MOUSE) {
+        // Microspeed:
+        //   Byte0: ??? y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: ??? x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: ??? ??? ??? ??? ??? bM  bR  bL
+        // Contour Mouse:
+        //   Byte0: bbb y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: 1   x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: 0   0   0   0   1   bM  bR  bL
+        //   Byte3: 0   0   0   0   1   bM  bR  bL
+        //     b--: button state(0:pressed, 1:released)
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        buf[0] = ((buf[2] & 1) << 7) | (buf[0] & 0x7F);
+        buf[1] = ((buf[2] & 2) << 6) | (buf[1] & 0x7F) ;
+        buf[2] = ((buf[2] & 4) << 5) | (buf[2] & 8) | (yneg ? 0x70 : 0x00) | (xneg ? 0x07 : 0x00);
+        len = 3;
+    } else if (mouse_handler == ADB_HANDLER_CHPRODUCTS_PRO) {
+        // CH Products Trackball Pro:
+        //   Byte0: ??? y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: ??? x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: ??? ??? ??? ??? bL0 bL1 bR  bM
+        //     b--: button state(0:pressed, 1:released)
+        //     L=(bL0 & bL1)
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        buf[0] = (((buf[2] & 4) << 5) & ((buf[2] & 8) << 4)) | (buf[0] & 0x7F);
+        buf[1] = ((buf[2] & 2) << 6) | (buf[1] & 0x7F) ;
+        buf[2] = ((buf[2] & 1) << 7) | (yneg ? 0x70 : 0x00) | (xneg ? 0x0F : 0x08);
+        len = 3;
+    } else if (mouse_handler == ADB_HANDLER_MOUSESYSTEMS_A3) {
+        // Mouse Systems A3: 3-button mouse/trackball:
+        //   Byte0: ??? y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: ??? x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: ??? ??? ??? ??? ??? bR  bM  bL
+        //     b--: button state(0:pressed, 1:released)
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        buf[0] = ((buf[2] & 1) << 7) | (buf[0] & 0x7F);
+        buf[1] = ((buf[2] & 4) << 5) | (buf[1] & 0x7F) ;
+        buf[2] = ((buf[2] & 2) << 6) | (yneg ? 0x70 : 0x00) | (xneg ? 0x0F : 0x08);
+        len = 3;
+    } else if (mouse_handler == ADB_HANDLER_EXTENDED_MOUSE ||
+               mouse_handler == ADB_HANDLER_TURBO_MOUSE) {
+        // Apple Extended Mouse:
+        //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: b01 x06 x05 x04 x03 x02 x01 x00
+        //   Byte2: b02 y09 y08 y07 b03 x09 x08 x07
+        //   Byte3: b04 y12 y11 y10 b05 x12 x11 x10
+        //   Byte4: b06 y15 y14 y13 b07 x15 x14 x13
+        //     b--: button state(0:pressed, 1:released)
+        //     Data can be 2-5 bytes.
+        //     L=b00, R=b01, M=b02
+        if (buf[len - 1] & 0x40) yneg = true;
+        if (buf[len - 1] & 0x04) xneg = true;
+    } else {
+        // Apple Classic Mouse and Unknown devices:
+        //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: b01 x06 x05 x04 x03 x02 x01 x00
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        len = 2;
+
+        #ifdef ADB_MOUSE_2ND_BUTTON_QUIRK
+        // Ignore b01('optional second button') as OSX/MacOS9 does.
+        // Some mouses misuse the bit and make it unusable.
+        // https://github.com/tmk/tmk_keyboard/issues/724
+        buf[1] |= 0x80;
+        #endif
     }
 
+    // Make unused buf bytes compatible with Extended Mouse Protocol
     for (int8_t i = len; i < sizeof(buf); i++) {
         buf[i] = 0x88;
         if (yneg) buf[i] |= 0x70;
         if (xneg) buf[i] |= 0x07;
     }
 
-    // 8 buttons at max
-    // TODO: Fix HID report descriptor for mouse to support button6-8
+    xprintf("M:[ ");
+    for (uint8_t i = 0; i < sizeof(buf); i++)
+        xprintf("%02X ", buf[i]);
+    xprintf("]\n");
+
     uint8_t buttons = 0;
     if (!(buf[4] & 0x08)) buttons |= MOUSE_BTN8;
     if (!(buf[4] & 0x80)) buttons |= MOUSE_BTN7;
     if (!(buf[3] & 0x08)) buttons |= MOUSE_BTN6;
     if (!(buf[3] & 0x80)) buttons |= MOUSE_BTN5;
     if (!(buf[2] & 0x08)) buttons |= MOUSE_BTN4;
-    if (!(buf[2] & 0x80)) buttons |= MOUSE_BTN3;
-    if (!(buf[1] & 0x80)) buttons |= MOUSE_BTN2;
-    if (!(buf[0] & 0x80)) buttons |= MOUSE_BTN1;
+    if (!(buf[2] & 0x80)) buttons |= MOUSE_BTN3;    // Middle
+    if (!(buf[1] & 0x80)) buttons |= MOUSE_BTN2;    // Right
+    if (!(buf[0] & 0x80)) buttons |= MOUSE_BTN1;    // Left
 
     // check if the scroll enable button is pressed
     bool scroll_enable = (bool)(buttons & scroll_button_mask);
