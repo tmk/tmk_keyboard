@@ -68,18 +68,17 @@ static void keyboard_init(void)
 
     // Check if there is keyboard at default address
     reg3 = adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
-    if (!reg3) return;
     if (reg3) {
-        xprintf("K:found: addr:" xstr(ADB_ADDR_KEYBOARD) " reg3:%04X\n", reg3);
+        xprintf("K:found: reg3:%04X\n", reg3);
         adb_host_listen(ADB_ADDR_KEYBOARD, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_KBD_TMP, 0xFE);
     }
 
     // Check if there is device to setup at temporary address
     reg3 = adb_host_talk(ADB_ADDR_KBD_TMP, ADB_REG_3);
     if (!reg3) {
-        xprintf("K:fail: move\n");
         return;
     }
+    xprintf("K:TMP: reg3:%04X\n", reg3);
 
     // Determine ISO keyboard by handler id
     // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c?v=4.4#L815
@@ -94,6 +93,7 @@ static void keyboard_init(void)
         is_iso_layout = false;
         break;
     }
+    xprintf("K:ISO: %s\n", (is_iso_layout ? "yes" : "no"));
 
     // Adjustable keyboard media keys: address=0x07 and handlerID=0x02
     has_media_keys = (0x02 == (adb_host_talk(ADB_ADDR_APPLIANCE, ADB_REG_3) & 0xff));
@@ -112,11 +112,14 @@ static void keyboard_init(void)
 
     // Move to keyboard polling address
     adb_host_listen(ADB_ADDR_KBD_TMP, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_KBD_POLL, 0xFE);
-    if (adb_host_talk(ADB_ADDR_KBD_TMP, ADB_REG_3)) {
-        xprintf("K:fail: move\n");
+    reg3 = adb_host_talk(ADB_ADDR_KBD_TMP, ADB_REG_3);
+    if (reg3) {
+        xprintf("K:POL: fail reg3:%04X\n", reg3);
+    } else {
+        xprintf("K:POL: done\n");
     }
-    xprintf("K:setup: addr:" xstr(ADB_ADDR_KBD_POLL) " reg3:%04X, ISO:%s\n",
-            reg3, (is_iso_layout ? "yes" : "no"));
+
+    device_scan();
 }
 
 void matrix_init(void)
