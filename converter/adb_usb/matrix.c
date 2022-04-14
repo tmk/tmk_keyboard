@@ -38,11 +38,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static bool has_media_keys = false;
 static bool is_iso_layout = false;
 
-#if ADB_MOUSE_ENABLE
-#define dmprintf(fmt, ...)  do { /* if (debug_mouse) */ xprintf("M:" fmt, ##__VA_ARGS__); } while (0)
-static uint16_t mouse_cpi = 100;
-static void mouse_init(void);
-#endif
 
 // matrix state buffer(1:on, 0:off)
 static matrix_row_t matrix[MATRIX_ROWS];
@@ -156,7 +151,9 @@ void matrix_init(void)
 }
 
 #ifdef ADB_MOUSE_ENABLE
+static uint16_t mouse_cpi = 100;
 static uint8_t mouse_handler;
+
 static void mouse_init(void)
 {
     uint16_t reg3;
@@ -165,6 +162,7 @@ again:
     // Check if there is mouse device at default address 3
     reg3 = adb_host_talk(ADB_ADDR_MOUSE, ADB_REG_3);
     if (reg3) {
+        xprintf("M:found: reg3:%04X\n", reg3);
         // Move device to tmp address
         // Collision detection can fail sometimes in fact when two devices are connected on startup
         // and the devices can be moved to tmp address at same time in the result. In that case
@@ -180,7 +178,7 @@ again:
     if (!reg3) {
         return;
     }
-    dmprintf("TMP: reg3:%04X\n", reg3);
+    xprintf("M:TMP: reg3:%04X\n", reg3);
     mouse_handler = reg3 & 0xFF;
 
 
@@ -220,18 +218,18 @@ again:
             adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_CLASSIC2_MOUSE);
             mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
         }
-        dmprintf("EXT: reg3:%04X\n", reg3);
+        xprintf("M:EXT: reg3:%04X\n", reg3);
     }
 
     // Classic Protocol 100cpi
     if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
-        dmprintf("Classic 100cpi\n");
+        xprintf("M:Classic 100cpi\n");
         mouse_cpi = 100;
     }
 
     // Classic Protocol 200cpi
     if (mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
-        dmprintf("Classic 200cpi\n");
+        xprintf("M:Classic 200cpi\n");
         mouse_cpi = 200;
     }
 
@@ -253,13 +251,13 @@ again:
         }
 
         if (len) {
-            dmprintf("EXT: [%02X %02X %02X %02X %02X %02X %02X %02X] cpi=%d btn=%d len=%d\n",
+            xprintf("M:EXT: [%02X %02X %02X %02X %02X %02X %02X %02X] cpi=%d btn=%d len=%d\n",
                     buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], mouse_cpi, buf[7], len);
         }
 
         // Kensington Turbo Mouse 5: default device
         if (buf[0] == 0x4B && buf[1] == 0x4D && buf[2] == 0x4C && buf[3] == 0x31) {
-            dmprintf("TM5: found\n");
+            xprintf("M:TM5: found\n");
             // Move it to addr0 to remove this device and get new device with handle id 50 on addr 3
             // and the new device on address 3 should be handled with command sequence later.
             //
@@ -277,7 +275,7 @@ again:
             adb_host_listen(ADB_ADDR_MOUSE_TMP, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_MACALLY2_MOUSE);
             mouse_handler = (reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3)) & 0xFF;
             xprintf("M: reg3:%04X\n", reg3);
-            dmprintf("Macally2: found: %02X\n", mouse_handler);
+            xprintf("M:Macally2: found: %02X\n", mouse_handler);
         } else if (buf[0] == 0x9A && (buf[1] == 0x20 || buf[1] == 0x21)) {
             if (buf[1] == 0x20) {
                 xprintf("M:MouseMan\n");
@@ -299,7 +297,7 @@ again:
             // set pseudo handler
             mouse_handler = ADB_HANDLER_LOGITECH_EXT;
         } else {
-            dmprintf("Extended\n");
+            xprintf("M:Extended\n");
         }
     }
 
@@ -359,9 +357,9 @@ again:
     adb_host_flush(ADB_ADDR_MOUSE_POLL);
     reg3 = adb_host_talk(ADB_ADDR_MOUSE_TMP, ADB_REG_3);
     if (reg3) {
-        dmprintf("POL: fail reg3:%04X\n", reg3);
+        xprintf("M:POL: fail reg3:%04X\n", reg3);
     } else {
-        dmprintf("POL: done\n");
+        xprintf("M:POL: done\n");
     }
 
     device_scan();
@@ -577,7 +575,7 @@ void adb_mouse_task(void)
         mouse_report.y = y;
     }
 
-    dmprintf("[B:%02X X:%d(%d) Y:%d(%d) V:%d A:%d]\n", mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouse_report.v, mouseacc);
+    xprintf("M:[B:%02X X:%d(%d) Y:%d(%d) V:%d A:%d]\n", mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouse_report.v, mouseacc);
 
     // Send result by usb.
     host_mouse_send(&mouse_report);
