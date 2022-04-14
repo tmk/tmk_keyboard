@@ -51,7 +51,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #define NEXT_KBD_H
 
 #define NEXT_KBD_KMBUS_IDLE 0x300600
-#define NEXT_KBD_TIMING     50
+
+// https://github.com/tmk/tmk_keyboard/issues/704
+#define NEXT_KBD_TIMING     52
 
 extern uint8_t next_kbd_error;
 

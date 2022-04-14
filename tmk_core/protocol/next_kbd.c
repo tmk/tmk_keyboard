@@ -59,16 +59,10 @@ static inline void query(void);
 static inline void reset(void);
 static inline uint32_t response(void);
 
-/* The keyboard sends signal with 50us pulse width on OUT line
- * while it seems to miss the 50us pulse on In line.
- * next_kbd_set_leds() often fails to sync LED status with 50us
- * but it works well with 51us(+1us) on TMK converter(ATMeaga32u2) at least.
- * TODO: test on Teensy and Pro Micro configuration
- */
-#define out_hi_delay(intervals)  do { out_hi(); _delay_us((NEXT_KBD_TIMING+1) * intervals); } while (0);
-#define out_lo_delay(intervals)  do { out_lo(); _delay_us((NEXT_KBD_TIMING+1) * intervals); } while (0);
-#define query_delay(intervals)   do { query();  _delay_us((NEXT_KBD_TIMING+1) * intervals); } while (0);
-#define reset_delay(intervals)   do { reset();  _delay_us((NEXT_KBD_TIMING+1) * intervals); } while (0);
+#define out_hi_delay(intervals)  do { out_hi(); _delay_us((NEXT_KBD_TIMING) * intervals); } while (0);
+#define out_lo_delay(intervals)  do { out_lo(); _delay_us((NEXT_KBD_TIMING) * intervals); } while (0);
+#define query_delay(intervals)   do { query();  _delay_us((NEXT_KBD_TIMING) * intervals); } while (0);
+#define reset_delay(intervals)   do { reset();  _delay_us((NEXT_KBD_TIMING) * intervals); } while (0);
 
 void next_kbd_init(void)
 {
@@ -144,34 +138,14 @@ static inline uint32_t response(void)
         sei();
         return 0;
     }
-    _delay_us(NEXT_KBD_TIMING / 2);
+    _delay_us(NEXT_KBD_TIMING / 2 - 1);
     for (; i < 22; i++)
     {
         if (NEXT_KBD_READ)
         {
-            data |= ((uint32_t) 1 << i);
-            /* Note:
-             * My testing with the ATmega32u4 showed that there might
-             * something wrong with the timing here; by the end of the
-             * second data byte some of the modifiers can get bumped out
-             * to the next bit over if we just cycle through the data
-             * based on the expected interval.  There is a bit (i = 10) 
-             * in the middle of the data that is always on followed by 
-             * one that is always off - so we'll use that to reset our 
-             * timing in case we've gotten ahead of the keyboard;
-             */
-            if (i == 10)
-            {
-                i++;
-                while (NEXT_KBD_READ) ;
-                _delay_us(NEXT_KBD_TIMING / 2);
-            }
-        } else {
-            /* redundant - but I don't want to remove if it might screw
-             * up the timing
-             */
-            data |= ((uint32_t) 0 << i);
+            data |= (uint32_t)1 << 22;
         }
+        data >>= 1;
         _delay_us(NEXT_KBD_TIMING);
     }
     
