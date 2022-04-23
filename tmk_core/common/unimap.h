@@ -264,6 +264,7 @@ enum unimap_position_codes {
 #define UNIMAP_NUBS UNIMAP_NONUS_BSLASH
 /* Japanese specific */
 #define UNIMAP_ZKHK UNIMAP_GRAVE
+#define UNIMAP_JPY  UNIMAP_JYEN
 /* Keypad */
 #define UNIMAP_P1   UNIMAP_KP_1
 #define UNIMAP_P2   UNIMAP_KP_2
