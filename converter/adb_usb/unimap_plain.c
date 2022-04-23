@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define AC_FN0  ACTION_LAYER_TAP_KEY(1, KC_GRV)
-#define AC_FN1  ACTION_LAYER_TAP_KEY(2, KC_BSLS)
+#define AC_FN1  ACTION_LAYER_TAP_KEY(1, KC_BSLS)
 #define AC_PKEY ACTION_MODS_TAP_KEY(MOD_NONE, KC_PWR)
 
 #ifdef KEYMAP_SECTION_ENABLE
@@ -74,30 +74,5 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
     TRNS,VOLD,VOLU,MUTE,TRNS,TRNS,TRNS,TRNS,HOME,PGUP,LEFT,RGHT,     TRNS,TRNS,                   TRNS,TRNS,TRNS,TRNS,  TRNS,
     TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,END, PGDN,DOWN,     TRNS,TRNS,       PGUP,       TRNS,TRNS,TRNS,TRNS,
     TRNS,TRNS,TRNS,TRNS,          TRNS,               TRNS,TRNS,     TRNS,TRNS,  HOME,PGDN,END,   TRNS,TRNS,TRNS,       TRNS
-    ),
-
-    /*
-     * ,---.   .---------------. ,---------------. ,---------------. ,-----------.             ,---.
-     * |  `|   |   |   |   |   | |   |   |   |   | |   |   |   |   | |   |   |   |             |   |
-     * `---'   `---------------' `---------------' `---------------' `-----------'             `---'
-     * ,-----------------------------------------------------------. ,-----------. ,---------------. ,---.
-     * |Esc| F1| F2| F3| F4| F5| F6| F7| F8| F9|F10|F11|F12|Ins|Del| |   |   |   | |   |   |   |   | |   |
-     * |-----------------------------------------------------------| |-----------| |---------------| |---|
-     * |     |   |   |   |   |   |   |   |PrS|ScL|Pau|Up |INS|     | |   |   |   | |   |   |   |   | |   |
-     * |-----------------------------------------------------------| `-----------' |---------------| |---|
-     * |CapsLo|VoD|VoU|Mut|   |   |   |   |Hom|PgU|Lef|Rig|#  |Retn|               |   |   |   |   | |   |
-     * |-----------------------------------------------------------|     ,---.     |---------------| `---'
-     * |    |   |   |   |   |   |   |   |   |End|PgD|Dow| RO| Shift|     |PgU|     |   |   |   |   |
-     * |-----------------------------------------------------------| ,-----------. |-----------|   | ,---.
-     * |     |    |    |    |                 |   |     |    |     | |Hom|PgD|End| |   |   |   |   | |   |
-     * `-----------------------------------------------------------' `-----------' `---------------' `---'
-     */
-    [2] = UNIMAP_ADB(
-    GRV,      TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,       TRNS,TRNS,TRNS,                 TRNS,
-    ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,   TRNS,TRNS,TRNS,  TRNS,TRNS,TRNS,TRNS,  TRNS,
-    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,UP,  INS,      TRNS,  TRNS,TRNS,TRNS,  TRNS,TRNS,TRNS,TRNS,  TRNS,
-    TRNS,VOLD,VOLU,MUTE,TRNS,TRNS,TRNS,TRNS,HOME,PGUP,LEFT,RGHT,     TRNS,TRNS,                   TRNS,TRNS,TRNS,TRNS,  TRNS,
-    TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,END, PGDN,DOWN,     TRNS,TRNS,       PGUP,       TRNS,TRNS,TRNS,TRNS,
-    TRNS,TRNS,TRNS,TRNS,          TRNS,                    TRNS,     TRNS,TRNS,  HOME,PGDN,END,   TRNS,TRNS,TRNS,       TRNS
     ),
 };
