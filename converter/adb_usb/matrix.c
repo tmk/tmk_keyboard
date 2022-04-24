@@ -392,6 +392,7 @@ void adb_mouse_task(void)
     }
 
     len = adb_host_talk_buf(ADB_ADDR_MOUSE_POLL, ADB_REG_0, buf, sizeof(buf));
+    if (!len && adb_service_request()) len = adb_host_talk_buf(ADB_ADDR_MOUSE, ADB_REG_0, buf, sizeof(buf));
 
     // If nothing received reset mouse acceleration, and quit.
     if (len < 2) {
@@ -616,6 +617,7 @@ uint8_t matrix_scan(void)
         tick_ms = timer_read();
 
         codes = adb_host_kbd_recv(ADB_ADDR_KBD_POLL);
+        if (!codes && adb_service_request()) codes = adb_host_kbd_recv(ADB_ADDR_KEYBOARD);
         if (codes) xprintf("%04X ", codes);
 
         // Adjustable keybaord media keys
