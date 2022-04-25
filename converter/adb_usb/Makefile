@@ -78,9 +78,6 @@ UNIMAP_ENABLE ?= yes		# Use unimap
 ACTIONMAP_ENABLE ?= no          # Use 16bit actionmap instead of 8bit keymap
 KEYMAP_SECTION_ENABLE ?= yes	# fixed address keymap for keymap editor
 
-# ADB Mice need acceleration for todays much bigger screens. 
-ADB_MOUSE_MAXACC ?= 1
-OPT_DEFS += -DADB_MOUSE_MAXACC=$(ADB_MOUSE_MAXACC)
 
 # Enable scroll wheel functionality using the y-axis of the mouse
 # Hold the assigned button down to scroll using the mouse
@@ -96,12 +93,13 @@ OPT_DEFS += -DADB_MOUSE_MAXACC=$(ADB_MOUSE_MAXACC)
 #
 ADB_MOUSE_SCROLL_BUTTON ?= 0	# Assign the button (1-8) (0 to disable)
 ADB_MOUSE_SCROLL_SPEED ?= 10	# 1 (fastest) to 127 (slowest)
+OPT_DEFS += -DADB_MOUSE_SCROLL_BUTTON=$(ADB_MOUSE_SCROLL_BUTTON)
+OPT_DEFS += -DADB_MOUSE_SCROLL_SPEED=$(ADB_MOUSE_SCROLL_SPEED)
+
 
 # Optimize size but this may cause error "relocation truncated to fit"
 #EXTRALDFLAGS = -Wl,--relax
 
-OPT_DEFS += -DADB_MOUSE_SCROLL_BUTTON=$(ADB_MOUSE_SCROLL_BUTTON)
-OPT_DEFS += -DADB_MOUSE_SCROLL_SPEED=$(ADB_MOUSE_SCROLL_SPEED)
 
 #
 # Keymap file

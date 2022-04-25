@@ -376,7 +376,6 @@ void adb_mouse_task(void)
     uint8_t len;
     uint8_t buf[5];
     int16_t x, y;
-    static int8_t mouseacc;
 
     /* tick of last polling */
     static uint16_t tick_ms;
@@ -395,9 +394,7 @@ void adb_mouse_task(void)
     len = adb_host_talk_buf(ADB_ADDR_MOUSE_POLL, ADB_REG_0, buf, sizeof(buf));
     if (!len && adb_service_request()) len = adb_host_talk_buf(ADB_ADDR_MOUSE, ADB_REG_0, buf, sizeof(buf));
 
-    // If nothing received reset mouse acceleration, and quit.
     if (len < 2) {
-        mouseacc = 1;
         return;
     };
 
@@ -548,12 +545,8 @@ void adb_mouse_task(void)
     mouse_report.buttons = buttons;
 
     int16_t xx, yy;
-    yy = (buf[0] & 0x7F) | (buf[2] & 0x70) << 3 | (buf[3] & 0x70) << 6 | (buf[4] & 0x70) << 9;
-    xx = (buf[1] & 0x7F) | (buf[2] & 0x07) << 7 | (buf[3] & 0x07) << 10 | (buf[4] & 0x07) << 13;
-
-    // Accelerate mouse. (They weren't meant to be used on screens larger than 320x200).
-    x = xx * mouseacc;
-    y = yy * mouseacc;
+    y = yy = (buf[0] & 0x7F) | (buf[2] & 0x70) << 3 | (buf[3] & 0x70) << 6 | (buf[4] & 0x70) << 9;
+    x = xx = (buf[1] & 0x7F) | (buf[2] & 0x07) << 7 | (buf[3] & 0x07) << 10 | (buf[4] & 0x07) << 13;
 
     #ifndef MOUSE_EXT_REPORT
     x = (x > 127) ? 127 : ((x < -127) ? -127 : x);
@@ -575,14 +568,10 @@ void adb_mouse_task(void)
         mouse_report.y = y;
     }
 
-    xprintf("M:[B:%02X X:%d(%d) Y:%d(%d) V:%d A:%d]\n", mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouse_report.v, mouseacc);
+    xprintf("M:[B:%02X X:%d(%d) Y:%d(%d) V:%d]\n", mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouse_report.v);
 
     // Send result by usb.
     host_mouse_send(&mouse_report);
-
-    // TODO: acceleration curve is needed for precise operation?
-    // increase acceleration of mouse
-    mouseacc += ( mouseacc < (mouse_cpi < 200 ? ADB_MOUSE_MAXACC : ADB_MOUSE_MAXACC/2) ? 1 : 0 );
 
     return;
 }
