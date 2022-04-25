@@ -762,3 +762,37 @@ void led_set(uint8_t usb_led)
 {
     adb_host_kbd_led(ADB_ADDR_KBD_POLL, ~usb_led);
 }
+
+#ifdef ADB_SRQ_SCAN_REG0
+void hook_main_loop(void)
+{
+    // Scan unsupported devices when Service Request(SRQ) is asserted
+    uint8_t len;
+    uint8_t buf[16];
+    static uint8_t addr = 0;
+    if (!adb_service_request()) return;
+    for (addr = addr % 16; addr < 16; addr++) {
+        if (addr == ADB_ADDR_KEYBOARD ||
+                addr == ADB_ADDR_KBD_POLL ||
+                addr == ADB_ADDR_KBD_TMP ||
+                #ifdef ADB_MOUSE_ENABLE
+                addr == ADB_ADDR_MOUSE ||
+                addr == ADB_ADDR_MOUSE_POLL ||
+                addr == ADB_ADDR_MOUSE_TMP ||
+                #endif
+                addr == ADB_ADDR_APPLIANCE) {
+            continue;
+        }
+        len = adb_host_talk_buf(addr, ADB_REG_0, buf, sizeof(buf));
+        if (len) {
+            xprintf("addr%d reg0: [ ", addr);
+            for (uint8_t i = 0; i < len; i++) {
+                xprintf("%02X ", buf[i]);
+            }
+            xprintf("]\n");
+            break;
+        }
+        if (!adb_service_request()) return;
+    }
+}
+#endif
