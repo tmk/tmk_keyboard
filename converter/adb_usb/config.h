@@ -56,7 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ADB_PIN         PIND
 #define ADB_DDR         DDRD
 #define ADB_DATA_BIT    0
-//#define ADB_PSW_BIT     1       // optional
+#define ADB_PSW_BIT     1
 
 /* key combination for command */
 #ifndef __ASSEMBLER__

@@ -621,6 +621,22 @@ uint8_t matrix_scan(void)
         if (!codes && adb_service_request()) codes = adb_host_kbd_recv(ADB_ADDR_KEYBOARD);
         if (codes) xprintf("%04X ", codes);
 
+        // Check PSW pin
+        static bool psw_state = false;
+        if (codes == 0) {
+            if (!psw_state) {
+                if (!adb_host_psw()) {
+                    codes = 0x7F7F; // power key press
+                    psw_state = true;
+                }
+            } else {
+                if (adb_host_psw()) {
+                    codes = 0xFFFF; // power key release
+                    psw_state = false;
+                }
+            }
+        }
+
         // Adjustable keybaord media keys
         if (codes == 0 && has_media_keys &&
                 (codes = adb_host_kbd_recv(ADB_ADDR_APPLIANCE))) {
