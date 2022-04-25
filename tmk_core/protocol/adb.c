@@ -285,7 +285,9 @@ void adb_host_kbd_led(uint8_t addr, uint8_t led)
     // Listen Register2
     //  upper byte: not used
     //  lower byte: bit2=ScrollLock, bit1=CapsLock, bit0=NumLock
-    adb_host_listen(addr, 2, 0, led & 0x07);
+    uint16_t reg2 = adb_host_talk(addr, 2);
+    _delay_us(400);
+    adb_host_listen(addr, 2, reg2 >> 8, (reg2 & 0xF8) | (led & 0x07));
 }
 
 
