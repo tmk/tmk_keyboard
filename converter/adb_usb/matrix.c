@@ -36,7 +36,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 static bool has_media_keys = false;
-static bool is_iso_layout = false;
+static enum {
+    ADB_LAYOUT_ANSI,
+    ADB_LAYOUT_ISO,
+    ADB_LAYOUT_JIS
+} adb_layout = ADB_LAYOUT_ANSI;
 
 
 // matrix state buffer(1:on, 0:off)
@@ -64,7 +68,7 @@ static void keyboard_init(void)
     // Check if there is keyboard at default address
     reg3 = adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
     if (reg3) {
-        xprintf("K:found: reg3:%04X\n", reg3);
+        xprintf("K:Found: reg3:%04X\n", reg3);
         adb_host_listen(ADB_ADDR_KEYBOARD, ADB_REG_3, ((reg3 >> 8) & 0xF0) | ADB_ADDR_KBD_TMP, 0xFE);
     }
 
@@ -75,20 +79,30 @@ static void keyboard_init(void)
     }
     xprintf("K:TMP: reg3:%04X\n", reg3);
 
-    // Determine ISO keyboard by handler id
-    // http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c?v=4.4#L815
+    // https://elixir.bootlin.com/linux/v5.17.4/source/drivers/macintosh/adbhid.c#L802
     handler = reg3 & 0xFF;
     switch (handler) {
+    case 0x01: case 0x02: case 0x03: case 0x06: case 0x08:
+    case 0x0C: case 0x10: case 0x18: case 0x1B: case 0x1C:
+    case 0xC0: case 0xC3: case 0xC6:
+        adb_layout = ADB_LAYOUT_ANSI;
+        break;
     case 0x04: case 0x05: case 0x07: case 0x09: case 0x0D:
     case 0x11: case 0x14: case 0x19: case 0x1D: case 0xC1:
     case 0xC4: case 0xC7:
-        is_iso_layout = true;
+        adb_layout = ADB_LAYOUT_ISO;
+        break;
+    case 0x12: case 0x15: case 0x16: case 0x17: case 0x1A:
+    case 0x1E: case 0xC2: case 0xC5: case 0xC8: case 0xC9:
+        adb_layout = ADB_LAYOUT_JIS;
         break;
     default:
-        is_iso_layout = false;
+        adb_layout = ADB_LAYOUT_ANSI;
         break;
     }
-    xprintf("K:ISO: %s\n", (is_iso_layout ? "yes" : "no"));
+    xprintf("K:Layout: %s\n", (adb_layout == ADB_LAYOUT_ANSI ? "ANSI" : (
+                               adb_layout == ADB_LAYOUT_ISO  ? "ISO"  : (
+                               adb_layout == ADB_LAYOUT_JIS  ? "JIS"  : "???"))));
 
     // Adjustable keyboard media keys: address=0x07 and handlerID=0x02
     has_media_keys = (0x02 == (adb_host_talk(ADB_ADDR_APPLIANCE, ADB_REG_3) & 0xff));
@@ -693,7 +707,7 @@ uint8_t matrix_scan(void)
             key1 = 0xFF;
         }
 
-        /* Swap codes for ISO keyboard
+        /* Keyboard code translation
          * https://github.com/tmk/tmk_keyboard/issues/35
          *
          * ANSI
@@ -704,8 +718,8 @@ uint8_t matrix_scan(void)
          * |-----------    ----------|
          * |CapsLo|  A|    '|Return  |
          * |-----------    ----------|
-         * |Shift   |      Shift     |
-         * `-----------    ----------'
+         * |Shift   |     |Shift     |
+         * |-----------    ----------|
          *
          * ISO
          * ,-----------    ----------.
@@ -715,27 +729,49 @@ uint8_t matrix_scan(void)
          * |-----------    -----`    |
          * |CapsLo|  A|    '| *c|    |
          * |-----------    ----------|
-         * |Shif| *b|      Shift     |
-         * `-----------    ----------'
+         * |Shif| *b|     |Shift     |
+         * |-----------    ----------|
          *
-         *         ADB scan code   USB usage
-         *         -------------   ---------
-         * Key     ANSI    ISO     ANSI    ISO
-         * ---------------------------------------------
-         * *a      0x32    0x0A    GRAVE   GRAVE
-         * *b      ----    0x32    ----    NUBS
-         * *c      0x2A    0x70    BSLASH  NUHS
+         * JIS
+         * ,-----------    ----------.
+         * | *a|  1|  2     =| *d| BS|
+         * |-----------    ----------|
+         * |Tab  |  Q|     |  [|Retur|
+         * |-----------    -----`    |
+         * |CapsLo|  A|    :| *c|    |
+         * |-----------    ----------|
+         * |Shift   |     | *e| Shift|
+         * |-----------    ----------|
+         *
+         *         ADB scan code        USB usage
+         *         -------------        ---------
+         * Key     ANSI   ISO    JIS    ANSI    ISO     JIS
+         * ---------------------------------------------------
+         * *a      0x32   0x0A   0x32   GRAVE   GRAVE   GRAVE
+         * *b      ----   0x32   ----   ----    NUBS    ----
+         * *c      0x2A   0x70   0x2A   BSLASH  NUHS    NUHS
+         * *d      ----   ----   0x5D   ----    ----    JPY
+         * *e      ----   ----   0x5E   ----    ----    RO
          */
-        if (is_iso_layout) {
+        if (adb_layout == ADB_LAYOUT_ISO) {
+            // 32 <-> 0A
             if ((key0 & 0x7F) == 0x32) {
                 key0 = (key0 & 0x80) | 0x0A;
             } else if ((key0 & 0x7F) == 0x0A) {
                 key0 = (key0 & 0x80) | 0x32;
             }
+            // 2A -> 70
             if ((key0 & 0x7F) == 0x2A) {
                 key0 = (key0 & 0x80) | 0x70;
             }
         }
+        if (adb_layout == ADB_LAYOUT_JIS) {
+            // 2A -> 70
+            if ((key0 & 0x7F) == 0x2A) {
+                key0 = (key0 & 0x80) | 0x70;
+            }
+        }
+
         register_key(key0);
         if (key1 != 0xFF)       // key1 is 0xFF when no second key.
             extra_key = key1<<8 | 0xFF; // process in a separate call

@@ -27,59 +27,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * |Esc|   |F1 |F2 |F3 |F4 | |F5 |F6 |F7 |F8 | |F9 |F10|F11|F12| |PrS|ScL|Pau|             |F24|
  * `---'   `---------------' `---------------' `---------------' `-----------'             `---'
  * ,-----------------------------------------------------------. ,-----------. ,---------------. ,---.
- * |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|Backspa| |Ins|Hom|PgU| |NmL|  =|  /|  *| |VUp|
+ * |  `|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|JPY| BS| |Ins|Hom|PgU| |NmL|  =|  /|  *| |VUp|
  * |-----------------------------------------------------------| |-----------| |---------------| |---|
  * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|  \  | |Del|End|PgD| |  7|  8|  9|  -| |VDn|
  * |-----------------------------------------------------------| `-----------' |---------------| |---|
  * |CapsLo|  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  #| Ret|               |  4|  5|  6|  +| |Mut|
  * |-----------------------------------------------------------|     ,---.     |---------------| `---'
- * |Shif|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  ,|  /|Shift     |     |Up |     |  1|  2|  3|   |
+ * |Shif|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  ,|  /| RO| Shift|     |Up |     |  1|  2|  3|   |
  * |-----------------------------------------------------------| ,-----------. |-----------|Ent| ,---.
- * |Ctrl |Opt |Gui  |        Space            |Gui* |Opt |Ctrl | |Lef|Dow|Rig| |      0|  .|   | |F13|
+ * |Ctrl |Opt |Cmd  |Eng|    Space    |Jpn|Ent|Cmd* |Opt |Ctrl | |Lef|Dow|Rig| |  0|  ,|  .|   | |F13|
  * `-----------------------------------------------------------' `-----------' `---------------' `---'
+ * Eng:英数, Jpn:かな
  *
  * ,---.   .---------------. ,---------------. ,---------------. ,-----------.             ,---.
  * | 35|   | 7A| 78| 63| 76| | 60| 61| 62| 64| | 65| 6D| 67| 6F| | 69| 6B| 71|             | 7F|
  * `---'   `---------------' `---------------' `---------------' `-----------'             `---'
  * ,-----------------------------------------------------------. ,-----------. ,---------------. ,---.
- * |*32| 12| 13| 14| 15| 17| 16| 1A| 1C| 19| 1D| 1B| 18|   33  | | 72| 73| 74| | 47| 51| 4B| 43| | 48|
+ * |*32| 12| 13| 14| 15| 17| 16| 1A| 1C| 19| 1D| 1B| 18| 5D| 33| | 72| 73| 74| | 47| 51| 4B| 43| | 48|
  * |-----------------------------------------------------------| |-----------| |---------------| |---|
- * |  30 | 0C| 0D| 0E| 0F| 10| 11| 20| 22| 1F| 23| 21| 1E|  2A | | 75| 77| 79| | 59| 5B| 5C| 4E| | 49|
+ * |  30 | 0C| 0D| 0E| 0F| 11| 10| 20| 22| 1F| 23| 21| 1E|  2A | | 75| 77| 79| | 59| 5B| 5C| 4E| | 49|
  * |-----------------------------------------------------------| `-----------' |---------------| |---|
  * |  39  | 00| 01| 02| 03| 05| 04| 26| 28| 25| 29| 27|*70| 24 |               | 56| 57| 58| 45| | 4A|
  * |-----------------------------------------------------------|     ,---.     |---------------| `---'
- * | 38 |*0A| 06| 07| 08| 09| 0B| 2D| 2E| 2B| 2F| 2C|    7B    |     | 3E|     | 53| 54| 55|   |
+ * | 38 |*0A| 06| 07| 08| 09| 0B| 2D| 2E| 2B| 2F| 2C| 5E|  7B  |     | 3E|     | 53| 54| 55|   |
  * |-----------------------------------------------------------| ,-----------. |-----------| 4C| ,---.
- * |  36 | 3A |  37 |           31            |  37 | 7C |  7D | | 3B| 3D| 3C| |    52 | 41|   | | 42|
+ * |  36 | 3A |  37 | 66|       31    | 68| 6A| *37 | 7C |  7D | | 3B| 3D| 3C| | 52| 5F| 41|   | | 42|
  * `-----------------------------------------------------------' `-----------' `---------------' `---'
  * NOTE: Not-extended ADB keyboards have no discrimination between left and right modifiers.
  * Use left ones for mapping. Right modifier always sends same code as left one.
  * Apple Extended Keyboard can discriminate the modifiers except for Command(GUI) key.
- * For Apple ISO keyboard scan code 0A and 32 are swapped and scan code 2A is translated to 70.
+ * For ISO keyboard scan code 0A and 32 are swapped and scan code 2A is translated to 70.
+ * For JIS Keyboard scan code 2A is translated to 70.
  */
 #define UNIMAP_ADB( \
     K35,    K7A,K78,K63,K76,K60,K61,K62,K64,K65,K6D,K67,K6F,      K69,K6B,K71,              K7F,      \
-    K32,K12,K13,K14,K15,K17,K16,K1A,K1C,K19,K1D,K1B,K18,    K33,  K72,K73,K74,  K47,K51,K4B,K43, K48, \
-    K30,K0C,K0D,K0E,K0F,K10,K11,K20,K22,K1F,K23,K21,K1E,    K2A,  K75,K77,K79,  K59,K5B,K5C,K4E, K49, \
+    K32,K12,K13,K14,K15,K17,K16,K1A,K1C,K19,K1D,K1B,K18,K5D,K33,  K72,K73,K74,  K47,K51,K4B,K43, K48, \
+    K30,K0C,K0D,K0E,K0F,K11,K10,K20,K22,K1F,K23,K21,K1E,    K2A,  K75,K77,K79,  K59,K5B,K5C,K4E, K49, \
     K39,K00,K01,K02,K03,K05,K04,K26,K28,K25,K29,K27,    K70,K24,                K56,K57,K58,K45, K4A, \
-    K38,K0A,K06,K07,K08,K09,K0B,K2D,K2E,K2B,K2F,K2C,        K7B,      K3E,      K53,K54,K55,K4C,      \
-    K36,K3A,K37,            K31,                        K7C,K7D,  K3B,K3D,K3C,      K52,K41,     K42  \
+    K38,K0A,K06,K07,K08,K09,K0B,K2D,K2E,K2B,K2F,K2C,    K5E,K7B,      K3E,      K53,K54,K55,K4C,      \
+    K36,K3A,K37,K66,        K31,            K68,K6A,    K7C,K7D,  K3B,K3D,K3C,  K52,K5F,K41,     K42  \
 ) UNIMAP( \
             K42,NO, NO, NO, NO, NO, NO, NO, NO, NO, NO, K7F,                                     \
     K35,    K7A,K78,K63,K76,K60,K61,K62,K64,K65,K6D,K67,K6F,      K69,K6B,K71,      K49,K48,K4A, \
-    K32,K12,K13,K14,K15,K17,K16,K1A,K1C,K19,K1D,K1B,K18,NO, K33,  K72,K73,K74,  K47,K51,K4B,K43, \
-    K30,K0C,K0D,K0E,K0F,K10,K11,K20,K22,K1F,K23,K21,K1E,    K2A,  K75,K77,K79,  K59,K5B,K5C,K4E, \
+    K32,K12,K13,K14,K15,K17,K16,K1A,K1C,K19,K1D,K1B,K18,K5D,K33,  K72,K73,K74,  K47,K51,K4B,K43, \
+    K30,K0C,K0D,K0E,K0F,K11,K10,K20,K22,K1F,K23,K21,K1E,    K2A,  K75,K77,K79,  K59,K5B,K5C,K4E, \
     K39,K00,K01,K02,K03,K05,K04,K26,K28,K25,K29,K27,    K70,K24,                K56,K57,K58,K45, \
-    K38,K0A,K06,K07,K08,K09,K0B,K2D,K2E,K2B,K2F,K2C,    NO, K7B,      K3E,      K53,K54,K55,K4C, \
-    K36,K37,K3A,NO,         K31,        NO, NO, K7C,NO, NO, K7D,  K3B,K3D,K3C,      K52,K41,NO   \
+    K38,K0A,K06,K07,K08,K09,K0B,K2D,K2E,K2B,K2F,K2C,    K5E,K7B,      K3E,      K53,K54,K55,K4C, \
+    K36,K37,K3A,K66,        K31,        K68,K6A,K7C,NO, NO, K7D,  K3B,K3D,K3C,  K52,    K41,K5F  \
 )
 
 
-// http://lxr.free-electrons.com/source/drivers/macintosh/adbhid.c
-// http://opensource.apple.com//source/IOHIDFamily/IOHIDFamily-701.20.10/IOHIDFamily/Cosmo_USB2ADB.c
-// http://m0115.web.fc2.com/m0115.jpg
-// Not used: UNIMAP_{F14, F15, F21, F22, KP_EQUAL}
-// Not mapped: 0x46, 0x4D, 0x6C
+// https://github.com/tmk/tmk_keyboard/wiki/Apple-Desktop-Bus#scan-codes
 const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
         //  Position(unimap)        ADB scan code(matrix)
         //  ---------------------------------------------
@@ -161,14 +159,14 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
             UNIMAP_RIGHT,           // 0x3C
             UNIMAP_DOWN,            // 0x3D
             UNIMAP_UP,              // 0x3E
-            UNIMAP_F23,             // 0x3F     FN?
+            UNIMAP_NO,              // 0x3F     FN?
         },
         {
-            UNIMAP_F17,             // 0x40
+            UNIMAP_NO,              // 0x40
             UNIMAP_KP_DOT,          // 0x41
             UNIMAP_F13,             // 0x42     Mic(Adjustable keyboard)
             UNIMAP_KP_MINUS,        // 0x43     ADB keypad asterisk(top right)
-            UNIMAP_F18,             // 0x44     dup
+            UNIMAP_NO,              // 0x44
             UNIMAP_KP_COMMA,        // 0x45     ADB keypad plus
             UNIMAP_NO,              // 0x46
             UNIMAP_NUMLOCK,         // 0x47
@@ -181,10 +179,10 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
             UNIMAP_KP_ENTER,        // 0x4C     dup
             UNIMAP_NO,              // 0x4D
             UNIMAP_KP_PLUS,         // 0x4E     ADB keypad minus
-            UNIMAP_F18,             // 0x4F     dup
+            UNIMAP_NO,              // 0x4F
         },
         {
-            UNIMAP_F19,             // 0x50
+            UNIMAP_NO,              // 0x50
             UNIMAP_KP_SLASH,        // 0x51     ADB keypad equal(next to clear/numlock)
             UNIMAP_KP_0,            // 0x52
             UNIMAP_KP_1,            // 0x53
@@ -196,12 +194,12 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
         {
             UNIMAP_KP_6,            // 0x58
             UNIMAP_KP_7,            // 0x59
-            UNIMAP_F20,             // 0x5A
+            UNIMAP_NO,              // 0x5A
             UNIMAP_KP_8,            // 0x5B
             UNIMAP_KP_9,            // 0x5C
-            UNIMAP_JYEN,            // 0x5D
-            UNIMAP_RO,              // 0x5E
-            UNIMAP_KP_COMMA,        // 0x5F
+            UNIMAP_JPY,             // 0x5D     JIS Yen
+            UNIMAP_RO,              // 0x5E     JIS Ro
+            UNIMAP_KP_COMMA,        // 0x5F     JIS Keypad-,
         },
         {
             UNIMAP_F5,              // 0x60
@@ -210,13 +208,13 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
             UNIMAP_F3,              // 0x63
             UNIMAP_F8,              // 0x64
             UNIMAP_F9,              // 0x65
-            UNIMAP_MHEN,            // 0x66
+            UNIMAP_MHEN,            // 0x66     Eisu
             UNIMAP_F11,             // 0x67
         },
         {
-            UNIMAP_HENK,            // 0x68
+            UNIMAP_HENK,            // 0x68     Kana
             UNIMAP_PSCREEN,         // 0x69     PrintScreen/F13
-            UNIMAP_F16,             // 0x6A
+            UNIMAP_KANA,            // 0x6A
             UNIMAP_SCROLLLOCK,      // 0x6B     ScrollLock/F14
             UNIMAP_NO,              // 0x6C
             UNIMAP_F10,             // 0x6D
