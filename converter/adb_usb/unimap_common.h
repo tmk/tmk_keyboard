@@ -163,7 +163,7 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
         },
         {
             UNIMAP_NO,              // 0x40
-            UNIMAP_KP_DOT,          // 0x41
+            UNIMAP_KP_DOT,          // 0x41     ADB keypad dot
             UNIMAP_F13,             // 0x42     Mic(Adjustable keyboard)
             UNIMAP_KP_MINUS,        // 0x43     ADB keypad asterisk(top right)
             UNIMAP_NO,              // 0x44
@@ -199,7 +199,7 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
             UNIMAP_KP_9,            // 0x5C
             UNIMAP_JPY,             // 0x5D     JIS Yen
             UNIMAP_RO,              // 0x5E     JIS Ro
-            UNIMAP_KP_COMMA,        // 0x5F     JIS Keypad-,
+            UNIMAP_KP_EQUAL,        // 0x5F     JIS keypad comma
         },
         {
             UNIMAP_F5,              // 0x60

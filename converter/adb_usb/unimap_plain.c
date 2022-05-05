@@ -39,7 +39,7 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
      * |-----------------------------------------------------------|     ,---.     |---------------| `---'
      * |Shif|  <|  Z|  X|  C|  V|  B|  N|  M|  ,|  ,|  /| RO| Shift|     |Up |     |  1|  2|  3|   |
      * |-----------------------------------------------------------| ,-----------. |-----------|Ent| ,---.
-     * |Ctrl |Opt |Gui  |MHN|    Space    |HNK|Ent|Gui* |Opt |Ctrl | |Lef|Dow|Rig| |  0|  ,|  .|   | |Ply|
+     * |Ctrl |Opt |Gui  |MHN|    Space    |HNK|KAN|Gui* |Opt |Ctrl | |Lef|Dow|Rig| |  0|  ,|  .|   | |Ply|
      * `-----------------------------------------------------------' `-----------' `---------------' `---'
      */
     [0] = UNIMAP_ADB(
