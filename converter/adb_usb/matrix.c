@@ -442,7 +442,7 @@ static int32_t scroll_state = 0;
 static uint8_t scroll_speed = ADB_MOUSE_SCROLL_SPEED;
 static uint8_t scroll_button_mask = (1 << ADB_MOUSE_SCROLL_BUTTON) >> 1;
 
-static void mouse_proc(uint8_t addr)
+static uint8_t mouse_proc(uint8_t addr)
 {
     uint8_t len;
     uint8_t buf[5];
@@ -454,7 +454,7 @@ static void mouse_proc(uint8_t addr)
 
     len = adb_host_talk_buf(addr, ADB_REG_0, buf, sizeof(buf));
     if (len < 2) {
-        return;
+        return 0;
     };
 
     xprintf("M:$%X[ ", addr);
@@ -627,7 +627,7 @@ static void mouse_proc(uint8_t addr)
     // Send result by usb.
     host_mouse_send(&mouse_report);
 
-    return;
+    return 1;
 }
 
 uint8_t adb_mouse_buttons(void)
@@ -660,11 +660,11 @@ static uint8_t appliance_keymap(uint8_t code)
     }
 }
 
-static void appliance_proc(uint8_t addr)
+static uint8_t appliance_proc(uint8_t addr)
 {
     // Adjustable keybaord M1242 media keys: handler=2
     uint16_t codes = adb_host_kbd_recv(addr);
-    if (!codes) return;
+    if (!codes) return 0;
     xprintf("m:$%X:%04X ", addr, codes);
 
     uint8_t key;
@@ -680,6 +680,8 @@ static void appliance_proc(uint8_t addr)
             register_key(key);
         }
     }
+
+    return 1;
 }
 
 
@@ -842,47 +844,40 @@ void hook_main_loop(void)
         }
     }
 
-    // Address Resolution
-    if (timer_elapsed(detect_ms) > 1000) {
-        detect_ms = timer_read();
-        resolve_address();
-        poll_ms = timer_read();
-        return;
-    }
-
-    // Polling with 11ms interval
-    if (timer_elapsed(poll_ms) < 11) return;
-
     uint8_t len;
     uint8_t buf[8];
     uint8_t addr = active_addr;
-    do {
+    uint8_t busy = 0;
+
+    // Polling with 11ms interval
+    if (timer_elapsed(poll_ms) >= 11) do {
         addr %= 16;
 
         // Ignore Address 0
         if (addr == 0) continue;
 
+        poll_ms = timer_read();
         switch (device_table[addr].addr_default) {
         case ADB_ADDR_KEYBOARD:
-            keyboard_proc(addr);
+            busy = keyboard_proc(addr);
             break;
         case ADB_ADDR_MOUSE:
-            mouse_proc(addr);
+            busy = mouse_proc(addr);
             break;
         case ADB_ADDR_APPLIANCE:
-            appliance_proc(addr);
+            busy = appliance_proc(addr);
             break;
         case 0:
-            // No device or dumb device #733
+            // No device entry but 'dumb' device may exist #733
             switch (addr) {
             case ADB_ADDR_KEYBOARD:
-                keyboard_proc(addr);
+                busy = keyboard_proc(addr);
                 break;
             case ADB_ADDR_MOUSE:
-                mouse_proc(addr);
+                busy = mouse_proc(addr);
                 break;
             case ADB_ADDR_APPLIANCE:
-                appliance_proc(addr);
+                busy = appliance_proc(addr);
                 break;
             }
             break;
@@ -896,6 +891,7 @@ void hook_main_loop(void)
                 }
                 xprintf("]\n");
                 #endif
+                busy = 1;
             }
             break;
         }
@@ -906,5 +902,14 @@ void hook_main_loop(void)
         }
     } while (++addr != active_addr);
     active_addr = addr % 16;
-    poll_ms = timer_read();
+
+    // Address Resolution
+    if (!busy) {
+        if (timer_elapsed(detect_ms) >= 1000) {
+            detect_ms = timer_read();
+            resolve_address();
+        }
+    } else {
+        detect_ms = timer_read();
+    }
 }
