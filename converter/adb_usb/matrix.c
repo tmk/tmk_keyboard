@@ -36,7 +36,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // matrix state buffer(1:on, 0:off)
 static matrix_row_t matrix[MATRIX_ROWS];
 
-static void register_key(uint8_t key);
+static void register_key(uint8_t key)
+{
+    uint8_t col, row;
+    col = key&0x07;
+    row = (key>>3)&0x0F;
+    if (key&0x80) {
+        matrix[row] &= ~(1<<col);
+    } else {
+        matrix[row] |=  (1<<col);
+    }
+}
+
 
 // ADB device table
 static struct adb_device {
@@ -44,22 +55,6 @@ static struct adb_device {
     uint8_t handler_default;
     uint8_t handler;
 } device_table[16] = {0};
-
-static uint8_t free_address(void)
-{
-    // address for dynamic assignment
-    for (uint8_t addr = 15; addr > 7; addr--) {
-        if (device_table[addr].addr_default == 0)
-            return addr;
-    }
-
-    uint16_t reg3;
-    for (uint8_t addr = 15; addr > 7; addr--) {
-        reg3 = adb_host_talk(addr, ADB_REG_3);
-        if (!reg3) return addr;
-    }
-    return 0;
-}
 
 static void print_device_table(void)
 {
@@ -688,6 +683,22 @@ static uint8_t appliance_proc(uint8_t addr)
 ////////////////////////////////////////////////////////////////////////////////
 // Address Resolution - hot-plug support
 ////////////////////////////////////////////////////////////////////////////////
+static uint8_t free_address(void)
+{
+    // address for dynamic assignment
+    for (uint8_t addr = 15; addr > 7; addr--) {
+        if (device_table[addr].addr_default == 0)
+            return addr;
+    }
+
+    uint16_t reg3;
+    for (uint8_t addr = 15; addr > 7; addr--) {
+        reg3 = adb_host_talk(addr, ADB_REG_3);
+        if (!reg3) return addr;
+    }
+    return 0;
+}
+
 static void resolve_address(void)
 {
     uint16_t reg3;
@@ -744,6 +755,9 @@ again:
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Core API
+////////////////////////////////////////////////////////////////////////////////
 void hook_late_init(void)
 {
     debug_enable = true;
@@ -794,19 +808,6 @@ inline
 matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
-}
-
-inline
-static void register_key(uint8_t key)
-{
-    uint8_t col, row;
-    col = key&0x07;
-    row = (key>>3)&0x0F;
-    if (key&0x80) {
-        matrix[row] &= ~(1<<col);
-    } else {
-        matrix[row] |=  (1<<col);
-    }
 }
 
 void led_set(uint8_t usb_led)
