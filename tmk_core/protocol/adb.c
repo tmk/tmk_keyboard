@@ -164,7 +164,7 @@ uint8_t adb_host_talk_buf(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len)
     // the stop by a minimum of 140 J.lS beyond its normal duration, as shown in Figure 8-15."
     // http://ww1.microchip.com/downloads/en/AppNotes/00591b.pdf
     if (!data_in()) { adb_srq = true; } else { adb_srq = false; }
-    if (!wait_data_hi(500)) {    // Service Request(310us Adjustable Keyboard): just ignored
+    if (!wait_data_hi(500)) {    // wait for end of SRQ:(310us Adjustable Keyboard)
         xprintf("R");
         sei();
         return 0;
@@ -198,12 +198,14 @@ uint8_t adb_host_talk_buf(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len)
         // |________|       |
         //
         uint8_t lo = (uint8_t) wait_data_hi(130);
-        if (!lo)
-            goto error; // no more bit or after stop bit
+        if (!lo) {
+            goto error; // SRQ?
+        }
 
         uint8_t hi = (uint8_t) wait_data_lo(lo);
-        if (!hi)
-            goto error; // stop bit extedned by Srq?
+        if (!hi) {
+            goto error; // stop bit
+        }
 
         if (n/8 >= len) continue; // can't store in buf
 
