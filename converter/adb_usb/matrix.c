@@ -161,27 +161,9 @@ static uint8_t keyboard_proc(uint8_t addr)
     codes = extra_key;
     extra_key = 0xFFFF;
 
-    if ( codes == 0xFFFF )
-    {
+    if ( codes == 0xFFFF ) {
         codes = adb_host_kbd_recv(addr);
         if (codes) xprintf("$%X:%04X ", addr, codes);
-
-        // TODO:
-        // Check PSW pin
-        static bool psw_state = false;
-        if (codes == 0) {
-            if (!psw_state) {
-                if (!adb_host_psw()) {
-                    codes = 0x7F7F; // power key press
-                    psw_state = true;
-                }
-            } else {
-                if (adb_host_psw()) {
-                    codes = 0xFFFF; // power key release
-                    psw_state = false;
-                }
-            }
-        }
     }
     key0 = codes>>8;
     key1 = codes&0xFF;
@@ -724,9 +706,6 @@ again:
                 device_table[addr].addr_default = addr;
                 device_table[addr].handler_default = reg3 & 0xFF;
                 device_table[addr].handler = reg3 & 0xFF;
-
-                device_scan();
-                print_device_table();
             }
             continue;
         }
@@ -843,6 +822,25 @@ void hook_main_loop(void)
     static uint16_t poll_ms;
     static uint16_t detect_ms;
     static uint8_t active_addr = 3;
+
+    // Check PSW pin
+    // https://github.com/tmk/tmk_keyboard/issues/735
+    static bool psw_state = false;
+    if (!psw_state) {
+        if (!adb_host_psw()) {
+            register_key(0x7F); // power key press
+            psw_state = true;
+        }
+    } else {
+        if (adb_host_psw()) {
+            register_key(0xFF); // power key release
+            psw_state = false;
+
+            // for debug
+            device_scan();
+            print_device_table();
+        }
+    }
 
     // Address Resolution
     if (timer_elapsed(detect_ms) > 1000) {
