@@ -218,6 +218,7 @@ uint8_t adb_host_talk_buf(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len)
 
 error:
     sei();
+    _delay_us(200);
     return n/8;
 }
 
@@ -246,6 +247,7 @@ void adb_host_listen_buf(uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len)
     }
     place_bit0();               // Stopbit(0);
     sei();
+    _delay_us(200);
 }
 
 void adb_host_listen(uint8_t addr, uint8_t reg, uint8_t data_h, uint8_t data_l)
