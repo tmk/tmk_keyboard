@@ -771,6 +771,9 @@ void hook_late_init(void)
         device_table[addr].handler = 0;
     }
 
+    // initialize matrix state: all keys off
+    for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
+
     // LED on
     DDRD |= (1<<6); PORTD |= (1<<6);
 
@@ -778,17 +781,7 @@ void hook_late_init(void)
     adb_host_reset_hard();
     //adb_host_reset(); // some of devices done't recognize
 
-    // AEK/AEKII(ANSI/ISO) startup is slower. Without proper delay
-    // it would fail to recognize layout and enable Extended protocol.
-    // 200ms seems to be enough for AEKs. 1000ms is used for safety.
-    // Tested with devices:
-    // M0115J(AEK), M3501(AEKII), M0116(Standard), M1242(Adjustable),
-    // G5431(Mouse), 64210(Kensington Trubo Mouse 5)
-    //wait_ms(1000);
     device_scan();
-
-    // initialize matrix state: all keys off
-    for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
 
     // LED off
     DDRD |= (1<<6); PORTD &= ~(1<<6);
