@@ -178,12 +178,18 @@ uint8_t IBMPCConverter::process_interface(void)
     if (ibmpc.error) {
         xprintf("\n%u ERR:%02X ISR:%04X ", timer_read(), ibmpc.error, ibmpc.isr_debug);
 
+        /* Error handling:
+         * IBMPC_ERR_PARITY         Reinit
+         * IBMPC_ERR_PARITY_AA      AT/XT Auto-Switching
+         * IBMPC_ERR_SEND           Ignore
+         * IBMPC_ERR_TIMEOUT        Reinit
+         * IBMPC_ERR_FULL           Ignore
+         * IBMPC_ERR_ILLEGAL        Reinit
+         * IBMPC_ERR_FF             Ignore(not used)
+         */
         // when recv error, neither send error nor buffer full
         if (!(ibmpc.error & (IBMPC_ERR_SEND | IBMPC_ERR_FULL))) {
-            if (state == LOOP) {
-                // Reset
-                state = ERROR;
-            }
+            state = ERROR;
             if (ibmpc.error == IBMPC_ERR_PARITY_AA) {
                 // AT/XT Auto-Switching support
                 // https://github.com/tmk/tmk_keyboard/wiki/IBM-PC-Keyboard-Converter#atxt-auto-switching
@@ -219,6 +225,7 @@ uint8_t IBMPCConverter::process_interface(void)
         case INIT:
             xprintf("I%u ", timer_read());
             init_time = timer_read();
+            ibmpc.host_isr_clear();
             ibmpc.host_enable();
             state = WAIT_SETTLE;
             break;
