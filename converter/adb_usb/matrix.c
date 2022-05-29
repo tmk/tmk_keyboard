@@ -137,8 +137,6 @@ static void keyboard_setup(uint8_t addr)
 
     // Keyboard indicator
     adb_host_kbd_led(addr, ~(host_keyboard_leds()));
-
-    device_scan();
 }
 
 static uint8_t keyboard_proc(uint8_t addr)
@@ -705,6 +703,7 @@ static uint8_t free_address(void)
 
 static void resolve_address(void)
 {
+    bool found = false;
     uint16_t reg3;
     // Find new device at address 1 to 7
     for (uint8_t addr = 1; addr < 8; addr++) {
@@ -712,49 +711,39 @@ again:
         reg3 = adb_host_talk(addr, ADB_REG_3);
         if (!reg3) continue;
 
-        // Unsupported device
-        switch (addr) {
-        case ADB_ADDR_DONGLE: // 1
-        case ADB_ADDR_TABLET: // 4
-        case 5:
-        case 6:
-            if (device_table[addr].addr_default == 0) {
-                xprintf("R:Unsupported at $%X. R3:%04X\n", addr, reg3);
-                device_table[addr].addr_default = addr;
-                device_table[addr].handler_default = reg3 & 0xFF;
-                device_table[addr].handler = reg3 & 0xFF;
-            }
-            continue;
-        }
-
+        found = true;
+        xprintf("R:$%X:Found. R3:%04X\n", addr, reg3);
         uint8_t new_addr = free_address();
         if (!new_addr) {
-            xprintf("R:$%X: No free address\n", addr);
+            xprintf("R:$%X:No free address\n", addr);
             continue;
         }
 
-        // Move supported device to higher address 8 to 15
+        // Move device to higher address 8 to 15
         adb_host_listen(addr, ADB_REG_3, ((reg3 >> 8) & 0xF0) | new_addr, 0xFE);
         reg3 = adb_host_talk(new_addr, ADB_REG_3);
         if (!reg3) {
-            xprintf("R:$%X: Fail to move\n", addr);
+            xprintf("R:$%X:Fail to move\n", addr);
             continue;
         }
         device_table[new_addr].addr_default = addr;
         device_table[new_addr].handler_default = reg3 & 0xFF;
         device_table[new_addr].handler = reg3 & 0xFF;
-        xprintf("R:Move $%X to $%X. R3:%04X\n", addr, new_addr, reg3);
+        xprintf("R:$%X:Move to $%X. R3:%04X\n", addr, new_addr, reg3);
 
-        // Setup device
+        // Setup supported device
         if (addr == ADB_ADDR_KEYBOARD)  keyboard_setup(new_addr);
         if (addr == ADB_ADDR_MOUSE)     mouse_setup(new_addr);
         if (addr == ADB_ADDR_APPLIANCE) appliance_setup(new_addr);
 
+        goto again; // if addr still has another deivce
+    }
+
+    // TODO: update table
+
+    if (found) {
         device_scan();
         print_device_table();
-        reg3 = adb_host_talk(addr, ADB_REG_3);
-        if (!reg3) continue;
-        goto again; // if addr still has another deivce
     }
 }
 
