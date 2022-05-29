@@ -169,6 +169,10 @@ static uint8_t keyboard_proc(uint8_t addr)
         register_key(0x7F);
     } else if (codes == 0xFFFF) {   // power key release
         register_key(0xFF);
+
+        // for debug
+        device_scan();
+        print_device_table();
     } else {
         // Macally keyboard sends keys inversely against ADB protocol
         // https://deskthority.net/workshop-f7/macally-mk96-t20116.html
@@ -818,25 +822,7 @@ void hook_main_loop(void)
     static uint16_t poll_ms;
     static uint16_t detect_ms;
     static uint8_t active_addr = 3;
-
-    // Check PSW pin
-    // https://github.com/tmk/tmk_keyboard/issues/735
     static bool psw_state = false;
-    if (!psw_state) {
-        if (!adb_host_psw()) {
-            register_key(0x7F); // power key press
-            psw_state = true;
-        }
-    } else {
-        if (adb_host_psw()) {
-            register_key(0xFF); // power key release
-            psw_state = false;
-
-            // for debug
-            device_scan();
-            print_device_table();
-        }
-    }
 
     uint8_t len;
     uint8_t buf[8];
@@ -844,26 +830,15 @@ void hook_main_loop(void)
     uint8_t busy = 0;
 
     // Polling with 11ms interval
-    if (timer_elapsed(poll_ms) >= 11) do {
-        addr %= 16;
-
-        // Ignore Address 0
-        if (addr == 0) continue;
-
+    if (timer_elapsed(poll_ms) >= 11) {
         poll_ms = timer_read();
-        switch (device_table[addr].addr_default) {
-        case ADB_ADDR_KEYBOARD:
-            busy = keyboard_proc(addr);
-            break;
-        case ADB_ADDR_MOUSE:
-            busy = mouse_proc(addr);
-            break;
-        case ADB_ADDR_APPLIANCE:
-            busy = appliance_proc(addr);
-            break;
-        case 0:
-            // No device entry but 'dumb' device may exist #733
-            switch (addr) {
+        do {
+            addr %= 16;
+
+            // Ignore Address 0
+            if (addr == 0) continue;
+
+            switch (device_table[addr].addr_default) {
             case ADB_ADDR_KEYBOARD:
                 busy = keyboard_proc(addr);
                 break;
@@ -873,28 +848,56 @@ void hook_main_loop(void)
             case ADB_ADDR_APPLIANCE:
                 busy = appliance_proc(addr);
                 break;
-            }
-            break;
-        default:
-            // Unsupported device
-            len = adb_host_talk_buf(addr, ADB_REG_0, buf, sizeof(buf));
-            if (len) {
-                xprintf("$%X R0: [ ", addr);
-                for (uint8_t i = 0; i < len; i++) {
-                    xprintf("%02X ", buf[i]);
+            case 0:
+                // No device
+                // but 'dumb' device may exist at 2, 3 and 7 #733
+                switch (addr) {
+                case ADB_ADDR_KEYBOARD:
+                    busy = keyboard_proc(addr);
+                    break;
+                case ADB_ADDR_MOUSE:
+                    busy = mouse_proc(addr);
+                    break;
+                case ADB_ADDR_APPLIANCE:
+                    busy = appliance_proc(addr);
+                    break;
                 }
-                xprintf("]\n");
-                busy = 1;
+                break;
+            default:
+                // Unsupported device
+                len = adb_host_talk_buf(addr, ADB_REG_0, buf, sizeof(buf));
+                if (len) {
+                    xprintf("$%X R0: [ ", addr);
+                    for (uint8_t i = 0; i < len; i++) {
+                        xprintf("%02X ", buf[i]);
+                    }
+                    xprintf("]\n");
+                    busy = 1;
+                }
+                break;
             }
-            break;
-        }
 
-        // Scan next device when Service Request(SRQ) is asserted
-        if (!adb_service_request()) {
-            break;
+            // Poll next device when Service Request(SRQ) is asserted
+            if (!adb_service_request()) {
+                break;
+            }
+        } while (++addr != active_addr);
+        active_addr = addr % 16;
+
+        // Check PSW pin for NeXT keyboard
+        // https://github.com/tmk/tmk_keyboard/issues/735
+        if (!psw_state) {
+            if (!adb_host_psw()) {
+                register_key(0x7F); // power key press
+                psw_state = true;
+            }
+        } else {
+            if (adb_host_psw()) {
+                register_key(0xFF); // power key release
+                psw_state = false;
+            }
         }
-    } while (++addr != active_addr);
-    active_addr = addr % 16;
+    }
 
     // Address Resolution
     if (!busy) {
