@@ -715,7 +715,7 @@ again:
         case 5:
         case 6:
             if (device_table[addr].addr_default == 0) {
-                xprintf("R:Unspported at $%X. R3:%04X\n", addr, reg3);
+                xprintf("R:Unsupported at $%X. R3:%04X\n", addr, reg3);
                 device_table[addr].addr_default = addr;
                 device_table[addr].handler_default = reg3 & 0xFF;
                 device_table[addr].handler = reg3 & 0xFF;
@@ -876,15 +876,14 @@ void hook_main_loop(void)
             }
             break;
         default:
+            // Unsupported device
             len = adb_host_talk_buf(addr, ADB_REG_0, buf, sizeof(buf));
             if (len) {
-                #ifdef ADB_SRQ_SCAN_REG0
                 xprintf("$%X R0: [ ", addr);
                 for (uint8_t i = 0; i < len; i++) {
                     xprintf("%02X ", buf[i]);
                 }
                 xprintf("]\n");
-                #endif
                 busy = 1;
             }
             break;
