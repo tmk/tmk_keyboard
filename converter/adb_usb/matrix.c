@@ -685,6 +685,22 @@ static uint8_t appliance_proc(uint8_t addr)
 ////////////////////////////////////////////////////////////////////////////////
 // Address Resolution - hot-plug support
 ////////////////////////////////////////////////////////////////////////////////
+static bool update_device_table(void)
+{
+    bool changed = false;
+    // remove entry for non-existent device
+    for (uint8_t addr = 8; addr < 16; addr++) {
+        uint16_t reg3 = adb_host_talk(addr, ADB_REG_3);
+        if (!reg3) {
+            if (device_table[addr].addr_default) {
+                changed = true;
+                device_table[addr] = (struct adb_device){0};
+            }
+        }
+    }
+    return changed;
+}
+
 static uint8_t free_address(void)
 {
     // address for dynamic assignment
@@ -692,26 +708,26 @@ static uint8_t free_address(void)
         if (device_table[addr].addr_default == 0)
             return addr;
     }
-
-    uint16_t reg3;
-    for (uint8_t addr = 15; addr > 7; addr--) {
-        reg3 = adb_host_talk(addr, ADB_REG_3);
-        if (!reg3) return addr;
-    }
     return 0;
 }
 
 static void resolve_address(void)
 {
-    bool found = false;
+    bool changed = false;
     uint16_t reg3;
     // Find new device at address 1 to 7
     for (uint8_t addr = 1; addr < 8; addr++) {
 again:
         reg3 = adb_host_talk(addr, ADB_REG_3);
-        if (!reg3) continue;
+        if (!reg3) {
+            if (device_table[addr].addr_default) {
+                changed = true;
+                device_table[addr] = (struct adb_device){0};
+            }
+            continue;
+        }
 
-        found = true;
+        changed = true;
         xprintf("R:$%X:Found. R3:%04X\n", addr, reg3);
         uint8_t new_addr = free_address();
         if (!new_addr) {
@@ -739,10 +755,10 @@ again:
         goto again; // if addr still has another deivce
     }
 
-    // TODO: update table
+    // update table entry
+    changed |= update_device_table();
 
-    if (found) {
-        device_scan();
+    if (changed) {
         print_device_table();
     }
 }
@@ -838,8 +854,7 @@ void hook_main_loop(void)
                 busy = appliance_proc(addr);
                 break;
             case 0:
-                // No device
-                // but 'dumb' device may exist at 2, 3 and 7 #733
+                // 'Dumb' device may exist at 2, 3 and 7 #733
                 switch (addr) {
                 case ADB_ADDR_KEYBOARD:
                     busy = keyboard_proc(addr);
@@ -850,6 +865,9 @@ void hook_main_loop(void)
                 case ADB_ADDR_APPLIANCE:
                     busy = appliance_proc(addr);
                     break;
+                default:
+                    // No device - Poll next address
+                    continue;
                 }
                 break;
             default:
@@ -866,8 +884,8 @@ void hook_main_loop(void)
                 break;
             }
 
-            // Poll next device when Service Request(SRQ) is asserted
             if (!adb_service_request()) {
+                // No SRQ - Done.
                 break;
             }
         } while (++addr != active_addr);
