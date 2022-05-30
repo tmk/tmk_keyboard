@@ -47,9 +47,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // https://github.com/tmk/tmk_keyboard/issues/724
 #define ADB_MOUSE_2ND_BUTTON_QUIRK
 
-// Scan unsupported devices with register0 when SRQ is asserted
-#define ADB_SRQ_SCAN_REG0
-
 
 /* ADB port setting */
 #define ADB_PORT        PORTD
