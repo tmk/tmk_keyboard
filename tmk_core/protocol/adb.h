@@ -68,11 +68,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define ADB_ADDR_13         13
 #define ADB_ADDR_14         14
 #define ADB_ADDR_15         15
-// for temporary purpose, do not use for polling
-#define ADB_ADDR_KBD_POLL    9
-#define ADB_ADDR_MOUSE_POLL 10
-#define ADB_ADDR_KBD_TMP    14
-#define ADB_ADDR_MOUSE_TMP  15
 // Command Type
 #define ADB_CMD_RESET       0
 #define ADB_CMD_FLUSH       1
