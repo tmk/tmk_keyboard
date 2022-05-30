@@ -59,14 +59,14 @@ static struct adb_device {
 static void print_device_table(void)
 {
     xprintf("\nTable:\n");
-    xprintf("A: a h  H\n");
-    xprintf("----------\n");
+    xprintf("A:H  a:h\n");
+    xprintf("---------\n");
     for (uint8_t addr = 0; addr < 16; addr++) {
         if (device_table[addr].addr_default == 0) continue;
-        xprintf("%X: %X %02X %02X\n", addr,
+        xprintf("%X:%02X %X:%02X\n", addr,
+                device_table[addr].handler,
                 device_table[addr].addr_default,
-                device_table[addr].handler_default,
-                device_table[addr].handler);
+                device_table[addr].handler_default);
     }
     xprintf("\n");
 }
@@ -120,15 +120,15 @@ static void keyboard_setup(uint8_t addr)
     // Check if there is keyboard at default address
     reg3 = adb_host_talk(addr, ADB_REG_3);
     if (!reg3) {
-        xprintf("K:Not found at $%X.\n", addr);
+        xprintf("K:$%X:Not found\n", addr);
         return;
     }
-    xprintf("K:Setup at $%X. R3:%04X\n", addr, reg3);
+    xprintf("K:$%X:Setup. R3:%04X\n", addr, reg3);
 
     uint8_t adb_layout = keyboard_layout(reg3 & 0xFF);
-    xprintf("K:Layout: %s\n", (adb_layout == ADB_LAYOUT_ANSI ? "ANSI" : (
-                               adb_layout == ADB_LAYOUT_ISO  ? "ISO"  : (
-                               adb_layout == ADB_LAYOUT_JIS  ? "JIS"  : "???"))));
+    xprintf("K:$%X:Layout: %s\n", addr, (adb_layout == ADB_LAYOUT_ANSI ? "ANSI" : (
+                                         adb_layout == ADB_LAYOUT_ISO  ? "ISO"  : (
+                                         adb_layout == ADB_LAYOUT_JIS  ? "JIS"  : "???"))));
 
     // Enable Extended protocol
     adb_host_listen(addr, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_EXTENDED_KEYBOARD);
@@ -156,7 +156,7 @@ static uint8_t keyboard_proc(uint8_t addr)
 
     if ( codes == 0xFFFF ) {
         codes = adb_host_kbd_recv(addr);
-        if (codes) xprintf("$%X:%04X ", addr, codes);
+        if (codes) xprintf("K:$%X:%02X:%04X ", addr, device_table[addr].handler_default, codes);
     }
     key0 = codes>>8;
     key1 = codes&0xFF;
@@ -267,10 +267,10 @@ static void mouse_setup(uint8_t addr)
     // Check if there is mouse device to setup
     reg3 = adb_host_talk(addr, ADB_REG_3);
     if (!reg3) {
-        xprintf("M:Not found at $%X.\n", addr);
+        xprintf("M:$%X:Not found\n", addr);
         return;
     }
-    xprintf("M:Setup at $%X. R3:%04X\n", addr, reg3);
+    xprintf("M:$%X:Setup. R3:%04X\n", addr, reg3);
     mouse_handler = reg3 & 0xFF;
 
     if (mouse_handler == ADB_HANDLER_MICROSPEED_MACTRAC ||
@@ -305,18 +305,17 @@ static void mouse_setup(uint8_t addr)
             adb_host_listen(addr, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_CLASSIC2_MOUSE);
             mouse_handler = (reg3 = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
         }
-        //xprintf("M:EXT: R3:%04X\n", reg3);
     }
 
     // Classic Protocol 100cpi
     if (mouse_handler == ADB_HANDLER_CLASSIC1_MOUSE) {
-        xprintf("M:Classic1 100cpi\n");
+        xprintf("M:$%X:Classic1 100cpi\n", addr);
         mouse_cpi = 100;
     }
 
     // Classic Protocol 200cpi
     if (mouse_handler == ADB_HANDLER_CLASSIC2_MOUSE) {
-        xprintf("M:Classic2 200cpi\n");
+        xprintf("M:$%X:Classic2 200cpi\n", addr);
         mouse_cpi = 200;
     }
 
@@ -338,12 +337,12 @@ static void mouse_setup(uint8_t addr)
         }
 
         if (len) {
-            xprintf("M:EXT: [%02X %02X %02X %02X %02X %02X %02X %02X] cpi=%d btn=%d len=%d\n",
-                    buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], mouse_cpi, buf[7], len);
+            xprintf("M:$%X:EXT: [%02X %02X %02X %02X %02X %02X %02X %02X] cpi=%d btn=%d len=%d\n",
+                    addr, buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], mouse_cpi, buf[7], len);
         }
 
         if (buf[0] == 0x4B && buf[1] == 0x4D && buf[2] == 0x4C && buf[3] == 0x31) {
-            xprintf("M:Kensington Ext\n");
+            xprintf("M:$%X:Kensington Ext\n", addr);
             // Kensington Turbo Mouse 5/Thinking Mouse: Extended device
             // Another device, whose handler ID is $32, becomes available in address 3
             // when this device is moved from address 3.
@@ -354,11 +353,11 @@ static void mouse_setup(uint8_t addr)
             adb_host_flush(addr);
             adb_host_listen(addr, ADB_REG_3, (reg3 >> 8), ADB_HANDLER_MACALLY2_MOUSE);
             mouse_handler = (reg3 = adb_host_talk(addr, ADB_REG_3)) & 0xFF;
-            xprintf("M:Macally-2btn\n");
+            xprintf("M:$%X:Macally-2btn\n", addr);
         } else if (buf[0] == 0x9A && (buf[1] == 0x20 || buf[1] == 0x21)) {
             // Logitech MouseMan/TrackMan proprietary
             // buf[1] = 0x20:MouseMan, 0x21:TrackMan
-            xprintf("M:Logitech\n");
+            xprintf("M:$%X:Logitech\n", addr);
 
             // https://elixir.bootlin.com/linux/v5.17/source/drivers/macintosh/adbhid.c#L1047
             adb_host_listen(addr, ADB_REG_1, 0x00, 0x81);
@@ -372,18 +371,18 @@ static void mouse_setup(uint8_t addr)
             // Logitech MouaseMan/TrackMan Extended
             // MouseMan - FCCID:DZLMAH32 'LT01'
             // MouseMan Cordless - FCCID:DZLMRC33T 'LTW1'
-            xprintf("M:Logitech-Extended\n");
+            xprintf("M:$%X:Logitech-Extended\n", addr);
 
             // set pseudo handler
             mouse_handler = ADB_HANDLER_LOGITECH_EXT;
         } else {
-            xprintf("M:Extended\n");
+            xprintf("M:$%X:Extended\n", addr);
         }
     }
 
     // Kensington Turbo Mouse 5: setup
     if (mouse_handler == ADB_HANDLER_TURBO_MOUSE) {
-        xprintf("M:Kensington\n");
+        xprintf("M:$%X:Kensington\n", addr);
 
         /* byte0: 0xb5  speed - 0xa0, 0xa5, 0xb0 and 0xb5 seem to work
          *              uppper nibble:
@@ -454,10 +453,10 @@ static uint8_t mouse_proc(uint8_t addr)
         return 0;
     };
 
-    xprintf("M:$%X[ ", addr);
+    xprintf("M:$%X:%02X:[ ", addr, mouse_handler);
     for (uint8_t i = 0; i < len; i++)
         xprintf("%02X ", buf[i]);
-    xprintf("] mh:%02X\n", mouse_handler);
+    xprintf("] ");
 
     bool xneg = false;
     bool yneg = false;
@@ -466,7 +465,7 @@ static uint8_t mouse_proc(uint8_t addr)
         //   Byte0: bbb y06 y05 y04 y03 y02 y01 y00
         //   Byte1: 1   x06 x05 x04 x03 x02 x01 x00
         //   Byte2: 0   0   0   0   0   BL  BM  BR
-        //     Bx: button state(1:pressed, 1:released)
+        //     Bx: button state(1:pressed, 0:released)
         //     bbb: 0 when either BL, BR or BM is pressed
         if (buf[0] & 0x40) yneg = true;
         if (buf[1] & 0x40) xneg = true;
@@ -578,6 +577,13 @@ static uint8_t mouse_proc(uint8_t addr)
         if (xneg) buf[i] |= 0x07;
     }
 
+    /* for debug
+    xprintf("[ ");
+    for (uint8_t i = 0; i < 5; i++)
+        xprintf("%02X ", buf[i]);
+    xprintf("] ");
+    */
+
     uint8_t buttons = 0;
     if (!(buf[4] & 0x08)) buttons |= MOUSE_BTN8;
     if (!(buf[4] & 0x80)) buttons |= MOUSE_BTN7;
@@ -619,7 +625,8 @@ static uint8_t mouse_proc(uint8_t addr)
         mouse_report.y = y;
     }
 
-    xprintf("M:[B:%02X X:%d(%d) Y:%d(%d) V:%d]\n", mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouse_report.v);
+    xprintf("[ B:%02X X:%d(%d) Y:%d(%d) V:%d ]\n",
+            mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouse_report.v);
 
     // Send result by usb.
     host_mouse_send(&mouse_report);
@@ -640,7 +647,7 @@ uint8_t adb_mouse_buttons(void)
 static void appliance_setup(uint8_t addr)
 {
     // Adjustable keyboard M1242 media keys: address=7 and handler=2
-    xprintf("K:Media keys\n");
+    xprintf("A:$%X:Appliance(Media keys)\n", addr);
 }
 
 static uint8_t appliance_keymap(uint8_t code)
@@ -874,7 +881,7 @@ void hook_main_loop(void)
                 // Unsupported device
                 len = adb_host_talk_buf(addr, ADB_REG_0, buf, sizeof(buf));
                 if (len) {
-                    xprintf("$%X R0: [ ", addr);
+                    xprintf("U:$%X:%02X:[ ", addr, device_table[addr].handler);
                     for (uint8_t i = 0; i < len; i++) {
                         xprintf("%02X ", buf[i]);
                     }
