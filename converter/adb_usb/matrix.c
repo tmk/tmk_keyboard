@@ -460,6 +460,17 @@ static uint8_t mouse_proc(uint8_t addr)
 
     bool xneg = false;
     bool yneg = false;
+    // Convert data into Apple Extended Mouse format
+    //
+    // Apple Extended Mouse:
+    //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
+    //   Byte1: b01 x06 x05 x04 x03 x02 x01 x00
+    //   Byte2: b02 y09 y08 y07 b03 x09 x08 x07
+    //   Byte3: b04 y12 y11 y10 b05 x12 x11 x10
+    //   Byte4: b06 y15 y14 y13 b07 x15 x14 x13
+    //     b--: button state(0:pressed, 1:released)
+    //     Data can be 2-5 bytes.
+    //     L=b00, R=b01, M=b02
     if (mouse_handler == ADB_HANDLER_LOGITECH) {
         // Logitech:
         //   Byte0: bbb y06 y05 y04 y03 y02 y01 y00
@@ -544,14 +555,6 @@ static uint8_t mouse_proc(uint8_t addr)
     } else if (mouse_handler == ADB_HANDLER_EXTENDED_MOUSE ||
                mouse_handler == ADB_HANDLER_TURBO_MOUSE) {
         // Apple Extended Mouse:
-        //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
-        //   Byte1: b01 x06 x05 x04 x03 x02 x01 x00
-        //   Byte2: b02 y09 y08 y07 b03 x09 x08 x07
-        //   Byte3: b04 y12 y11 y10 b05 x12 x11 x10
-        //   Byte4: b06 y15 y14 y13 b07 x15 x14 x13
-        //     b--: button state(0:pressed, 1:released)
-        //     Data can be 2-5 bytes.
-        //     L=b00, R=b01, M=b02
         if (buf[len - 1] & 0x40) yneg = true;
         if (buf[len - 1] & 0x04) xneg = true;
     } else {
