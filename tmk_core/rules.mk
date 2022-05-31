@@ -139,6 +139,7 @@ CFLAGS += -Wstrict-prototypes
 CFLAGS += -Wa,-adhlns=$(@:%.o=%.lst)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 CFLAGS += $(CSTANDARD)
+CFLAGS += -flto
 ifdef CONFIG_H
     CFLAGS += -include $(CONFIG_H)
 endif
@@ -173,6 +174,7 @@ CPPFLAGS += -Wundef
 CPPFLAGS += -Wa,-adhlns=$(@:%.o=%.lst)
 CPPFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 #CPPFLAGS += $(CSTANDARD)
+CPPFLAGS += -flto
 ifdef CONFIG_H
     CPPFLAGS += -include $(CONFIG_H)
 endif
@@ -189,6 +191,7 @@ endif
 #       dump that will be displayed for a given single line of source input.
 ASFLAGS = $(ADEFS) -Wa,-adhlns=$(@:%.o=%.lst),-gstabs,--listing-cont-lines=100
 ASFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
+ASFLAGS += -flto
 ifdef CONFIG_H
     ASFLAGS += -include $(CONFIG_H)
 endif
@@ -261,6 +264,7 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 #LDFLAGS += -T linker_script.x
 # You can give EXTRALDFLAGS at 'make' command line.
 LDFLAGS += $(EXTRALDFLAGS)
+LDFLAGS += -flto
 
 
 
