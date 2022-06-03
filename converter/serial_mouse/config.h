@@ -47,7 +47,7 @@ Copyright 2022 Jun Wako <wakojun@gmail.com>
 
 /*
  * Hardware Serial(UART)
- *   Add protocol/serial_uart.c to SRC in Makefile
+ *   1200 baud, 7-bit data, no parity, 1-bit stop, lsb-first
  */
 #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega32U2__)
     #define SERIAL_UART_BAUD       1200
@@ -61,7 +61,7 @@ Copyright 2022 Jun Wako <wakojun@gmail.com>
         UCSR1B |= (1<<RXCIE1) | (1<<RXEN1); /* RX interrupt, RX: enable */ \
         UCSR1B |= (0<<TXCIE1) | (1<<TXEN1); /* TX interrupt, TX: enable */ \
         UCSR1C =  (1<<UCSZ11) | (0<<UCSZ10) | /* data: 7-bit */ \
-                  (0<<UPM11) | (0<<UPM10);  /* parity: none(00), even(01), odd(11) */ \
+                  (0<<UPM11)  | (0<<UPM10);  /* parity: none(00), even(01), odd(11) */ \
         DDRD  &= ~(1<<2); PORTD |=  (1<<2); /* Pull-up RXD pin */ \
         sei(); \
     } while(0)
@@ -72,11 +72,11 @@ Copyright 2022 Jun Wako <wakojun@gmail.com>
 
 /*
  * Software Serial
- *   Add protocol/serial_soft.c to SRC in Makefile
+ *   1200 baud, 7-bit data, no parity, 1-bit stop, lsb-first
  */
 #define SERIAL_SOFT_BAUD                1200
 #define SERIAL_SOFT_PARITY_NONE
-#define SERIAL_SOFT_BIT_ORDER_MSB
+#define SERIAL_SOFT_BIT_ORDER_LSB
 //#define SERIAL_SOFT_LOGIC_NEGATIVE
 #define SERIAL_SOFT_DATA_7BIT
 #define SERIAL_SOFT_DEBUG
@@ -93,8 +93,7 @@ Copyright 2022 Jun Wako <wakojun@gmail.com>
     SERIAL_SOFT_RXD_DDR &= ~(1<<SERIAL_SOFT_RXD_BIT); \
     SERIAL_SOFT_RXD_PORT |= (1<<SERIAL_SOFT_RXD_BIT); \
     /* enable interrupt: INT2(Positive:falling edge, Negative:rising edge) */ \
-    EICRA |= ((1<<ISC21)|(1<<ISC20)); \
-    /* EICRA |= ((1<<ISC21)|(0<<ISC20)); \ */ \
+    EICRA |= ((1<<ISC21)|(0<<ISC20)); \
     EIMSK |= (1<<INT2); \
     sei(); \
 } while (0)
