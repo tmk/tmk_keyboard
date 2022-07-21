@@ -880,8 +880,16 @@ int8_t IBMPCConverter::process_cs1(uint8_t code)
  */
 uint8_t IBMPCConverter::cs2_e0code(uint8_t code) {
     switch(code) {
-        // E0 prefixed codes translation See [a].
-        case 0x11: return 0x0F; // right alt
+        case 0x11:  if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id)
+                        return 0x13; // Hiragana(5576) -> KANA
+                    else
+                        return 0x0F; // right alt
+
+        case 0x41:  if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id)
+                        return 0x7C; // Keypad ,(5576) -> Keypad *
+                    else
+                        return (code & 0x7F);
+
         case 0x14: return 0x19; // right control
         case 0x1F: return 0x17; // left GUI
         case 0x27: return 0x1F; // right GUI
@@ -982,13 +990,6 @@ uint8_t IBMPCConverter::translate_5576_cs2(uint8_t code) {
     }
     return code;
 }
-uint8_t IBMPCConverter::translate_5576_cs2_e0(uint8_t code) {
-    switch (code) {
-        case 0x11: return 0x13; // Hiragana -> KANA
-        case 0x41: return 0x7C; // Keypad , -> Keypad *
-    }
-    return code;
-}
 
 int8_t IBMPCConverter::process_cs2(uint8_t code)
 {
@@ -1035,9 +1036,6 @@ int8_t IBMPCConverter::process_cs2(uint8_t code)
             }
             break;
         case CS2_E0:    // E0-Prefixed
-            if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id) {
-                code = translate_5576_cs2_e0(code);
-            }
             switch (code) {
                 case 0x12:  // to be ignored
                 case 0x59:  // to be ignored
@@ -1082,9 +1080,6 @@ int8_t IBMPCConverter::process_cs2(uint8_t code)
             }
             break;
         case CS2_E0_F0: // Break code of E0-prefixed
-            if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id) {
-                code = translate_5576_cs2_e0(code);
-            }
             switch (code) {
                 case 0x12:  // to be ignored
                 case 0x59:  // to be ignored
