@@ -140,6 +140,13 @@ RETRY:
     WAIT(data_hi, 300, 7);
     WAIT(clock_hi, 300, 8);
 
+#ifdef SIEMENS_PCD_SUPPORT
+    // inhibit - https://github.com/tmk/tmk_keyboard/issues/747
+    wait_us(15);
+    clock_lo();
+    wait_us(150);
+#endif
+
     // clear buffer to get response correctly
     host_isr_clear();
 
@@ -360,6 +367,13 @@ void IBMPC::isr(void)
     }
 
 DONE:
+#ifdef SIEMENS_PCD_SUPPORT
+    // inhibit - https://github.com/tmk/tmk_keyboard/issues/747
+    clock_lo();
+    wait_us(150);
+    clock_hi();
+#endif
+
     // store data
     ringbuf_put(isr_state & 0xFF);
     if (ringbuf_is_full()) {
