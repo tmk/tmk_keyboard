@@ -215,7 +215,7 @@ CONFIG = {
             desc: "IBMPC-USB Converter(TMK/ATmega32U2)",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibmpc_usb/binary/ibmpc_usb_atmega32u2.hex",
             firmware_format: "ihex",
-            layout: "layout-128key.html",
+            layout: "layout-ibmpc_full.html",
         },
         ibmpc_usb_xt: {
             desc: "IBMPC-USB Converter(TMK/ATmega32U2) - 83-key XT",
@@ -240,7 +240,7 @@ CONFIG = {
             desc: "IBMPC-USB Converter(ATmega32U4)",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibmpc_usb/binary/ibmpc_usb_atmega32u4.hex",
             firmware_format: "ihex",
-            layout: "layout-128key.html",
+            layout: "layout-ibmpc_full.html",
         },
         ibmpc_usb_32u4_xt: {
             desc: "IBMPC-USB Converter(ATmega32U4) - 83-key XT",
@@ -265,7 +265,7 @@ CONFIG = {
             desc: "IBMPC-USB Converter(AT90USB1286)",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/ibmpc_usb/binary/ibmpc_usb_at90usb1286.hex",
             firmware_format: "ihex",
-            layout: "layout-128key.html",
+            layout: "layout-ibmpc_full.html",
         },
         ibmpc_usb_1286_xt: {
             desc: "IBMPC-USB Converter(AT90USB1286) - 83-key XT",
