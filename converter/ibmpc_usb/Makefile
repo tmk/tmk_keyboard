@@ -74,7 +74,7 @@ BOOTMAGIC_ENABLE ?= no	# Virtual DIP switch configuration(+1150)
 MOUSEKEY_ENABLE ?= yes	# Mouse keys(+2200)
 EXTRAKEY_ENABLE ?= yes	# Audio control and System control(+400)
 CONSOLE_ENABLE ?= yes	# Console for debug(+4150)
-COMMAND_ENABLE ?= no	# Commands for debug and configuration(+3600)
+COMMAND_ENABLE ?= yes	# Commands for debug and configuration(+3600)
 NKRO_ENABLE ?= yes	# USB Nkey Rollover(+350)
 
 KEYMAP_SECTION_ENABLE ?= yes
