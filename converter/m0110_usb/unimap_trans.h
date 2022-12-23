@@ -89,7 +89,7 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
         {
             UNIMAP_C,               // 0x08
             UNIMAP_V,               // 0x09
-            UNIMAP_NO,              // 0x0A
+            UNIMAP_NONUS_BSLASH,    // 0x0A
             UNIMAP_B,               // 0x0B
 #endif
             UNIMAP_Q,               // 0x0C
