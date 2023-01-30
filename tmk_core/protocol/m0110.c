@@ -495,9 +495,15 @@ RAW CODE:
 
 
 MODEL NUMBER:
-    M0110:           0x09  00001001 : model number 4 (100)
-    M0110A:          0x0B  00001011 : model number 5 (101)
-    M0110 & M0120:   ???
+    M0110(GS536):           0x03  00000011 : model number 1 (001)
+    M0110(GS624):           0x09  00001001 : model number 4 (100)
+    M0110A(M923):           0x0B  00001011 : model number 5 (101)
+    M0110AJ(M839):          0x0B  00001011 : model number 5 (101)
+    M0110AJ(A615):          0x0B  00001011 : model number 5 (101)
+    M0120(BCG9GRM0120):     0x11  00010001
+    M0120 & M0110(G536):    0x13  00010011
+    M0120 & M0110(G624):    0x19  00011001
+    M0120 & M0110A(M923):   0x1B  00011011
 
 
 Scan Code
