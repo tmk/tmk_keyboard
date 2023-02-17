@@ -16,10 +16,13 @@ typedef enum { NONE, PC_XT, PC_AT, PC_TERMINAL, PC_MOUSE } keyboard_kind_t;
      kind == PC_MOUSE ? "MOUSE" :   \
      "NONE")
 
-#define ID_STR(id)  (id == 0xFFFE ? "_????" : \
+#define ID_STR(id)  (id == 0xFFFF ? "_NONE" : \
+                    (id == 0xFFFE ? "_ERROR" : \
                     (id == 0xFFFD ? "_Z150" : \
-                    (id == 0x0000 ? "_AT84" : \
-                     "")))
+                    (id == 0xFFFC ? "_IBM" : \
+                    (id == 0xFFFB ? "_CLONE" : \
+                    (id == 0x0000 ? "_IBM84" : \
+                     ""))))))
 
 #define ROW(code)      ((code>>4)&0x07)
 #define COL(code)      (code&0x0F)

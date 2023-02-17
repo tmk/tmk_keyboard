@@ -132,9 +132,11 @@ int16_t IBMPCConverter::read_wait(uint16_t wait_ms)
  * Keyboard ID
  *
  * 0000: IBM 84-key keyboard
- * FFFF: XT keyobard
+ * FFFF: No keyboard or XT
  * FFFE: Broken AT or PS/2 keyboard?
  * FFFD: Zenith Z-150 AT
+ * FFFC: IBM XT
+ * FFFB: Clone XT
  * AB83: AT or PS/2 keyboard
  * BFBF: IBM Terminal keyboard
  * 00FF: Mouse
@@ -149,17 +151,21 @@ uint16_t IBMPCConverter::read_keyboard_id(void)
     // https://deskthority.net/viewtopic.php?p=495196#p495196
     if (ibmpc.protocol == IBMPC_PROTOCOL_AT_Z150) return 0xFFFD;
 
+    // XT doesn't response
+    if (ibmpc.protocol == IBMPC_PROTOCOL_XT_IBM) return 0xFFFC;
+    if (ibmpc.protocol == IBMPC_PROTOCOL_XT_CLONE) return 0xFFFB;
+
     // Disable
     //code = ibmpc_host_send(0xF5);
 
     // Read ID
     code = ibmpc.host_send(0xF2);
-    if (code == -1) { id = 0xFFFF; goto DONE; }     // XT or No keyboard
+    if (code == -1) { id = 0xFFFF; goto DONE; }     // No keyboard or XT
     if (code != 0xFA) { id = 0xFFFE; goto DONE; }   // Broken PS/2?
 
     // ID takes 500ms max TechRef [8] 4-41
     code = read_wait(500);
-    if (code == -1) { id = 0x0000; goto DONE; }     // AT
+    if (code == -1) { id = 0x0000; goto DONE; }     // AT IBM 84-key
     id = (code & 0xFF)<<8;
 
     // Mouse responds with one-byte 00, this returns 00FF [y] p.14
@@ -322,12 +328,16 @@ uint8_t IBMPCConverter::process_interface(void)
 
             if (0x0000 == keyboard_id) {            // CodeSet2 AT(IBM PC AT 84-key)
                 keyboard_kind = PC_AT;
-            } else if (0xFFFF == keyboard_id) {     // CodeSet1 XT
+            } else if (0xFFFF == keyboard_id) {     // No keyboard or XT
                 keyboard_kind = PC_XT;
             } else if (0xFFFE == keyboard_id) {     // CodeSet2 PS/2 fails to response?
                 keyboard_kind = PC_AT;
             } else if (0xFFFD == keyboard_id) {     // Zenith Z-150 AT
                 keyboard_kind = PC_AT;
+            } else if (0xFFFC == keyboard_id) {     // IBM XT
+                keyboard_kind = PC_XT;
+            } else if (0xFFFB == keyboard_id) {     // Clone XT
+                keyboard_kind = PC_XT;
             } else if (0x00FF == keyboard_id) {     // Mouse is not supported
                 keyboard_kind = PC_MOUSE;
             } else if (0xAB85 == keyboard_id || // IBM 122-key Model M, NCD N-97
