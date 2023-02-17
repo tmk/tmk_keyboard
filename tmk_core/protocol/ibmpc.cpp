@@ -142,9 +142,11 @@ RETRY:
 
 #ifdef SIEMENS_PCD_SUPPORT
     // inhibit - https://github.com/tmk/tmk_keyboard/issues/747
-    wait_us(15);
-    clock_lo();
-    wait_us(150);
+    if (protocol & IBMPC_PROTOCOL_AT) {
+        wait_us(15);
+        clock_lo();
+        wait_us(150);
+    }
 #endif
 
     // clear buffer to get response correctly
@@ -369,9 +371,11 @@ void IBMPC::isr(void)
 DONE:
 #ifdef SIEMENS_PCD_SUPPORT
     // inhibit - https://github.com/tmk/tmk_keyboard/issues/747
-    clock_lo();
-    wait_us(150);
-    clock_hi();
+    if (protocol & IBMPC_PROTOCOL_AT) {
+        clock_lo();
+        wait_us(150);
+        clock_hi();
+    }
 #endif
 
     // store data
