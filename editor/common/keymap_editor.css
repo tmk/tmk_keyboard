@@ -5,7 +5,6 @@ html * {
 textarea {
     font-family:monospace;
 }
-
 .key, .keync {
     box-shadow:inset -3px -3px 2px 5px #ebebeb;
     background-color:#ffffff;
@@ -27,7 +26,6 @@ textarea {
 .key:hover {
     box-shadow:inset -3px -3px 2px 5px #cfcfcf;
     position:relative;
-    top:2px;
 }
 .key:active {
 }
@@ -36,7 +34,6 @@ textarea {
 .key-editing {
     box-shadow:inset -3px -3px 2px 5px #cfcfcf;
     position:relative;
-    top:2px;
     background-color:#efefef;
     border:2px solid #7f7f7f;
 }
