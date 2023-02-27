@@ -95,6 +95,17 @@ SRC += next_kbd.c
 VPATH += $(TARGET_DIR)
 VPATH += $(TMK_DIR)
 
+# Suspend mode:
+#    Mode              Power consumption       RemoteWakeup        Replug during suspend
+#    -----------------------------------------------------------------------------------
+#    STANDBY           10mA                    NG                  OK
+#    POWER_DOWN        10mA                    OK                  OK
+#    IDLE              23mA                    OK                  OK
+#    NOPOWERSAVE       23mA                    OK                  OK
+#    NO_POWER_DOWN     23mA                    OK                  OK
+# RemoteWakeup does not work with STANDBY due to NeXT query&response protocol.
+# Use Power Down mode(default).
+#OPT_DEFS += -DSUSPEND_MODE_STANDBY
 
 include $(TMK_DIR)/protocol.mk
 include $(TMK_DIR)/protocol/lufa.mk
