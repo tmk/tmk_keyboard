@@ -1,4 +1,9 @@
 TARGET = next_usb_unimap
 UNIMAP_ENABLE = yes
 KEYMAP_SECTION_ENABLE = yes
+
+# LUFA debug print enabled temporarily for this issue:
+# https://github.com/tmk/tmk_keyboard/issues/753
+TMK_LUFA_DEBUG = yes
+
 include Makefile
