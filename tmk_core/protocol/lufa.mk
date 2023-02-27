@@ -51,7 +51,7 @@ TMK_LUFA_OPTS += -DUSE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_E
 TMK_LUFA_OPTS += -DFIXED_CONTROL_ENDPOINT_SIZE=8
 TMK_LUFA_OPTS += -DFIXED_NUM_CONFIGURATIONS=1
 # Remote wakeup fix for ATmega32U2        https://github.com/tmk/tmk_keyboard/issues/361
-ifeq ($(MCU),atmega32u2)
+ifeq (atmega32u2,$(strip $(MCU)))
         TMK_LUFA_OPTS += -DNO_LIMITED_CONTROLLER_CONNECT
 endif
 

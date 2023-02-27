@@ -442,7 +442,7 @@ void EVENT_USB_Device_ControlRequest(void)
                     Endpoint_ClearOUT();
                     Endpoint_ClearStatusStage();
 #ifdef TMK_LUFA_DEBUG
-                    xprintf("[L%d]", USB_ControlRequest.wIndex);
+                    xprintf("[L%d %02X]", USB_ControlRequest.wIndex, keyboard_led_stats);
 #endif
                     break;
 #endif
@@ -490,7 +490,7 @@ void EVENT_USB_Device_ControlRequest(void)
                     keyboard_protocol = (USB_ControlRequest.wValue & 0xFF);
                     clear_keyboard();
 #ifdef TMK_LUFA_DEBUG
-                    print("[P]");
+                    xprintf("[P%d %04X]", USB_ControlRequest.wIndex, USB_ControlRequest.wValue);
 #endif
                 }
 #endif
@@ -515,7 +515,7 @@ void EVENT_USB_Device_ControlRequest(void)
 
                 keyboard_idle = ((USB_ControlRequest.wValue & 0xFF00) >> 8);
 #ifdef TMK_LUFA_DEBUG
-                xprintf("[I%d]%d", USB_ControlRequest.wIndex, (USB_ControlRequest.wValue & 0xFF00) >> 8);
+                xprintf("[I%d %04X]", USB_ControlRequest.wIndex, USB_ControlRequest.wValue);
 #endif
 #endif
             }

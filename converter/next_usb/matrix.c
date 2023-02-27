@@ -76,8 +76,6 @@ static bool is_modified = false;
 
 #define NEXT_KBD_PWR_READ (NEXT_KBD_PWR_PIN&(1<<NEXT_KBD_PWR_BIT))
 
-static bool power_state = false;
-
 /* intialize matrix for scanning. should be called once. */
 void matrix_init(void)
 {
@@ -94,10 +92,7 @@ void matrix_init(void)
     NEXT_KBD_LED1_ON;
     
     NEXT_KBD_PWR_DDR &= ~(1<<NEXT_KBD_PWR_BIT);  // Power Button pin to input
-    NEXT_KBD_PWR_PIN |=  (1<<NEXT_KBD_PWR_BIT);  // KBD_PWR pull up
-    
-    power_state = NEXT_KBD_PWR_READ ? false : true;
-    dprintf("Initial power button state: %b\n", power_state);
+    NEXT_KBD_PWR_PORT |=  (1<<NEXT_KBD_PWR_BIT);  // KBD_PWR pull up
     
     next_kbd_init();
 
@@ -155,20 +150,8 @@ uint8_t matrix_scan(void)
     
     if (!NEXT_KBD_PWR_READ) {
         matrix_make(NEXT_KBD_PWR_KEYCODE);
-        power_state = 1;
-        if (is_modified)
-        {
-            dprintf("Power state 1\n");
-            
-        }
     } else {
         matrix_break(NEXT_KBD_PWR_KEYCODE);
-        power_state = 0;
-        if (is_modified)
-        {
-            dprintf("Power state 0\n");
-            
-        }
     }
     
     uint32_t resp = (next_kbd_recv());
@@ -187,6 +170,7 @@ uint8_t matrix_scan(void)
     );
 #endif
     
+/*
     dprintf("[ r=%04lX keycode=%02X pressed=%X CTRL=%X SHIFT_LEFT=%X SHIFT_RGHT=%X CMD_LEFT=%X CMD_RGHT=%X ALT_LEFT=%X ALT_RGHT=%X ]\n", \
         resp, \
         NEXT_KBD_KEYCODE(resp), \
@@ -199,6 +183,7 @@ uint8_t matrix_scan(void)
         NEXT_KBD_PRESSED_ALT_LEFT(resp), \
         NEXT_KBD_PRESSED_ALT_RGHT(resp) \
     );
+*/
     
     // Modifier keys don't return keycode; have to check the upper bits    
     NEXT_KBD_MAKE_OR_BREAK(ALT_RGHT,   0x51);
@@ -226,6 +211,7 @@ static void matrix_make(uint8_t code)
     if (!matrix_is_on(ROW(code), COL(code))) {
         matrix[ROW(code)] |= 1<<COL(code);
         is_modified = true;
+        dprintf("%02X ", code);
     }
 }
 
@@ -235,5 +221,6 @@ static void matrix_break(uint8_t code)
     if (matrix_is_on(ROW(code), COL(code))) {
         matrix[ROW(code)] &= ~(1<<COL(code));
         is_modified = true;
+        dprintf("%02X ", code | 0x80);
     }
 }
