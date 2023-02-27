@@ -94,8 +94,9 @@ void matrix_init(void)
     NEXT_KBD_LED1_ON;
     
     NEXT_KBD_PWR_DDR &= ~(1<<NEXT_KBD_PWR_BIT);  // Power Button pin to input
-    NEXT_KBD_PWR_PIN |=  (1<<NEXT_KBD_PWR_BIT);  // KBD_PWR pull up
+    NEXT_KBD_PWR_PORT |=  (1<<NEXT_KBD_PWR_BIT);  // KBD_PWR pull up
     
+    _delay_us(1);   // prevents from reading immediately after pin config
     power_state = NEXT_KBD_PWR_READ ? false : true;
     dprintf("Initial power button state: %b\n", power_state);
     
