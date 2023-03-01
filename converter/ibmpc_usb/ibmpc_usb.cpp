@@ -914,6 +914,7 @@ uint8_t IBMPCConverter::cs2_e0code(uint8_t code) {
         case 0x72: return 0x3F; // cursor down
         case 0x74: return 0x47; // cursor right
         case 0x75: return 0x4F; // cursor up
+        case 0x77: return 0x00; // Unicomp New Model M Pause/Break key fix
         case 0x7A: return 0x56; // page down
         case 0x7D: return 0x5E; // page up
         case 0x7C: return 0x7F; // Print Screen
