@@ -449,6 +449,11 @@ void register_code(uint8_t code)
     else if IS_CONSUMER(code) {
         host_consumer_send(KEYCODE2CONSUMER(code));
     }
+    else if (code == KC_BOOTLOADER) {
+        clear_keyboard();
+        wait_ms(50);
+        bootloader_jump();
+    }
 }
 
 void unregister_code(uint8_t code)
