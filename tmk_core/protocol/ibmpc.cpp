@@ -401,14 +401,17 @@ NEXT:
     return;
 }
 
-/* send LED state to keyboard */
-void IBMPC::host_set_led(uint8_t led)
+/* send enquiry byte to keyboard to check if it can handle LED state byte */
+bool IBMPC::host_enq_led(void)
 {
-    if (0xFA == host_send(0xED)) {
-        host_send(led);
-    }
+    return (host_send(IBMPC_SET_LED) == IBMPC_ACK);
 }
 
+/* send LED state byte to keyboard */
+void IBMPC::host_set_led(uint8_t led)
+{
+    host_send(led);
+}
 
 // NOTE: With this ISR data line should be read within 5us after clock falling edge.
 // Confirmed that ATmega32u4 can read data line in 2.5us from interrupt after
