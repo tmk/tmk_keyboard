@@ -110,7 +110,7 @@ class IBMPC
     int16_t host_recv_response(void);
     int16_t host_recv(void);
     void host_isr_clear(void);
-    bool host_enq_led(void);
+    bool host_led_enq(void);
     void host_set_led(uint8_t led);
 
     IBMPC(uint8_t clock, uint8_t data) :

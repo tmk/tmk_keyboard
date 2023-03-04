@@ -402,7 +402,7 @@ NEXT:
 }
 
 /* send enquiry byte to keyboard to check if it can handle LED state byte */
-bool IBMPC::host_enq_led(void)
+bool IBMPC::host_led_enq(void)
 {
     return (host_send(IBMPC_SET_LED) == IBMPC_ACK);
 }

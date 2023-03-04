@@ -113,17 +113,17 @@ void IBMPCConverter::set_led(uint8_t usb_led)
      * bit, but the bit order differs between protocols (see led.h and ibmpc.h).
      */
     switch (keyboard_kind) {
-        /* if the connected device is unidentified (temporarily or otherwise), a
-         * pointing device, or an "XT" protocol keyboard, do nothing: */
+        /* If the connected device is unidentified (temporarily or otherwise), a
+         * pointing device, or an "XT" protocol keyboard, do nothing */
         case NONE:
-        case PC_MOUSE:
         case PC_XT:
+        case PC_MOUSE:
             break;
-        /* if keyboard returns "ACK" acknowledgement byte (0xFA) when LED update
+        /* If keyboard returns "ACK" acknowledgement byte (0xFA) when LED update
          * enquiry byte (0xED) is sent, reorganise USB HID LED byte into IBM bit
-         * order and send to keyboard to update all 3 of its lock state LEDs: */
+         * order and send to keyboard to update all 3 of its lock state LEDs */
         default:
-            if (ibmpc.host_enq_led()) {
+            if (ibmpc.host_led_enq()) {
                 uint8_t ibm_led = 0;
                 if (usb_led & (1 << USB_LED_SCROLL_LOCK)) {
                     ibm_led |= (1 << IBMPC_LED_SCROLL_LOCK);
