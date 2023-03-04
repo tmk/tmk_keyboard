@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "hook.h"
 #include "ibmpc.hpp"
 #include "ibmpc_usb.hpp"
+#include "led_pins.h"
 
 
 // Converter
@@ -71,8 +72,50 @@ uint8_t matrix_scan(void)
 #endif
 }
 
+void write_led_pin(uint8_t usb_led, uint8_t pin)
+{
+    uint8_t relevant_bit;
+    switch (pin) {
+#ifdef CAPS_LOCK_PIN
+        case CAPS_LOCK_PIN:
+            relevant_bit = USB_LED_CAPS_LOCK;
+            break;
+#endif
+#ifdef NUM_LOCK_PIN
+        case NUM_LOCK_PIN:
+            relevant_bit = USB_LED_NUM_LOCK;
+            break;
+#endif
+#ifdef SCROLL_LOCK_PIN
+        case SCROLL_LOCK_PIN:
+            relevant_bit = USB_LED_SCROLL_LOCK;
+            break;
+#endif
+        default:
+            return;
+    }
+    if (usb_led & (1 << relevant_bit)) {
+        LOCK_INDICATOR_DDR |= (1 << pin);
+        LOCK_INDICATOR_PORT |= (1 << pin);
+    } else {
+        LOCK_INDICATOR_DDR &= ~(1 << pin);
+        LOCK_INDICATOR_PORT &= ~(1 << pin);
+    }
+}
+
 void led_set(uint8_t usb_led)
 {
+    // Write lock states to indicators on the converter itself
+#ifdef NUM_LOCK_PIN
+    converter_set_led(usb_led, NUM_LOCK_PIN);
+#endif
+#ifdef CAPS_LOCK_PIN
+    converter_set_led(usb_led, CAPS_LOCK_PIN);
+#endif
+#ifdef SCROLL_LOCK_PIN
+    converter_set_led(usb_led, SCROLL_LOCK_PIN);
+#endif
+    // Send lock states out to connected input device(s), if appropriate
     converter0.set_led(usb_led);
 #if defined(IBMPC_CLOCK_BIT1) && defined(IBMPC_DATA_BIT1)
     converter1.set_led(usb_led);
