@@ -488,7 +488,6 @@ void EVENT_USB_Device_ControlRequest(void)
                     Endpoint_ClearStatusStage();
 
                     keyboard_protocol = (USB_ControlRequest.wValue & 0xFF);
-                    clear_keyboard();
 #ifdef TMK_LUFA_DEBUG
                     xprintf("[P%d %04X]", USB_ControlRequest.wIndex, USB_ControlRequest.wValue);
 #endif
@@ -500,7 +499,9 @@ void EVENT_USB_Device_ControlRequest(void)
                     Endpoint_ClearStatusStage();
 
                     mouse_protocol = (USB_ControlRequest.wValue & 0xFF);
-                    clear_keyboard();
+#ifdef TMK_LUFA_DEBUG
+                    xprintf("[P%d %04X]", USB_ControlRequest.wIndex, USB_ControlRequest.wValue);
+#endif
                 }
 #endif
             }
@@ -632,6 +633,12 @@ static void send_system(uint16_t data)
     if (USB_DeviceState != DEVICE_STATE_Configured)
         return;
 
+#ifdef MOUSE_ENABLE
+    // Not send while mouse is set to Boot Protocol
+    if (mouse_protocol == 0)
+        return;
+#endif
+
     report_extra_t r = { .report_id = REPORT_ID_SYSTEM };
     if (data < SYSTEM_POWER_DOWN) {
         r.usage = 0;
@@ -656,6 +663,12 @@ static void send_consumer(uint16_t data)
 
     if (USB_DeviceState != DEVICE_STATE_Configured)
         return;
+
+#ifdef MOUSE_ENABLE
+    // Not send while mouse is set to Boot Protocol
+    if (mouse_protocol == 0)
+        return;
+#endif
 
     report_extra_t r = {
         .report_id = REPORT_ID_CONSUMER,
