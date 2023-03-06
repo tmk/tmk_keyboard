@@ -166,7 +166,7 @@ void IBMPCConverter::set_led(uint8_t usb_led)
          * enquiry byte (0xED) is sent, reorganise USB HID LED byte into IBM bit
          * order and send to keyboard to update all 3 of its lock state LEDs */
         default:
-            if (ibmpc.host_led_enq()) {
+            if (ibmpc.host_send(IBMPC_SET_LED) == IBMPC_ACK) {
                 uint8_t ibm_led = 0;
                 if (usb_led & (1 << USB_LED_SCROLL_LOCK)) {
                     ibm_led |= (1 << IBMPC_LED_SCROLL_LOCK);
@@ -177,7 +177,7 @@ void IBMPCConverter::set_led(uint8_t usb_led)
                 if (usb_led & (1 << USB_LED_CAPS_LOCK)) {
                     ibm_led |= (1 << IBMPC_LED_CAPS_LOCK);
                 }
-                ibmpc.host_set_led(ibm_led);
+                ibmpc.host_send(ibm_led);
             }
             break;
     // TODO: PC_TERMINAL_IBM_RT support

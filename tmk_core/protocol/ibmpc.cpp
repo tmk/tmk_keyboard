@@ -401,18 +401,6 @@ NEXT:
     return;
 }
 
-/* Send enquiry byte to keyboard to check if it can handle LED state byte */
-bool IBMPC::host_led_enq(void)
-{
-    return (host_send(IBMPC_SET_LED) == IBMPC_ACK);
-}
-
-/* Send LED state byte to keyboard */
-void IBMPC::host_set_led(uint8_t led)
-{
-    host_send(led);
-}
-
 // NOTE: With this ISR data line should be read within 5us after clock falling edge.
 // Confirmed that ATmega32u4 can read data line in 2.5us from interrupt after
 // ISR prologue pushs r18, r19, r20, r21, r24, r25 r30 and r31 with GCC 5.4.0
