@@ -107,13 +107,13 @@ void led_set(uint8_t usb_led)
 {
     // Write lock states to indicators on the converter itself
 #ifdef NUM_LOCK_PIN
-    converter_set_led(usb_led, NUM_LOCK_PIN);
+    write_led_pin(usb_led, NUM_LOCK_PIN);
 #endif
 #ifdef CAPS_LOCK_PIN
-    converter_set_led(usb_led, CAPS_LOCK_PIN);
+    write_led_pin(usb_led, CAPS_LOCK_PIN);
 #endif
 #ifdef SCROLL_LOCK_PIN
-    converter_set_led(usb_led, SCROLL_LOCK_PIN);
+    write_led_pin(usb_led, SCROLL_LOCK_PIN);
 #endif
     // Send lock states out to connected input device(s), if appropriate
     converter0.set_led(usb_led);
