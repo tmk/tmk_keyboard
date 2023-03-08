@@ -85,8 +85,38 @@ IBMPC_SECONDARY ?= yes		# enable secondary interface(+800)
 IBMPC_MOUSE_ENABLE ?= yes	# enable mouse support(+2000)
 
 
-# Optimize size but this may cause error "relocation truncated to fit"
-#EXTRALDFLAGS = -Wl,--relax
+# Size optimization
+# https://github.com/obdev/v-usb/blob/master/usbdrv/Readme.txt
+# https://p5r.uk/blog/2008/avr-gcc-optimisations.html
+# Confirmed 5.4.0, 7.3.0 and 8-12
+GCC_MAJOR = $(shell avr-gcc -dumpversion | cut -d. -f1)
+
+EXTRALDFLAGS = -Wl,--relax
+
+# GCC8-12: disable LTO with function-sections
+ifeq ($(GCC_MAJOR),$(filter $(GCC_MAJOR),8 9 10 11 12))
+    # disable feature to reduce size
+    COMMAND_ENABLE = no
+    EXTRACFLAGS += -fno-lto
+    EXTRACFLAGS += -ffunction-sections
+    EXTRACFLAGS += -fdata-sections
+else
+    EXTRACFLAGS += -fno-function-sections
+    EXTRACFLAGS += -fno-data-sections
+endif
+EXTRACFLAGS += -fno-move-loop-invariants
+EXTRACFLAGS += -fno-tree-scev-cprop
+EXTRACFLAGS += -fno-inline-small-functions
+
+# GCC8-9: disable LTO
+ifeq ($(GCC_MAJOR),$(filter $(GCC_MAJOR),8 9))
+    EXTRACPPFLAGS += -fno-lto
+endif
+EXTRACPPFLAGS += -fno-function-sections
+EXTRACPPFLAGS += -fno-data-sections
+EXTRACPPFLAGS += -fno-move-loop-invariants
+EXTRACPPFLAGS += -fno-tree-scev-cprop
+EXTRACPPFLAGS += -fno-inline-small-functions
 
 
 #
