@@ -811,11 +811,6 @@ void matrix_init(void)
 {
 }
 
-uint8_t matrix_scan(void)
-{
-    return 0;
-}
-
 inline
 matrix_row_t matrix_get_row(uint8_t row)
 {
@@ -832,7 +827,7 @@ void led_set(uint8_t usb_led)
     adb_host_kbd_led(ADB_ADDR_KEYBOARD, ~usb_led);
 }
 
-void hook_main_loop(void)
+uint8_t matrix_scan(void)
 {
     static uint16_t poll_ms;
     static uint16_t detect_ms;
