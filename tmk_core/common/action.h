@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keyboard.h"
 #include "keycode.h"
 #include "action_code.h"
+#include "action_layer.h"
 #include "action_macro.h"
 
 
