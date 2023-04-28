@@ -31,6 +31,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_COLS     8
 
 /* key combination for command */
+#ifndef __ASSEMBLER__
+#include "matrix.h"
+#endif
 #define IS_COMMAND()    ( \
     matrix_is_on(12, 0) || /* STOP */ \
     keyboard_report->mods == (MOD_BIT(KC_LALT) | MOD_BIT(KC_RALT)) \
