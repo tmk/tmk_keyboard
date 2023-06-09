@@ -506,19 +506,6 @@ MOUSE_DONE:
                     break;
                 }
 
-                // Keyboard Error/Overrun([3]p.26) or Buffer full
-                // Scan Code Set 1: 0xFF
-                // Scan Code Set 2 and 3: 0x00
-                // Buffer full(IBMPC_ERR_FULL): 0xFF
-                if (keyboard_kind != PC_MOUSE && (code == 0x00 || code == 0xFF)) {
-                    // clear stuck keys
-                    matrix_clear();
-                    clear_keyboard();
-
-                    xprintf("\n[CLR] ");
-                    break;
-                }
-
                 switch (keyboard_kind) {
                     case PC_XT:
                         if (process_cs1(code) == -1) state = ERROR;
@@ -747,6 +734,18 @@ uint8_t IBMPCConverter::cs1_e0code(uint8_t code) {
 
 int8_t IBMPCConverter::process_cs1(uint8_t code)
 {
+    // Keyboard Error/Overrun([3]p.26) or Buffer full
+    // Scan Code Set 1: 0xFF
+    // Buffer full(IBMPC_ERR_FULL): 0xFF
+    if (code == 0xFF) {
+        // clear stuck keys
+        matrix_clear();
+        clear_keyboard();
+
+        xprintf("\n[CLR] ");
+        return 0;
+    }
+
     switch (state_cs1) {
         case CS1_INIT:
             switch (code) {
@@ -890,6 +889,8 @@ int8_t IBMPCConverter::process_cs1(uint8_t code)
  */
 uint8_t IBMPCConverter::cs2_e0code(uint8_t code) {
     switch(code) {
+        case 0x00: return 0x65; // volume down (Siemens F500)
+
         case 0x11:  if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id)
                         return 0x13; // Hiragana(5576) -> KANA
                     else
@@ -1004,6 +1005,18 @@ uint8_t IBMPCConverter::translate_5576_cs2(uint8_t code) {
 
 int8_t IBMPCConverter::process_cs2(uint8_t code)
 {
+    // Keyboard Error/Overrun([3]p.26) or Buffer full
+    // Scan Code Set 2 and 3: 0x00
+    // Buffer full(IBMPC_ERR_FULL): 0xFF
+    if (state_cs2 != CS2_E0 && state_cs2 != CS2_E0_F0 && code == 0x00 || code == 0xFF) {
+        // clear stuck keys
+        matrix_clear();
+        clear_keyboard();
+
+        xprintf("\n[CLR] ");
+        return 0;
+    }
+
     switch (state_cs2) {
         case CS2_INIT:
             if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id) {
@@ -1238,6 +1251,18 @@ uint8_t IBMPCConverter::translate_televideo_dec_cs3(uint8_t code) {
 
 int8_t IBMPCConverter::process_cs3(uint8_t code)
 {
+    // Keyboard Error/Overrun([3]p.26) or Buffer full
+    // Scan Code Set 2 and 3: 0x00
+    // Buffer full(IBMPC_ERR_FULL): 0xFF
+    if (code == 0x00 || code == 0xFF) {
+        // clear stuck keys
+        matrix_clear();
+        clear_keyboard();
+
+        xprintf("\n[CLR] ");
+        return 0;
+    }
+
     switch (code) {
         case 0xAA:  // BAT code
         case 0xFC:  // BAT code
