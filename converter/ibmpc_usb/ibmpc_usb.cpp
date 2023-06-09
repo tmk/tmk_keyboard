@@ -506,19 +506,6 @@ MOUSE_DONE:
                     break;
                 }
 
-                // Keyboard Error/Overrun([3]p.26) or Buffer full
-                // Scan Code Set 1: 0xFF
-                // Scan Code Set 2 and 3: 0x00
-                // Buffer full(IBMPC_ERR_FULL): 0xFF
-                if (keyboard_kind != PC_MOUSE && (code == 0x00 || code == 0xFF)) {
-                    // clear stuck keys
-                    matrix_clear();
-                    clear_keyboard();
-
-                    xprintf("\n[CLR] ");
-                    break;
-                }
-
                 switch (keyboard_kind) {
                     case PC_XT:
                         if (process_cs1(code) == -1) state = ERROR;
@@ -950,6 +937,10 @@ uint8_t IBMPCConverter::cs2_e0code(uint8_t code) {
         case 0x0D: return 0x19; // LCompose    DEC LK411 -> LGUI
         case 0x79: return 0x6D; // KP-         DEC LK411 -> PCMM
         case 0x83: return 0x28; // F17         DEC LK411
+
+        // https://github.com/tmk/tmk_keyboard/pull/760
+        case 0x00: return 0x65; // TERM FUNC   Siemens F500 -> VOLD
+
         default: return (code & 0x7F);
     }
 }
