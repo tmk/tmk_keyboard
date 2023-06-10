@@ -666,7 +666,7 @@ MOUSE_DONE:
  *
  * See [3], [a]
  *
- * E0-escaped scan codes are translated into unused range of the matrix.(54-7F)
+ * E0-prefixed scan codes are translated into unused range of the matrix.(54-7F)
  *
  *     01-53: Normal codes used in original XT keyboard
  *     54-7F: Not used in original XT keyboard
@@ -677,8 +677,8 @@ MOUSE_DONE:
  *     70  x   *   *   x   *   *   x   *   *   x   *   x   *   x   x   *
  *
  * -: codes existed in original XT keyboard
- * *: E0-escaped codes translated
- * x: Non-espcaped codes(Some are not used in real keyboards probably)
+ * *: E0-prefixed codes translated
+ * x: Non-prefixed codes(Some are not used in real keyboards probably)
  *
  * Codes assigned in range 54-7F:
  *
@@ -1049,7 +1049,7 @@ int8_t IBMPCConverter::process_cs2(uint8_t code)
                     }
             }
             break;
-        case CS2_E0:    // E0-Prefixed
+        case CS2_E0:    // E0-prefixed
             switch (code) {
                 case 0x12:  // to be ignored
                 case 0x59:  // to be ignored
