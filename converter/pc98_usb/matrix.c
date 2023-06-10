@@ -105,6 +105,19 @@ static bool pc98_is_newtype(void)
     return true;
 }
 
+static void pc98_enable_winkey(void)
+{
+    uint16_t code;
+RETRY:
+    pc98_send(0x95);
+    code = pc98_wait_response();
+    if (code != 0xFA) return;
+
+    pc98_send(0x03);
+    code = pc98_wait_response();
+    if (code != 0xFA) goto RETRY;
+}
+
 static uint8_t pc98_led = 0;
 static void pc98_led_set(void)
 {
@@ -140,8 +153,14 @@ void matrix_init(void)
     serial_init();
 
     _delay_ms(50);
-    if (pc98_is_newtype()) xprintf("new type\n"); else xprintf("old type\n");
+    xprintf("\nKeyboard Type: ");
+    if (pc98_is_newtype()) xprintf("[NEW]"); else xprintf("[OLD]");
+
+    xprintf("\nInhibit Repeat: ");
     pc98_inhibit_repeat();
+
+    xprintf("\nEnable Winkey: ");
+    pc98_enable_winkey();
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
