@@ -179,6 +179,14 @@ DONE:
     return id;
 }
 
+static void clear_stuck_keys(void)
+{
+    matrix_clear();
+    clear_keyboard();
+    xprintf("\n[CLR] ");
+}
+
+
 uint8_t IBMPCConverter::process_interface(void)
 {
     if (ibmpc.error) {
@@ -643,8 +651,7 @@ MOUSE_DONE:
             xprintf("E%u ", timer_read());
             // reinit state
             init();
-            matrix_clear();
-            clear_keyboard();
+            clear_stuck_keys();
             state = INIT;
             break;
         default:
@@ -736,6 +743,9 @@ int8_t IBMPCConverter::process_cs1(uint8_t code)
     switch (state_cs1) {
         case CS1_INIT:
             switch (code) {
+                case 0xFF:  // Error/Overrun([3]p.26)
+                    clear_stuck_keys();
+                    break;
                 case 0xE0:
                     state_cs1 = CS1_E0;
                     break;
@@ -884,8 +894,9 @@ uint8_t IBMPCConverter::cs2_e0code(uint8_t code) {
         case 0x41:  if (0xAB90 == keyboard_id || 0xAB91 == keyboard_id)
                         return 0x7C; // Keypad ,(5576) -> Keypad *
                     else
-                        return (code & 0x7F);
+                        return (code & 0x7F); // unknown
 
+        // standard E0-prefixed codes [a]
         case 0x14: return 0x19; // right control
         case 0x1F: return 0x17; // left GUI
         case 0x27: return 0x1F; // right GUI
@@ -905,7 +916,6 @@ uint8_t IBMPCConverter::cs2_e0code(uint8_t code) {
         case 0x7D: return 0x5E; // page up
         case 0x7C: return 0x7F; // Print Screen
         case 0x7E: return 0x00; // Control'd Pause
-
         case 0x21: return 0x65; // volume down
         case 0x32: return 0x6E; // volume up
         case 0x23: return 0x6F; // mute
@@ -940,7 +950,7 @@ uint8_t IBMPCConverter::cs2_e0code(uint8_t code) {
         // https://github.com/tmk/tmk_keyboard/pull/760
         case 0x00: return 0x65; // TERM FUNC   Siemens F500 -> VOLD
 
-        default: return (code & 0x7F);
+        default: return (code & 0x7F); // unknown
     }
 }
 
@@ -1000,6 +1010,9 @@ int8_t IBMPCConverter::process_cs2(uint8_t code)
                 code = translate_5576_cs2(code);
             }
             switch (code) {
+                case 0x00:  // Error/Overrun([3]p.26)
+                    clear_stuck_keys();
+                    break;
                 case 0xE0:
                     state_cs2 = CS2_E0;
                     break;
@@ -1248,6 +1261,9 @@ int8_t IBMPCConverter::process_cs3(uint8_t code)
                 code = translate_televideo_dec_cs3(code);
             }
             switch (code) {
+                case 0x00:  // Error/Overrun([3]p.26)
+                    clear_stuck_keys();
+                    break;
                 case 0xF0:
                     state_cs3 = CS3_F0;
                     break;
