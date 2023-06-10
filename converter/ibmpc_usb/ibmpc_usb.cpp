@@ -191,9 +191,8 @@ uint8_t IBMPCConverter::process_interface(void)
          * IBMPC_ERR_TIMEOUT        Reinit
          * IBMPC_ERR_FULL           Ignore
          * IBMPC_ERR_ILLEGAL        Reinit
-         * IBMPC_ERR_FF             Ignore(not used)
          */
-        // when recv error, neither send error nor buffer full
+        // send error and buffer full are ignored   TODO: refactor
         if (!(ibmpc.error & (IBMPC_ERR_SEND | IBMPC_ERR_FULL))) {
             state = ERROR;
             if (ibmpc.error == IBMPC_ERR_PARITY_AA) {
