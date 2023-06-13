@@ -59,7 +59,6 @@ CONSOLE_ENABLE ?= yes	# Console for debug
 COMMAND_ENABLE ?= yes    # Commands for debug and configuration
 #NKRO_ENABLE ?= yes	# USB Nkey Rollover
 UNIMAP_ENABLE ?= yes
-#KYMAP_SECTION_ENABLE ?= yes
 
 
 # Boot Section Size in bytes
