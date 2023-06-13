@@ -152,7 +152,7 @@ void matrix_init(void)
 
     serial_init();
 
-    _delay_ms(50);
+    _delay_ms(500);
     xprintf("\nKeyboard Type: ");
     if (pc98_is_newtype()) xprintf("[NEW]"); else xprintf("[OLD]");
 
