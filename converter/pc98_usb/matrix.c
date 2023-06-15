@@ -60,8 +60,11 @@ static void pc98_send(uint8_t data)
 
 static int16_t pc98_wait_response(void)
 {
-    int16_t code = -1;
-    uint8_t timeout = 255;
+    int16_t code;
+    uint8_t timeout;
+RETRY:
+    code = -1;
+    timeout = 255;
     while (timeout-- && (code = serial_recv2()) == -1) _delay_ms(1);
 
     // Keyboards require RDY pulse >=37us to send next data
@@ -71,6 +74,7 @@ static int16_t pc98_wait_response(void)
     PC98_RDY_PORT &= ~(1<<PC98_RDY_BIT);
 
     xprintf("r%04X ", code);
+    if (code == 0xFB) goto RETRY;
     return code;
 }
 
