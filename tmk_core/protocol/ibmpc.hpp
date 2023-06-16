@@ -84,7 +84,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define IBMPC_ERR_TIMEOUT     0x20
 #define IBMPC_ERR_FULL        0x40
 #define IBMPC_ERR_ILLEGAL     0x80
-#define IBMPC_ERR_FF          0xF0
 
 #define IBMPC_LED_SCROLL_LOCK 0
 #define IBMPC_LED_NUM_LOCK    1
