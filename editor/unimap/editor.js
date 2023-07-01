@@ -137,7 +137,7 @@ $(function() {
                 .attr({ value: code, title: mousekey_codes[code].desc })
                 .text(mousekey_codes[code].name));
     }
-    for (var i = 0; i < 32; i++) {
+    for (var i = 0; i < 8; i++) {
         $("#layer_dropdown").append($("<option></option>")
                 .attr({ value: i, title: "Layer " + i })
                 .text("Layer " + i));
@@ -172,9 +172,13 @@ $(function() {
         $("#system_codes_dropdown").val(act.usage_code);
         $("#consumer_codes_dropdown").val(act.usage_code);
         $("#mousekey_codes_dropdown").val(act.mousekey_code);
-        $("#layer_dropdown").val(act.layer_tap_val);
+        if (act.kind == ACT_LAYER) {
+            $("#layer_dropdown").val(act.layer_bitop_layer);
+        } else {
+            $("#layer_dropdown").val(act.layer_tap_val);
+        }
         $("#layer_mods_dropdown").val(act.layer_tap_code & 0x1f);
-        $("#layer_on_dropdown").val(act.layer_bitop_op);
+        $("#layer_on_dropdown").val(act.layer_bitop_on);
         $("#command_ids_dropdown").val(act.command_id);
         $("#code_hex").val(('000' + code.toString(16)).substr(-4).toUpperCase());
     };
