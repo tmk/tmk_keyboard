@@ -234,7 +234,7 @@ $(function() {
             case "COMMAND":
                 return kind_codes[action_kind] | command_id;
         };
-        return 0;
+        return parseInt($("#code_hex").val(), 16);  // UNKNOWN
     };
 
     // control display of dropdown elements

@@ -32,7 +32,7 @@ OP_BIT_XOR        = 2;
 OP_BIT_SET        = 3;
 
 // Layer Bit operation timings
-ON_SPECIAL_USE    = 0;
+ON_DEFAULT_LAYER  = 0;
 ON_PRESS          = 1;
 ON_RELEASE        = 2;
 ON_BOTH           = 3;
@@ -95,9 +95,8 @@ var kind_codes = {
     LAYER_BIT_OR:       ACT_LAYER<<12 | OP_BIT_OR<<10,
     LAYER_BIT_XOR:      ACT_LAYER<<12 | OP_BIT_XOR<<10,
     LAYER_BIT_SET:      ACT_LAYER<<12 | OP_BIT_SET<<10,
-    DEFAULT_LAYER_SET:  ACT_LAYER<<12 | OP_BIT_SET<<10 | ON_SPECIAL_USE<<8,
+    DEFAULT_LAYER_SET:  ACT_LAYER<<12 | OP_BIT_SET<<10 | ON_DEFAULT_LAYER<<8,
     COMMAND:            ACT_COMMAND<<12,
-    UNKNOWN:            0,
 };
 
 
@@ -332,7 +331,7 @@ function Action(code) {
                             });
                 break;
         };
-        return action_kinds.UNKNOWN;
+        return { id: "UNKNOWN", name: "???", desc: "Unknown action" };
     };
 
     Object.defineProperty(this, "id", {
@@ -368,14 +367,16 @@ var action_kinds = {
     USAGE_SYSTEM:       { id: "USAGE_SYSTEM",           name: "ACTION_USAGE_SYSTEM",        desc: "System control key" },
     USAGE_CONSUMER:     { id: "USAGE_CONSUMER",         name: "ACTION_USAGE_CONSUMER",      desc: "Consumer key" },
     MOUSEKEY:           { id: "MOUSEKEY",               name: "ACTION_MOUSEKEY",            desc: "Mouse key" },
+    /*
     MACRO:              { id: "MACRO",                  name: "ACTION_MACRO",               desc: "Macro" },
     MACRO_TAP:          { id: "MACRO_TAP",              name: "ACTION_MACRO_TAP",           desc: "Macro for tap key" },
     MACRO_OPT:          { id: "MACRO_OPT",              name: "ACTION_MACRO_OPT",           desc: "Macro with option" },
     FUNCTION:           { id: "FUNCTION",               name: "ACTION_FUNCTION",            desc: "Function" },
     FUNCTION_TAP:       { id: "FUNCTION_TAP",           name: "ACTION_FUNCTION_TAP",        desc: "Function for tap key" },
     FUNCTION_OPT:       { id: "FUNCTION_OPT",           name: "ACTION_FUNCTION_OPT",        desc: "Function with option" },
+    */
     LAYER_CLEAR:        { id: "LAYER_CLEAR",            name: "ACTION_LAYER_CLEAR",         desc: "Trun off all layers" },
-    LAYER_MOMENTARY:    { id: "LAYER_MOMENTARY",        name: "ACTION_LAYER_MOMENTARY",     desc: "Turn on a layer while pressing" },
+    LAYER_MOMENTARY:    { id: "LAYER_MOMENTARY",        name: "ACTION_LAYER_MOMENTARY",     desc: "Turn on a layer on press and off the layer on release" },
     LAYER_TOGGLE:       { id: "LAYER_TOGGLE",           name: "ACTION_LAYER_TOGGLE",        desc: "Toggle a layer between on and off" },
     LAYER_INVERT:       { id: "LAYER_INVERT",           name: "ACTION_LAYER_INVERT",        desc: "Invert state of a layer" },
     LAYER_ON:           { id: "LAYER_ON",               name: "ACTION_LAYER_ON",            desc: "Turn on a layer" },
@@ -383,7 +384,7 @@ var action_kinds = {
     LAYER_SET:          { id: "LAYER_SET",              name: "ACTION_LAYER_SET",           desc: "Turn on a layer solely" },
     LAYER_ON_OFF:       { id: "LAYER_ON_OFF",           name: "ACTION_LAYER_ON_OFF",        desc: "Turn on a layer, then off" },
     LAYER_OFF_ON:       { id: "LAYER_OFF_ON",           name: "ACTION_LAYER_OFF_ON",        desc: "Turn off a layer, then on" },
-    LAYER_SET_CLEAR:    { id: "LAYER_SET_CLEAR",        name: "ACTION_LAYER_SET_CLEAR",     desc: "Turn on a layer solely, then off all layers" },
+    LAYER_SET_CLEAR:    { id: "LAYER_SET_CLEAR",        name: "ACTION_LAYER_SET_CLEAR",     desc: "Turn on a layer solely on press and clear all layers on release" },
     LAYER_MODS:         { id: "LAYER_MODS",             name: "ACTION_LAYER_MODS",          desc: "Turn on a layer with modifiers" },
     LAYER_TAP_KEY:      { id: "LAYER_TAP_KEY",          name: "ACTION_LAYER_TAP_KEY",       desc: "Turn on a layer on hold and type a key on tap" },
     LAYER_TAP_TOGGLE:   { id: "LAYER_TAP_TOGGLE",       name: "ACTION_LAYER_TAP_TOGGLE",    desc: "Turn on a layer on hold and tap toggle" },
@@ -391,9 +392,8 @@ var action_kinds = {
     LAYER_BIT_OR:       { id: "LAYER_BIT_OR",           name: "ACTION_LAYER_BIT_OR",        desc: "Layer Bit OR" },
     LAYER_BIT_XOR:      { id: "LAYER_BIT_XOR",          name: "ACTION_LAYER_BIT_XOR",       desc: "Layer Bit XOR" },
     LAYER_BIT_SET:      { id: "LAYER_BIT_SET",          name: "ACTION_LAYER_BIT_SET",       desc: "Layer Bit SET" },
-    DEFAULT_LAYER_SET:  { id: "DEFAULT_LAYER_SET",      name: "ACTION_DEFAULT_LAYER_SET",   desc: "Set a default layer" },
+    DEFAULT_LAYER_SET:  { id: "DEFAULT_LAYER_SET",      name: "ACTION_DEFAULT_LAYER_SET",   desc: "Turn on a default layer solely" },
     COMMAND:            { id: "COMMAND",                name: "ACTION_COMMAND",             desc: "Built-in Command" },
-    UNKNOWN:            { id: "UNKNOWN",                name: "ACTION_UNKNOWN",             desc: "Unknown action" },
 };
 
 
@@ -597,7 +597,6 @@ keycodes[0x00BD] = {id: 'BRTI',                        name: 'Brightness Inc',  
 keycodes[0x00BE] = {id: 'BRTD',                        name: 'Brightness Dec',              desc: 'Brightness Decrement'};
 keycodes[0x00BF] = {id: 'BTLD',                        name: 'Bootloader',                  desc: 'Start Bootloader'    };
 
-
 keycodes[0x00E0] = {id: 'LCTL',                        name: 'LCtrl',                       desc: 'Left Control'};
 keycodes[0x00E1] = {id: 'LSFT',                        name: 'LShift',                      desc: 'Left Shift'};
 keycodes[0x00E2] = {id: 'LALT',                        name: 'LAlt',                        desc: 'Left Alt(\u2325)'};
@@ -606,7 +605,6 @@ keycodes[0x00E4] = {id: 'RCTL',                        name: 'RCtrl',           
 keycodes[0x00E5] = {id: 'RSFT',                        name: 'RShift',                      desc: 'Right Shift'};
 keycodes[0x00E6] = {id: 'RALT',                        name: 'RAlt',                        desc: 'Right Alt(\u2325)'};
 keycodes[0x00E7] = {id: 'RGUI',                        name: 'RGui',                        desc: 'Right Windows(\u2318)'};
-
 
 keycodes[0x00F0] = {id: 'MS_U',                        name: 'Mouse Up',                    desc: 'Mouse UP'};
 keycodes[0x00F1] = {id: 'MS_D',                        name: 'Mouse down',                  desc: 'Mouse Down'};
