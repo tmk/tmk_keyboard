@@ -1,4 +1,6 @@
 CONFIG = {
+    layer_num: 8,
+    tapping_toggle: 5,
     layout_default:  "layout-128key.html",
     keymap: {
         /*

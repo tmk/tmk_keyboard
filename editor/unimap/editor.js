@@ -137,7 +137,7 @@ $(function() {
                 .attr({ value: code, title: mousekey_codes[code].desc })
                 .text(mousekey_codes[code].name));
     }
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < CONFIG.layer_num; i++) {
         $("#layer_dropdown").append($("<option></option>")
                 .attr({ value: i, title: "Layer " + i })
                 .text("Layer " + i));
@@ -149,6 +149,17 @@ $(function() {
         $("#layer_mods_dropdown").append($("<option></option>")
                 .attr({ value: code, title: mods_codes[code].desc })
                 .text(mods_codes[code].name));
+    }
+    for (let i = 0; i < 8; i++) {
+        $("#layer_part_dropdown").append($("<option></option>")
+                .attr({ value: i, title: "(Bits&0xF) << " + i*4 })
+                .text("Part " + i));
+    }
+    for (let i = 0; i < 32; i++) {
+        $("#layer_bits_dropdown").append($("<option></option>")
+                .attr({ value: i, title: "bits: " + ('000' + i.toString(2)).substr(-4) +
+                                         "\nmask: " + ((i & 0x10) ? "~(((uint32_t)0xF)<<(part*4))" : "0") })
+                .text("Bits " + ('0000' + i.toString(2)).substr(-5)));
     }
     for (var code in on_codes) {
         $("#layer_on_dropdown").append($("<option></option>")
@@ -178,6 +189,8 @@ $(function() {
             $("#layer_dropdown").val(act.layer_tap_val);
         }
         $("#layer_mods_dropdown").val(act.layer_tap_code & 0x1f);
+        $("#layer_part_dropdown").val(act.layer_bitop_part);
+        $("#layer_bits_dropdown").val(act.layer_bitop_xbit<<4 | act.layer_bitop_bits);
         $("#layer_on_dropdown").val(act.layer_bitop_on);
         $("#command_ids_dropdown").val(act.command_id);
         $("#code_hex").val(('000' + code.toString(16)).substr(-4).toUpperCase());
@@ -193,6 +206,8 @@ $(function() {
         var mousekey_code = parseInt($("#mousekey_codes_dropdown").val());
         var layer = parseInt($("#layer_dropdown").val());
         var layer_mods = parseInt($("#layer_mods_dropdown").val());
+        let layer_part = parseInt($("#layer_part_dropdown").val());
+        let layer_bits = parseInt($("#layer_bits_dropdown").val());
         var layer_on =  parseInt($("#layer_on_dropdown").val());
         var command_id = parseInt($("#command_ids_dropdown").val());
         switch (action_kind) {
@@ -227,13 +242,23 @@ $(function() {
 
             case "LAYER_INVERT":
             case "LAYER_ON":
-            case "LAYER_OFF":
             case "LAYER_SET":
                 return kind_codes[action_kind] | layer_on<<8 | (layer/4)<<5 | 1<<(layer%4);
+            case "LAYER_OFF":
+                return kind_codes[action_kind] | layer_on<<8 | (layer/4)<<5 | 1<<4 | (~(1<<(layer%4)) & 0xf);
             case "LAYER_TOGGLE":
                 return kind_codes[action_kind] | (layer/4)<<5 | 1<<(layer%4);
             case "LAYER_CLEAR":
                 return kind_codes[action_kind] | layer_on<<8 | 0<<5 | 0;
+
+            case "LAYER_BIT_AND":
+            case "LAYER_BIT_OR":
+            case "LAYER_BIT_XOR":
+            case "LAYER_BIT_SET":
+                return kind_codes[action_kind] | layer_on<<8 | layer_part<<5 | layer_bits;
+
+            case "DEFAULT_LAYER_SET":
+                return kind_codes[action_kind] | (layer/4)<<5 | 1<<(layer%4);
 
             case "COMMAND":
                 return kind_codes[action_kind] | command_id;
@@ -302,6 +327,17 @@ $(function() {
                 break;
             case "LAYER_CLEAR":
                 $("#layer_on_dropdown").show();
+                break;
+            case "LAYER_BIT_AND":
+            case "LAYER_BIT_OR":
+            case "LAYER_BIT_XOR":
+            case "LAYER_BIT_SET":
+                $("#layer_part_dropdown").show();
+                $("#layer_bits_dropdown").show();
+                $("#layer_on_dropdown").show();
+                break;
+            case "DEFAULT_LAYER_SET":
+                $("#layer_dropdown").show();
                 break;
             case "COMMAND":
                 $("#command_ids_dropdown").show();

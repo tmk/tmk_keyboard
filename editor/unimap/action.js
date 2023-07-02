@@ -159,8 +159,8 @@ function Action(code) {
         set: function(val)  { this.code |= (val & 0xf); },
         get: function()     { return (this.code & 0x000f); }
     });
-    Object.defineProperty(this, "layer_bitop_bits_is_single", {
-        // bits has just single bit
+    Object.defineProperty(this, "layer_bitop_bits_is_single_1", {
+        // bits has just single 1
         get: function()     {
             return (this.layer_bitop_bits == 1) ||
                    (this.layer_bitop_bits == 2) ||
@@ -168,12 +168,59 @@ function Action(code) {
                    (this.layer_bitop_bits == 8);
         }
     });
+    Object.defineProperty(this, "layer_bitop_bits_is_single_0", {
+        // bits has just single 0
+        get: function()     {
+            return (this.layer_bitop_bits == (~1 & 0xf)) ||
+                   (this.layer_bitop_bits == (~2 & 0xf)) ||
+                   (this.layer_bitop_bits == (~4 & 0xf)) ||
+                   (this.layer_bitop_bits == (~8 & 0xf));
+        }
+    });
     Object.defineProperty(this, "layer_bitop_layer", {
         get: function()     {
-            return ((this.layer_bitop_bits == 1) ? 0 : (
-                    (this.layer_bitop_bits == 2) ? 1 : (
-                    (this.layer_bitop_bits == 4) ? 2 : (
-                    (this.layer_bitop_bits == 8) ? 3 : 0)))) + this.layer_bitop_part * 4;
+            if (this.layer_bitop_xbit == 0) {
+                return ((this.layer_bitop_bits == 1) ? 0 : (
+                        (this.layer_bitop_bits == 2) ? 1 : (
+                        (this.layer_bitop_bits == 4) ? 2 : (
+                        (this.layer_bitop_bits == 8) ? 3 : 0)))) + this.layer_bitop_part * 4;
+            } else {
+                return ((this.layer_bitop_bits == (~1 & 0xf)) ? 0 : (
+                        (this.layer_bitop_bits == (~2 & 0xf)) ? 1 : (
+                        (this.layer_bitop_bits == (~4 & 0xf)) ? 2 : (
+                        (this.layer_bitop_bits == (~8 & 0xf)) ? 3 : 0)))) + this.layer_bitop_part * 4;
+            }
+        }
+    });
+    Object.defineProperty(this, "layer_bitop_bits_str", {
+        get: function()     {
+            let shift = this.layer_bitop_part*4;
+            let bits_shifted = this.layer_bitop_bits*(2**shift); // bits<<shift
+            return "0x" + ("0000000" + bits_shifted.toString(16)).substr(-8).toUpperCase();
+        }
+    });
+    Object.defineProperty(this, "layer_bitop_mask_str", {
+        get: function()     {
+            let shift = this.layer_bitop_part*4;
+            let mask = this.layer_bitop_xbit ?  (0xffffffff - (0xf*(2**shift))) : 0; // ~(0xf<<shift)
+            return "0x" + ("0000000" + mask.toString(16)).substr(-8).toUpperCase();
+        }
+    });
+    Object.defineProperty(this, "layer_bitop_masked_bits_str", {
+        get: function()     {
+            let shift = this.layer_bitop_part*4;
+            let bits_shifted = this.layer_bitop_bits*(2**shift); // bits<<shift
+            let mask = this.layer_bitop_xbit ?  (0xffffffff - (0xf*(2**shift))) : 0; // ~(0xf<<shift)
+            let masked_bits = (bits_shifted + mask); // bits_shifted | mask
+            return "0x" + ("0000000" + masked_bits.toString(16)).substr(-8).toUpperCase();
+        }
+    });
+    Object.defineProperty(this, "layer_bitop_on_str", {
+        get: function()     {
+            return ((this.layer_bitop_on == ON_DEFAULT_LAYER) ? "(default layer)" : (
+                    (this.layer_bitop_on == ON_PRESS) ? "on press" : (
+                    (this.layer_bitop_on == ON_RELEASE) ? "on release" : (
+                    (this.layer_bitop_on == ON_BOTH) ? "on both" : ""))));
         }
     });
     // ACT_MOUSEKEY
@@ -249,25 +296,72 @@ function Action(code) {
             case ACT_LAYER:
                 switch (this.layer_bitop_op) {
                     case OP_BIT_AND:
-                        return action_kinds.LAYER_BIT_AND;
-                    case OP_BIT_OR:
-                        return action_kinds.LAYER_BIT_OR;
-                    case OP_BIT_XOR:
-                        if (this.layer_bitop_on == ON_RELEASE &&
-                            this.layer_bitop_xbit == 0 && this.layer_bitop_bits_is_single) {
-                            return $.extend({}, action_kinds.LAYER_TOGGLE,
+                        if (this.layer_bitop_bits == 0 && this.layer_bitop_xbit == 0) {
+                            return $.extend({}, action_kinds.LAYER_CLEAR,
                                     {
-                                        name: "T" + this.layer_bitop_layer,
-                                        desc: "Toggle on/off Layer " + this.layer_bitop_layer
+                                        name: "Lclr",
+                                        desc: "Disable all layers " + this.layer_bitop_on_str
                                     });
                         }
-                        return action_kinds.LAYER_BIT_XOR;
+                        if (this.layer_bitop_bits_is_single_0 &&
+                            this.layer_bitop_layer < CONFIG.layer_num &&
+                            this.layer_bitop_xbit == 1) {
+                            return $.extend({}, action_kinds.LAYER_OFF,
+                                    {
+                                        name: "L-" + this.layer_bitop_layer,
+                                        desc: "Disable Layer " + this.layer_bitop_layer + " " + this.layer_bitop_on_str
+                                    });
+                        }
+                        return $.extend({}, action_kinds.LAYER_BIT_AND,
+                                {
+                                    name: "Lba",
+                                    desc: "layers & " +  this.layer_bitop_masked_bits_str +
+                                            "\n" + this.layer_bitop_on_str
+                                });
+                    case OP_BIT_OR:
+                        if (this.layer_bitop_bits_is_single_1 &&
+                            this.layer_bitop_layer < CONFIG.layer_num &&
+                            this.layer_bitop_xbit == 0) {
+                            return $.extend({}, action_kinds.LAYER_ON,
+                                    {
+                                        name: "L+" + this.layer_bitop_layer,
+                                        desc: "Enable Layer " + this.layer_bitop_layer + " " + this.layer_bitop_on_str
+                                    });
+                        }
+                        return $.extend({}, action_kinds.LAYER_BIT_OR,
+                                {
+                                    name: "Lbo",
+                                    desc: "layers | " +  this.layer_bitop_masked_bits_str +
+                                            "\n" + this.layer_bitop_on_str
+                                });
+                    case OP_BIT_XOR:
+                        if (this.layer_bitop_bits_is_single_1 &&
+                            this.layer_bitop_layer < CONFIG.layer_num &&
+                            this.layer_bitop_xbit == 0) {
+                            if (this.layer_bitop_on == ON_RELEASE) {
+                                return $.extend({}, action_kinds.LAYER_TOGGLE,
+                                        {
+                                            name: "T" + this.layer_bitop_layer,
+                                            desc: "Toggle Layer " + this.layer_bitop_layer
+                                        });
+                            } else {
+                                return $.extend({}, action_kinds.LAYER_INVERT,
+                                        {
+                                            name: "Li" + this.layer_bitop_layer,
+                                            desc: "Invert Layer " + this.layer_bitop_layer + " " + this.layer_bitop_on_str
+                                        });
+                            }
+                        }
+                        return $.extend({}, action_kinds.LAYER_BIT_XOR,
+                                {
+                                    name: "Lbx",
+                                    desc: "layers ^ " +  this.layer_bitop_masked_bits_str +
+                                            "\n" + this.layer_bitop_on_str
+                                });
                     case OP_BIT_SET:
-                        shift = this.layer_bitop_part*4;
-                        bits = this.layer_bitop_bits<<shift;
-                        mask = this.layer_bitop_xbit ? ~(0xf<<shift) : 0;
-
-                        if (this.layer_bitop_xbit == 0 && this.layer_bitop_bits_is_single) {
+                        if (this.layer_bitop_bits_is_single_1 &&
+                            this.layer_bitop_layer < CONFIG.layer_num &&
+                            this.layer_bitop_xbit == 0) {
                             if (this.layer_bitop_on == ON_DEFAULT_LAYER) {
                                 return $.extend({}, action_kinds.DEFAULT_LAYER_SET,
                                         {
@@ -285,7 +379,9 @@ function Action(code) {
                         return $.extend({}, action_kinds.LAYER_BIT_SET,
                                 {
                                     name: "Lbs",
-                                    desc: "layers_state & 0x" + mask.toString(16) + "(mask) | 0x" + bits.toString(16) + "(bits)"
+                                    desc: (this.layer_bitop_xbit ?
+                                            "(layers & " + this.layer_bitop_mask_str + ") | " :
+                                            "layers = ") + this.layer_bitop_bits_str + "\n" + this.layer_bitop_on_str
                                 });
                 }
                 break;
@@ -299,16 +395,20 @@ function Action(code) {
                         return $.extend({}, action_kinds.LAYER_TAP_TOGGLE,
                                 {
                                     name: "Lt" + this.layer_tap_val,
-                                    desc: "Turn on Layer " + this.layer_tap_val + " with Tap toggle"
+                                    desc: "Toggle Layer " + this.layer_tap_val + " / lock it with "+ CONFIG.tapping_toggle + " taps"
                                 });
                     case OP_ON_OFF:
                         return $.extend({}, action_kinds.LAYER_MOMENTARY,
                                 {
                                     name: "L" + this.layer_tap_val,
-                                    desc: "Turn on Layer " + this.layer_tap_val + " on press and off the layer on release"
+                                    desc: "Enable Layer " + this.layer_tap_val + " on press / disable it on release"
                                 });
                     case OP_OFF_ON:
-                        return action_kinds.LAYER_OFF_ON;
+                        return $.extend({}, action_kinds.LAYER_OFF_ON,
+                                {
+                                    name: "L-+" + this.layer_tap_val,
+                                    desc: "Disable Layer " + this.layer_tap_val + " on press / enable it on release"
+                                });
                     case OP_SET_CLEAR:
                         return $.extend({}, action_kinds.LAYER_SET_CLEAR,
                                 {
@@ -421,7 +521,7 @@ var action_kinds = {
     LAYER_OFF:          { id: "LAYER_OFF",              name: "ACTION_LAYER_OFF",           desc: "Turn off a layer" },
     LAYER_SET:          { id: "LAYER_SET",              name: "ACTION_LAYER_SET",           desc: "Turn on a layer solely" },
     LAYER_ON_OFF:       { id: "LAYER_ON_OFF",           name: "ACTION_LAYER_ON_OFF",        desc: "Turn on a layer, then off" },
-    LAYER_OFF_ON:       { id: "LAYER_OFF_ON",           name: "ACTION_LAYER_OFF_ON",        desc: "Turn off a layer, then on" },
+    LAYER_OFF_ON:       { id: "LAYER_OFF_ON",           name: "ACTION_LAYER_OFF_ON",        desc: "Disable a layer on press and enable the layer on release" },
     LAYER_SET_CLEAR:    { id: "LAYER_SET_CLEAR",        name: "ACTION_LAYER_SET_CLEAR",     desc: "Turn on a layer solely on press and clear all layers on release" },
     LAYER_MODS:         { id: "LAYER_MODS",             name: "ACTION_LAYER_MODS",          desc: "Turn on a layer with modifiers" },
     LAYER_TAP_KEY:      { id: "LAYER_TAP_KEY",          name: "ACTION_LAYER_TAP_KEY",       desc: "Turn on a layer on hold and type a key on tap" },
