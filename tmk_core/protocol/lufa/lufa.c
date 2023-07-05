@@ -41,6 +41,7 @@
 #include "host_driver.h"
 #include "keyboard.h"
 #include "action.h"
+#include "action_util.h"
 #include "led.h"
 #include "sendchar.h"
 #include "ringbuf.h"
@@ -73,7 +74,7 @@ uint8_t keyboard_idle = 0;
 /* 0: Boot Protocol, 1: Report Protocol(default) */
 uint8_t keyboard_protocol = 1;
 static uint8_t keyboard_led_stats = 0;
-static report_keyboard_t keyboard_report_sent;
+static report_keyboard_t keyboard_report_sent = (report_keyboard_t){};
 #endif
 
 #ifdef MOUSE_ENABLE
@@ -304,6 +305,19 @@ void EVENT_USB_Device_Reset(void)
 {
 #ifdef TMK_LUFA_DEBUG
     print("[R]");
+#endif
+
+// reset to initial state: protocol to Report(default)
+#ifndef NO_KEYBOARD
+    keyboard_protocol = 1;
+    keyboard_idle = 0;
+    keyboard_led_stats = 0;
+    keyboard_report_sent = (report_keyboard_t){};
+    // keyboard_report keys/bits part is not compatible between Boot and Report protocol
+    clear_keys();
+#endif
+#ifdef MOUSE_ENABLE
+    mouse_protocol = 1;
 #endif
 }
 
