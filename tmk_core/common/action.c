@@ -454,6 +454,12 @@ void register_code(uint8_t code)
         wait_ms(50);
         bootloader_jump();
     }
+#ifdef MOUSEKEY_ENABLE
+    else if IS_MOUSEKEY(code) {
+        mousekey_on(code);
+        mousekey_send();
+    }
+#endif
 }
 
 void unregister_code(uint8_t code)
@@ -503,6 +509,12 @@ void unregister_code(uint8_t code)
     else if IS_CONSUMER(code) {
         host_consumer_send(0);
     }
+#ifdef MOUSEKEY_ENABLE
+    else if IS_MOUSEKEY(code) {
+        mousekey_off(code);
+        mousekey_send();
+    }
+#endif
 }
 
 void type_code(uint8_t code)

@@ -149,7 +149,7 @@ static action_t keycode_to_action(uint8_t keycode)
             return (action_t)ACTION_USAGE_CONSUMER(KEYCODE2CONSUMER(keycode));
             break;
         case KC_MS_UP ... KC_MS_ACCEL2:
-            return (action_t)ACTION_MOUSEKEY(keycode);
+            return (action_t)ACTION_KEY(keycode);
             break;
         case KC_TRNS:
             return (action_t)ACTION_TRANSPARENT;
