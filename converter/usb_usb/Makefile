@@ -121,6 +121,7 @@ else
 endif
 ifdef KEYMAP
     SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
+    TARGET := $(TARGET)_$(KEYMAP)
 else
     SRC := $(KEYMAP_FILE).c $(SRC)
 endif
