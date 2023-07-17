@@ -12,6 +12,12 @@ void KBDReportParser::Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *b
     }
     xprintf("\r\n");
 
+    // boot keyboard report length should be 8
+    if (len != 8) {
+        xprintf(" ignored\r\n");
+        return;
+    }
+
     // Rollover error
     // Cherry: 0101010101010101
     // https://geekhack.org/index.php?topic=69169.msg2638223#msg2638223
