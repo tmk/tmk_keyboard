@@ -632,3 +632,9 @@ $(shell mkdir $(OBJDIR) 2>/dev/null)
 build elf hex eep lss sym coff extcoff \
 clean clean_list debug gdb-config show_path \
 program teensy dfu flip dfu-ee flip-ee dfu-start
+
+
+# Print out the value of a make variable.
+# https://stackoverflow.com/questions/16467718/how-to-print-out-a-variable-in-makefile
+print-%:
+	@echo $* = $($*)
