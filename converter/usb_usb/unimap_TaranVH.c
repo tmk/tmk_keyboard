@@ -2,8 +2,8 @@
 // https://geekhack.org/index.php?topic=69169.msg2781175#msg2781175
 //
 // how to build:
-// $ make -f Makefile.unimap KEYMAP=TaranVH_F24 clean
-// $ make -f Makefile.unimap KEYMAP=TaranVH_F24
+// $ make -f Makefile.unimap KEYMAP=TaranVH PREFIX_KEY=F24 clean
+// $ make -f Makefile.unimap KEYMAP=TaranVH PREFIX_KEY=F24
 
 
 #include "unimap_trans.h"
@@ -19,7 +19,7 @@ const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] __attribute__ ((section ("
 const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS] PROGMEM = {
 #endif
     UNIMAP(
-              F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23,  NO,
+              F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24,
     ESC,      F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12,           PSCR,SLCK,PCMM,         VOLD,VOLU,MUTE,
     GRV, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, JYEN,BSPC,     INS, HOME,PGUP,    INT6,PSLS,PAST,PMNS,
     TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,     BSLS,     DEL, END, PGDN,    P7,  P8,  P9,  PPLS,
