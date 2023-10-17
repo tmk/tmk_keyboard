@@ -42,6 +42,13 @@ SOFTWARE.
 #define SACK    0x31
 #define MACK    0x32
 #define SMAK    0x33
+#define KDDA    0xC0
+#define KUDA    0xD0
+
+// Archimedes LED
+#define ARC_LED_CAPS_LOCK      0
+#define ARC_LED_NUM_LOCK       1
+#define ARC_LED_SCROLL_LOCK    2
 
 
 void matrix_init(void)
@@ -53,36 +60,131 @@ void matrix_init(void)
     // wait for keyboard coming up
     // otherwise LED status update fails
     print("Archimedes starts.\n");
-    print("Sending HRST(0xFF): ");
+    xprintf("EIMSK: %02X\n", EIMSK);
+    xprintf("EICRA: %02X\n", EICRA);
 
     return;
 }
 
+static uint8_t arc_led = 1<<ARC_LED_SCROLL_LOCK;
+static enum  {
+    INIT,
+    SCAN,
+    WAIT_KEY_COL,
+} state = INIT;
+
+static int16_t check_reply(void)
+{
+    int16_t d;
+    while ((d = serial_recv2()) != -1) {
+        xprintf("r%02X ", d & 0xFF);
+        if (d == HRST) state = INIT;
+        return d;
+    }
+    return -1;
+}
+
+static void send_cmd(uint8_t cmd)
+{
+    xprintf("s%02X ", cmd);
+    serial_send(cmd);
+}
+
 uint8_t matrix_scan(void)
 {
-    //while (1) {
-        print(".");
-        serial_send(0xFF);
-        _delay_ms(10);
-        serial_send(RAK1);
-        _delay_ms(10);
-        serial_send(RAK2);
-        _delay_ms(10);
-        serial_send(SACK);
+    static uint8_t key;
 
-        _delay_ms(10);
-        //serial_send(LEDS(0x5));  // ScrollLock and CapsLock
-        //serial_send(LEDS(0x3));  // NumLock and CapsLock
-        serial_send(LEDS(0x6));  // NumLock and CapsLock
+    switch (state) {
+        case INIT:
+            send_cmd(0xFF);
+            _delay_ms(10);
+            check_reply();
 
-        //serial_send(RQID);
+            send_cmd(RAK1);
+            _delay_ms(10);
+            check_reply();
 
-        _delay_ms(500);
-    //}
+            send_cmd(RAK2);
+            _delay_ms(10);
+            check_reply();
+
+            //send_cmd(SACK);
+            send_cmd(SMAK);
+            check_reply();
+
+            state = SCAN;
+            break;
+        case SCAN: {
+            int16_t d;
+            d = check_reply();
+            switch (d) {
+                case -1:
+                    // no reply
+                    //xprintf(".");
+                    break;
+                case KDDA ... KDDA+15:
+                case KUDA ... KUDA+15:
+                    // key row
+                    key = (d & 0xF) << 4;
+                    _delay_ms(1);
+                    send_cmd(BACK);
+                    state = WAIT_KEY_COL;
+                    break;
+                default:
+                    state = INIT;
+                    break;
+            }
+            break;
+        }
+        case WAIT_KEY_COL: {
+            int16_t d;
+            d = check_reply();
+            switch (d) {
+                case -1:
+                    // no reply
+                    break;
+                case KDDA ... KDDA+15:
+                case KUDA ... KUDA+15:
+                    if ((d & KUDA) == KUDA) { key |= 0x80; }    // key up flag
+                    key |= d & 0xF;
+                    xprintf("[k%02X] ", key);
+                    _delay_ms(1);
+                    send_cmd(SMAK);
+                    state = SCAN;
+                    break;
+                default:
+                    // error
+                    state = INIT;
+                    break;
+            }
+            break;
+        }
+    }
+
+    // TODO
+    // toggle ScrollLock LED
+/*
+    _delay_ms(10);
+    arc_led = arc_led ^ 1<<ARC_LED_SCROLL_LOCK;
+    serial_send(LEDS(arc_led % 8));
+    _delay_ms(500);
+*/
+
+    return 0;
 }
 
 uint8_t matrix_get_row(uint8_t row)
 {
     // TODO
     return 0;
+}
+
+#include "led.h"
+void led_set(uint8_t usb_led)
+{
+    arc_led = 0;
+    if (usb_led & (1<<USB_LED_NUM_LOCK))    arc_led |= (1<<ARC_LED_NUM_LOCK);
+    if (usb_led & (1<<USB_LED_CAPS_LOCK))   arc_led |= (1<<ARC_LED_CAPS_LOCK);
+    if (usb_led & (1<<USB_LED_SCROLL_LOCK)) arc_led |= (1<<ARC_LED_SCROLL_LOCK);
+    xprintf("LED: %02X %02X\n", usb_led, arc_led);
 }

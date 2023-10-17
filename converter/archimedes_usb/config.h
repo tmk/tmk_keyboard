@@ -44,14 +44,14 @@ SOFTWARE.
 /* Software Serial configuration
  *     RX: PD1, TX: PD3
  *     asynchronous, negative logic, 31250 baud
- *     start bit(0), 8-bit data(LSB first), 9th bit(1), stop bit(1)
+ *     start bit(0), 8-bit data(LSB first), stop bit(1)
  */
+#define SERIAL_SOFT_DEBUG
 #define SERIAL_SOFT_BAUD            31250
-// TODO: 9th bit is optional?
-//#define SERIAL_SOFT_9TH_BIT
 #define SERIAL_SOFT_PARITY_NONE
 #define SERIAL_SOFT_BIT_ORDER_LSB
 #define SERIAL_SOFT_LOGIC_NEGATIVE
+
 /* RXD Port */
 #define SERIAL_SOFT_RXD_ENABLE
 #define SERIAL_SOFT_RXD_DDR         DDRD
@@ -59,6 +59,7 @@ SOFTWARE.
 #define SERIAL_SOFT_RXD_PIN         PIND
 #define SERIAL_SOFT_RXD_BIT         1
 #define SERIAL_SOFT_RXD_VECT        INT1_vect
+
 /* RXD Interupt */
 #ifdef SERIAL_SOFT_LOGIC_NEGATIVE
 /* enable interrupt: INT1(rising edge) */
@@ -67,26 +68,32 @@ SOFTWARE.
 /* enable interrupt: INT1(falling edge) */
 #define INTR_TRIG_EDGE   ((1<<ISC11)|(0<<ISC10))
 #endif
+
 #define SERIAL_SOFT_RXD_INIT()      do { \
     /* pin configuration: input with pull-up */ \
     SERIAL_SOFT_RXD_DDR &= ~(1<<SERIAL_SOFT_RXD_BIT); \
     SERIAL_SOFT_RXD_PORT |= (1<<SERIAL_SOFT_RXD_BIT); \
     EICRA |= INTR_TRIG_EDGE; \
-    EIMSK |= (1<<INT2); \
+    EIMSK |= (1<<INT1); \
     sei(); \
 } while (0)
+
 #define SERIAL_SOFT_RXD_INT_ENTER()
+
 #define SERIAL_SOFT_RXD_INT_EXIT()  do { \
     /* clear interrupt  flag */ \
-    EIFR = (1<<INTF2); \
+    EIFR = (1<<INTF1); \
 } while (0)
+
 #define SERIAL_SOFT_RXD_READ()      (SERIAL_SOFT_RXD_PIN&(1<<SERIAL_SOFT_RXD_BIT))
+
 /* TXD Port */
 #define SERIAL_SOFT_TXD_ENABLE
 #define SERIAL_SOFT_TXD_DDR         DDRD
 #define SERIAL_SOFT_TXD_PORT        PORTD
 #define SERIAL_SOFT_TXD_PIN         PIND
 #define SERIAL_SOFT_TXD_BIT         3
+
 #define SERIAL_SOFT_TXD_HI()        do { SERIAL_SOFT_TXD_PORT |=  (1<<SERIAL_SOFT_TXD_BIT); } while (0)
 #define SERIAL_SOFT_TXD_LO()        do { SERIAL_SOFT_TXD_PORT &= ~(1<<SERIAL_SOFT_TXD_BIT); } while (0)
 #define SERIAL_SOFT_TXD_INIT()      do { \
