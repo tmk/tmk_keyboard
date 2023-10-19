@@ -23,6 +23,7 @@ SOFTWARE.
 #include <stdint.h>
 #include <util/delay.h>
 #include "protocol/serial.h"
+#include "wait.h"
 #include "debug.h"
 #include "print.h"
 
@@ -96,22 +97,34 @@ uint8_t matrix_scan(void)
 
     switch (state) {
         case INIT:
-            send_cmd(0xFF);
-            _delay_ms(10);
+            // ignore unprocessed replies
             check_reply();
+
+            // reset sequence
+            send_cmd(HRST);
+            wait_ms(1);
+            if (HRST != check_reply()) {
+                wait_ms(1000);
+                break;
+            }
 
             send_cmd(RAK1);
-            _delay_ms(10);
-            check_reply();
+            wait_ms(1);
+            if (RAK1 != check_reply()) {
+                wait_ms(1000);
+                break;
+            }
 
             send_cmd(RAK2);
-            _delay_ms(10);
-            check_reply();
+            wait_ms(1);
+            if (RAK2 != check_reply()) {
+                wait_ms(1000);
+                break;
+            }
 
-            //send_cmd(SACK);
+            // ack to scan now
             send_cmd(SMAK);
             check_reply();
-
             state = SCAN;
             break;
         case SCAN: {
@@ -120,13 +133,14 @@ uint8_t matrix_scan(void)
             switch (d) {
                 case -1:
                     // no reply
-                    //xprintf(".");
                     break;
                 case KDDA ... KDDA+15:
                 case KUDA ... KUDA+15:
                     // key row
                     key = (d & 0xF) << 4;
-                    _delay_ms(1);
+                    wait_us(100);
+
+                    // ack for key data first byte
                     send_cmd(BACK);
                     state = WAIT_KEY_COL;
                     break;
@@ -145,12 +159,17 @@ uint8_t matrix_scan(void)
                     break;
                 case KDDA ... KDDA+15:
                 case KUDA ... KUDA+15:
-                    if ((d & KUDA) == KUDA) { key |= 0x80; }    // key up flag
+                    // key col
                     key |= d & 0xF;
-                    xprintf("[k%02X] ", key);
-                    _delay_ms(1);
+                    if ((d & KUDA) == KUDA) { key |= 0x80; }    // key up flag
+                                                                //
+                    // ack
+                    wait_us(100);
                     send_cmd(SMAK);
                     state = SCAN;
+
+                    // TODO: make/brak key
+                    xprintf("[k%02X] ", key);
                     break;
                 default:
                     // error
@@ -164,10 +183,10 @@ uint8_t matrix_scan(void)
     // TODO
     // toggle ScrollLock LED
 /*
-    _delay_ms(10);
+    wait_ms(10);
     arc_led = arc_led ^ 1<<ARC_LED_SCROLL_LOCK;
     serial_send(LEDS(arc_led % 8));
-    _delay_ms(500);
+    wait_ms(500);
 */
 
     return 0;
