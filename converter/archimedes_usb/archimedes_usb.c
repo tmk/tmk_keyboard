@@ -21,9 +21,10 @@ SOFTWARE.
 */
 
 #include <stdint.h>
-#include <util/delay.h>
+#include <avr/interrupt.h>
 #include "protocol/serial.h"
 #include "wait.h"
+#include "timer.h"
 #include "debug.h"
 #include "print.h"
 
@@ -64,10 +65,13 @@ void matrix_init(void)
     xprintf("EIMSK: %02X\n", EIMSK);
     xprintf("EICRA: %02X\n", EICRA);
 
+
     return;
 }
 
-static uint8_t arc_led = 1<<ARC_LED_SCROLL_LOCK;
+// LED status
+static uint8_t arc_led = 0;
+static uint8_t arc_led_prev = 0;
 static enum  {
     INIT,
     SCAN,
@@ -88,7 +92,9 @@ static int16_t check_reply(void)
 static void send_cmd(uint8_t cmd)
 {
     xprintf("s%02X ", cmd);
+    cli();
     serial_send(cmd);
+    sei();
 }
 
 uint8_t matrix_scan(void)
@@ -131,8 +137,13 @@ uint8_t matrix_scan(void)
             int16_t d;
             d = check_reply();
             switch (d) {
-                case -1:
-                    // no reply
+                case -1: // no input
+                    // update LED
+                    if (arc_led != arc_led_prev) {
+                        wait_ms(1);
+                        send_cmd(LEDS(arc_led));
+                        arc_led_prev = arc_led;
+                    }
                     break;
                 case KDDA ... KDDA+15:
                 case KUDA ... KUDA+15:
@@ -180,14 +191,13 @@ uint8_t matrix_scan(void)
         }
     }
 
-    // TODO
+    // DEBUG
     // toggle ScrollLock LED
-/*
-    wait_ms(10);
-    arc_led = arc_led ^ 1<<ARC_LED_SCROLL_LOCK;
-    serial_send(LEDS(arc_led % 8));
-    wait_ms(500);
-*/
+    static uint16_t time_last;
+    if (timer_elapsed(time_last) > 1000) {
+        arc_led = arc_led ^ 1<<ARC_LED_SCROLL_LOCK;
+        time_last = timer_read();
+    }
 
     return 0;
 }

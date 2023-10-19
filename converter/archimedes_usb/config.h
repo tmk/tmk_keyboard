@@ -60,6 +60,7 @@ SOFTWARE.
 #define SERIAL_SOFT_RXD_BIT         1
 #define SERIAL_SOFT_RXD_VECT        INT1_vect
 
+// XXX: phantom interrupt(INT1) occrus on rising edge of PD3/TXD for some reason.
 /* RXD Interupt */
 #ifdef SERIAL_SOFT_LOGIC_NEGATIVE
 /* enable interrupt: INT1(rising edge) */
