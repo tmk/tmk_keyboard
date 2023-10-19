@@ -31,8 +31,8 @@ SOFTWARE.
 #define DESCRIPTION     converts Archimedes keyboard into USB
 
 /* matrix size */
-#define MATRIX_ROWS 16
-#define MATRIX_COLS 8
+#define MATRIX_ROWS 8
+#define MATRIX_COLS 16
 
 /* key combination for command */
 #define IS_COMMAND() ( \

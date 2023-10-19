@@ -23,6 +23,7 @@ SOFTWARE.
 #include <stdint.h>
 #include <avr/interrupt.h>
 #include "protocol/serial.h"
+#include "matrix.h"
 #include "wait.h"
 #include "timer.h"
 #include "debug.h"
@@ -52,19 +53,46 @@ SOFTWARE.
 #define ARC_LED_NUM_LOCK       1
 #define ARC_LED_SCROLL_LOCK    2
 
+/* key matrix 8x16
+ * |R/C|  0|  1|  2|  3|  4|  5|  6|  7|  8|  9|  A|  B|  C|  D|  E|  F|
+ * |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+ * |  0|ESC| F1| F2| F3| F4| F5| F6| F7| F8| F9|F10|F11|F12|Prt|ScL|Brk|
+ * |  1| `~|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0| -_| =+|  £| BS|Ins|
+ * |  2|Hom|PgU|NmL| P/| P*| P#|Tab|  Q|  W|  E|  R|  T|  Y|  U|  I|  O|
+ * |  3|  P| [{| ]}| \||Del|Cpy|PgD| P7| P8| P9| P-|LCt|  A|  S|  D|  F|
+ * |  4|  G|  H|  J|  K|  L| ;:| '"|Rtn| P4| P5| P6| P+|LSh|   |  Z|  X|
+ * |  5|  C|  V|  B|  N|  M| ,<| .>| /?|RSh| Up| P1| P2| P3|Cap|LAl|Spc|
+ * |  6|Ral|RCt|Lef|Dow|Rig| P0| P.|PEn|   |   |   |   |   |   |   |   |
+ * |  7|SW1|SW2|SW3|   |   |   |   |   |   |   |   |   |   |   |   |   |
+ */
+#define ROW(key)    ((key & 0x70) >> 4)
+#define COL(key)    (key & 0x0F)
+static matrix_row_t matrix[MATRIX_ROWS];
+
+void matrix_clear(void)
+{
+    for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
+}
+
+matrix_row_t matrix_get_row(uint8_t row)
+{
+    return matrix[row];
+}
+
 
 void matrix_init(void)
 {
     //debug_enable = true;
+    //debug_matrix = true;
 
+    matrix_clear();
     serial_init();
 
     // wait for keyboard coming up
     // otherwise LED status update fails
     print("Archimedes starts.\n");
-    xprintf("EIMSK: %02X\n", EIMSK);
-    xprintf("EICRA: %02X\n", EICRA);
-
+    //xprintf("EIMSK: %02X\n", EIMSK);
+    //xprintf("EICRA: %02X\n", EICRA);
 
     return;
 }
@@ -72,6 +100,7 @@ void matrix_init(void)
 // LED status
 static uint8_t arc_led = 0;
 static uint8_t arc_led_prev = 0;
+
 static enum  {
     INIT,
     SCAN,
@@ -148,10 +177,10 @@ uint8_t matrix_scan(void)
                 case KDDA ... KDDA+15:
                 case KUDA ... KUDA+15:
                     // key row
-                    key = (d & 0xF) << 4;
+                    key = (d & 0x7) << 4;
                     wait_us(100);
 
-                    // ack for key data first byte
+                    // ack
                     send_cmd(BACK);
                     state = WAIT_KEY_COL;
                     break;
@@ -173,13 +202,18 @@ uint8_t matrix_scan(void)
                     // key col
                     key |= d & 0xF;
                     if ((d & KUDA) == KUDA) { key |= 0x80; }    // key up flag
-                                                                //
+
                     // ack
                     wait_us(100);
                     send_cmd(SMAK);
                     state = SCAN;
 
                     // TODO: make/brak key
+                    if (key & 0x80) {
+                        matrix[ROW(key)] &= ~(1 << COL(key));
+                    } else {
+                        matrix[ROW(key)] |=  (1 << COL(key));
+                    }
                     xprintf("[k%02X] ", key);
                     break;
                 default:
@@ -193,18 +227,14 @@ uint8_t matrix_scan(void)
 
     // DEBUG
     // toggle ScrollLock LED
+/*
     static uint16_t time_last;
     if (timer_elapsed(time_last) > 1000) {
         arc_led = arc_led ^ 1<<ARC_LED_SCROLL_LOCK;
         time_last = timer_read();
     }
+*/
 
-    return 0;
-}
-
-uint8_t matrix_get_row(uint8_t row)
-{
-    // TODO
     return 0;
 }
 
@@ -215,5 +245,5 @@ void led_set(uint8_t usb_led)
     if (usb_led & (1<<USB_LED_NUM_LOCK))    arc_led |= (1<<ARC_LED_NUM_LOCK);
     if (usb_led & (1<<USB_LED_CAPS_LOCK))   arc_led |= (1<<ARC_LED_CAPS_LOCK);
     if (usb_led & (1<<USB_LED_SCROLL_LOCK)) arc_led |= (1<<ARC_LED_SCROLL_LOCK);
-    xprintf("LED: %02X %02X\n", usb_led, arc_led);
+    xprintf("LED:%02X:%02X ", usb_led, arc_led);
 }
