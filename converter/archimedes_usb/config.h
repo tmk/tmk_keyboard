@@ -46,11 +46,14 @@ SOFTWARE.
  *     asynchronous, negative logic, 31250 baud
  *     start bit(0), 8-bit data(LSB first), stop bit(1)
  */
-#define SERIAL_SOFT_DEBUG
 #define SERIAL_SOFT_BAUD            31250
 #define SERIAL_SOFT_PARITY_NONE
 #define SERIAL_SOFT_BIT_ORDER_LSB
 #define SERIAL_SOFT_LOGIC_NEGATIVE
+
+/* debug for signal timing, see debug pin with oscilloscope */
+#define SERIAL_SOFT_DEBUG_INIT()    (DDRD |= 1<<2)
+#define SERIAL_SOFT_DEBUG_TGL()     (PIND |= 1<<2)
 
 /* RXD Port */
 #define SERIAL_SOFT_RXD_ENABLE

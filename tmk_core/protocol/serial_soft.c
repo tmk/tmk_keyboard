@@ -49,7 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
  *  TODO: delay is not accurate enough. Instruction cycle should be counted and inline assemby is needed.
  */
 
-#define WAIT_US     (1000000L/SERIAL_SOFT_BAUD)
+#define WAIT_US     (1000000L/SERIAL_SOFT_BAUD - 1)
 
 #ifdef SERIAL_SOFT_LOGIC_NEGATIVE
     #define SERIAL_SOFT_RXD_IN()        !(SERIAL_SOFT_RXD_READ())
@@ -68,11 +68,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 /* debug for signal timing, see debug pin with oscilloscope */
-#ifdef SERIAL_SOFT_DEBUG
-    #define SERIAL_SOFT_DEBUG_INIT()    (DDRD |= 1<<7)
-    #define SERIAL_SOFT_DEBUG_TGL()     (PORTD ^= 1<<7)
-#else
+#ifndef SERIAL_SOFT_DEBUG_INIT
     #define SERIAL_SOFT_DEBUG_INIT()
+#endif
+#ifndef SERIAL_SOFT_DEBUG_TGL
     #define SERIAL_SOFT_DEBUG_TGL()
 #endif
 
@@ -177,6 +176,9 @@ void serial_send(uint8_t data)
 ISR(SERIAL_SOFT_RXD_VECT)
 {
     SERIAL_SOFT_DEBUG_TGL();
+    /* can be triggered by other pin. don't know why */
+    if (SERIAL_SOFT_RXD_IN()) { return; }
+
     SERIAL_SOFT_RXD_INT_ENTER();
 
     uint8_t data = 0;
@@ -196,6 +198,7 @@ ISR(SERIAL_SOFT_RXD_VECT)
     /* to center of start bit */
     _delay_us(WAIT_US/2);
     SERIAL_SOFT_DEBUG_TGL();
+    //if (SERIAL_SOFT_RXD_IN()) { return; }
     do {
         /* to center of next bit */
         _delay_us(WAIT_US);
