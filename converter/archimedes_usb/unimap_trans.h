@@ -30,9 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * |-----------------------------------------------------------| |-----------| |---------------|
  * |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|  \  | |Del|Cpy|PgD| |  7|  8|  9|  -|
  * |-----------------------------------------------------------| `-----------' |---------------|
- * |CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '| ^a|Entr|               |  4|  5|  6|  +|
+ * |CapsL |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  Enter |               |  4|  5|  6|  +|
  * |-----------------------------------------------------------|     ,---.     |---------------|
- * |Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /| RO|Shift |     |Up |     |  1|  2|  3|   |
+ * |Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|   Shift  |     |Up |     |  1|  2|  3|   |
  * |-----------------------------------------------------------| ,-----------. |-----------|Ent|
  * | Ctrl|   | Alt |         Space             | Alt |   | Ctrl| |Lef|Dow|Rig| |      0|  .|   |
  * `-----'   `---------------------------------------'   `-----' `-----------' `---------------'
@@ -67,7 +67,7 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
       UNIMAP_RSFT, UNIMAP_UP,   UNIMAP_P1,   UNIMAP_P2,   UNIMAP_P3,   UNIMAP_CAPS, UNIMAP_LALT, UNIMAP_SPC  }, /* 58-5F */
     { UNIMAP_RALT, UNIMAP_RCTL, UNIMAP_LEFT, UNIMAP_DOWN, UNIMAP_RIGHT,UNIMAP_P0,   UNIMAP_PDOT, UNIMAP_PENT,   /* 60-67 */
       UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO   }, /* 68-6F */
-    { UNIMAP_VOLD, UNIMAP_VOLU, UNIMAP_MUTE, UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,     /* 70-77 */
+    { UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,     /* 70-77 */
       UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO,   UNIMAP_NO   }, /* 78-7F */
 };
 

@@ -26,6 +26,7 @@ SOFTWARE.
 #include "matrix.h"
 #include "wait.h"
 #include "timer.h"
+#include "host.h"
 #include "debug.h"
 #include "print.h"
 
@@ -47,6 +48,10 @@ SOFTWARE.
 #define SMAK    0x33
 #define KDDA    0xC0
 #define KUDA    0xD0
+// mouse data: 0b0xxx xxxx(0x00 - 0x7F)
+// mouse delta: -64 - 63
+#define MDAT_MIN    0x00
+#define MDAT_MAX    0x7F
 
 // Archimedes LED
 #define ARC_LED_CAPS_LOCK      0
@@ -84,6 +89,8 @@ void matrix_init(void)
 {
     //debug_enable = true;
     //debug_matrix = true;
+    //debug_keyboard = true;
+    //debug_mouse = true;
 
     matrix_clear();
     serial_init();
@@ -105,6 +112,7 @@ static enum  {
     INIT,
     SCAN,
     WAIT_KEY_COL,
+    WAIT_MDAT_Y,
 } state = INIT;
 
 static int16_t check_reply(void)
@@ -121,14 +129,18 @@ static int16_t check_reply(void)
 static void send_cmd(uint8_t cmd)
 {
     xprintf("s%02X ", cmd);
+    uint8_t sreg = SREG;
     cli();
     serial_send(cmd);
-    sei();
+    SREG = sreg;
 }
 
 uint8_t matrix_scan(void)
 {
     static uint8_t key;
+    static uint8_t mouse_btn = 0;
+    static int8_t mouse_x = 0;
+    static int8_t mouse_y = 0;
 
     switch (state) {
         case INIT:
@@ -184,6 +196,14 @@ uint8_t matrix_scan(void)
                     send_cmd(BACK);
                     state = WAIT_KEY_COL;
                     break;
+                case MDAT_MIN ... MDAT_MAX:
+                    // sign bit for int8_t
+                    if (d & 0x40) d |= 0x80;
+                    mouse_x = d;
+                    // ack
+                    send_cmd(BACK);
+                    state = WAIT_MDAT_Y;
+                    break;
                 default:
                     state = INIT;
                     break;
@@ -208,16 +228,74 @@ uint8_t matrix_scan(void)
                     send_cmd(SMAK);
                     state = SCAN;
 
-                    // TODO: make/brak key
                     if (key & 0x80) {
-                        matrix[ROW(key)] &= ~(1 << COL(key));
+                        // break
+                        switch (key & 0x7F) {
+                            case 0x70:  // mouse SW1
+                            case 0x71:  // mouse SW2
+                            case 0x72:  // mouse SW3
+                                mouse_btn &= ~(1 << (key & 3));
+
+                                report_mouse_t mouse_report = {};
+                                mouse_report.buttons = mouse_btn;
+                                host_mouse_send(&mouse_report);
+                                break;
+                            default:
+                                matrix[ROW(key)] &= ~(1 << COL(key));
+                                break;
+                        }
                     } else {
-                        matrix[ROW(key)] |=  (1 << COL(key));
+                        // make
+                        switch (key & 0x7F) {
+                            case 0x70:  // mouse SW1
+                            case 0x71:  // mouse SW2
+                            case 0x72:  // mouse SW3
+                                mouse_btn |= (1 << (key & 3));
+
+                                report_mouse_t mouse_report = {};
+                                mouse_report.buttons = mouse_btn;
+                                host_mouse_send(&mouse_report);
+                                break;
+                            default:
+                                matrix[ROW(key)] |=  (1 << COL(key));
+                                break;
+                        }
                     }
                     xprintf("[k%02X] ", key);
                     break;
                 default:
                     // error
+                    state = INIT;
+                    break;
+            }
+            break;
+        }
+        case WAIT_MDAT_Y: {
+            int16_t d;
+            d = check_reply();
+            switch (d) {
+                case -1:
+                    // no reply
+                    break;
+                case MDAT_MIN ... MDAT_MAX:
+                    // sign bit for int8_t
+                    if (d & 0x40) d |= 0x80;
+                    mouse_y = d;
+                    xprintf("[m%02d,%02d] ", mouse_x, mouse_y);
+
+                    report_mouse_t mouse_report = {};
+                    mouse_report.buttons = mouse_btn;
+                    // TODO: move direction is not confirmed
+                    mouse_report.x = mouse_x;
+                    mouse_report.y = mouse_y;
+                    host_mouse_send(&mouse_report);
+
+                    // ack
+                    wait_us(100);
+                    send_cmd(SMAK);
+                    state = SCAN;
+                    break;
+                default:
                     state = INIT;
                     break;
             }
@@ -245,5 +323,5 @@ void led_set(uint8_t usb_led)
     if (usb_led & (1<<USB_LED_NUM_LOCK))    arc_led |= (1<<ARC_LED_NUM_LOCK);
     if (usb_led & (1<<USB_LED_CAPS_LOCK))   arc_led |= (1<<ARC_LED_CAPS_LOCK);
     if (usb_led & (1<<USB_LED_SCROLL_LOCK)) arc_led |= (1<<ARC_LED_SCROLL_LOCK);
-    xprintf("LED:%02X:%02X ", usb_led, arc_led);
+    xprintf("[LED:%02X:%02X] ", usb_led, arc_led);
 }
