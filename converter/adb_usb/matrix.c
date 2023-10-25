@@ -508,9 +508,29 @@ static uint8_t mouse_proc(uint8_t addr)
         if (buf[1] & 0x40) xneg = true;
         // Ignore Byte2 and 3
         len = 2;
-    } else if (mouse_handler == ADB_HANDLER_MICROSPEED_MACTRAC ||
+    } else if (mouse_handler == ADB_HANDLER_MICROSPEED_MACTRAC && len == 2) {
+        // MacTRAC 2.0 old firmware
+        // https://github.com/tmk/tmk_keyboard/issues/725#issuecomment-1779462409
+        //   Byte0: b00 y06 y05 y04 y03 y02 y01 y00
+        //   Byte1: b01 x06 x05 x04 x03 x02 x01 x00
+        //   left button: b00=0, b01=1
+        //   right button: b00=0, b01=0
+        //   center button: Drag Lock
+        if (buf[0] & 0x40) yneg = true;
+        if (buf[1] & 0x40) xneg = true;
+        len = 2;
+
+        uint16_t packet = (buf[0] << 8) | buf[1];
+        // right button
+        if ((packet & 0x8080) == 0x0000) {
+            buf[0] |=  0x80;
+            buf[1] &= ~0x80;
+        } else {
+            buf[1] |=  0x80;
+        }
+    } else if ((mouse_handler == ADB_HANDLER_MICROSPEED_MACTRAC ||
                mouse_handler == ADB_HANDLER_MICROSPEED_UNKNOWN ||
-               mouse_handler == ADB_HANDLER_CONTOUR_MOUSE) {
+               mouse_handler == ADB_HANDLER_CONTOUR_MOUSE) && len >= 3) {
         // Microspeed:
         //   Byte0: ??? y06 y05 y04 y03 y02 y01 y00
         //   Byte1: ??? x06 x05 x04 x03 x02 x01 x00
