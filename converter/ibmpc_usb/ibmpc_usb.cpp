@@ -950,6 +950,14 @@ uint8_t IBMPCConverter::cs2_e0code(uint8_t code) {
         // https://github.com/tmk/tmk_keyboard/pull/760
         case 0x00: return 0x65; // TERM FUNC   Siemens F500 -> VOLD
 
+        // Silitek SK-7100P
+        case 0x43: return 0x40; // Close    Silitek SK-7100P -> F20
+        case 0x42: return 0x48; // CD       Silitek SK-7100P -> F21
+        case 0x44: return 0x50; // Video    Silitek SK-7100P -> F22
+        case 0x1C: return 0x30; // U/P      Silitek SK-7100P -> F18
+        case 0x24: return 0x28; // Pause    Silitek SK-7100P -> F17
+        case 0x4B: return 0x57; // Display  Silitek SK-7100P -> F23
+
         default: return (code & 0x7F); // unknown
     }
 }
