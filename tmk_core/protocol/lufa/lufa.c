@@ -105,7 +105,11 @@ host_driver_t lufa_driver = {
  * Console
  ******************************************************************************/
 #ifdef CONSOLE_ENABLE
-#define SENDBUF_SIZE 256
+#   ifdef _AVR_ATmega32U2_H_
+#       define SENDBUF_SIZE 128
+#   else
+#       define SENDBUF_SIZE 256
+#   endif
 static uint8_t sbuf[SENDBUF_SIZE];
 static ringbuf_t sendbuf = {
     .buffer = sbuf,
