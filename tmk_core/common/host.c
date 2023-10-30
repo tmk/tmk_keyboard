@@ -106,6 +106,10 @@ void host_mouse_send(report_mouse_t *report)
 #endif
     (*driver->send_mouse)(report);
     report->buttons = b;
+
+    if (debug_mouse) {
+        xprintf("mouse: [%02X|%d %d %d %d]\n", report->buttons, report->x, report->y, report->v, report->h);
+    }
 }
 
 void host_system_send(uint16_t report)
