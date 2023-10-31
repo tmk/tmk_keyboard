@@ -302,5 +302,14 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-pc9801.html",
         },
+        /*
+         * Acorn Archimedes
+         */
+        archimedes_usb: {
+            desc: "Archimedes-USB Converter(ATmega32U2)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/archimedes_usb/binary/archimedes_usb_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-archimedes.html",
+        },
     },
 };
