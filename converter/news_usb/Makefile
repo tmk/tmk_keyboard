@@ -8,8 +8,7 @@ TMK_DIR = ../../tmk_core
 TARGET_DIR = .
 
 # keyboard dependent files
-SRC =	keymap.c \
-	matrix.c \
+SRC =	matrix.c \
 	led.c \
 	news.c
 
@@ -77,6 +76,28 @@ EXTRAKEY_ENABLE = yes	# Audio control and System control(+600)
 CONSOLE_ENABLE = yes    # Console for debug
 COMMAND_ENABLE = yes    # Commands for debug and configuration
 #NKRO_ENABLE = yes	# USB Nkey Rollover(+500)
+
+KEYMAP_SECTION_ENABLE ?= yes
+UNIMAP_ENABLE ?= yes
+
+
+#
+# Keymap file
+#
+ifdef UNIMAP_ENABLE
+    KEYMAP_FILE = unimap
+else
+    ifdef ACTIONMAP_ENABLE
+	KEYMAP_FILE = actionmap
+    else
+	KEYMAP_FILE = keymap
+    endif
+endif
+ifdef KEYMAP
+    SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
+else
+    SRC := $(KEYMAP_FILE)_plain.c $(SRC)
+endif
 
 
 # Search Path
