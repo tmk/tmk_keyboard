@@ -311,5 +311,20 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-archimedes.html",
         },
+        /*
+         * Sony NEWS
+         */
+        news_usb_411: {
+            desc: "NEWS-USB Converter(ATmega32U2) NWP-411A",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/news_usb/binary/news_usb_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-news_411.html",
+        },
+        news_usb_5461: {
+            desc: "NEWS-USB Converter(ATmega32U2) NWP-5461",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/news_usb/binary/news_usb_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-news_5461.html",
+        },
     },
 };
