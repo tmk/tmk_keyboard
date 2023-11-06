@@ -10,6 +10,7 @@ TARGET_DIR = .
 # keyboard dependent files
 SRC =	matrix.c \
 	led.c \
+	tone.c \
 	news.c
 
 CONFIG_H = config.h

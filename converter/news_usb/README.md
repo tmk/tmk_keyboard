@@ -2,22 +2,31 @@ Sony NEWS keyboard converter
 ============================
 Sony NEWS is a BSD workstation with 68K/MIPS released in 1987 in Japan.
 
-- http://en.wikipedia.org/wiki/Sony_NEWS
-- https://www.sony.net/SonyInfo/CorporateInfo/History/SonyHistory/2-12.html#block3
-
 This converter allows NEWS keyboard to be connected to modern PC via USB. It works with NWP-5461 and NWP-411A.
 
-How DIP switches work is unknown and you may need to turn all switches off with this converter.
-
 Limitations:
-- Speaker/Buzzer is not supported.
 - LEDs on NWP-5461 is not supported.
-
-Pics:
-- http://imgur.com/a/JyMzw
+- Mouse is not supported.
 
 Discussion:
 - https://geekhack.org/index.php?topic=25759
+
+Resources:
+- https://github.com/tmk/tmk_keyboard/wiki/Sony-NEWS
+
+
+Wiring
+------
+Use PD2(USART RXD) for 'Keyboard Data' pin and give power with VCC and GND. Other pins are optional and not supported at this point.
+
+    AVR     NEWS
+    ------------------------
+    PD2     Keyboard Data
+    PD3     Keyboard Command
+    PD4     Mouse Data
+    PD0     BZ
+
+Target microcontroller is Atmel ATMega32U2 by default but porting this project to other 8-bit AVR controllers would be easy.
 
 
 
@@ -40,6 +49,7 @@ For example 0x29 is sent when 'a' key is pressed and 0xA9 when released.
     | | | | | | | |
     | +-+-+-+-+-+-+-- scan code(00-7F)
     +---------------- break flag: sets when released
+
 
 
 Scan Codes
@@ -118,3 +128,17 @@ I have three NWP-5461s and GND and FG is connected in one of them for some reaso
     8 NC
     9 FG
     NOTE: These are just from my guess and not confirmed.
+
+
+
+Buzzer
+------
+You can control buzzer using `tone()` and `noTone()`. BZ pin should be connected to PD0.
+
+- `void tone(unsigned int frequency, unsigned long duration)`
+- `void noTone(void)`
+
+`tone()` sounds buzzer in frequency(in hertz) for duration(in milliseconds).
+When giving -1 as duration to `tone()` buzzer makes a sound forever until `noTone()` is called.
+
+Buzzer is not used by default firmware.

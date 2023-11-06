@@ -58,6 +58,8 @@ void matrix_init(void)
     return;
 }
 
+void tone(unsigned int frequency, unsigned long duration);
+void noTone(void);
 uint8_t matrix_scan(void)
 {
     uint8_t code;
@@ -76,6 +78,7 @@ uint8_t matrix_scan(void)
         // make code
         if (!matrix_is_on(ROW(code), COL(code))) {
             matrix[ROW(code)] |=  (1<<COL(code));
+            //tone(80, 100);
         }
     }
     return code;
