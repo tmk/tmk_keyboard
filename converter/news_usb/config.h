@@ -54,8 +54,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   define NEWS_KBD_RX_INIT()      do { \
         UBRR1L = (uint8_t) NEWS_KBD_RX_UBBR; \
         UBRR1H = (uint8_t) (NEWS_KBD_RX_UBBR>>8); \
-        UCSR1B |= (1<<RXCIE1) | (1<<RXEN1); \
+        UCSR1B |= (1<<RXCIE1) | (1<<RXEN1) | (1<<TXEN1); \
+        sei(); \
     } while(0)
+#   define SERIAL_UART_TXD_READY   (UCSR1A&(1<<UDRE1))
+#   define SERIAL_UART_DATA        UDR1
 #else
 #   error "USART configuration is needed."
 #endif

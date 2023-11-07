@@ -52,11 +52,11 @@ static uint8_t rbuf[RBUF_SIZE];
 static uint8_t rbuf_head = 0;
 static uint8_t rbuf_tail = 0;
 
-uint8_t news_recv(void)
+int16_t news_recv(void)
 {
     uint8_t data = 0;
     if (rbuf_head == rbuf_tail) {
-        return 0;
+        return -1;
     }
 
     data = rbuf[rbuf_tail];
@@ -72,6 +72,12 @@ ISR(NEWS_KBD_RX_VECT)
         rbuf[rbuf_head] = NEWS_KBD_RX_DATA;
         rbuf_head = next;
     }
+}
+
+void news_send(uint8_t data)
+{
+    while (!SERIAL_UART_TXD_READY) ;
+    SERIAL_UART_DATA = data;
 }
 
 

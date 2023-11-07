@@ -9,7 +9,6 @@ TARGET_DIR = .
 
 # keyboard dependent files
 SRC =	matrix.c \
-	led.c \
 	tone.c \
 	news.c
 
@@ -71,7 +70,7 @@ OPT_DEFS += -DBOOTLOADER_SIZE=4096
 # Build Options
 #   *Comment out* to disable the options.
 #
-BOOTMAGIC_ENABLE = yes	# Virtual DIP switch configuration(+1000)
+#BOOTMAGIC_ENABLE = yes	# Virtual DIP switch configuration(+1000)
 MOUSEKEY_ENABLE = yes	# Mouse keys(+5000)
 EXTRAKEY_ENABLE = yes	# Audio control and System control(+600)
 CONSOLE_ENABLE = yes    # Console for debug

@@ -24,6 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "news.h"
 #include "matrix.h"
 #include "debug.h"
+#include "led.h"
+#include "hook.h"
+#include "wait.h"
 
 
 /*
@@ -47,6 +50,8 @@ static uint8_t matrix[MATRIX_ROWS];
 #define ROW(code)      ((code>>3)&0xF)
 #define COL(code)      (code&0x07)
 
+static uint8_t news_led = 0;
+
 
 void matrix_init(void)
 {
@@ -58,17 +63,67 @@ void matrix_init(void)
     return;
 }
 
+static uint16_t send_cmd(uint8_t cmd)
+{
+    int16_t ret = 0;
+
+    xprintf("s%02X ", cmd);
+    news_send(cmd);
+    wait_ms(10);
+
+    int16_t c;
+    while ((c = news_recv()) != -1) {
+        if ((c != 0x7B) && (c != 0xFB)) {
+            ret <<= 8;
+            ret |= c & 0xFF;
+        }
+        xprintf("r%02X ", c);
+        if (c == 0xFB) {
+            xprintf("\n");
+            return ret;
+        }
+    }
+    return -1;
+}
+
+void hook_late_init(void)
+{
+    /* Commands for starup
+     * 82 is needed to enable LED command at least
+     *
+     *  80      Reset? turns LEDs off
+     *          FB
+     *  81      replies whether LED command is enabled
+     *          7B [00|01] FB
+     *  82      enable LED command
+     *  83      replies DIP switches status
+     *          7B 00 0X FB
+     */
+    send_cmd(0x80);
+    send_cmd(0x82);
+    send_cmd(0x81);
+    send_cmd(0x83);
+}
+
 void tone(unsigned int frequency, unsigned long duration);
 void noTone(void);
 uint8_t matrix_scan(void)
 {
-    uint8_t code;
+    static uint8_t sent_led = 0;
+    int16_t code;
+
     code = news_recv();
-    if (code == 0) {
+    if (code == -1) {
+        // update LED
+        if (news_led != sent_led) {
+            send_cmd(0xB0);
+            send_cmd(news_led);
+            sent_led = news_led;
+        }
         return 0;
     }
 
-    phex(code); print(" ");
+    xprintf("%02X ", code);
     if (code&0x80) {
         // break code
         if (matrix_is_on(ROW(code), COL(code))) {
@@ -88,4 +143,13 @@ inline
 uint8_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
+}
+
+void led_set(uint8_t usb_led)
+{
+    news_led = 0;
+    if (usb_led & (1<<USB_LED_CAPS_LOCK))
+        news_led |= 4;
+    if (usb_led & (1<<USB_LED_NUM_LOCK))
+        news_led |= 8;
 }

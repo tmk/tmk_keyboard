@@ -44,7 +44,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* host role */
 void news_init(void);
-uint8_t news_recv(void);
+int16_t news_recv(void);
+void news_send(uint8_t data);
 
 /* device role */
 
