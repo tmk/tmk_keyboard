@@ -10,7 +10,7 @@ TARGET_DIR = .
 # keyboard dependent files
 SRC =	matrix.c \
 	tone.c \
-	news.c
+	protocol/serial_uart.c
 
 CONFIG_H = config.h
 

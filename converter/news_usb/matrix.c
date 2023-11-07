@@ -1,5 +1,5 @@
 /*
-Copyright 2012 Jun Wako <wakojun@gmail.com>
+Copyright 2012,2023 Jun Wako <wakojun@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <util/delay.h>
 #include "print.h"
 #include "util.h"
-#include "news.h"
+#include "serial.h"
 #include "matrix.h"
 #include "debug.h"
 #include "led.h"
@@ -55,7 +55,7 @@ static uint8_t news_led = 0;
 
 void matrix_init(void)
 {
-    news_init();
+    serial_init();
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
@@ -68,11 +68,11 @@ static uint16_t send_cmd(uint8_t cmd)
     int16_t ret = 0;
 
     xprintf("s%02X ", cmd);
-    news_send(cmd);
+    serial_send(cmd);
     wait_ms(10);
 
     int16_t c;
-    while ((c = news_recv()) != -1) {
+    while ((c = serial_recv2()) != -1) {
         if ((c != 0x7B) && (c != 0xFB)) {
             ret <<= 8;
             ret |= c & 0xFF;
@@ -112,7 +112,7 @@ uint8_t matrix_scan(void)
     static uint8_t sent_led = 0;
     int16_t code;
 
-    code = news_recv();
+    code = serial_recv2();
     if (code == -1) {
         // update LED
         if (news_led != sent_led) {
