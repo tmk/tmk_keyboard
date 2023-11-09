@@ -133,7 +133,7 @@ uint8_t matrix_scan(void)
         // make code
         if (!matrix_is_on(ROW(code), COL(code))) {
             matrix[ROW(code)] |=  (1<<COL(code));
-            //tone(80, 100);
+            //tone(440, 100);
         }
     }
     return code;

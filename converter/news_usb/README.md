@@ -23,8 +23,8 @@ Use PD2(USART RXD) for 'Keyboard Data' pin and give power with VCC and GND. Othe
     ------------------------
     PD2     Keyboard Data
     PD3     Keyboard Command
-    PD4     Mouse Data
-    PD0     BZ
+    PD0     Mouse Data
+    PD1     BZ
 
 Target microcontroller is Atmel ATMega32U2 by default but porting this project to other 8-bit AVR controllers would be easy.
 

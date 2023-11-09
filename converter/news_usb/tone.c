@@ -25,7 +25,7 @@
 // Pin for buzzer: PD0
 #define BZ_PIN_PORT     PORTD
 #define BZ_PIN_DDR      DDRD
-#define BZ_PIN_MASK     (1<<0)
+#define BZ_PIN_MASK     (1<<1)
 
 volatile long toggle_count;
 
