@@ -10,11 +10,7 @@ void eeconfig_init(void)
     eeprom_write_word(EECONFIG_MAGIC,          EECONFIG_MAGIC_NUMBER);
     eeprom_write_byte(EECONFIG_DEBUG,          0);
     eeprom_write_byte(EECONFIG_DEFAULT_LAYER,  0);
-#if defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE)
-    eeprom_write_byte(EECONFIG_KEYMAP,         ((keymap_config_t) { .nkro = 1 }).raw);
-#else
     eeprom_write_byte(EECONFIG_KEYMAP,         0);
-#endif
     eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL, 0);
 #ifdef BACKLIGHT_ENABLE
     eeprom_write_byte(EECONFIG_BACKLIGHT,      0);

@@ -94,7 +94,9 @@ void bootmagic(void)
     eeconfig_write_keymap(kc.raw);
 
 #if defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE)
-    keyboard_nkro = kc.nkro;
+    if (kc.nkro) {
+        keyboard_nkro = !keyboard_nkro;
+    }
 #endif
 
     /* default layer */
