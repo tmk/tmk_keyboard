@@ -62,7 +62,7 @@ void matrix_init(void)
     }
 
     //debug
-    debug_matrix = true;
+    debug_matrix = false;
     LED_ON();
     _delay_ms(500);
     LED_OFF();
