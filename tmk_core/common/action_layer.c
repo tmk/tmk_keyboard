@@ -142,6 +142,108 @@ static uint8_t current_layer_for_key(keypos_t key)
 }
 
 
+#ifdef BOOTMAGIC_ENABLE
+#include "keymap.h"
+extern keymap_config_t keymap_config;
+
+static uint8_t config_keymap(uint8_t keycode)
+{
+    switch (keycode) {
+        case KC_CAPSLOCK:
+        case KC_LOCKING_CAPS:
+            if (keymap_config.swap_control_capslock || keymap_config.capslock_to_control) {
+                return KC_LCTL;
+            }
+            return keycode;
+        case KC_LCTL:
+            if (keymap_config.swap_control_capslock) {
+                return KC_CAPSLOCK;
+            }
+            return KC_LCTL;
+        case KC_LALT:
+            if (keymap_config.swap_lalt_lgui) {
+                if (keymap_config.no_gui) {
+                    return KC_NO;
+                }
+                return KC_LGUI;
+            }
+            return KC_LALT;
+        case KC_LGUI:
+            if (keymap_config.swap_lalt_lgui) {
+                return KC_LALT;
+            }
+            if (keymap_config.no_gui) {
+                return KC_NO;
+            }
+            return KC_LGUI;
+        case KC_RALT:
+            if (keymap_config.swap_ralt_rgui) {
+                if (keymap_config.no_gui) {
+                    return KC_NO;
+                }
+                return KC_RGUI;
+            }
+            return KC_RALT;
+        case KC_RGUI:
+            if (keymap_config.swap_ralt_rgui) {
+                return KC_RALT;
+            }
+            if (keymap_config.no_gui) {
+                return KC_NO;
+            }
+            return KC_RGUI;
+        case KC_GRAVE:
+            if (keymap_config.swap_grave_esc) {
+                return KC_ESC;
+            }
+            return KC_GRAVE;
+        case KC_ESC:
+            if (keymap_config.swap_grave_esc) {
+                return KC_GRAVE;
+            }
+            return KC_ESC;
+        case KC_BSLASH:
+            if (keymap_config.swap_backslash_backspace) {
+                return KC_BSPACE;
+            }
+            return KC_BSLASH;
+        case KC_BSPACE:
+            if (keymap_config.swap_backslash_backspace) {
+                return KC_BSLASH;
+            }
+            return KC_BSPACE;
+        default:
+            return keycode;
+    }
+}
+
+static action_t get_action(uint8_t layer, keypos_t key)
+{
+    action_t act = action_for_key(layer, key);
+    switch (act.kind.id) {
+        case ACT_LMODS:
+        case ACT_RMODS:
+        case ACT_LMODS_TAP:
+        case ACT_RMODS_TAP:
+            act.key.code = config_keymap(act.key.code);
+            break;
+        case ACT_LAYER_TAP:
+        case ACT_LAYER_TAP_EXT:
+            act.layer_tap.code = config_keymap(act.layer_tap.code);
+            break;
+        default:
+            break;
+    }
+    return act;
+}
+#else
+static action_t get_action(uint8_t layer, keypos_t key)
+{
+    return action_for_key(layer, key);
+}
+#endif
+
+
 #ifndef NO_TRACK_KEY_PRESS
 /* record layer on where key is pressed */
 static uint8_t layer_pressed[MATRIX_ROWS][MATRIX_COLS] = {};
@@ -161,5 +263,5 @@ action_t layer_switch_get_action(keyevent_t event)
 #else
     layer = current_layer_for_key(event.key);
 #endif
-    return action_for_key(layer, event.key);
+    return get_action(layer, event.key);
 }
