@@ -34,7 +34,7 @@ void bootmagic(void)
 
     /* eeconfig clear */
     if (bootmagic_scan_key(BOOTMAGIC_KEY_EEPROM_CLEAR)) {
-        eeconfig_init();
+        eeconfig_disable();
     }
 
     /* bootloader */
@@ -44,6 +44,10 @@ void bootmagic(void)
 
     /* user-defined checks */
     hook_bootmagic();
+
+    if (!eeconfig_is_enabled()) {
+        goto WAIT;
+    }
 
     /* debug enable */
     debug_config.raw = eeconfig_read_debug();
@@ -61,35 +65,36 @@ void bootmagic(void)
     eeconfig_write_debug(debug_config.raw);
 
     /* keymap config */
-    keymap_config.raw = eeconfig_read_keymap();
+    keymap_config_t kc;
+    kc.raw = eeconfig_read_keymap();
     if (bootmagic_scan_key(BOOTMAGIC_KEY_SWAP_CONTROL_CAPSLOCK)) {
-        keymap_config.swap_control_capslock = !keymap_config.swap_control_capslock;
+        kc.swap_control_capslock = !kc.swap_control_capslock;
     }
     if (bootmagic_scan_key(BOOTMAGIC_KEY_CAPSLOCK_TO_CONTROL)) {
-        keymap_config.capslock_to_control = !keymap_config.capslock_to_control;
+        kc.capslock_to_control = !kc.capslock_to_control;
     }
     if (bootmagic_scan_key(BOOTMAGIC_KEY_SWAP_LALT_LGUI)) {
-        keymap_config.swap_lalt_lgui = !keymap_config.swap_lalt_lgui;
+        kc.swap_lalt_lgui = !kc.swap_lalt_lgui;
     }
     if (bootmagic_scan_key(BOOTMAGIC_KEY_SWAP_RALT_RGUI)) {
-        keymap_config.swap_ralt_rgui = !keymap_config.swap_ralt_rgui;
+        kc.swap_ralt_rgui = !kc.swap_ralt_rgui;
     }
     if (bootmagic_scan_key(BOOTMAGIC_KEY_NO_GUI)) {
-        keymap_config.no_gui = !keymap_config.no_gui;
+        kc.no_gui = !kc.no_gui;
     }
     if (bootmagic_scan_key(BOOTMAGIC_KEY_SWAP_GRAVE_ESC)) {
-        keymap_config.swap_grave_esc = !keymap_config.swap_grave_esc;
+        kc.swap_grave_esc = !kc.swap_grave_esc;
     }
     if (bootmagic_scan_key(BOOTMAGIC_KEY_SWAP_BACKSLASH_BACKSPACE)) {
-        keymap_config.swap_backslash_backspace = !keymap_config.swap_backslash_backspace;
+        kc.swap_backslash_backspace = !kc.swap_backslash_backspace;
     }
     if (bootmagic_scan_key(BOOTMAGIC_HOST_NKRO)) {
-        keymap_config.nkro = !keymap_config.nkro;
+        kc.nkro = !kc.nkro;
     }
-    eeconfig_write_keymap(keymap_config.raw);
+    eeconfig_write_keymap(kc.raw);
 
 #if defined(NKRO_ENABLE) || defined(NKRO_6KRO_ENABLE)
-    keyboard_nkro = keymap_config.nkro;
+    keyboard_nkro = kc.nkro;
 #endif
 
     /* default layer */
@@ -108,6 +113,18 @@ void bootmagic(void)
     } else {
         default_layer = eeconfig_read_default_layer();
         default_layer_set((uint32_t)default_layer);
+    }
+
+    keymap_config = kc;
+
+    // wait until all key is released
+WAIT:
+    matrix_scan();
+    for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
+        if (matrix_get_row(r)) {
+            goto WAIT;
+            wait_ms(10);
+        }
     }
 }
 

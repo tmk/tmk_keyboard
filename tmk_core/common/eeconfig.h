@@ -72,4 +72,6 @@ uint8_t eeconfig_read_backlight(void);
 void eeconfig_write_backlight(uint8_t val);
 #endif
 
+void eeconfig_debug(void);
+
 #endif

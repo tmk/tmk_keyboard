@@ -145,6 +145,8 @@ static void command_common_help(void)
 }
 
 #ifdef BOOTMAGIC_ENABLE
+__attribute__ ((weak)) void eeconfig_debug(void) {}
+
 static void print_eeconfig(void)
 {
     print("default_layer: "); print_dec(eeconfig_read_default_layer()); print("\n");
@@ -176,6 +178,8 @@ static void print_eeconfig(void)
     print(".enable: "); print_dec(bc.enable); print("\n");
     print(".level: "); print_dec(bc.level); print("\n");
 #endif
+
+    eeconfig_debug();
 }
 #endif
 
