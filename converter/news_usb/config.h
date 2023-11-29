@@ -62,4 +62,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   error "USART configuration is needed."
 #endif
 
+
+/* POWER ON Switch on NWP-5461 */
+#define NEWS_POWER_DDR      DDRD
+#define NEWS_POWER_PORT     PORTD
+#define NEWS_POWER_PIN      PIND
+#define NEWS_POWER_BIT      4
+/* input with pull-up */
+#define NEWS_POWER_INIT()   do { \
+    NEWS_POWER_DDR  &= ~(1 << NEWS_POWER_BIT); \
+    NEWS_POWER_PORT |=  (1 << NEWS_POWER_BIT); \
+} while(0)
+#define NEWS_POWER_SW       (!(NEWS_POWER_PIN & (1 << NEWS_POWER_BIT)))
+
 #endif

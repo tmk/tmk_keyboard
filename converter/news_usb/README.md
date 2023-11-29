@@ -17,14 +17,17 @@ Resources:
 
 Wiring
 ------
-Use PD2(USART RXD) for 'Keyboard Data' pin and give power with VCC and GND. Other pins are optional and not supported at this point.
+Use PD2(USART RXD) for 'Keyboard Data' pin and give power with VCC and GND. Other pins are optional.
 
     AVR     NEWS
     ------------------------
-    PD2     Keyboard Data
-    PD3     Keyboard Command
-    PD0     Mouse Data
-    PD1     BZ
+    PD0     7 Mouse Data
+    PD1     2 BZ(Speaker)
+    PD2     3 Keyboard Data
+    PD3     6 Keyboard Command(NWP-5461)
+    PD4     8 POWER ON Switch(NWP-5461)
+    VCC     1 VCC
+    GND     5 GND
 
 Target microcontroller is Atmel ATMega32U2 by default but porting this project to other 8-bit AVR controllers would be easy.
 
@@ -86,6 +89,37 @@ Scan Codes
     | 43  | 44 | 45 |       46          |    47    | 48| 49|  4A  | | 6E| | 66| 5B| 5C| 5D|
     `-------------------------------------------------------------' `---' `---------------'
 
+POWER ON Switch registers scan code 0x7A(0xFA) and pin 8 is not needed actually.
+
+### NWP-411A
+            ,------------------------, ,------------------------.
+            | F1 | F2 | F3 | F4 | F5 | | F6 | F7 | F8 | F9 | F10|
+            `------------------------' `------------------------'
+    ,-------------------------------------------------------------.  ,---------------.
+    |Esc|  1|  2|  3|  4|  5|  6|  7|  8|  9|  0|  -|  =|  \|  BS |  |  7|  8|  9|  -|
+    |-------------------------------------------------------------|  |---------------|
+    |Tab  |  Q|  W|  E|  R|  T|  Y|  U|  I|  O|  P|  [|  ]|Del|   |  |  4|  5|  6|  +|
+    |---------------------------------------------------------'   |  |---------------|
+    |Ctrl  |  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  `|Enter |  |  1|  2|  3|  ,|
+    |-------------------------------------------------------------|  |---------------|
+    |Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  ,|  /|   | Shift  |  |  0| ↑ |  .|   |
+    |-------------------------------------------------------------|  |-----------|Ent|
+    |Alt   |Cap|     |         Space         |     |   |   |      |  | ← | ↓ | → |   |
+    `-------------------------------------------------------------'  `---------------'
+            ,------------------------, ,------------------------.
+            | 01 | 02 | 03 | 04 | 05 | | 06 | 07 | 08 | 09 | 0A |
+            `------------------------' `------------------------'
+    ,-------------------------------------------------------------.  ,---------------.
+    | 0B| 0C| 0D| 0E| 0F| 10| 11| 12| 13| 14| 15| 16| 17| 18|  19 |  | 4B| 4C| 4D| 4E|
+    |-------------------------------------------------------------|  |---------------|
+    |  1A | 1B| 1C| 1D| 1E| 1F| 20| 21| 22| 23| 24| 25| 26| 27|   |  | 4F| 50| 51| 52|
+    |---------------------------------------------------------'   |  |---------------|
+    |  28  | 29| 2A| 2B| 2C| 2D| 2E| 2F| 30| 31| 32| 33| 34|  35  |  | 53| 54| 55| 56|
+    |-------------------------------------------------------------|  |---------------|
+    |  36    | 37| 38| 39| 3A| 3B| 3C| 3D| 3E| 3F| 40| 41|   42   |  | 57| 58| 59|   |
+    |-------------------------------------------------------------|  |-----------| 5A|
+    | 43   |44 | 45  |       46              | 47  | 48| 49|  4A  |  | 5B| 5C| 5D|   |
+    `-------------------------------------------------------------'  `---------------'
 
 
 Pinouts
@@ -101,16 +135,10 @@ Pinouts
     3 Keyboard Data(from keyboard MCU TxD)
     4 NC
     5 GND
-    6 Keyboard Command?(to MCU RxD via two schmitt triggers of Z8 74LS14)
+    6 Keyboard Command(to keyboard MCU RxD via two schmitt triggers of Z8 74LS14)
     7 Mouse Data(from Mouse Ext connector)
     8 Power switch(directly to the switch via diode)
     9 FG
-
-I have three NWP-5461s and GND and FG is connected in one of them for some reason.
-- Serial No.14178(EH0100 5 04 04 0173) GND and FG is not tied.
-- Serial No.14580(EH0100 5 09 12 0211) GND and FG is not tied.
-- Serial No.17458(EH0100 7 09 08 0104) GND and FG is not tied.
-
 
 ### NWP-411A
 
@@ -127,7 +155,6 @@ I have three NWP-5461s and GND and FG is connected in one of them for some reaso
     7 Mouse Data(from Mouse Ext connector)
     8 NC
     9 FG
-    NOTE: These are just from my guess and not confirmed.
 
 
 
