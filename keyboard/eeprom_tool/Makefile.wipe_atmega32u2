@@ -1,0 +1,6 @@
+NAME = eeprom_wipe
+MCU = atmega32u2
+TARGET = $(NAME)_$(MCU)
+SRC = $(NAME).c
+
+include Makefile

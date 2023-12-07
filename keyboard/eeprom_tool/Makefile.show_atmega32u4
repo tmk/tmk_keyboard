@@ -1,0 +1,6 @@
+NAME = eeprom_show
+MCU = atmega32u4
+TARGET = $(NAME)_$(MCU)
+SRC = $(NAME).c
+
+include Makefile
