@@ -236,10 +236,26 @@ void hook_usb_suspend_loop(void)
     suspend_power_down();
 #endif
     if (USB_Device_RemoteWakeupEnabled) {
-        if (suspend_wakeup_condition()) {
+        if (usb_host.checkRemoteWakeup()) {
             USB_Device_SendRemoteWakeup();
         }
     } else {
         matrix_scan();
     }
+}
+
+static uint8_t _led_stats = 0;
+void hook_usb_suspend_entry(void)
+{
+    matrix_clear();
+    clear_keyboard();
+
+    usb_host.suspend();
+}
+
+void hook_usb_wakeup(void)
+{
+    suspend_wakeup_init();
+
+    usb_host.resume();
 }
