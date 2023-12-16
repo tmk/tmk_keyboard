@@ -226,9 +226,6 @@ void led_set(uint8_t usb_led)
     if (kbd4.isReady()) kbd4.SetLed(&usb_led);
 }
 
-// We need to keep doing UHS2 USB::Task() to initialize keyboard
-// even during USB bus is suspended and remote wakeup is not enabled yet on LUFA side.
-// This situation can happen just after pluging converter into USB port.
 void hook_usb_suspend_loop(void)
 {
 #ifndef TMK_LUFA_DEBUG_UART
@@ -239,8 +236,6 @@ void hook_usb_suspend_loop(void)
         if (usb_host.checkRemoteWakeup()) {
             USB_Device_SendRemoteWakeup();
         }
-    } else {
-        matrix_scan();
     }
 }
 
