@@ -242,15 +242,38 @@ void hook_usb_suspend_loop(void)
 static uint8_t _led_stats = 0;
 void hook_usb_suspend_entry(void)
 {
+    dprintf("[S]");
     matrix_clear();
     clear_keyboard();
 
     usb_host.suspend();
+
+#ifdef UHS2_POWER_SAVING
+    // power down when remote wake is not enabled
+    if (!USB_Device_RemoteWakeupEnabled) {
+        dprintf("[p]");
+        usb_host.powerDown();
+    }
+#endif
 }
 
 void hook_usb_wakeup(void)
 {
+    dprintf("[W]");
     suspend_wakeup_init();
+
+#ifdef UHS2_POWER_SAVING
+    // power down when remote wake is not enabled
+    if (!USB_Device_RemoteWakeupEnabled) {
+        dprintf("[P]");
+        usb_host.powerUp();
+
+        // USB state cannot be retained through power down/up cycle
+        // device should be enumerated and initialize from the beginning
+        usb_host.ReleaseAllDevices();
+        usb_host.setUsbTaskState(USB_STATE_DETACHED);
+    }
+#endif
 
     usb_host.resume();
 }
