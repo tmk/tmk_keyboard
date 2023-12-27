@@ -277,3 +277,17 @@ void hook_usb_wakeup(void)
 
     usb_host.resume();
 }
+
+void hook_usb_startup_wait_loop(void)
+{
+    usb_host.Task();
+
+    static uint8_t usb_state = 0;
+    if (usb_state != usb_host.getUsbTaskState()) {
+        usb_state = usb_host.getUsbTaskState();
+        dprintf("u:%02X\n", usb_state);
+        if (usb_state == USB_STATE_RUNNING) {
+            dprintf("s:%s\n", usb_host.getVbusState()==FSHOST ? "f" : "l");
+        }
+    }
+}
