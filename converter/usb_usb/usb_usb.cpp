@@ -226,8 +226,16 @@ void led_set(uint8_t usb_led)
     if (kbd4.isReady()) kbd4.SetLed(&usb_led);
 }
 
+static bool init_done = false;
+void hook_late_init()
+{
+    dprintf("[i]");
+    init_done = true;
+}
+
 void hook_usb_suspend_loop(void)
 {
+    dprintf("[s]");
 #ifndef TMK_LUFA_DEBUG_UART
     // This corrupts debug print when suspend
     suspend_power_down();
@@ -243,6 +251,8 @@ static uint8_t _led_stats = 0;
 void hook_usb_suspend_entry(void)
 {
     dprintf("[S]");
+    if (!init_done) return;
+
     matrix_clear();
     clear_keyboard();
 
@@ -260,6 +270,8 @@ void hook_usb_suspend_entry(void)
 void hook_usb_wakeup(void)
 {
     dprintf("[W]");
+    if (!init_done) return;
+
     suspend_wakeup_init();
 
 #ifdef UHS2_POWER_SAVING
