@@ -226,20 +226,80 @@ void led_set(uint8_t usb_led)
     if (kbd4.isReady()) kbd4.SetLed(&usb_led);
 }
 
-// We need to keep doing UHS2 USB::Task() to initialize keyboard
-// even during USB bus is suspended and remote wakeup is not enabled yet on LUFA side.
-// This situation can happen just after pluging converter into USB port.
+static bool init_done = false;
+void hook_late_init()
+{
+    dprintf("[i]");
+    init_done = true;
+}
+
 void hook_usb_suspend_loop(void)
 {
+    dprintf("[s]");
 #ifndef TMK_LUFA_DEBUG_UART
     // This corrupts debug print when suspend
     suspend_power_down();
 #endif
     if (USB_Device_RemoteWakeupEnabled) {
-        if (suspend_wakeup_condition()) {
+        if (usb_host.checkRemoteWakeup()) {
             USB_Device_SendRemoteWakeup();
         }
-    } else {
-        matrix_scan();
+    }
+}
+
+static uint8_t _led_stats = 0;
+void hook_usb_suspend_entry(void)
+{
+    dprintf("[S]");
+    if (!init_done) return;
+
+    matrix_clear();
+    clear_keyboard();
+
+    usb_host.suspend();
+
+#ifdef UHS2_POWER_SAVING
+    // power down when remote wake is not enabled
+    if (!USB_Device_RemoteWakeupEnabled) {
+        dprintf("[p]");
+        usb_host.powerDown();
+    }
+#endif
+}
+
+void hook_usb_wakeup(void)
+{
+    dprintf("[W]");
+    if (!init_done) return;
+
+    suspend_wakeup_init();
+
+#ifdef UHS2_POWER_SAVING
+    // power down when remote wake is not enabled
+    if (!USB_Device_RemoteWakeupEnabled) {
+        dprintf("[P]");
+        usb_host.powerUp();
+
+        // USB state cannot be retained through power down/up cycle
+        // device should be enumerated and initialize from the beginning
+        usb_host.ReleaseAllDevices();
+        usb_host.setUsbTaskState(USB_STATE_DETACHED);
+    }
+#endif
+
+    usb_host.resume();
+}
+
+void hook_usb_startup_wait_loop(void)
+{
+    usb_host.Task();
+
+    static uint8_t usb_state = 0;
+    if (usb_state != usb_host.getUsbTaskState()) {
+        usb_state = usb_host.getUsbTaskState();
+        dprintf("u:%02X\n", usb_state);
+        if (usb_state == USB_STATE_RUNNING) {
+            dprintf("s:%s\n", usb_host.getVbusState()==FSHOST ? "f" : "l");
+        }
     }
 }
