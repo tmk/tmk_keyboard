@@ -494,16 +494,19 @@ RAW CODE:
     * 0x71, 0x79,DD / 0xF1, 0x79, 0xUU
 
 
-MODEL NUMBER:
-    M0110(GS536):           0x03  00000011 : model number 1 (001)
-    M0110(GS624):           0x09  00001001 : model number 4 (100)
-    M0110A(M923):           0x0B  00001011 : model number 5 (101)
-    M0110AJ(M839):          0x0B  00001011 : model number 5 (101)
-    M0110AJ(A615):          0x0B  00001011 : model number 5 (101)
-    M0120(BCG9GRM0120):     0x11  00010001
-    M0120 & M0110(G536):    0x13  00010011
-    M0120 & M0110(G624):    0x19  00011001
-    M0120 & M0110A(M923):   0x1B  00011011
+MODEL CODE:
+    Model                   Code    Layout  Made in     Desc
+    ---------------------------------------------------------------------
+    M0110(GS536)            0x03    US      USA
+    M0110(GS624)            0x09    US      USA
+    M0110F                  0x03    French  Ireland     https://github.com/tmk/tmk_keyboard/issues/771
+    M0110A(M923)            0x0B    US
+    M0110AJ(M839)           0x0B    US
+    M0110AJ(A615)           0x0B    US
+    M0120(BCG9GRM0120)      0x11
+    M0120 & M0110(G536)     0x13
+    M0120 & M0110(G624)     0x19
+    M0120 & M0110A(M923)    0x1B
 
 
 Scan Code
@@ -578,8 +581,8 @@ Scan Code
 References
 ----------
 Technical Info for 128K/512K and Plus
-    ftp://ftp.apple.asimov.net/pub/apple_II/documentation/macintosh/Mac%20Hardware%20Info%20-%20Mac%20128K.pdf
-    ftp://ftp.apple.asimov.net/pub/apple_II/documentation/macintosh/Mac%20Hardware%20Info%20-%20Mac%20Plus.pdf
+    https://www.apple.asimov.net/documentation/macintosh/Mac%20Hardware%20Info%20-%20Mac%20128K.pdf
+    https://www.apple.asimov.net/documentation/macintosh/Mac%20Hardware%20Info%20-%20Mac%20Plus.pdf
 Protocol:
     Page 20 of Tech Info for 128K/512K
     http://www.mac.linux-m68k.org/devel/plushw.php
