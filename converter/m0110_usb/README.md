@@ -22,6 +22,7 @@ Update
 - 2014/06: Change keymaps
 - 2015/03: Add support for "International"(ISO) keyboard(keymap_intl.c)
 - 2016/09: Unimap support - keymap editor on web browser
+- 2024/01: Add Keymap Editor support for International layout
 
 
 
@@ -55,24 +56,35 @@ You may need pull-up resistors on signal lines(`CLOCK`, `DATA`) in particular wh
 
 Building Firmware
 -----------------
-To compile firmware you need AVR GCC. You can edit *Makefile* and *config.h* to change compile options and pin configuration. Also `KEYMAP` option can be used to select keymap.
+To compile firmware you need AVR GCC. You can edit *Makefile* and *config.h* to change compile options and pin configuration.
 
     $ git clone git://github.com/tmk/tmk_keyboard.git (or download source)
     $ cd m0110_usb
-    $ make -f Makefile.rev2 clean
-    $ make -f Makefile.rev2 [KEYMAP={intl|spacefn}]
+    $ make -f Makefile.unimap.rev2 clean
+    $ make -f Makefile.unimap.rev2
 
-Use `Maefile.rev1` for TMK converter rev.1 and Teensy(ATMega32u4), instead.
+Use `Maefile.unimap.rev1` for TMK converter rev.1 and Teensy(ATMega32u4), instead.
+
+
+### Keymap file
+To create your own keymap copy `unimap.c` to `unimap_<name>.c` and edit it. You can build firmware like below:
+
+    $ make -f Makefile.unimap.rev2 KEYMAP=<name>
 
 
 
-Keymap
-------
-To create your own keymap copy existent keymap file to `keymap_<name>.c` and edit it. You can build with `make -f Makefile.rev2 KEYMAP=<name>`.
-
-Or you can edit keymap on web browser and download firmware.
+Keymap Editor
+-------------
+You can edit your keymap on Keymap Editor and download firmware.
 
 http://www.tmk-kbd.com/tmk_keyboard/editor/
+
+
+### International layout
+[Keymap Editor for International layout](https://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?m0110_usb_intl#456C4oOW4Kmg6biL5oKGcOOOiNeA5rWMxoDjkr/suIDrg6DhjIDqsqTgu4PrlIDng6DinI7Isu6zs+KykuyDjOK8nO2kgOuoue2MtuqFmeu1puSxiu6EoeySl+GKvOSskNuK5I2J4aWS64um7r6564O07bK755et7aK34Kuc45226ree65ym5pCK4Yuo5Z6h5pqE7K2V75GB6qGJ5LGo5L2I5K6K7o6G5IeG5JeG5K+M7Iam5LGG5IWI6rGA5JaX6LGt6Z6X6IGf6YGJ5IOM5q2L6K2B7K2F7K2I6ZaL7K2M5K2B5K2B6q2P5K2E7IOL6IOB7IOF7IOL7IOM5IOE4oig7Iag7LWA7L2A7Iuh6oWd5JGY5aGb6Yq865yu5KmC5Jai5JKy66GI5KCs5qii7Jmx7Jim6ruu54uJ5Jqp5o2x542G7I2M5KWG46mx7KWF75eE76W97qO024XuoaTliojotYvojZDng5TlsbvouIruvIjqhqjjkarmqIfhnIfnhrnqp6jmqKbjlZjspYTkpp3sqLTimIDir63kkqHkooHunaPhv4bpvYzmlp3ioKHhhKXgt6/knbjjjrnnvLrmgLLqj4jml7LppKLpubHskYnvkJborbniianlkrHusK/pl4rosrLqlZTrhZzqvZbqrLXjqo3lqqTlnqntlIrkuYbttbbrvZTivLbprK3pi6vkhqrthazmmJvhtrTonZ3qhZbupbTlt4Xpobfnkrntn6nmgIbrt4Hrvajnh57hrrbkn7Xth5Pkvrbtl63nkKfPnuy9iueYtOqjjemuk+imleS5veOameCym+eMnu+ziOeCtuGirOSaq+WGmuyxruucmOa5p+isqe2Lq+anlO27j+ubm+KWmeWlsuu/nuq4juqPhy/pgIA=) is available.
+
+See also [issue #771](https://github.com/tmk/tmk_keyboard/issues/771).
+
 
 
 Debug
