@@ -63,6 +63,8 @@ textarea {
  * +---------------------------+
  * margin:0 + border:0 +  padding:24 = 24px
  */
+.btn050  { width:2px   }  /* 26  - 24 */
+.btn075  { width:15px  }  /* 39  - 24 */
 .btn100  { width:28px  }  /* 52  - 24 */
 .btn125  { width:41px  }  /* 65  - 24 */
 .btn150  { width:54px  }  /* 78  - 24 */
