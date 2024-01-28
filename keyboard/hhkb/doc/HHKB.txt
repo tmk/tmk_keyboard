@@ -9,6 +9,10 @@ Controller PCB
 
     (HHKB_controller.jpg)
 
+    6MHz crystal Kyocera(KSS) CX1255CA
+                https://ele.kyocera.com/sites/default/files/assets/static/discontinued/cx1255ca_2013_e.pdf
+
+
 Keyswitch PCB
 -------------
     HC4051      Analog Multiplexer: select a row line.
