@@ -12,11 +12,14 @@ void KBDReportParser::Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *b
     }
     xprintf("\r\n");
 
+    /* Keyboard can send report in size other than 8 bytes
+     * https://github.com/tmk/tmk_keyboard/issues/773
     // boot keyboard report length should be 8
     if (len != 8) {
         xprintf(" ignored\r\n");
         return;
     }
+    */
 
     // Rollover error
     // Cherry: 0101010101010101
