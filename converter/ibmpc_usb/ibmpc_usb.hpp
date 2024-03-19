@@ -52,6 +52,8 @@ class IBMPCConverter {
 
     uint8_t process_interface(void);
 
+    void write_led_pin(uint8_t usb_led, uint8_t pin);
+
     void set_led(uint8_t usb_led);
 
     static inline void matrix_clear(void) {

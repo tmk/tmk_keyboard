@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "hook.h"
 #include "ibmpc.hpp"
 #include "ibmpc_usb.hpp"
+#include "led_pins.h"
 
 
 // Converter
@@ -71,8 +72,50 @@ uint8_t matrix_scan(void)
 #endif
 }
 
+void write_led_pin(uint8_t usb_led, uint8_t pin)
+{
+    uint8_t relevant_bit;
+    switch (pin) {
+#ifdef CAPS_LOCK_PIN
+        case CAPS_LOCK_PIN:
+            relevant_bit = USB_LED_CAPS_LOCK;
+            break;
+#endif
+#ifdef NUM_LOCK_PIN
+        case NUM_LOCK_PIN:
+            relevant_bit = USB_LED_NUM_LOCK;
+            break;
+#endif
+#ifdef SCROLL_LOCK_PIN
+        case SCROLL_LOCK_PIN:
+            relevant_bit = USB_LED_SCROLL_LOCK;
+            break;
+#endif
+        default:
+            return;
+    }
+    if (usb_led & (1 << relevant_bit)) {
+        LOCK_INDICATOR_DDR |= (1 << pin);
+        LOCK_INDICATOR_PORT |= (1 << pin);
+    } else {
+        LOCK_INDICATOR_DDR &= ~(1 << pin);
+        LOCK_INDICATOR_PORT &= ~(1 << pin);
+    }
+}
+
 void led_set(uint8_t usb_led)
 {
+    // Write lock states to indicators on the converter itself
+#ifdef NUM_LOCK_PIN
+    write_led_pin(usb_led, NUM_LOCK_PIN);
+#endif
+#ifdef CAPS_LOCK_PIN
+    write_led_pin(usb_led, CAPS_LOCK_PIN);
+#endif
+#ifdef SCROLL_LOCK_PIN
+    write_led_pin(usb_led, SCROLL_LOCK_PIN);
+#endif
+    // Send lock states out to connected input device(s), if appropriate
     converter0.set_led(usb_led);
 #if defined(IBMPC_CLOCK_BIT1) && defined(IBMPC_DATA_BIT1)
     converter1.set_led(usb_led);
@@ -96,28 +139,49 @@ uint8_t ibmpc_mouse_buttons(void)
 
 void IBMPCConverter::set_led(uint8_t usb_led)
 {
-    // Sending before keyboard recognition may be harmful for XT keyboard
-    if (keyboard_kind == NONE) return;
-
-    // XT keyobard doesn't support any command and it is harmful perhaps
-    // https://github.com/tmk/tmk_keyboard/issues/635#issuecomment-626993437
-    if (keyboard_kind == PC_XT) return;
-    if (keyboard_kind == PC_MOUSE) return;
-
-    // It should be safe to send the command to keyboards with AT protocol
-    // - IBM Terminal doesn't support the command and response with 0xFE but it is not harmful.
-    // - Some other Terminals like G80-2551 supports the command.
-    //   https://geekhack.org/index.php?topic=103648.msg2894921#msg2894921
-
+    /* Pointing devices and original IBM PC ("XT") protocol keyboards do not
+     * support receiving data signals, only sending them, so it's probably not a
+     * good idea to send any to them:
+     * https://github.com/tmk/tmk_keyboard/issues/635#issuecomment-626993437
+     * 
+     * IBM terminal boards don't have LEDs, but are capable of receiving and
+     * responding to incoming data. This is useful, because it means we can send
+     * the enquiry byte to terminal keyboards, which will facilitate updating
+     * the lock state LEDs on terminal keyboards that do have them, like the
+     * Cherry G80-2551:
+     * https://geekhack.org/index.php?topic=103648.msg2894921#msg2894921
+     *
+     * The USB HID and IBM PC/AT protocols both set keyboards' lock state LEDs
+     * by sending a single byte in which each lock state is represented by one
+     * bit, but the bit order differs between protocols (see led.h and ibmpc.h).
+     */
+    switch (keyboard_kind) {
+        /* If the connected device is unidentified (temporarily or otherwise), a
+         * pointing device, or an "XT" protocol keyboard, do nothing */
+        case NONE:
+        case PC_XT:
+        case PC_MOUSE:
+            break;
+        /* If keyboard returns "ACK" acknowledgement byte (0xFA) when LED update
+         * enquiry byte (0xED) is sent, reorganise USB HID LED byte into IBM bit
+         * order and send to keyboard to update all 3 of its lock state LEDs */
+        default:
+            if (ibmpc.host_send(IBMPC_SET_LED) == IBMPC_ACK) {
+                uint8_t ibm_led = 0;
+                if (usb_led & (1 << USB_LED_SCROLL_LOCK)) {
+                    ibm_led |= (1 << IBMPC_LED_SCROLL_LOCK);
+                }
+                if (usb_led & (1 << USB_LED_NUM_LOCK)) {
+                    ibm_led |= (1 << IBMPC_LED_NUM_LOCK);
+                }
+                if (usb_led & (1 << USB_LED_CAPS_LOCK)) {
+                    ibm_led |= (1 << IBMPC_LED_CAPS_LOCK);
+                }
+                ibmpc.host_send(ibm_led);
+            }
+            break;
     // TODO: PC_TERMINAL_IBM_RT support
-    uint8_t ibmpc_led = 0;
-    if (usb_led &  (1<<USB_LED_SCROLL_LOCK))
-        ibmpc_led |= (1<<IBMPC_LED_SCROLL_LOCK);
-    if (usb_led &  (1<<USB_LED_NUM_LOCK))
-        ibmpc_led |= (1<<IBMPC_LED_NUM_LOCK);
-    if (usb_led &  (1<<USB_LED_CAPS_LOCK))
-        ibmpc_led |= (1<<IBMPC_LED_CAPS_LOCK);
-    ibmpc.host_set_led(ibmpc_led);
+    }
 }
 
 int16_t IBMPCConverter::read_wait(uint16_t wait_ms)
