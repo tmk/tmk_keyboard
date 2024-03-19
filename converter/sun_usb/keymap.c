@@ -63,7 +63,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     { KC_##K60, KC_##K61, KC_##K62, KC_##K63, KC_##K64, KC_##K65, KC_##K66, KC_##K67 }, \
     { KC_##K68, KC_##K69, KC_##K6A, KC_##K6B, KC_##K6C, KC_##K6D, KC_##K6E, KC_NO    }, \
     { KC_##K70, KC_##K71, KC_##K72, KC_##K73, KC_##K74, KC_##K75, KC_##K76, KC_##K77 }, \
-    { KC_##K78, KC_##K79, KC_##K7A, KC_##K7B, KC_NO,    KC_##K7D, KC_NO,    KC_NO    }  \
+    { KC_##K78, KC_##K79, KC_##K7A, KC_##K7B, KC_NUBS,  KC_##K7D, KC_NO,    KC_NO    }  \
 }
 
 /* CTCSP SHORT TYPE KEYBOARD */
