@@ -787,16 +787,20 @@ system_codes[0x83] = {id: 'WAKE',                        name: 'Sys Wake',      
  * Consumer page(0x0C) - media/application control
  **********************************************************************/
 consumer_codes = [];
-consumer_codes[0x0E2] = {id: 'MUTE',                        name: 'Mute',                        desc: 'Audio Mute'};
-consumer_codes[0x0E9] = {id: 'VOLU',                        name: 'Vol Up',                      desc: 'Audio Vol Up'};
-consumer_codes[0x0EA] = {id: 'VOLD',                        name: 'Vol Down',                    desc: 'Audio Vol Down'};
+consumer_codes[0x06F] = {id: 'BRTI',                        name: 'Bright Inc',                  desc: 'Brightness Increment'};
+consumer_codes[0x070] = {id: 'BRTD',                        name: 'Bright Dec',                  desc: 'Brightness Decrement'};
+consumer_codes[0x0B3] = {id: 'MFFD',                        name: 'Fast Forward',                desc: 'Media Fast Forward(Mac)'};
+consumer_codes[0x0B4] = {id: 'MRWD',                        name: 'Rewind',                      desc: 'Media Rewind(Mac)'};
 consumer_codes[0x0B5] = {id: 'MNXT',                        name: 'Next Track',                  desc: 'Next Track'};
 consumer_codes[0x0B6] = {id: 'MPRV',                        name: 'Prev Track',                  desc: 'Previous Track'};
 consumer_codes[0x0B7] = {id: 'MSTP',                        name: 'Stop',                        desc: 'Media Stop'};
 consumer_codes[0x0B8] = {id: 'EJCT',                        name: 'Eject',                       desc: 'Media Eject'};
-consumer_codes[0x0CD] = {id: 'MPLY',                        name: 'Play Pause',                  desc: 'Play Pause'};
-consumer_codes[0x183] = {id: 'MSEL',                        name: 'Media Select',                desc: 'Media Select'};
 consumer_codes[0x0CC] = {id: 'STEJ',                        name: 'Stop Eject',                  desc: 'Stop Eject'};
+consumer_codes[0x0CD] = {id: 'MPLY',                        name: 'Play Pause',                  desc: 'Play Pause'};
+consumer_codes[0x0E2] = {id: 'MUTE',                        name: 'Mute',                        desc: 'Audio Mute'};
+consumer_codes[0x0E9] = {id: 'VOLU',                        name: 'Vol Up',                      desc: 'Audio Vol Up'};
+consumer_codes[0x0EA] = {id: 'VOLD',                        name: 'Vol Down',                    desc: 'Audio Vol Down'};
+consumer_codes[0x183] = {id: 'MSEL',                        name: 'Media Select',                desc: 'Media Select'};
 consumer_codes[0x18A] = {id: 'MAIL',                        name: 'Mail',                        desc: 'Mail'};
 consumer_codes[0x192] = {id: 'CALC',                        name: 'Calc',                        desc: 'Calculator'};
 consumer_codes[0x194] = {id: 'MYCM',                        name: 'My Computer',                 desc: 'My Computer'};
@@ -807,10 +811,6 @@ consumer_codes[0x225] = {id: 'WFWD',                        name: 'Web Forward',
 consumer_codes[0x226] = {id: 'WSTP',                        name: 'Web Stop',                    desc: 'WWW Stop'};
 consumer_codes[0x227] = {id: 'WREF',                        name: 'Web Refresh',                 desc: 'WWW Refresh'};
 consumer_codes[0x22A] = {id: 'WFAV',                        name: 'Web Favorites',               desc: 'WWW Favorites'};
-consumer_codes[0x0B3] = {id: 'MFFD',                        name: 'Fast Forward',                desc: 'Media Fast Forward(Mac)'};
-consumer_codes[0x0B4] = {id: 'MRWD',                        name: 'Rewind',                      desc: 'Media Rewind(Mac)'};
-consumer_codes[0x06F] = {id: 'BRTI',                        name: 'Bright Inc',                  desc: 'Brightness Increment'};
-consumer_codes[0x070] = {id: 'BRTD',                        name: 'Bright Dec',                  desc: 'Brightness Decrement'};
 
 
 /**********************************************************************
