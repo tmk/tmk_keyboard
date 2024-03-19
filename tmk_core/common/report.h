@@ -47,14 +47,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Consumer Page(0x0C)
  * https://github.com/tmk/tmk_keyboard/issues/370
  */
-#define AUDIO_MUTE              0x00E2
-#define AUDIO_VOL_UP            0x00E9
-#define AUDIO_VOL_DOWN          0x00EA
+/* Display Brightness Controls  https://www.usb.org/sites/default/files/hutrr41_0.pdf */
+#define BRIGHTNESS_INCREMENT    0x006F
+#define BRIGHTNESS_DECREMENT    0x0070
+#define TRANSPORT_FAST_FORWARD  0x00B3
+#define TRANSPORT_REWIND        0x00B4
 #define TRANSPORT_NEXT_TRACK    0x00B5
 #define TRANSPORT_PREV_TRACK    0x00B6
 #define TRANSPORT_STOP          0x00B7
+#define TRANSPORT_EJECT         0x00B8
 #define TRANSPORT_STOP_EJECT    0x00CC
 #define TRANSPORT_PLAY_PAUSE    0x00CD
+#define AUDIO_MUTE              0x00E2
+#define AUDIO_VOL_UP            0x00E9
+#define AUDIO_VOL_DOWN          0x00EA
 /* application launch */
 #define APPLAUNCH_CC_CONFIG     0x0183
 #define APPLAUNCH_EMAIL         0x018A
@@ -71,13 +77,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* supplement for Bluegiga iWRAP HID(not supported by Windows?) */
 #define APPLAUNCH_LOCK          0x019E
 #define TRANSPORT_RECORD        0x00B2
-#define TRANSPORT_FAST_FORWARD  0x00B3
-#define TRANSPORT_REWIND        0x00B4
-#define TRANSPORT_EJECT         0x00B8
 #define APPCONTROL_MINIMIZE     0x0206
-/* Display Brightness Controls  https://www.usb.org/sites/default/files/hutrr41_0.pdf */
-#define BRIGHTNESS_INCREMENT    0x006F
-#define BRIGHTNESS_DECREMENT    0x0070
 
 /*
  * Generic Desktop Page(0x01) - system power control
