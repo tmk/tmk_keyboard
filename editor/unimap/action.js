@@ -443,12 +443,24 @@ function Action(code) {
                                         name: system_codes[this.usage_code].name,
                                         desc: system_codes[this.usage_code].desc
                                     });
+                        else
+                            return $.extend({}, action_kinds.USAGE_SYSTEM,
+                                    {
+                                        name: "System " + this.usage_code.toString(16).toUpperCase(),
+                                        desc: "System Control " + this.usage_code.toString(16).toUpperCase(),
+                                    });
                     case PAGE_CONSUMER:
                         if (consumer_codes[this.usage_code])
                             return $.extend({}, action_kinds.USAGE_CONSUMER,
                                     {
                                         name: consumer_codes[this.usage_code].name,
                                         desc: consumer_codes[this.usage_code].desc
+                                    });
+                        else
+                            return $.extend({}, action_kinds.USAGE_CONSUMER,
+                                    {
+                                        name: "Consumer " + this.usage_code.toString(16).toUpperCase(),
+                                        desc: "Consumer Page " + this.usage_code.toString(16).toUpperCase(),
                                     });
                 }
                 break;
@@ -781,9 +793,10 @@ consumer_codes[0x0EA] = {id: 'VOLD',                        name: 'Vol Down',   
 consumer_codes[0x0B5] = {id: 'MNXT',                        name: 'Next Track',                  desc: 'Next Track'};
 consumer_codes[0x0B6] = {id: 'MPRV',                        name: 'Prev Track',                  desc: 'Previous Track'};
 consumer_codes[0x0B7] = {id: 'MSTP',                        name: 'Stop',                        desc: 'Media Stop'};
+consumer_codes[0x0B8] = {id: 'EJCT',                        name: 'Eject',                       desc: 'Media Eject'};
 consumer_codes[0x0CD] = {id: 'MPLY',                        name: 'Play Pause',                  desc: 'Play Pause'};
 consumer_codes[0x183] = {id: 'MSEL',                        name: 'Media Select',                desc: 'Media Select'};
-consumer_codes[0x0CC] = {id: 'EJCT',                        name: 'Eject',                       desc: 'Media Eject'};
+consumer_codes[0x0CC] = {id: 'STEJ',                        name: 'Stop Eject',                  desc: 'Stop Eject'};
 consumer_codes[0x18A] = {id: 'MAIL',                        name: 'Mail',                        desc: 'Mail'};
 consumer_codes[0x192] = {id: 'CALC',                        name: 'Calc',                        desc: 'Calculator'};
 consumer_codes[0x194] = {id: 'MYCM',                        name: 'My Computer',                 desc: 'My Computer'};
@@ -796,6 +809,8 @@ consumer_codes[0x227] = {id: 'WREF',                        name: 'Web Refresh',
 consumer_codes[0x22A] = {id: 'WFAV',                        name: 'Web Favorites',               desc: 'WWW Favorites'};
 consumer_codes[0x0B3] = {id: 'MFFD',                        name: 'Fast Forward',                desc: 'Media Fast Forward(Mac)'};
 consumer_codes[0x0B4] = {id: 'MRWD',                        name: 'Rewind',                      desc: 'Media Rewind(Mac)'};
+consumer_codes[0x06F] = {id: 'BRTI',                        name: 'Bright Inc',                  desc: 'Brightness Increment'};
+consumer_codes[0x070] = {id: 'BRTD',                        name: 'Bright Dec',                  desc: 'Brightness Decrement'};
 
 
 /**********************************************************************
