@@ -1,7 +1,9 @@
 Keyboard converter for IBM terminal keyboard
 ============================================
 It supports PS/2 Scan Code Set 3 and runs on USB AVR chips such like PJRC Teensy.
-I tested the converter on ATMega32U4 with 1392595(102keys) and 6110345(122keys).
+I tested the converter on ATMega32U4 with 1392595(102keys), 6110345(122keys).
+
+arianvp tested the converter on AtMega32U4 with 1394312(122keys, german, plate number 1394338).
 
 Source code: https://github.com/tmk/tmk_keyboard
 Article: http://geekhack.org/index.php?topic=27272.0
