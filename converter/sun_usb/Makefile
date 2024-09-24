@@ -8,9 +8,7 @@ TMK_DIR ?= ../../tmk_core
 TARGET_DIR ?= .
 
 # keyboard dependent files
-SRC ?=	matrix.c \
-	led.c \
-	command_extra.c
+SRC ?=	sun_usb.c
 
 
 CONFIG_H ?= config.h
@@ -60,17 +58,10 @@ MOUSEKEY_ENABLE ?= yes	# Mouse keys
 EXTRAKEY_ENABLE ?= yes	# Audio control and System control
 CONSOLE_ENABLE ?= yes	# Console for debug
 COMMAND_ENABLE ?= yes    # Commands for debug and configuration
-#HARDWARE_SERIAL ?= yes  # Use hardware serial (requires inverted serial, see README)
 #NKRO_ENABLE ?= yes	# USB Nkey Rollover
 UNIMAP_ENABLE = yes
 KEYMAP_SECTION_ENABLE = yes
 
-ifdef HARDWARE_SERIAL
-	SRC := protocol/serial_uart.c $(SRC)
-	OPT_DEFS += -DHARDWARE_SERIAL
-else
-	SRC := protocol/serial_soft.c $(SRC)
-endif
 
 # Boot Section Size in bytes
 #   Teensy halfKay   512

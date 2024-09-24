@@ -1,23 +1,32 @@
 Sun to USB keyboard protocol converter
 ======================================
-Target MCU is ATMega32u2/4 but other USB capable AVR will also work.
-
-This converter will work with Sun Type 2-5 Keyboards.
+This converter translates Sun keyboard protocol into USB HID to use vintage Sun keyboards on modern computer. The converter should work with Sun Type 2-5 Keyboards. Target MCU is ATmega32U2/4. Mouse support is available only to ATmega32U2 at this time.
 
 
-Check wiki pages for other information about TMK keyobard firware.
+Prebuilt TMK Sun converter is available here:
+
+https://geekhack.org/index.php?topic=72052.0
+
+Refer to this page for Sun keyboard protocol details.
+
+https://github.com/tmk/tmk_keyboard/wiki/Sun-Keyboard-Protocol
+
+Check wiki for general information about TMK keyboard firmware.
 
 https://github.com/tmk/tmk_keyboard/wiki
 
 
+
 Update
 ------
+2024-09-28 Add mouse support and rewrite code to use timer for software uart
 2020-04-08 Added unimap support
 
 
-Connector
----------
-Modern Type 4 and 5 keyboards uses 8Pin mini DIN.
+
+Wiriing
+-------
+For Type 4 and 5 keyboards use 8Pin mini DIN.
 
        ___ ___
       /  |_|  \
@@ -27,65 +36,37 @@ Modern Type 4 and 5 keyboards uses 8Pin mini DIN.
        \_____/
      (receptacle)
 
-    Wiring:
     Pin mini DIN        MCU
     ----------------------------------
     1   GND             GND
     2   GND             GND
-    3   5V
-    4   RX/TX(Mouse)
-    5   RX              PD3
-    6   TX              PD2
+    3   5V              VCC
+    4   Mouse RX/TX     PD4
+    5   Keyboard RX     PD2
+    6   Keyboard TX     PD3
     7   GND             GND
     8   5V              VCC
 
 
-Protocol
---------
-Signal: Asynchronous, Negative logic, 1200baud, No Flow control
-
-Frame format: 1-Start bit, 8-Data bits, No-Parity, 1-Stop bit
-
-AVR USART engine expects positive logic while Sun keyboard signal is negative.
-To use AVR UART engine you need external inverter in front of RX and TX pin.
-Otherwise you can use software serial to communicate the keyboard.
-
-This firmware uses software serial by default, so you don't need any inverter.
-It can be still built with 'make HARDWARE_SERIAL=y' to enable hardware serial if you have inverter. You can use 74LS04 for example.
+Just wire connecotr pins to MCU pins respectively, no extra component is needed. Pull-up resistor on signal lines are optional.
 
 
-### Commands From System To Keyboard
 
-    0x01 Reset
-            Keyboard responds with following byte sequence:
-            Success: 0xFF 0x04 0x7F
-            Fail:    0x7E 0x01 0x7F
-    0x02 Bell On
-    0x03 Bell Off
-    0x0A Click On
-    0x0B Click Off
-    0x0E LED
-            followed by LED status byte:
-            bit: 3       2       1       0
-            LED: CapsLk  ScrLk   Compose NumLk
-    0x0F Layout
-            Keyboard responds with 'Layout Response' 0xFE 0xXX
+Keymap Editor
+-------------
+You can download prebuilt firmware on TMK keymap editor.
 
-### Commands From Keyboard To System
-    0x7F Idle
-            means no keys pressed.
-    0xFE Layout Response
-    0xFF Reset Response(followed by 0x04)
+https://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?sun_usb
 
-### Reference
-- http://kentie.net/article/sunkbd/page2.htm
-- http://kentie.net/article/sunkbd/KBD.pdf
+For ATmega32U4 use this link, instead.
+
+https://www.tmk-kbd.com/tmk_keyboard/editor/unimap/?sun_usb_32u4
+
 
 
 Build Firmware
 --------------
-For TMK converter with ATmega32U2 just run `make` to build firmware hex file.
-For other DIY converters with ATmega32U4 like Teensy2 or Pro Micro use `make -f Makefile.atmega32u4` instead of `make`.
+For TMK converter with ATmega32U2 just run `make` to build firmware hex file. For ATmega32U4 use `make -f Makefile.atmega32u4` instead of `make`.
 
     $ cd sun_usb
     $ make
@@ -96,30 +77,18 @@ Then, load the hex file into MCU with your favorite programmer. If you have `dfu
 
 
 
-Keyboard Control
-----------------
-You can send Sun protocol commands with TMK `Magic` key combo. By default `Magic` key is `LShift` + `RShift`, `LAlt` + `RAlt' or `LMeta` + `RMeta`.
-https://github.com/tmk/tmk_keyboard#magic-commands
+Keyboard Commands
+-----------------
+You can send Sun keyboard commands with TMK Magic key combo. Magic key is `LShift + RShift` on the converter.
 
-Following Sun specific commands are available. For example, to send 'Bell On' you can press `LShift` + `RShift` + `Up` keys simultaneously.
+For example, to send 'Reset' command press `LShift + RShift + Delete` key combo.
 
-```
------ Sun converter Help -----
-Up:     Bell On
-Down:   Bell Off
-Left:   Click On
-Right:  Click Off
-PgUp:   LED all On
-PgDown: LED all On
-Insert: Layout
-Delete: Reset
-```
+Following Sun specific commands are available.
 
-
-Tested on
----------
-### Type 3
-http://blog.daveastels.com.s3-website-us-west-2.amazonaws.com/2014/12/27/type-3-keyboard.html
-
-### CTCSP SHORT TYPE KEYBOARD(Type 5)
-http://imgur.com/a/QIv6p
+    --- Sun keyboard commands ---
+    Home:        Toggle Bell
+    End:         Toggle Click
+    PgUp:        LED All On
+    PgDown:      LED All Off
+    Insert:      Layout
+    Delete:      Reset
