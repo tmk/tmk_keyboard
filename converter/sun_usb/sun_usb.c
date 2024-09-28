@@ -29,6 +29,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "host.h"
 
 
+#if !defined(SUN_MOUSE_ENABLE)
+#   define SUN_MOUSE_ENABLE 1
+#endif
+
 // Timer count
 #define BAUD                1200
 #define PRESCALE            8
@@ -156,6 +160,7 @@ ISR(TIMER1_COMPA_vect)
 }
 
 
+#if SUN_MOUSE_ENABLE
 //
 // mouse uart
 //
@@ -224,6 +229,7 @@ ISR(TIMER1_COMPC_vect)
         break;
     }
 }
+#endif
 
 
 void hook_early_init(void)
@@ -265,11 +271,13 @@ void hook_early_init(void)
     EICRA  |=  (1 << ISC21) | (1 << ISC20);
     EIMSK  |=  (1 << INT2);
 
+#if SUN_MOUSE_ENABLE
     // mouse init
     suart_init(&ms_suart);
     // enable interrupt on rising edge for mouse
     EICRB  |=  (1 << ISC51) |(1 << ISC50);
     EIMSK  |=  (1 << INT5);
+#endif
 
     sei();
 }
@@ -296,6 +304,7 @@ void hook_late_init(void)
  *  the device seems to fail to follow movement and send wrong value when dragging it rapidly.
  *  it causes opposite direction movement in the result. encoder speed limit? if not a bug in my code.
  */
+#if SUN_MOUSE_ENABLE
 void hook_main_loop(void)
 {
     static uint8_t n = 0;
@@ -338,6 +347,7 @@ void hook_main_loop(void)
     }
     n = (n + 1) % 5;
 }
+#endif
 
 
 /*

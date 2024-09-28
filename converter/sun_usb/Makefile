@@ -62,6 +62,8 @@ COMMAND_ENABLE ?= yes    # Commands for debug and configuration
 UNIMAP_ENABLE = yes
 KEYMAP_SECTION_ENABLE = yes
 
+SUN_MOUSE_ENABLE ?= yes # Sun mouse support
+
 
 # Boot Section Size in bytes
 #   Teensy halfKay   512
@@ -87,6 +89,12 @@ ifdef KEYMAP
     SRC := $(KEYMAP_FILE)_$(KEYMAP).c $(SRC)
 else
     SRC := $(KEYMAP_FILE).c $(SRC)
+endif
+
+ifeq (yes,$(strip $(SUN_MOUSE_ENABLE)))
+    OPT_DEFS += -DSUN_MOUSE_ENABLE=1
+else
+    OPT_DEFS += -DSUN_MOUSE_ENABLE=0
 endif
 
 

@@ -1,5 +1,7 @@
 TARGET = sun_usb_atmega32u4
 MCU = atmega32u4
 
+SUN_MOUSE_ENABLE = no	# Sun mouse support
+
 include Makefile
 
