@@ -27,10 +27,6 @@ typedef enum { NONE, PC_XT, PC_AT, PC_TERMINAL, PC_MOUSE } keyboard_kind_t;
 #define ROW(code)      ((code>>4)&0x07)
 #define COL(code)      (code&0x0F)
 
-#ifdef IBMPC_MOUSE_ENABLE
-extern "C" uint8_t ibmpc_mouse_buttons(void);
-#endif
-
 
 class IBMPCConverter {
     public:

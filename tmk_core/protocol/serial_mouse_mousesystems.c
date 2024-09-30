@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "print.h"
 #include "debug.h"
+#include "mouse.h"
 
 #ifdef MAX
 #undef MAX
@@ -34,7 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //#define SERIAL_MOUSE_CENTER_SCROLL
 
-static uint8_t last_buttons;
 static void print_usb_data(const report_mouse_t *report);
 
 void serial_mouse_task(void)
@@ -78,16 +78,14 @@ void serial_mouse_task(void)
         report.v = MAX((int8_t)buffer[2], -127);
 
         print_usb_data(&report);
-        host_mouse_send(&report);
-        last_buttons = report.buttons;
+        mouse_send(&report);
 
         if (buffer[3] || buffer[4]) {
             report.h = MAX((int8_t)buffer[3], -127);
             report.v = MAX((int8_t)buffer[4], -127);
 
             print_usb_data(&report);
-            host_mouse_send(&report);
-            last_buttons = report.buttons;
+            mouse_send(&report);
         }
 
         return;
@@ -112,21 +110,15 @@ void serial_mouse_task(void)
     report.y = MAX(-(int8_t)buffer[2], -127);
 
     print_usb_data(&report);
-    host_mouse_send(&report);
+    mouse_send(&report);
 
     if (buffer[3] || buffer[4]) {
         report.x = MAX((int8_t)buffer[3], -127);
         report.y = MAX(-(int8_t)buffer[4], -127);
 
         print_usb_data(&report);
-        host_mouse_send(&report);
-        last_buttons = report.buttons;
+        mouse_send(&report);
     }
-}
-
-uint8_t serial_mouse_buttons(void)
-{
-    return last_buttons;
 }
 
 static void print_usb_data(const report_mouse_t *report)

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define  PS2_MOUSE_H
 
 #include <stdbool.h>
+#include "mouse.h"
 
 #define PS2_MOUSE_READ_DATA     0xEB
 
@@ -62,6 +63,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 uint8_t ps2_mouse_init(void);
 void ps2_mouse_task(void);
-uint8_t ps2_mouse_buttons(void);
 
 #endif

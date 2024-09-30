@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "print.h"
 #include "debug.h"
+#include "mouse.h"
 #include "mousekey.h"
 
 
@@ -171,7 +172,13 @@ void mousekey_off(uint8_t code)
 void mousekey_send(void)
 {
     mousekey_debug();
-    host_mouse_send(&mouse_report);
+
+    report_mouse_t r = mouse_report;
+
+    // buttons integration between mouse and mousekey
+    r.buttons |= mouse_buttons();
+
+    host_mouse_send(&r);
     last_timer = timer_read();
 }
 

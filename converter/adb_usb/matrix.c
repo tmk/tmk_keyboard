@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "led.h"
 #include "timer.h"
 #include "wait.h"
+#include "mouse.h"
 
 
 // matrix state buffer(1:on, 0:off)
@@ -652,14 +653,9 @@ static uint8_t mouse_proc(uint8_t addr)
             mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouse_report.v);
 
     // Send result by usb.
-    host_mouse_send(&mouse_report);
+    mouse_send(&mouse_report);
 
     return 1;
-}
-
-uint8_t adb_mouse_buttons(void)
-{
-    return mouse_report.buttons;
 }
 #endif
 
@@ -940,4 +936,6 @@ uint8_t matrix_scan(void)
     } else {
         detect_ms = timer_read();
     }
+
+    return 1;
 }

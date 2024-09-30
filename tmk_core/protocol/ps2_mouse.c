@@ -25,10 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "print.h"
 #include "debug.h"
+#include "mouse.h"
 
 
 static report_mouse_t mouse_report = {};
-static uint8_t last_buttons;
 
 
 static void print_usb_data(void);
@@ -140,7 +140,7 @@ void ps2_mouse_task(void)
                 mouse_report.h =  mouse_report.x/(PS2_MOUSE_SCROLL_DIVISOR_H);
                 mouse_report.x = 0;
                 mouse_report.y = 0;
-                //host_mouse_send(&mouse_report);
+                //mouse_send(&mouse_report);
             }
         }
         else if ((mouse_report.buttons & (PS2_MOUSE_SCROLL_BTN_MASK)) == 0) {
@@ -149,7 +149,7 @@ void ps2_mouse_task(void)
                     TIMER_DIFF_16(timer_read(), scroll_button_time) < PS2_MOUSE_SCROLL_BTN_SEND) {
                 // send Scroll Button(down and up at once) when not scrolled
                 mouse_report.buttons |= (PS2_MOUSE_SCROLL_BTN_MASK);
-                host_mouse_send(&mouse_report);
+                mouse_send(&mouse_report);
                 _delay_ms(100);
                 mouse_report.buttons &= ~(PS2_MOUSE_SCROLL_BTN_MASK);
             }
@@ -161,8 +161,7 @@ void ps2_mouse_task(void)
 #endif
 
 
-        host_mouse_send(&mouse_report);
-        last_buttons = mouse_report.buttons;
+        mouse_send(&mouse_report);
         print_usb_data();
     }
     // clear report
@@ -171,11 +170,6 @@ void ps2_mouse_task(void)
     mouse_report.v = 0;
     mouse_report.h = 0;
     mouse_report.buttons = 0;
-}
-
-uint8_t ps2_mouse_buttons(void)
-{
-    return last_buttons;
 }
 
 static void print_usb_data(void)

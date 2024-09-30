@@ -115,7 +115,6 @@ void     adb_host_reset_hard(void);
 void     adb_host_kbd_led(uint8_t addr, uint8_t led);
 void     adb_mouse_task(void);
 void     adb_mouse_init(void);
-uint8_t  adb_mouse_buttons(void);
 bool     adb_service_request(void);
 
 

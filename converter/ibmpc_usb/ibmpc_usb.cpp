@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "hook.h"
 #include "ibmpc.hpp"
 #include "ibmpc_usb.hpp"
+#include "mouse.h"
 
 
 // Converter
@@ -84,14 +85,6 @@ action_t action_for_key(uint8_t layer, keypos_t key)
 {
     return (action_t){ .code = pgm_read_word(&actionmaps[(layer)][key.row & 0x07][key.col & 0x0F]) };
 }
-
-#ifdef IBMPC_MOUSE_ENABLE
-static uint8_t last_buttons;
-uint8_t ibmpc_mouse_buttons(void)
-{
-    return last_buttons;
-}
-#endif
 
 
 void IBMPCConverter::set_led(uint8_t usb_led)
@@ -625,8 +618,7 @@ MOUSE_DONE:
                         #endif
                         mouse_report.v = -CHOP8(v);
                         mouse_report.h =  CHOP8(h);
-                        host_mouse_send(&mouse_report);
-                        last_buttons = mouse_report.buttons;
+                        mouse_send(&mouse_report);
                         xprintf("M[x:%d y:%d v:%d h:%d b:%02X]\n", mouse_report.x, mouse_report.y,
                                 mouse_report.v, mouse_report.h, mouse_report.buttons);
                         break; }

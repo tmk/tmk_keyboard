@@ -305,6 +305,8 @@ void hook_late_init(void)
  *  it causes opposite direction movement in the result. encoder speed limit? if not a bug in my code.
  */
 #if SUN_MOUSE_ENABLE
+#include "mouse.h"
+
 void hook_main_loop(void)
 {
     static uint8_t n = 0;
@@ -323,6 +325,10 @@ void hook_main_loop(void)
             return;
         }
         mouse_report.buttons = 0;
+        mouse_report.x = 0;
+        mouse_report.y = 0;
+        mouse_report.v = 0;
+        mouse_report.h = 0;
         if ((code & (1 << 0)) == 0) { mouse_report.buttons |= MOUSE_BTN2; }
         if ((code & (1 << 1)) == 0) { mouse_report.buttons |= MOUSE_BTN3; }
         if ((code & (1 << 2)) == 0) { mouse_report.buttons |= MOUSE_BTN1; }
@@ -332,7 +338,7 @@ void hook_main_loop(void)
         break;
     case 2:
         mouse_report.y = -((int8_t)code < -127 ? -127 : (int8_t)code);
-        host_mouse_send(&mouse_report);
+        mouse_send(&mouse_report);
         break;
     case 3:
         mouse_report.x =  ((int8_t)code < -127 ? -127 : (int8_t)code);
@@ -340,7 +346,7 @@ void hook_main_loop(void)
     case 4:
         mouse_report.y = -((int8_t)code < -127 ? -127 : (int8_t)code);
         if (mouse_report.x || mouse_report.y) {
-            host_mouse_send(&mouse_report);
+            mouse_send(&mouse_report);
         }
         dprint("\r\n");
         break;

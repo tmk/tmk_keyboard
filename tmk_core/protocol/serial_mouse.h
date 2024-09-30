@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 #include "serial.h"
+#include "mouse.h"
 
 static inline uint8_t serial_mouse_init(void)
 {
@@ -29,6 +30,5 @@ static inline uint8_t serial_mouse_init(void)
 }
 
 void serial_mouse_task(void);
-uint8_t serial_mouse_buttons(void);
 
 #endif

@@ -92,7 +92,7 @@ else
 endif
 
 ifeq (yes,$(strip $(SUN_MOUSE_ENABLE)))
-    OPT_DEFS += -DSUN_MOUSE_ENABLE=1
+    OPT_DEFS += -DSUN_MOUSE_ENABLE=1 -DMOUSE_ENABLE=1
 else
     OPT_DEFS += -DSUN_MOUSE_ENABLE=0
 endif

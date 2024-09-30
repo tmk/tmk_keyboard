@@ -22,20 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "util.h"
 #include "debug.h"
 
+#include "mouse.h"
 #ifdef MOUSEKEY_ENABLE
 #   include "mousekey.h"
-#endif
-#ifdef PS2_MOUSE_ENABLE
-#   include "ps2_mouse.h"
-#endif
-#ifdef SERIAL_MOUSE_ENABLE
-#   include "serial_mouse.h"
-#endif
-#ifdef ADB_MOUSE_ENABLE
-#   include "adb.h"
-#endif
-#ifdef IBMPC_MOUSE_ENABLE
-uint8_t ibmpc_mouse_buttons(void);
 #endif
 
 
@@ -87,28 +76,10 @@ void host_mouse_send(report_mouse_t *report)
     report->boot_y = (report->y > 127) ? 127 : ((report->y < -127) ? -127 : report->y);
 #endif
 
-    /* Mouse buttons integration */
-    uint8_t b = report->buttons;
-#ifdef MOUSEKEY_ENABLE
-    report->buttons |= mousekey_buttons();
-#endif
-#ifdef PS2_MOUSE_ENABLE
-    report->buttons |= ps2_mouse_buttons();
-#endif
-#ifdef SERIAL_MOUSE_ENABLE
-    report->buttons |= serial_mouse_buttons();
-#endif
-#ifdef ADB_MOUSE_ENABLE
-    report->buttons |= adb_mouse_buttons();
-#endif
-#ifdef IBMPC_MOUSE_ENABLE
-    report->buttons |= ibmpc_mouse_buttons();
-#endif
     (*driver->send_mouse)(report);
-    report->buttons = b;
 
     if (debug_mouse) {
-        xprintf("mouse: [%02X|%d %d %d %d]\n", report->buttons, report->x, report->y, report->v, report->h);
+        xprintf("\nmouse: [%02X|%d %d %d %d] ", report->buttons, report->x, report->y, report->v, report->h);
     }
 }
 
