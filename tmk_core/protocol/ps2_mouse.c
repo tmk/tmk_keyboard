@@ -71,8 +71,6 @@ uint8_t ps2_mouse_init(void) {
 #define Y_IS_OVF  (mouse_report.buttons & (1<<PS2_MOUSE_Y_OVFLW))
 void ps2_mouse_task(void)
 {
-    enum { SCROLL_NONE, SCROLL_BTN, SCROLL_SENT };
-    static uint8_t scroll_state = SCROLL_NONE;
     static uint8_t buttons_prev = 0;
 
     /* receives packet from mouse */
@@ -120,46 +118,6 @@ void ps2_mouse_task(void)
 
         // invert coordinate of y to conform to USB HID mouse
         mouse_report.y = -mouse_report.y;
-
-
-#if PS2_MOUSE_SCROLL_BTN_MASK
-        static uint16_t scroll_button_time = 0;
-        if ((mouse_report.buttons & (PS2_MOUSE_SCROLL_BTN_MASK)) == (PS2_MOUSE_SCROLL_BTN_MASK)) {
-            if (scroll_state == SCROLL_NONE) {
-                scroll_button_time = timer_read();
-                scroll_state = SCROLL_BTN;
-            }
-
-            // doesn't send Scroll Button
-            //mouse_report.buttons &= ~(PS2_MOUSE_SCROLL_BTN_MASK);
-
-            if (mouse_report.x || mouse_report.y) {
-                scroll_state = SCROLL_SENT;
-
-                mouse_report.v = -mouse_report.y/(PS2_MOUSE_SCROLL_DIVISOR_V);
-                mouse_report.h =  mouse_report.x/(PS2_MOUSE_SCROLL_DIVISOR_H);
-                mouse_report.x = 0;
-                mouse_report.y = 0;
-                //mouse_send(&mouse_report);
-            }
-        }
-        else if ((mouse_report.buttons & (PS2_MOUSE_SCROLL_BTN_MASK)) == 0) {
-#if PS2_MOUSE_SCROLL_BTN_SEND
-            if (scroll_state == SCROLL_BTN &&
-                    TIMER_DIFF_16(timer_read(), scroll_button_time) < PS2_MOUSE_SCROLL_BTN_SEND) {
-                // send Scroll Button(down and up at once) when not scrolled
-                mouse_report.buttons |= (PS2_MOUSE_SCROLL_BTN_MASK);
-                mouse_send(&mouse_report);
-                _delay_ms(100);
-                mouse_report.buttons &= ~(PS2_MOUSE_SCROLL_BTN_MASK);
-            }
-#endif
-            scroll_state = SCROLL_NONE;
-        }
-        // doesn't send Scroll Button
-        mouse_report.buttons &= ~(PS2_MOUSE_SCROLL_BTN_MASK);
-#endif
-
 
         mouse_send(&mouse_report);
         print_usb_data();

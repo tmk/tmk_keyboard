@@ -33,7 +33,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #define MAX(X, Y) ((X) > (Y) ? (X) : (Y))
 
-//#define SERIAL_MOUSE_CENTER_SCROLL
 
 static void print_usb_data(const report_mouse_t *report);
 
@@ -70,27 +69,6 @@ void serial_mouse_task(void)
     if (buffer_cur < 5)
         return;
     buffer_cur = 0;
-
-#ifdef SERIAL_MOUSE_CENTER_SCROLL
-    if ((buffer[0] & 0x7) == 0x5 && (buffer[1] || buffer[2])) {
-        /* USB HID uses only values from -127 to 127 */
-        report.h = MAX((int8_t)buffer[1], -127);
-        report.v = MAX((int8_t)buffer[2], -127);
-
-        print_usb_data(&report);
-        mouse_send(&report);
-
-        if (buffer[3] || buffer[4]) {
-            report.h = MAX((int8_t)buffer[3], -127);
-            report.v = MAX((int8_t)buffer[4], -127);
-
-            print_usb_data(&report);
-            mouse_send(&report);
-        }
-
-        return;
-    }
-#endif
 
     /*
      * parse 5 byte packet.

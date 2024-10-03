@@ -64,4 +64,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 )
 #endif
 
+
+/* Mouse scroll by button
+ *
+ * Kensington Turbo Mouse 5
+ *                    .--------,
+ *    middle click -> |3  __  4|
+ *                    |  /  \  |
+ *                    |  \__/  |
+ *      left click -> |1      2| <- right click
+ *                    `--------'
+ */
+#define MOUSE_SCROLL_BUTTON     MOUSE_BTN2
+#define MOUSE_SCROLL_DIV        10
+
 #endif

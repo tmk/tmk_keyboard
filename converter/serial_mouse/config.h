@@ -117,4 +117,7 @@ Copyright 2022 Jun Wako <wakojun@gmail.com>
 } while (0)
 
 
+/* Mouse scroll by button(right) */
+#define MOUSE_SCROLL_BUTTON     MOUSE_BTN2
+
 #endif

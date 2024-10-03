@@ -435,9 +435,6 @@ static void mouse_setup(uint8_t addr)
 }
 
 static report_mouse_t mouse_report = {};
-static int32_t scroll_state = 0;
-static uint8_t scroll_speed = ADB_MOUSE_SCROLL_SPEED;
-static uint8_t scroll_button_mask = (1 << ADB_MOUSE_SCROLL_BUTTON) >> 1;
 
 static uint8_t mouse_proc(uint8_t addr)
 {
@@ -617,12 +614,6 @@ static uint8_t mouse_proc(uint8_t addr)
     if (!(buf[2] & 0x80)) buttons |= MOUSE_BTN3;    // Middle
     if (!(buf[1] & 0x80)) buttons |= MOUSE_BTN2;    // Right
     if (!(buf[0] & 0x80)) buttons |= MOUSE_BTN1;    // Left
-
-    // check if the scroll enable button is pressed
-    bool scroll_enable = (bool)(buttons & scroll_button_mask);
-    // mask out the scroll button so it isn't reported
-    buttons &= ~scroll_button_mask;
-
     mouse_report.buttons = buttons;
 
     int16_t xx, yy;
@@ -634,20 +625,10 @@ static uint8_t mouse_proc(uint8_t addr)
     y = (y > 127) ? 127 : ((y < -127) ? -127 : y);
     #endif
 
-    if (scroll_enable) {
-        scroll_state -= y;
-        mouse_report.v = scroll_state / scroll_speed;
-        scroll_state %= scroll_speed;
-
-        mouse_report.x = 0;
-        mouse_report.y = 0;
-    } else {
-        scroll_state = 0;
-        mouse_report.v = 0;
-
-        mouse_report.x = x;
-        mouse_report.y = y;
-    }
+    mouse_report.v = 0;
+    mouse_report.h = 0;
+    mouse_report.x = x;
+    mouse_report.y = y;
 
     xprintf("[ B:%02X X:%d(%d) Y:%d(%d) V:%d ]\n",
             mouse_report.buttons, mouse_report.x, xx, mouse_report.y, yy, mouse_report.v);

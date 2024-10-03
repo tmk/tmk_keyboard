@@ -4,6 +4,8 @@
 #include "stdint.h"
 #include "report.h"
 
+enum { MOUSE_SCROLL_V, MOUSE_SCROLL_H, MOUSE_SCROLL_VH };
+
 #ifdef __cplusplus
 extern "C" {
 #endif
