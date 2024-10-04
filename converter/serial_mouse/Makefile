@@ -77,6 +77,7 @@ CONSOLE_ENABLE = yes	# Console for debug(+400)
 
 NO_KEYBOARD = yes			# disable keyboard
 SERIAL_MOUSE_MICROSOFT_ENABLE = yes
+#SERIAL_MOUSE_MOUSESYSTEMS_ENABLE = yes
 
 SERIAL_MOUSE_USE_UART = yes		# Hardware UART(preferable)
 #SERIAL_MOUSE_USE_SOFT = yes		# Software Serial

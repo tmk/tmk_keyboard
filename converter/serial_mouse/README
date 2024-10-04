@@ -2,59 +2,50 @@ Serial Mouse Converter
 ======================
 This makes old serial mouse into modern USB one.
 
-Tested by:
-- Microsoft green-eyed mouse
-- DELL mouse can work with DTR only.
+https://github.com/tmk/tmk_keyboard/wiki/Serial-Mouse
+
 
 
 Pinout
 ------
 
-    DE-9    DB-25   DTE DCE     Description
-    ----------------------------------------------------------------
-    2       3       RXD TXD     data from mouse
-    3       2       TXD RXD     used by mouse as power source?
-    4       20      DTR DSR     used by mouse as power source
-    5       7       GND GND
-    7       4       RTS CTS     used by mouse as power source
-    *DTE=Converter, DCE=Mouse
+    DE-9   DB-25    Mouse     DCE     DTE     MAX232    MCU
+    ---------------------------------------------------------
+    1                         CD      CD
+    2      3        Data      TXD     RXD     ->        PD2
+    3      2        V-        RXD     TXD     <-
+    4      20       V+        DTR     DTR     V+
+    5               GND       GND     GND     GND       GND
+    6                         DSR     DSR
+    7      4        V+        CTS     RTS     V+
+    8                         RTS     CTS
+    9                         RI      RI
+    -      --                 ---     ---     VCC       VCC
 
 
 
-## RS-232 Driver
-Microsoft mouse seems to need higher voltage for power source.
-SP3232E outputs only +-6V at charge pump output and didn't work.
-ADM232A works for both Microsoft and DELL.
-
-Microsoft green-eyed mouse requires both while DELL mouse can work with DTR only.
-
-
-## Wiring
-Mouse RXD, TXD, DTR and RTS should be wired to RS-232 driver.
-Wire up RS-232 driver charge pump output V+ to DTR and RTS for power source purpose.
-
+Wiring
+------
+Mouse TXD, RXD, DTR and CTS should be wired to RS-232 driver.
+Wire up RS-232 driver charge pump output V+ to DTR and CTS for power source purpose.
 Connect Mouse TXD to AVR PD2(RXD) *through* RS-232 driver for mouse data.
 
 
 
-UART Setting
-------------
-defined in config.h.
+RS-232 Driver
+-------------
+Some mouses can require higher voltage for power source.
+SP3233E outputs only +-6V at charge pump output and didn't work with Microsoft green-eyed mouse.
+ADM232A works for both Microsoft green-eyed mouse and DELL serial mouse.
 
-### Microsoft serial mouse
+
+
+Build Setting
+-------------
+defined in config.h and Makefile.
+
+### Microsoft protocol
 1200 baud, 7-bit data, no parity, 1-bit stop, lsb-first
 
-### MouseSystems
+### MouseSystems protocol
 1200 baud, 8-bit data, no parity, 1-bit stop, lsb-first(Not tested)
-
-
-Resources
----------
-Get power out of PC RS-232 port:
-https://www.epanorama.net/circuits/rspower.html
-
-Microsoft serial mouse:
-https://web.archive.org/web/20130307230349/www.kryslix.com/nsfaq/Q.12.html
-
-Serial Mice Protocols:
-https://roborooter.com/post/serial-mice/

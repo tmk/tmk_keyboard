@@ -73,6 +73,7 @@ Copyright 2022 Jun Wako <wakojun@gmail.com>
 /*
  * Software Serial
  *   1200 baud, 7-bit data, no parity, 1-bit stop, lsb-first
+ *   ** RS-232C line driver is needed, it won't work withtout it **
  */
 #define SERIAL_SOFT_BAUD                1200
 #define SERIAL_SOFT_PARITY_NONE
@@ -92,7 +93,7 @@ Copyright 2022 Jun Wako <wakojun@gmail.com>
     /* pin configuration: input with pull-up */ \
     SERIAL_SOFT_RXD_DDR &= ~(1<<SERIAL_SOFT_RXD_BIT); \
     SERIAL_SOFT_RXD_PORT |= (1<<SERIAL_SOFT_RXD_BIT); \
-    /* enable interrupt: INT2(Positive:falling edge, Negative:rising edge) */ \
+    /* enable interrupt: INT2 Positive:falling edge(10), Negative:rising edge(11) */ \
     EICRA |= ((1<<ISC21)|(0<<ISC20)); \
     EIMSK |= (1<<INT2); \
     sei(); \
