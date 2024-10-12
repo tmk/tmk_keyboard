@@ -81,7 +81,19 @@ CONFIG = {
         /*
          * NeXT-USB
          */
-        next_usb: {
+        next_usb_ng: {
+            desc: "NeXT-USB Converter rev.2",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/next_usb_ng/binary/next_usb.hex",
+            firmware_format: "ihex",
+            layout: "layout-next_usb.html",
+        },
+        next_usb_ng_32u4: {
+            desc: "NeXT-USB Converter rev.2",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/next_usb_ng/binary/next_usb_atmega32u4.hex",
+            firmware_format: "ihex",
+            layout: "layout-next_usb.html",
+        },
+        next_usb_old: {
             desc: "NeXT-USB Converter rev.2",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/next_usb/binary/next_usb_unimap.hex",
             firmware_format: "ihex",
