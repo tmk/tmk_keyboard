@@ -5,6 +5,10 @@ With this converter you can use NeXT keyboard(non-ADB) on modern computer.
 See this for details.
 https://github.com/tmk/tmk_keyboard/wiki/NeXT
 
+Try new converter implementation next_usb_ng, instead of this next_usb.
+
+https://github.com/tmk/tmk_keyboard/tree/master/converter/next_usb_ng
+
 
 Wiring
 ------
