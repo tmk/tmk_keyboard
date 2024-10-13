@@ -465,8 +465,8 @@ void hook_main_loop(void)
     mouse_report.buttons = 0;
     if ((data1 & 0x01) == 0) mouse_report.buttons |= MOUSE_BTN1;
     if ((data2 & 0x01) == 0) mouse_report.buttons |= MOUSE_BTN2;
-    mouse_report.x = ((int8_t)(data1 & 0xFE) / 2);
-    mouse_report.y = ((int8_t)(data2 & 0xFE) / 2);
+    mouse_report.x = -((int8_t)(data1 & 0xFE) / 2);
+    mouse_report.y = -((int8_t)(data2 & 0xFE) / 2);
     mouse_report.x = (mouse_report.x > -127 ? mouse_report.x : -127);
     mouse_report.y = (mouse_report.y > -127 ? mouse_report.y : -127);
     mouse_send(&mouse_report);
