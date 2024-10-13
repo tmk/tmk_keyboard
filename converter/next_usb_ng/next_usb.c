@@ -300,13 +300,22 @@ static uint8_t next_led(void)
     return next_led;
 }
 
-void hook_late_init(void)
+static void next_reset(void)
 {
-    // reset
     next_send(0x1EF);
     next_send(0x000);
-    wait_ms(100);
+}
 
+static void next_set_led(void)
+{
+    next_send(0x100);
+    next_send(next_led());
+}
+
+void hook_late_init(void)
+{
+    next_reset();
+    wait_ms(100);
 }
 
 void matrix_clear(void)
@@ -318,10 +327,8 @@ void matrix_init(void)
 {
     matrix_clear();
 
-    // set led
-    next_send(0x100);
-    next_send(next_led());
-    wait_ms(100);
+    // to set led at startup
+    led_changed = true;
 }
 
 uint8_t matrix_scan(void)
@@ -355,6 +362,9 @@ uint8_t matrix_scan(void)
         data1 = suart_receive(&next_suart);
     } while (data1 == -1 && timer_elapsed(last_query) < 4);
     if (data1 == -1) {
+        next_reset();
+        matrix_init();
+        wait_ms(100);
         return 0;
     }
 
@@ -362,14 +372,15 @@ uint8_t matrix_scan(void)
         data2 = suart_receive(&next_suart);
     } while (data2 == -1 && timer_elapsed(last_query) < 4);
     if (data2 == -1) {
+        next_reset();
+        matrix_init();
+        wait_ms(100);
         return 0;
     }
 
     // update led
     if (led_changed) {
-        // set led
-        next_send(0x100);
-        next_send(next_led());
+        next_set_led();
         wait_ms(2);
         led_changed = false;
     }
