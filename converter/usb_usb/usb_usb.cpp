@@ -259,8 +259,8 @@ void hook_usb_suspend_entry(void)
     usb_host.suspend();
 
 #ifdef UHS2_POWER_SAVING
-    // power down when remote wake is not enabled
-    if (!USB_Device_RemoteWakeupEnabled) {
+    // power down when remote wake is not enabled or no keyboard is connected
+    if (!USB_Device_RemoteWakeupEnabled || usb_host.getUsbTaskState() != USB_STATE_RUNNING) {
         dprintf("[p]");
         usb_host.powerDown();
     }
@@ -275,8 +275,8 @@ void hook_usb_wakeup(void)
     suspend_wakeup_init();
 
 #ifdef UHS2_POWER_SAVING
-    // power down when remote wake is not enabled
-    if (!USB_Device_RemoteWakeupEnabled) {
+    // power down when remote wake is not enabled or no keyboard is connected
+    if (!USB_Device_RemoteWakeupEnabled || usb_host.getUsbTaskState() != USB_STATE_RUNNING) {
         dprintf("[P]");
         usb_host.powerUp();
 
