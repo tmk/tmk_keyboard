@@ -153,6 +153,7 @@ void process_action(keyrecord_t *record)
                         }
                         break;
                     default:
+                        /* tap key */
                         if (event.pressed) {
                             if (tap_count > 0) {
                                 if (record->tap.interrupted) {
@@ -181,6 +182,42 @@ void process_action(keyrecord_t *record)
                                 unregister_code(action.key.code);
                             } else {
                                 dprint("MODS_TAP: No tap: add_mods\n");
+                                unregister_mods(mods);
+                            }
+                        }
+                        break;
+                }
+            }
+            break;
+        case ACT_TAP_LMODS:
+        case ACT_TAP_RMODS:
+            {
+                uint8_t mods = (action.kind.id == ACT_TAP_LMODS) ?  action.key.mods :
+                                                                    action.key.mods<<4;
+                switch (action.key.code) {
+                    default:
+                        /* tap key */
+                        if (event.pressed) {
+                            if (tap_count > 0) {
+                                dprint("TAP_MODS: Tap: register_code\n");
+                                register_code(action.key.code);
+
+                                // Delay for MacOS #659
+                                if (action.key.code == KC_CAPSLOCK ||
+                                        action.key.code == KC_NUMLOCK ||
+                                        action.key.code == KC_SCROLLLOCK) {
+                                    wait_ms(100);
+                                }
+                            } else {
+                                dprint("TAP_MODS: No tap: add_mods\n");
+                                register_mods(mods);
+                            }
+                        } else {
+                            if (tap_count > 0) {
+                                dprint("TAP_MODS: Tap: unregister_code\n");
+                                unregister_code(action.key.code);
+                            } else {
+                                dprint("TAP_MODS: No tap: add_mods\n");
                                 unregister_mods(mods);
                             }
                         }
@@ -575,6 +612,12 @@ bool is_tap_key(keyevent_t event)
                 default:                    // tap key
                     return true;
             }
+        case ACT_TAP_LMODS:
+        case ACT_TAP_RMODS:
+            switch (action.key.code) {
+                default:                    // tap key
+                    return true;
+            }
         case ACT_LAYER_TAP:
         case ACT_LAYER_TAP_EXT:
             switch (action.layer_tap.code) {
@@ -620,6 +663,8 @@ void debug_action(action_t action)
         case ACT_RMODS:             dprint("ACT_RMODS");             break;
         case ACT_LMODS_TAP:         dprint("ACT_LMODS_TAP");         break;
         case ACT_RMODS_TAP:         dprint("ACT_RMODS_TAP");         break;
+        case ACT_TAP_LMODS:         dprint("ACT_TAP_LMODS");         break;
+        case ACT_TAP_RMODS:         dprint("ACT_TAP_RMODS");         break;
         case ACT_USAGE:             dprint("ACT_USAGE");             break;
         case ACT_MOUSEKEY:          dprint("ACT_MOUSEKEY");          break;
         case ACT_LAYER:             dprint("ACT_LAYER");             break;

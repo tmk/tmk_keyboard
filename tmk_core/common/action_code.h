@@ -36,7 +36,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 001r|mods|0000 0000    Modifiers with OneShot[TAP]
  * 001r|mods|0000 0001    Modifiers with tap toggle[TAP]
  * 001r|mods|0000 00xx    (reserved)            (0x02-03)
- * 001r|mods| keycode     Modifiers with tap key[TAP]
+ * 001r|mods| keycode     Modifiers and tap key[TAP]
+ *
+ * ACT_TAP_MODS(011r):
+ * 011r|mods|0000 00xx    (reserved)
+ * 011r|mods| keycode     Tap key and Modifiers[TAP]
  *
  *
  * Other Keys(01xx)
@@ -49,8 +53,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * ACT_MOUSEKEY(0101): TODO: Not needed?
  * 0101|xxxx| keycode     Mouse key
- *
- * 011x|xxxx xxxx xxxx    (reseved)
  *
  *
  * Layer Actions(10xx)
@@ -105,6 +107,9 @@ enum action_kind_id {
     ACT_MODS_TAP        = 0b0010,
     ACT_LMODS_TAP       = 0b0010,
     ACT_RMODS_TAP       = 0b0011,
+    ACT_TAP_MODS        = 0b0110,
+    ACT_TAP_LMODS       = 0b0110,
+    ACT_TAP_RMODS       = 0b0111,
     /* Other Keys */
     ACT_USAGE           = 0b0100,
     ACT_MOUSEKEY        = 0b0101,
@@ -218,6 +223,7 @@ enum mods_codes {
 #define ACTION_MODS_TAP_KEY(mods, key)  ACTION(ACT_MODS_TAP, ((mods)&0x1f00) | (key))
 #define ACTION_MODS_ONESHOT(mods)       ACTION(ACT_MODS_TAP, ((mods)&0x1f00) | MODS_ONESHOT)
 #define ACTION_MODS_TAP_TOGGLE(mods)    ACTION(ACT_MODS_TAP, ((mods)&0x1f00) | MODS_TAP_TOGGLE)
+#define ACTION_TAP_KEY_MODS(key, mods)  ACTION(ACT_TAP_MODS, ((mods)&0x1f00) | (key))
 
 
 /*
