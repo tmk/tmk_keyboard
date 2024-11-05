@@ -10,6 +10,9 @@ ACT_LMODS_TAP     = 2;  // 0b0010;
 ACT_RMODS_TAP     = 3;  // 0b0011;
 ACT_USAGE         = 4;  // 0b0100;
 ACT_MOUSEKEY      = 5;  // 0b0101;
+ACT_TAP_MODS      = 6;  // 0b0110;
+ACT_TAP_LMODS     = 6;  // 0b0110;
+ACT_TAP_RMODS     = 7;  // 0b0111;
 ACT_LAYER         = 8;  // 0b1000;
 ACT_LAYER_EXT     = 9;  // 0b1001;
 ACT_LAYER_TAP     = 10; // 0b1010; /* Layer  0-15 */
@@ -69,6 +72,7 @@ var kind_codes = {
     MODS_TAP_KEY:       ACT_MODS_TAP<<12,
     MODS_ONESHOT:       ACT_MODS_TAP<<12 | MODS_ONESHOT,
     MODS_TAP_TOGGLE:    ACT_MODS_TAP<<12 | MODS_TAP_TOGGLE,
+    TAP_KEY_MODS:       ACT_TAP_MODS<<12,
     USAGE_SYSTEM:       ACT_USAGE<<12 | PAGE_SYSTEM<<10,
     USAGE_CONSUMER:     ACT_USAGE<<12 | PAGE_CONSUMER<<10,
     MOUSEKEY:           ACT_MOUSEKEY<<12,
@@ -289,8 +293,17 @@ function Action(code) {
                 }
                 return $.extend({}, action_kinds.MODS_TAP_KEY,
                         {
-                            name: _mods_str.name + " " + keycodes[this.key_code].name,
-                            desc: _mods_str.desc + " " + keycodes[this.key_code].desc
+                            name: _mods_str.name + " \u296F" + keycodes[this.key_code].name,
+                            desc: _mods_str.desc + " and " + keycodes[this.key_code].desc + "(tap)"
+                        });
+                break;
+            case ACT_TAP_LMODS:
+            case ACT_TAP_RMODS:
+                var _mods_str = mods_str(this.key_mods);
+                return $.extend({}, action_kinds.TAP_KEY_MODS,
+                        {
+                            name: "\u296F" + keycodes[this.key_code].name + " " + _mods_str.name,
+                            desc: keycodes[this.key_code].desc + "(tap) and " + _mods_str.desc
                         });
                 break;
             case ACT_LAYER:
@@ -511,9 +524,10 @@ function Action(code) {
 var action_kinds = {
     KEY:                { id: "KEY",                    name: "ACTION_KEY",                 desc: "Normal key" },
     MODS_KEY:           { id: "MODS_KEY",               name: "ACTION_MODS_KEY",            desc: "Modified key" },
-    MODS_TAP_KEY:       { id: "MODS_TAP_KEY",           name: "ACTION_MODS_TAP_KEY",        desc: "Modifiers on hold and a type a key on tap" },
+    MODS_TAP_KEY:       { id: "MODS_TAP_KEY",           name: "ACTION_MODS_TAP_KEY",        desc: "Modifiers on hold and key type on tap" },
     MODS_ONESHOT:       { id: "MODS_ONESHOT",           name: "ACTION_MODS_ONESHOT",        desc: "Oneshot modifiers" },
     MODS_TAP_TOGGLE:    { id: "MODS_TAP_TOGGLE",        name: "ACTION_MODS_TAP_TOGGLE",     desc: "Modifiers and tap toggle" },
+    TAP_KEY_MODS:       { id: "TAP_KEY_MODS",           name: "ACTION_TAP_KEY_MODS",        desc: "Key type on tap and modifiers on hold" },
     USAGE_SYSTEM:       { id: "USAGE_SYSTEM",           name: "ACTION_USAGE_SYSTEM",        desc: "System control key" },
     USAGE_CONSUMER:     { id: "USAGE_CONSUMER",         name: "ACTION_USAGE_CONSUMER",      desc: "Consumer key" },
     MOUSEKEY:           { id: "MOUSEKEY",               name: "ACTION_MOUSEKEY",            desc: "Mouse key" },

@@ -221,6 +221,8 @@ $(function() {
                 return kind_codes[action_kind] | key_mods<<8;
             case "MODS_TAP_TOGGLE":
                 return kind_codes[action_kind] | key_mods<<8;
+            case "TAP_KEY_MODS":
+                return kind_codes[action_kind] | key_mods<<8 | keycode;
 
             case "USAGE_SYSTEM":
                 return kind_codes[action_kind] | system_code;
@@ -286,6 +288,10 @@ $(function() {
                 $("#key_mods_dropdown").show();
                 break;
             case "MODS_TAP_TOGGLE":
+                $("#key_mods_dropdown").show();
+                break;
+            case "TAP_KEY_MODS":
+                $("#keycodes_dropdown").show();
                 $("#key_mods_dropdown").show();
                 break;
 
