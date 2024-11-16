@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 |-------|  |-----------------------------------------------------------|  `-----------' |-----------| 7D|
 | 31| 33|  |  4C  | 4D| 4E| 4F| 50| 51| 52| 53| 54| 55| 56| 57|   59   |                | 5B| 5C| 5D|   |
 |-------|  |-----------------------------------------------------------|      ,---.     |-----------|---|
-| 48| 49|  |   63   | 64| 65| 66| 67| 68| 69| 6A| 6B| 6C| 6D|    6E    |      | 14|     | 70| 71| 72|   |
+| 48| 49|  | 63 | 7C| 64| 65| 66| 67| 68| 69| 6A| 6B| 6C| 6D|    6E    |      | 14|     | 70| 71| 72|   |
 |-------|  |-----------------------------------------------------------|  .-----------. |-----------| 5A|
 | 5F| 61|  | 77 | 13| 78 |*73 |       79         |*74 |*75| 7A | 43| 0D|  | 18| 1B| 1C| |   5E  | 32|   |
 `-------'  `-----------------------------------------------------------'  `-----------' `---------------'
@@ -45,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     K01,K03,  K1D,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K28,K29,K58,K2A,  K2C,K34,K60,  K62,K2E,K2F,K47, \
     K19,K1A,  K35, K36,K37,K38,K39,K3A,K3B,K3C,K3D,K3E,K3F,K40,K41,   K2B,  K42,K4A,K7B,  K44,K45,K46,K7D, \
     K31,K33,  K4C,  K4D,K4E,K4F,K50,K51,K52,K53,K54,K55,K56,K57,      K59,                K5B,K5C,K5D,     \
-    K48,K49,  K63,   K64,K65,K66,K67,K68,K69,K6A,K6B,K6C,K6D,         K6E,      K14,      K70,K71,K72,K5A, \
+    K48,K49,  K63,K7C,K64,K65,K66,K67,K68,K69,K6A,K6B,K6C,K6D,        K6E,      K14,      K70,K71,K72,K5A, \
     K5F,K61,  K77,K13, K78, K73,        K79,      K74, K75, K7A, K43, K0D,  K18,K1B,K1C,  K5E,    K32      \
 ) { \
     { KC_NO,    KC_##K01, KC_##K02, KC_##K03, KC_##K04, KC_##K05, KC_##K06, KC_##K07 }, \
@@ -63,7 +63,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     { KC_##K60, KC_##K61, KC_##K62, KC_##K63, KC_##K64, KC_##K65, KC_##K66, KC_##K67 }, \
     { KC_##K68, KC_##K69, KC_##K6A, KC_##K6B, KC_##K6C, KC_##K6D, KC_##K6E, KC_NO    }, \
     { KC_##K70, KC_##K71, KC_##K72, KC_##K73, KC_##K74, KC_##K75, KC_##K76, KC_##K77 }, \
-    { KC_##K78, KC_##K79, KC_##K7A, KC_##K7B, KC_NO,    KC_##K7D, KC_NO,    KC_NO    }  \
+    { KC_##K78, KC_##K79, KC_##K7A, KC_##K7B, KC_##K7C, KC_##K7D, KC_NO,    KC_NO    }  \
 }
 
 /* CTCSP SHORT TYPE KEYBOARD */
@@ -73,14 +73,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     K1D,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K28,K29,K58,K2A, \
     K35, K36,K37,K38,K39,K3A,K3B,K3C,K3D,K3E,K3F,K40,K41,   K2B, \
     K4C,  K4D,K4E,K4F,K50,K51,K52,K53,K54,K55,K56,K57,      K59, \
-    K63,   K64,K65,K66,K67,K68,K69,K6A,K6B,K6C,K6D, K0D,K14,K6E, \
+    K63,K7C,K64,K65,K66,K67,K68,K69,K6A,K6B,K6C,K6D,K0D,K14,K6E, \
     K77,K13, K78,             K79,      K7A,K43,K62,K18,K1B,K1C  \
 ) KEYMAP( \
          HELP,       NO,   K05,K06,K08,K0A,   K0C,K0E,K10,K11,   K12,K07,K09,K0B,  PSCR,SLCK,PAUS,  MUTE,VOLD,VOLU,K30,  \
     K01,    AGAIN,   K1D,K1E,K1F,K20,K21,K22,K23,K24,K25,K26,K27,K28,K29,K58,K2A,  K2C, K34, K60,   K62, PSLS,PAST,PMNS, \
     MENU,   UNDO,    K35, K36,K37,K38,K39,K3A,K3B,K3C,K3D,K3E,K3F,K40,K41,   K2B,  K42, K4A, K7B,   P7,  P8,  P9,  PPLS, \
     SELECT, K33,     K4C,  K4D,K4E,K4F,K50,K51,K52,K53,K54,K55,K56,K57,      K59,                   P4,  P5,  P6,        \
-    EXECUTE,K49,     K63,   K64,K65,K66,K67,K68,K69,K6A,K6B,K6C,K6D,         K6E,       K14,        P1,  P2,  P3,  PENT, \
+    EXECUTE,K49,     K63,K7C,K64,K65,K66,K67,K68,K69,K6A,K6B,K6C,K6D,        K6E,       K14,        P1,  P2,  P3,  PENT, \
     FIND,   K61,     K77,K13, K78, HENK,       K79,      MHEN, KANA, K7A,K43,K0D,  K18, K1B, K1C,   P0,       PDOT       \
 )
 
@@ -129,7 +129,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSLS,GRV,
         TAB,  Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,    BSPC,
         LCTL,  A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,        ENT,
-        LSFT,   Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,  RALT,UP,  RSFT,
+        LSFT,NUBS,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,RALT,UP,  RSFT,
         CAPS,LALT,LGUI,            SPC,              RGUI,APP, NLCK,LEFT,DOWN,RGHT
     ),
     // 1: with layer keys
@@ -139,7 +139,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSLS,GRV,
         TAB,  Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,    BSPC,
         LCTL,  A,   S,   D,   F,   G,   H,   J,   K,   L,   FN1, QUOT,        ENT,
-        LSFT,   Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, FN2,   RSFT,UP,  FN0,
+        LSFT,NUBS,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, FN2, RSFT,UP,  FN0,
         CAPS,LALT,LGUI,            SPC,              RGUI,RALT,FN0, LEFT,DOWN,RGHT
     ),
     // 2: HHKB
@@ -149,7 +149,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,
         CAPS, NO,  NO,  NO,  NO,  NO,  NO,  NO,  PSCR,SLCK,PAUS,UP,  NO,      BSPC,
         LCTL,  VOLD,VOLU,MUTE,NO,  NO,  NO,  NO,  HOME,PGUP,LEFT,RGHT,        ENT,
-        LSFT,   Z,   X,   C,   V,   B,   NO,  NO,  END, PGDN,DOWN,  RSFT,PGUP,FN0,
+        LSFT,NUBS,Z,   X,   C,   V,   B,   NO,  NO,  END, PGDN,DOWN,RSFT,PGUP,FN0,
         CAPS,LALT,LGUI,            SPC,              RGUI,RALT,FN0, HOME,PGDN,END
     ),
     // 3: Mousekey
@@ -159,7 +159,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,
         CAPS, NO,  NO,  NO,  NO,  NO,  WH_L,WH_D,WH_U,WH_R,NO,  NO,  NO,      BSPC,
         LCTL,  NO,  ACL0,ACL1,ACL2,NO,  MS_L,MS_D,MS_U,MS_R,FN1, NO,          ENT,
-        LSFT,   NO,  NO,  NO,  NO,  BTN3,BTN2,BTN1,NO,  NO,  NO,    RSFT,UP,  NO,
+        LSFT,NO,  NO,  NO,  NO,  NO,  BTN3,BTN2,BTN1,NO,  NO,  NO,  RSFT,UP,  NO,
         CAPS,LALT,LGUI,            BTN1,             RGUI,RALT,NO,  LEFT,DOWN,RGHT
     ),
     // 4: Cursor
@@ -169,7 +169,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         GRV, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, INS, DEL,
         CAPS, NO,  NO,  NO,  NO,  NO,  HOME,PGDN,PGUP,END, NO,  NO,  NO,      BSPC,
         LCTL,  NO,  NO,  NO,  NO,  NO,  LEFT,DOWN,UP,  RGHT,NO,  NO,          ENT,
-        LSFT,   NO,  NO,  NO,  NO,  NO,  HOME,PGDN,PGUP,END, FN2,   RSFT,UP,  NO,
+        LSFT,NO,  NO,  NO,  NO,  NO,  NO,  HOME,PGDN,PGUP,END, FN2, RSFT,UP,  NO,
         CAPS,LALT,LGUI,            BTN1,             RGUI,RALT,NO,  LEFT,DOWN,RGHT
     ),
 };

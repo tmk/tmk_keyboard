@@ -59,8 +59,8 @@ EXTRAKEY_ENABLE ?= yes	# Audio control and System control
 CONSOLE_ENABLE ?= yes	# Console for debug
 COMMAND_ENABLE ?= yes    # Commands for debug and configuration
 #NKRO_ENABLE ?= yes	# USB Nkey Rollover
-UNIMAP_ENABLE = yes
-KEYMAP_SECTION_ENABLE = yes
+UNIMAP_ENABLE ?= yes
+KEYMAP_SECTION_ENABLE ?= yes
 
 SUN_MOUSE_ENABLE ?= yes # Sun mouse support
 
@@ -83,6 +83,8 @@ else
         KEYMAP_FILE = actionmap
     else
         KEYMAP_FILE = keymap
+	# for deprecated legacy keymap
+        OPT_DEFS += -DUSE_LEGACY_KEYMAP=1
     endif
 endif
 ifdef KEYMAP
