@@ -226,8 +226,8 @@ void IBMPC::isr(void)
     if (isr_state == 0x8000) {
         timer_start = t;
     } else {
-        // This gives 2.0ms at least before timeout
-        if ((uint8_t)(t - timer_start) >= 5) {
+        // This gives 10ms at least before timeout
+        if ((uint8_t)(t - timer_start) > 10) {
             isr_debug = isr_state;
             error = IBMPC_ERR_TIMEOUT;
             goto ERROR;
