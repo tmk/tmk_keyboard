@@ -91,7 +91,7 @@ IBMPC_MOUSE_ENABLE ?= yes	# enable mouse support(+2000)
 # Confirmed 5.4.0, 7.3.0 and 8-12
 GCC_MAJOR = $(shell avr-gcc -dumpversion | cut -d. -f1)
 
-EXTRALDFLAGS = -Wl,--relax
+EXTRALDFLAGS += -Wl,--relax
 
 # GCC8-12: disable LTO with function-sections
 ifeq ($(GCC_MAJOR),$(filter $(GCC_MAJOR),8 9 10 11 12))
