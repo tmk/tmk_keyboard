@@ -1,0 +1,39 @@
+TARGET = ibmpc_capture_$(MCU)
+MCU ?= atmega32u2
+
+SRC ?=	protocol/ibmpc.cpp \
+	ibmpc_usb.cpp \
+	common/avr/capture.c
+
+# capture.h should be included in every compile unit when defining 'fixed register'
+#CONFIG_H ?= capture.h
+
+BOOTMAGIC_ENABLE = no
+MOUSEKEY_ENABLE = no
+EXTRAKEY_ENABLE = no
+CONSOLE_ENABLE = yes
+COMMAND_ENABLE = no
+NKRO_ENABLE = no
+
+KEYMAP_SECTION_ENABLE = no
+UNIMAP_ENABLE = no
+
+# IBMPC Options
+IBMPC_SECONDARY ?= no		# enable secondary interface(+800)
+IBMPC_MOUSE_ENABLE ?= no	# enable mouse support(+2000)
+
+# LUFA debug print
+# This may prevent USB enumeration and keyboard init
+TMK_LUFA_DEBUG = no
+# Select one of outputs for debug print
+#TMK_LUFA_DEBUG_UART = yes
+#TMK_LUFA_DEBUG_SUART = yes
+
+OPT_DEFS += -DCAPTURE_ENABLE -DNO_PRINT -DNO_DEBUG -DNO_ACTION_LAYER -DNO_ACTION_TAPPING -DNO_ACTION_ONESHOT -DNO_ACTION_MACRO -DNO_ACTION_FUNCTION -DNO_TRACK_KEY_PRESS
+
+#OPT_DEFS += -DNO_USB_STARTUP_WAIT_LOOP
+
+# for signal capture
+EXTRALDFLAGS += -Wl,--section-start,.data=0x800300
+
+include Makefile

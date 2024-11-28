@@ -66,6 +66,10 @@ void matrix_clear(void)
 
 uint8_t matrix_scan(void)
 {
+#ifdef CAPTURE_ENABLE
+    print_capture();
+#endif
+
     converter0.process_interface();
 #if defined(IBMPC_CLOCK_BIT1) && defined(IBMPC_DATA_BIT1)
     converter1.process_interface();
@@ -117,7 +121,16 @@ int16_t IBMPCConverter::read_wait(uint16_t wait_ms)
 {
     uint16_t start = timer_read();
     int16_t code;
+
+#ifdef CAPTURE_ENABLE
+    print_capture_all();
+    while ((code = ibmpc.host_recv()) == -1 && timer_elapsed(start) < wait_ms) {
+        print_capture();
+    }
+#else
     while ((code = ibmpc.host_recv()) == -1 && timer_elapsed(start) < wait_ms);
+#endif
+
     return code;
 }
 

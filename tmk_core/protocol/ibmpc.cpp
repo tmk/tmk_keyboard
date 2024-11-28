@@ -70,6 +70,13 @@ void IBMPC::host_init(void)
     int_init();
     int_off();
     host_isr_clear();
+#ifdef CAPTURE_ENABLE
+    // Make other pins stable
+    DDRD  |=   (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 7);
+    PORTD &= ~((1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 7));
+    capture_init();
+    capture();
+#endif
 }
 
 void IBMPC::host_enable(void)
@@ -216,7 +223,11 @@ void IBMPC::host_isr_clear(void)
 void IBMPC::isr(void)
 {
     uint8_t dbit;
+#ifdef CAPTURE_ENABLE
+    dbit = CAPTURE_PIN_STORED & (1 << data_bit);
+#else
     dbit = IBMPC_DATA_PIN&(1<<data_bit);
+#endif
 
     // Timeout check
     uint8_t t;
@@ -410,6 +421,32 @@ void IBMPC::host_set_led(uint8_t led)
 }
 
 
+#ifdef CAPTURE_ENABLE
+// declare application ISR
+extern "C" void app_isr(void) __attribute__ ((signal,__INTR_ATTRS));
+void app_isr(void)
+{
+    IBMPC::interface0.isr();
+}
+
+ISR(IBMPC_INT_VECT, ISR_NAKED)
+{
+    capture();
+    if ((PIND & (1 << 1)) == 0 && (PIND & (1 << 6)) == 0) {
+        // when PD1 is on falling edge and appliation ISR is enabled
+        asm volatile ("rjmp   app_isr" ::);
+    } else {
+        asm volatile ("reti" ::);
+    }
+}
+
+// Data line: PD0
+ISR(INT0_vect, ISR_NAKED)
+{
+    capture();
+    asm volatile ("reti" ::);
+}
+#else
 // NOTE: With this ISR data line should be read within 5us after clock falling edge.
 // Confirmed that ATmega32u4 can read data line in 2.5us from interrupt after
 // ISR prologue pushs r18, r19, r20, r21, r24, r25 r30 and r31 with GCC 5.4.0
@@ -423,4 +460,5 @@ ISR(IBMPC_INT_VECT1)
 {
     IBMPC::interface1.isr();
 }
+#endif
 #endif

@@ -26,6 +26,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "debug.h"
 #include "protocol/serial.h"
 
+#ifdef CAPTURE_ENABLE
+#include <avr/interrupt.h>
+#include "avr/capture.h"
+
+void hook_early_init(void) {
+    capture_init();
+    // INT4-1: Interrupt at any edge
+    EIMSK = 0;
+    EICRA = 0x54;       // INT2,3,1: any edge
+    EICRB = 0x01;       // INT4: any edge
+    EIFR  = 0xFF;       // clear interrupt flags
+    EIMSK = 0x1E;       // enbale INT4-1
+    sei();
+}
+
+void hook_main_loop(void) {
+    print_capture();
+}
+
+ISR(INT1_vect, ISR_NAKED)
+{
+    capture();
+    asm volatile ("reti" ::);
+}
+ISR(INT2_vect, ISR_NAKED)
+{
+    capture();
+    asm volatile ("reti" ::);
+}
+ISR(INT3_vect, ISR_NAKED)
+{
+    capture();
+    asm volatile ("reti" ::);
+}
+ISR(INT4_vect, ISR_NAKED)
+{
+    capture();
+    asm volatile ("reti" ::);
+}
+#endif
+
 
 /*
  * Matrix Array usage:
