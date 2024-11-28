@@ -6,20 +6,20 @@
 # Capture record format:
 #
 #   P: pin state(4-bit)
-#   T: timer(us)
-#   C: overflow count(4096 per count)
+#   TTT: timer[us](0-4095)
+#   CC: timer overflow count(1-255)
 #
 #   1. Pin change:      TTTP
 #   pin state should be changed from state of previous record.
 #   TTT indicates time(12-bit):     0-FFFh(4095)
 #
-#   2. Time elapsed:    CC0P
+#   2. Timer overflow count:    CC0P
 #   pin state should be same as state of previous record.
 #   CC indicates time elapsed:      CC(1-255) * 1000h(4096)
 #
-#   3. Time elapsed:    000P
+#   3. Timer overflow count rollover:    000P
 #   pin state should be same as state of previous record.
-#   this indicates time elapsed:    256 * 1000h(4096)
+#   this indicates time elapsed:    256 * 1000h(4096), around 1sec
 #
 
 import sys
@@ -47,7 +47,7 @@ with VCDWriter(sys.stdout, timescale='1 us', date=datetime.now(timezone.utc).cti
 
     ext_time = 0
     prv_time = 0
-    prv_stat = 0
+    prv_stat = -1
     for line in file:
         for record in line.strip().split():
             m = p.match(record)
@@ -55,28 +55,32 @@ with VCDWriter(sys.stdout, timescale='1 us', date=datetime.now(timezone.utc).cti
                 time = int(record[0:3], 16)
                 stat = int(record[3:4], 16)
 
-                # time overflow
                 if prv_stat == stat:
+                    # no pin change: timer overflow count
                     if time == 0:
-                        # rollover
+                        # overflow count rollover: 000P
                         ext_time += 0x100
                     else:
+                        # overflow count: CC0P
                         ext_time += time >> 4
-                    prv_time = 0    # no time rollover
+
+                    # no VCD record
                     #print('time overflow: ', time >> 4, hex(time), stat, file=sys.stderr);
-                    continue
 
-                # time flipped - this indicates error
-                if prv_time >= time:
-                    ext_time += 1
-                    print('time flipped: ', ext_time, ': ', hex(prv_time), '>', hex(time), file=sys.stderr);
+                    prv_time = 0
+                else:
+                    # Pin change: TTTP
+                    if prv_time >= time:
+                        # time flipped
+                        ext_time += 1
+                        #print('time flipped: ', ext_time, ': ', hex(prv_time), '>', hex(time), file=sys.stderr);
 
-                prv_time = time
-                prv_stat = stat
+                    # write VCD record
+                    writer.change(port, ((ext_time * 0x1000) + time), stat)
+                    #print(ext_time, time, hex(time), stat, file=sys.stderr)
 
-                # time: 1us per tick
-                #print(ext_time, time, hex(time), stat, file=sys.stderr)
-                writer.change(port, ((ext_time * 0x1000) + time), stat)
+                    prv_time = time
+                    prv_stat = stat
             else:
                 print('Invalid record: ', record, file=sys.stderr);
                 #sys.exit(1)
