@@ -72,6 +72,9 @@ uint8_t ps2_host_send(uint8_t data)
     bool parity = true;
     ps2_error = PS2_ERR_NONE;
 
+    // see http://www.burtonsys.com/ps2_chapweske.htm but note that
+    // sending host->device samples on the rising not falling CLK edge
+
     PS2_INT_OFF();
 
     /* terminate a transmission if we have */
@@ -85,7 +88,6 @@ uint8_t ps2_host_send(uint8_t data)
 
     /* Data bit[2-9] */
     for (uint8_t i = 0; i < 8; i++) {
-        _delay_us(15);
         if (data&(1<<i)) {
             parity = !parity;
             data_hi();
@@ -93,17 +95,16 @@ uint8_t ps2_host_send(uint8_t data)
             data_lo();
         }
         WAIT(clock_hi, 50, 2);
+        // keyboard sampled the data, just before here, just as the clock goes high
         WAIT(clock_lo, 50, 3);
     }
 
     /* Parity bit */
-    _delay_us(15);
     if (parity) { data_hi(); } else { data_lo(); }
     WAIT(clock_hi, 50, 4);
     WAIT(clock_lo, 50, 5);
 
     /* Stop bit */
-    _delay_us(15);
     data_hi();
 
     /* Ack */
