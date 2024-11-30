@@ -597,6 +597,10 @@ void clear_keyboard_but_mods(void)
 #endif
 }
 
+void layer_switch(uint8_t new_layer) {
+    layer_move(new_layer);
+}
+
 bool is_tap_key(keyevent_t event)
 {
     if (IS_NOEVENT(event)) { return false; }
