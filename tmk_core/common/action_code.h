@@ -33,14 +33,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *   r: Left/Right flag(Left:0, Right:1)
  *
  * ACT_MODS_TAP(001r):
- * 001r|mods|0000 0000    Modifiers with OneShot[TAP]
- * 001r|mods|0000 0001    Modifiers with tap toggle[TAP]
- * 001r|mods|0000 00xx    (reserved)            (0x02-03)
- * 001r|mods| keycode     Modifiers and tap key[TAP]
+ * ACT_MODS_DUAL_H(001r)
+ * 001r|mods|0000 0000    Modifiers with OneShot                [DUAL]
+ * 001r|mods|0000 0001    Modifiers with tap toggle             [DUAL]
+ * 001r|mods|0000 001x    (reserved)            (0x02-03)
+ * 001r|mods| keycode     Modifiers and tap key                 [DUAL] hold precedence
  *
- * ACT_TAP_MODS(011r):
- * 011r|mods|0000 00xx    (reserved)
- * 011r|mods| keycode     Tap key and Modifiers[TAP]
+ * ACT_MODS_DUAL_T(011r)
+ * 011r|mods|0000 00xx    (reserved)            (0x00-0x03)
+ * 011r|mods| keycode     Tap key and Modifiers                 [DUAL] tap precedence
  *
  *
  * Other Keys(01xx)
@@ -71,15 +72,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 1001|xxxx|xxxx xxxx   (reserved)
  * 1001|oopp|BBBB BBBB   8-bit Bitwise Operation???
  *
- * ACT_LAYER_TAP(101x):
- * 101E|LLLL| keycode    On/Off with tap key    [TAP]
- * 101E|LLLL|110r mods   On/Off with modifiers  (0xC0-DF)[NOT TAP]
- *                       r: Left/Right flag(Left:0, Right:1)
- * 101E|LLLL|1111 0000   Invert with tap toggle (0xF0)   [TAP]
- * 101E|LLLL|1111 0001   On/Off                 (0xF1)   [NOT TAP]
- * 101E|LLLL|1111 0010   Off/On                 (0xF2)   [NOT TAP]
- * 101E|LLLL|1111 0011   Set/Clear              (0xF3)   [NOT TAP]
+ * ACT_LAYER_DUAL_T(1010):
+ * ACT_LAYER_DUAL_H(1011):
+ * 101x|xxxx|0000 00xx   (reserved)             (0x00-03)
+ * 1010|LLLL| keycode    On/Off with tap key                [DUAL] tap precedence
+ * 1011|LLLL| keycode    On/Off with tap key                [DUAL] hold precedence
+ * 101E|LLLL|110r mods   On/Off with modifiers  (0xC0-DF)
+ * 101E|LLLL|1110 xxxx   (reserved)             (0xE0-EF)
+ * 101E|LLLL|1111 0000   Invert with tap toggle (0xF0)      [DUAL]
+ * 101E|LLLL|1111 0001   On/Off                 (0xF1)
+ * 101E|LLLL|1111 0010   Off/On                 (0xF2)
+ * 101E|LLLL|1111 0011   Set/Clear              (0xF3)
  * 101E|LLLL|1111 xxxx   (reserved)             (0xF4-FF)
+ *   r: Left/Right flag(Left:0, Right:1)
+ *   LLLL: layer 0-15
  *   ELLLL: layer 0-31(E: extra bit for layer 16-31)
  *
  *
@@ -107,16 +113,19 @@ enum action_kind_id {
     ACT_MODS_TAP        = 0b0010,
     ACT_LMODS_TAP       = 0b0010,
     ACT_RMODS_TAP       = 0b0011,
-    ACT_TAP_MODS        = 0b0110,
-    ACT_TAP_LMODS       = 0b0110,
-    ACT_TAP_RMODS       = 0b0111,
+    ACT_MODS_DUAL_H     = 0b0010, /* hold precedence */
+    ACT_LMODS_DUAL_H    = 0b0010,
+    ACT_RMODS_DUAL_H    = 0b0011,
+    ACT_MODS_DUAL_T     = 0b0110, /* tap precedence */
+    ACT_LMODS_DUAL_T    = 0b0110,
+    ACT_RMODS_DUAL_T    = 0b0111,
     /* Other Keys */
     ACT_USAGE           = 0b0100,
     ACT_MOUSEKEY        = 0b0101,
     /* Layer Actions */
     ACT_LAYER           = 0b1000,
-    ACT_LAYER_TAP       = 0b1010, /* Layer  0-15 */
-    ACT_LAYER_TAP_EXT   = 0b1011, /* Layer 16-31 */
+    ACT_LAYER_DUAL_T    = 0b1010, /* tap precedence */
+    ACT_LAYER_DUAL_H    = 0b1011, /* hold precedence */
     /* Extensions */
     ACT_MACRO           = 0b1100,
     ACT_BACKLIGHT       = 0b1101,
@@ -223,7 +232,6 @@ enum mods_codes {
 #define ACTION_MODS_TAP_KEY(mods, key)  ACTION(ACT_MODS_TAP, ((mods)&0x1f00) | (key))
 #define ACTION_MODS_ONESHOT(mods)       ACTION(ACT_MODS_TAP, ((mods)&0x1f00) | MODS_ONESHOT)
 #define ACTION_MODS_TAP_TOGGLE(mods)    ACTION(ACT_MODS_TAP, ((mods)&0x1f00) | MODS_TAP_TOGGLE)
-#define ACTION_TAP_KEY_MODS(key, mods)  ACTION(ACT_TAP_MODS, ((mods)&0x1f00) | (key))
 
 
 /*
@@ -259,7 +267,7 @@ enum layer_pram_tap_op {
     OP_SET_CLEAR,
 };
 #define ACTION_LAYER_BITOP(op, part, bits, on)      ACTION(ACT_LAYER, (op)<<10 | (on)<<8 | (part)<<5 | ((bits)&0x1f))
-#define ACTION_LAYER_TAP(layer, key)                ACTION(ACT_LAYER_TAP, (layer)<<8 | (key))
+#define ACTION_LAYER_TAP(layer, key)                ACTION(ACT_LAYER_DUAL_T, (layer)<<8 | (key))
 /* Default Layer */
 #define ACTION_DEFAULT_LAYER_SET(layer)             ACTION_DEFAULT_LAYER_BIT_SET((layer)/4, 1<<((layer)%4))
 #define ACTION_DEFAULT_LAYER_TOGGLE(layer)          ACTION_DEFAULT_LAYER_BIT_XOR((layer)/4, 1<<((layer)%4))
@@ -288,6 +296,17 @@ enum layer_pram_tap_op {
 #define ACTION_DEFAULT_LAYER_BIT_OR( part, bits)    ACTION_LAYER_BITOP(OP_BIT_OR,  (part), (bits), 0)
 #define ACTION_DEFAULT_LAYER_BIT_XOR(part, bits)    ACTION_LAYER_BITOP(OP_BIT_XOR, (part), (bits), 0)
 #define ACTION_DEFAULT_LAYER_BIT_SET(part, bits)    ACTION_LAYER_BITOP(OP_BIT_SET, (part), (bits), 0)
+
+
+
+/*
+ * Dual role
+ */
+#define ACTION_DUAL_MODS_KEY(mods, key)         ACTION(ACT_MODS_DUAL_H, ((mods)&0x1f00) | (key))
+#define ACTION_DUAL_KEY_MODS(key, mods)         ACTION(ACT_MODS_DUAL_T, ((mods)&0x1f00) | (key))
+#define ACTION_DUAL_LAYER_KEY(layer, key)       ACTION(ACT_LAYER_DUAL_H, (layer)<<8 | (key))
+#define ACTION_DUAL_KEY_LAYER(key, layer)       ACTION(ACT_LAYER_DUAL_T, (layer)<<8 | (key))
+
 
 
 /*

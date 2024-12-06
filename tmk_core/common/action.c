@@ -153,7 +153,7 @@ void process_action(keyrecord_t *record)
                         }
                         break;
                     default:
-                        /* tap key */
+                        /* dual-role hold precedence */
                         if (event.pressed) {
                             if (tap_count > 0) {
                                 if (record->tap.interrupted) {
@@ -189,17 +189,17 @@ void process_action(keyrecord_t *record)
                 }
             }
             break;
-        case ACT_TAP_LMODS:
-        case ACT_TAP_RMODS:
+        case ACT_LMODS_DUAL_T:
+        case ACT_RMODS_DUAL_T:
             {
-                uint8_t mods = (action.kind.id == ACT_TAP_LMODS) ?  action.key.mods :
-                                                                    action.key.mods<<4;
+                uint8_t mods = (action.kind.id == ACT_LMODS_DUAL_T) ?  action.key.mods :
+                                                                       action.key.mods<<4;
                 switch (action.key.code) {
                     default:
-                        /* tap key */
+                        /* dual-role tap precedence */
                         if (event.pressed) {
                             if (tap_count > 0) {
-                                dprint("TAP_MODS: Tap: register_code\n");
+                                dprint("MODS_DUAL_T: Tap: register_code\n");
                                 register_code(action.key.code);
 
                                 // Delay for MacOS #659
@@ -209,15 +209,15 @@ void process_action(keyrecord_t *record)
                                     wait_ms(100);
                                 }
                             } else {
-                                dprint("TAP_MODS: No tap: add_mods\n");
+                                dprint("MODS_DUAL_T: No tap: add_mods\n");
                                 register_mods(mods);
                             }
                         } else {
                             if (tap_count > 0) {
-                                dprint("TAP_MODS: Tap: unregister_code\n");
+                                dprint("MODS_DUAL_T: Tap: unregister_code\n");
                                 unregister_code(action.key.code);
                             } else {
-                                dprint("TAP_MODS: No tap: add_mods\n");
+                                dprint("MODS_DUAL_T: No tap: add_mods\n");
                                 unregister_mods(mods);
                             }
                         }
@@ -291,8 +291,8 @@ void process_action(keyrecord_t *record)
             }
             break;
     #ifndef NO_ACTION_TAPPING
-        case ACT_LAYER_TAP:
-        case ACT_LAYER_TAP_EXT:
+        case ACT_LAYER_DUAL_T:
+        case ACT_LAYER_DUAL_H:
             switch (action.layer_tap.code) {
                 case 0xc0 ... 0xdf:
                     /* layer On/Off with modifiers */
@@ -333,7 +333,42 @@ void process_action(keyrecord_t *record)
                                     layer_clear();
                     break;
                 default:
-                    /* tap key */
+                    /* dual-role */
+#ifndef ACTION_LAYER_DUAL_32
+                    /* hold precedence */
+                    if (action.kind.id == ACT_LAYER_DUAL_H) {
+                        if (event.pressed) {
+                            if (tap_count > 0) {
+                                if (record->tap.interrupted) {
+                                    // ad hoc: set 0 to cancel tap
+                                    record->tap.count = 0;
+                                    // limited to layer 0-15
+                                    layer_on(action.layer_tap.val & 0x0f);
+                                } else {
+                                    register_code(action.layer_tap.code);
+
+                                    // Delay for MacOS #659
+                                    if (action.key.code == KC_CAPSLOCK ||
+                                            action.key.code == KC_NUMLOCK ||
+                                            action.key.code == KC_SCROLLLOCK) {
+                                        wait_ms(100);
+                                    }
+                                }
+                            } else {
+                                layer_on(action.layer_tap.val & 0x0f);
+                            }
+                        } else {
+                            if (tap_count > 0) {
+                                unregister_code(action.layer_tap.code);
+                            } else {
+                                layer_off(action.layer_tap.val & 0x0f);
+                            }
+                        }
+                        return;
+                    }
+                    else
+#endif
+                    /* tap precedence */
                     if (event.pressed) {
                         if (tap_count > 0) {
                             dprint("KEYMAP_TAP_KEY: Tap: register_code\n");
@@ -612,14 +647,14 @@ bool is_tap_key(keyevent_t event)
                 default:                    // tap key
                     return true;
             }
-        case ACT_TAP_LMODS:
-        case ACT_TAP_RMODS:
+        case ACT_LMODS_DUAL_T:
+        case ACT_RMODS_DUAL_T:
             switch (action.key.code) {
                 default:                    // tap key
                     return true;
             }
-        case ACT_LAYER_TAP:
-        case ACT_LAYER_TAP_EXT:
+        case ACT_LAYER_DUAL_T:
+        case ACT_LAYER_DUAL_H:
             switch (action.layer_tap.code) {
                 case OP_ON_OFF:
                 case OP_OFF_ON:
@@ -663,13 +698,13 @@ void debug_action(action_t action)
         case ACT_RMODS:             dprint("ACT_RMODS");             break;
         case ACT_LMODS_TAP:         dprint("ACT_LMODS_TAP");         break;
         case ACT_RMODS_TAP:         dprint("ACT_RMODS_TAP");         break;
-        case ACT_TAP_LMODS:         dprint("ACT_TAP_LMODS");         break;
-        case ACT_TAP_RMODS:         dprint("ACT_TAP_RMODS");         break;
+        case ACT_LMODS_DUAL_T:      dprint("ACT_LMODS_DUAL_T");      break;
+        case ACT_RMODS_DUAL_T:      dprint("ACT_RMODS_DUAL_T");      break;
         case ACT_USAGE:             dprint("ACT_USAGE");             break;
         case ACT_MOUSEKEY:          dprint("ACT_MOUSEKEY");          break;
         case ACT_LAYER:             dprint("ACT_LAYER");             break;
-        case ACT_LAYER_TAP:         dprint("ACT_LAYER_TAP");         break;
-        case ACT_LAYER_TAP_EXT:     dprint("ACT_LAYER_TAP_EXT");     break;
+        case ACT_LAYER_DUAL_T:      dprint("ACT_LAYER_DUAL_T");      break;
+        case ACT_LAYER_DUAL_H:      dprint("ACT_LAYER_DUAL_H");;     break;
         case ACT_MACRO:             dprint("ACT_MACRO");             break;
         case ACT_COMMAND:           dprint("ACT_COMMAND");           break;
         case ACT_FUNCTION:          dprint("ACT_FUNCTION");          break;
