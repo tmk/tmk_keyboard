@@ -33,7 +33,7 @@ extern "C" {
 /* tapping count and state */
 typedef struct {
     bool    interrupted :1;
-    bool    reserved2   :1;
+    bool    timeout     :1;
     bool    reserved1   :1;
     bool    reserved0   :1;
     uint8_t count       :4;
@@ -71,6 +71,9 @@ void clear_keyboard(void);
 void clear_keyboard_but_mods(void);
 void layer_switch(uint8_t new_layer);
 bool is_tap_key(keyevent_t event);
+#ifndef NO_ZERO_DELAY_HOLD
+bool is_zero_delay_hold(keyevent_t event);
+#endif
 
 /* debug */
 void debug_event(keyevent_t event);

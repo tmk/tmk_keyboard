@@ -110,8 +110,20 @@ bool process_tapping(keyrecord_t *keyp)
                 }
 #endif
                 /* Process release event of a key pressed before tapping starts
-                 * Without this unexpected repeating will occur with having fast repeating setting
-                 * https://github.com/tmk/tmk_keyboard/issues/60
+                 * Release event of normal key is processed immediately, otherwise
+                 * unexpected repeating can occur.
+                 * https://github.com/tmk/tmk_keyboard/issues/60#issuecomment-24643938
+                 * Release event of mods is postponed until dual-role is determined so that
+                 * tap is modified expectedly.
+                 *      ___     _________
+                 *         \___/
+                 *             ^real event
+                 *      ___         ___
+                 *         \_______/     event should be postponed if it is mods
+                 *
+                 *            |------| TAPPING_TERM
+                 *      ______     _____
+                 *  dual      \___/
                  */
                 else if (IS_RELEASED(event) && !waiting_buffer_typed(event)) {
                     // Modifier should be retained till end of this tapping.
@@ -122,8 +134,10 @@ bool process_tapping(keyrecord_t *keyp)
                             if (action.key.mods && !action.key.code) return false;
                             if (IS_MOD(action.key.code)) return false;
                             break;
-                        case ACT_LMODS_TAP:
-                        case ACT_RMODS_TAP:
+                        case ACT_LMODS_DUAL_H:
+                        case ACT_RMODS_DUAL_H:
+                        case ACT_LMODS_DUAL_T:
+                        case ACT_RMODS_DUAL_T:
                             if (action.key.mods && keyp->tap.count == 0) return false;
                             if (IS_MOD(action.key.code)) return false;
                             break;
@@ -138,7 +152,7 @@ bool process_tapping(keyrecord_t *keyp)
                     if (event.pressed) {
                         tapping_key.tap.interrupted = true;
                     }
-                    // enqueue 
+                    // enqueue
                     return false;
                 }
             }
@@ -155,6 +169,7 @@ bool process_tapping(keyrecord_t *keyp)
                 else if (is_tap_key(event) && event.pressed) {
                     if (tapping_key.tap.count > 1) {
                         debug("Tapping: Start new tap with releasing last tap(>1).\n");
+                        // when seq. tap is interfered and new dual starts(ad hoc release of last tap)
                         // unregister key
                         process_action(&(keyrecord_t){
                                 .tap = tapping_key.tap,
@@ -165,6 +180,12 @@ bool process_tapping(keyrecord_t *keyp)
                     } else {
                         debug("Tapping: Start while last tap(1).\n");
                     }
+
+#ifndef NO_ZERO_DELAY_HOLD
+                    if (is_zero_delay_hold(event)) {
+                        process_action(keyp);
+                    }
+#endif
                     tapping_key = *keyp;
                     waiting_buffer_scan_tap();
                     debug_tapping_key();
@@ -184,6 +205,7 @@ bool process_tapping(keyrecord_t *keyp)
             if (tapping_key.tap.count == 0) {
                 debug("Tapping: End. Timeout. Not tap(0): ");
                 debug_event(event); debug("\n");
+                tapping_key.tap.timeout = true;
                 process_action(&tapping_key);
                 tapping_key = (keyrecord_t){};
                 debug_tapping_key();
@@ -192,6 +214,7 @@ bool process_tapping(keyrecord_t *keyp)
                 if (IS_TAPPING_KEY(event.key) && !event.pressed) {
                     debug("Tapping: End. last timeout tap release(>0).");
                     keyp->tap = tapping_key.tap;
+                    keyp->tap.timeout = true;
                     process_action(keyp);
                     tapping_key = (keyrecord_t){};
                     return true;
@@ -244,6 +267,11 @@ bool process_tapping(keyrecord_t *keyp)
                 } else if (is_tap_key(event)) {
                     // Sequential tap can be interfered with other tap key.
                     debug("Tapping: Start with interfering other tap.\n");
+#ifndef NO_ZERO_DELAY_HOLD
+                    if (is_zero_delay_hold(event)) {
+                        process_action(keyp);
+                    }
+#endif
                     tapping_key = *keyp;
                     waiting_buffer_scan_tap();
                     debug_tapping_key();
@@ -274,6 +302,12 @@ bool process_tapping(keyrecord_t *keyp)
     else {
         if (event.pressed && is_tap_key(event)) {
             debug("Tapping: Start(Press tap key).\n");
+#ifndef NO_ZERO_DELAY_HOLD
+            if (is_zero_delay_hold(event)) {
+                // zero-delay hold
+                process_action(keyp);
+            }
+#endif
             tapping_key = *keyp;
             waiting_buffer_scan_tap();
             debug_tapping_key();

@@ -99,6 +99,8 @@ void process_action(keyrecord_t *record)
             }
             break;
 #ifndef NO_ACTION_TAPPING
+        // ACT_LMODS_DUAL_H
+        // ACT_RMODS_DUAL_H
         case ACT_LMODS_TAP:
         case ACT_RMODS_TAP:
             {
@@ -157,12 +159,19 @@ void process_action(keyrecord_t *record)
                         if (event.pressed) {
                             if (tap_count > 0) {
                                 if (record->tap.interrupted) {
-                                    dprint("MODS_TAP: Tap: Cancel: add_mods\n");
+                                    dprint("MODS_TAP: Tap interrupted: +mods\n");
                                     // ad hoc: set 0 to cancel tap
                                     record->tap.count = 0;
                                     register_mods(mods);
                                 } else {
-                                    dprint("MODS_TAP: Tap: register_code\n");
+#ifndef NO_ZERO_DELAY_HOLD
+                                    dprint("MODS_TAP: Tap: -mods +code\n");
+                                    // cancel zero-delay hold
+                                    unregister_mods(mods);
+                                    wait_ms(2);
+#else
+                                    dprint("MODS_TAP: Tap: +code\n");
+#endif
                                     register_code(action.key.code);
 
                                     // Delay for MacOS #659
@@ -173,15 +182,19 @@ void process_action(keyrecord_t *record)
                                     }
                                 }
                             } else {
-                                dprint("MODS_TAP: No tap: add_mods\n");
+#ifndef NO_ZERO_DELAY_HOLD
+                                // avoid excess +mods
+                                if (record->tap.timeout) return;
+#endif
+                                dprint("MODS_TAP: Hold: +mods\n");
                                 register_mods(mods);
                             }
                         } else {
                             if (tap_count > 0) {
-                                dprint("MODS_TAP: Tap: unregister_code\n");
+                                dprint("MODS_TAP: Tap: -code\n");
                                 unregister_code(action.key.code);
                             } else {
-                                dprint("MODS_TAP: No tap: add_mods\n");
+                                dprint("MODS_TAP: Hold: -mods\n");
                                 unregister_mods(mods);
                             }
                         }
@@ -345,6 +358,10 @@ void process_action(keyrecord_t *record)
                                     // limited to layer 0-15
                                     layer_on(action.layer_tap.val & 0x0f);
                                 } else {
+#ifndef NO_ZERO_DELAY_HOLD
+                                    // cancel zero-delay hold
+                                    layer_off(action.layer_tap.val & 0x0f);
+#endif
                                     register_code(action.layer_tap.code);
 
                                     // Delay for MacOS #659
@@ -673,6 +690,37 @@ bool is_tap_key(keyevent_t event)
     }
     return false;
 }
+
+#ifndef NO_ZERO_DELAY_HOLD
+bool is_zero_delay_hold(keyevent_t event)
+{
+    if (IS_NOEVENT(event)) { return false; }
+
+    action_t action = layer_switch_get_action(event);
+
+    switch (action.kind.id) {
+        case ACT_LMODS_DUAL_H:
+        case ACT_RMODS_DUAL_H:
+            switch (action.key.code) {
+                case MODS_ONESHOT:
+                case MODS_TAP_TOGGLE:
+                default:
+                    return true;
+            }
+            return false;
+        case ACT_LMODS_DUAL_T:
+        case ACT_RMODS_DUAL_T:
+            return false;
+        case ACT_LAYER_DUAL_T:
+        case ACT_LAYER_DUAL_H:
+            return false;
+        case ACT_MACRO:
+        case ACT_FUNCTION:
+            return false;
+    }
+    return false;
+}
+#endif
 
 
 /*
