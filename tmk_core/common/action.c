@@ -222,16 +222,18 @@ void process_action(keyrecord_t *record)
                                     wait_ms(100);
                                 }
                             } else {
-                                dprint("MODS_DUAL_T: No tap: add_mods\n");
-                                register_mods(mods);
+                                dprint("MODS_DUAL_T: No tap: add_weak_mods\n");
+                                add_weak_mods(mods);
+                                send_keyboard_report();
                             }
                         } else {
                             if (tap_count > 0) {
                                 dprint("MODS_DUAL_T: Tap: unregister_code\n");
                                 unregister_code(action.key.code);
                             } else {
-                                dprint("MODS_DUAL_T: No tap: add_mods\n");
-                                unregister_mods(mods);
+                                dprint("MODS_DUAL_T: No tap: del_weak_mods\n");
+                                del_weak_mods(mods);
+                                send_keyboard_report();
                             }
                         }
                         break;
