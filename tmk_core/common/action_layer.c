@@ -67,7 +67,7 @@ static void layer_state_set(uint32_t state)
     layer_debug(); dprint(" to ");
     layer_state = state;
     hook_layer_change(layer_state);
-    layer_debug(); dprintln();
+    layer_debug(); dprint("\n");
 #ifdef NO_TRACK_KEY_PRESS
     clear_keyboard_but_mods(); // To avoid stuck keys
 #endif

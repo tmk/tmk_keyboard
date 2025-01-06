@@ -41,7 +41,7 @@ void action_exec(keyevent_t event)
 {
     if (!IS_NOEVENT(event)) {
         dprint("\n---- action_exec: start -----\n");
-        dprint("EVENT: "); debug_event(event); dprintln();
+        dprint("EVENT: "); debug_event(event); dprint("\n");
         hook_matrix_change(event);
     }
 
@@ -52,7 +52,7 @@ void action_exec(keyevent_t event)
 #else
     process_action(&record);
     if (!IS_NOEVENT(record.event)) {
-        dprint("processed: "); debug_record(record); dprintln();
+        dprint("processed: "); debug_record(record); dprint("\n");
     }
 #endif
 }
@@ -74,7 +74,7 @@ void process_action(keyrecord_t *record)
     dprint(" layer_state: "); layer_debug();
     dprint(" default_layer_state: "); default_layer_debug();
 #endif
-    dprintln();
+    dprint("\n");
 
     switch (action.kind.id) {
         /* Key and Mods */
@@ -534,23 +534,25 @@ void register_code(uint8_t code)
         add_mods(MOD_BIT(code));
         send_keyboard_report();
     }
+#ifdef EXTRAKEY_ENABLE
     else if IS_SYSTEM(code) {
         host_system_send(KEYCODE2SYSTEM(code));
     }
     else if IS_CONSUMER(code) {
         host_consumer_send(KEYCODE2CONSUMER(code));
     }
-    else if (code == KC_BOOTLOADER) {
-        clear_keyboard();
-        wait_ms(50);
-        bootloader_jump();
-    }
+#endif
 #ifdef MOUSEKEY_ENABLE
     else if IS_MOUSEKEY(code) {
         mousekey_on(code);
         mousekey_send();
     }
 #endif
+    else if (code == KC_BOOTLOADER) {
+        clear_keyboard();
+        wait_ms(50);
+        bootloader_jump();
+    }
 }
 
 void unregister_code(uint8_t code)
@@ -594,12 +596,14 @@ void unregister_code(uint8_t code)
         del_mods(MOD_BIT(code));
         send_keyboard_report();
     }
+#ifdef EXTRAKEY_ENABLE
     else if IS_SYSTEM(code) {
         host_system_send(0);
     }
     else if IS_CONSUMER(code) {
         host_consumer_send(0);
     }
+#endif
 #ifdef MOUSEKEY_ENABLE
     else if IS_MOUSEKEY(code) {
         mousekey_off(code);

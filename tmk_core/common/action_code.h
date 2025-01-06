@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ACTION_CODE_H
 #define ACTION_CODE_H
 
+#include <stdint.h>
+
 /* Action codes
  * ============
  * 16bit code: action_kind(4bit) + action_parameter(12bit)

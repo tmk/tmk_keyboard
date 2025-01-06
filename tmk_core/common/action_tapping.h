@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ACTION_TAPPING_H
 #define ACTION_TAPPING_H
 
+#include "action.h"
 
 
 /* period of tapping(ms) */

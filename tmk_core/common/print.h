@@ -68,6 +68,13 @@ void print_set_sendchar(int8_t (*print_sendchar_func)(uint8_t));
 /* TODO: to select output destinations: UART/USBSerial */
 #define print_set_sendchar(func)
 
+#else
+
+#include <stdio.h>
+#define xprintf(format, ...)        printf(format, ##__VA_ARGS__)
+int print(char* s);
+int println(char* s);
+
 #endif /* __AVR__ */
 
 

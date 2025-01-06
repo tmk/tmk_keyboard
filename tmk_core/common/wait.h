@@ -15,6 +15,9 @@ extern "C" {
 #   define wait_us(us) chThdSleepMicroseconds(us)
 #elif defined(__arm__) /* __AVR__ */
 #   include "wait_api.h"
+#else
+    void wait_ms(uint32_t ms);
+    void wait_us(uint32_t us);
 #endif /* __AVR__ */
 
 #ifdef __cplusplus
