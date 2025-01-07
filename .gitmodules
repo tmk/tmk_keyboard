@@ -4,3 +4,6 @@
 [submodule "tmk_core/protocol/lufa/lufa-abcminiuser"]
 	path = tmk_core/protocol/lufa/lufa-abcminiuser
 	url = https://github.com/abcminiuser/lufa.git
+[submodule "tmk_core/tool/cpputest"]
+	path = tmk_core/tool/cpputest
+	url = https://github.com/cpputest/cpputest.git
