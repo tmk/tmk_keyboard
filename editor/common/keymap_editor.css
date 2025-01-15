@@ -5,12 +5,11 @@ html * {
 textarea {
     font-family:monospace;
 }
-.key, .keync {
+.key {
     box-shadow:inset -3px -3px 3px 3px #a0a0a0;
     background-color:#ffffff;
     border-radius:6px;
     /* border:0px solid #dcdcdc; */
-    display:inline-block;
     color:#777777;
     font-family:helvetica, arial, sans-serif;
     font-size:12px;
@@ -22,6 +21,8 @@ textarea {
     overflow: hidden;
     margin: 0px 0px 0px 0px;
     white-space: normal;
+    position:relative;
+    z-index: 10;
 }
 .key:hover {
     box-shadow:inset -3px -3px 3px 3px #707070;
@@ -103,28 +104,33 @@ textarea {
 .btn975  { width:483px }  /* 507 - 24 */
 .btn1000 { width:496px }  /* 520 - 24 */
 
-.spc025 { width:13px;  visibility:hidden; padding:0; border:0; margin:0; }
-.spc050 { width:26px;  visibility:hidden; padding:0; border:0; margin:0; }
-.spc075 { width:39px;  visibility:hidden; padding:0; border:0; margin:0; }
-.spc100 { width:52px;  visibility:hidden; padding:0; border:0; margin:0; }
-.spc125 { width:65px;  visibility:hidden; padding:0; border:0; margin:0; }
-.spc150 { width:78px;  visibility:hidden; padding:0; border:0; margin:0; }
-.spc175 { width:91px;  visibility:hidden; padding:0; border:0; margin:0; }
-.spc200 { width:104px; visibility:hidden; padding:0; border:0; margin:0; }
-.spc225 { width:117px; visibility:hidden; padding:0; border:0; margin:0; }
-.spc250 { width:130px; visibility:hidden; padding:0; border:0; margin:0; }
-.spc275 { width:143px; visibility:hidden; padding:0; border:0; margin:0; }
-.spc300 { width:156px; visibility:hidden; padding:0; border:0; margin:0; }
+.spc025 { width:13px;  height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc050 { width:26px;  height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc075 { width:39px;  height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc100 { width:52px;  height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc125 { width:65px;  height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc150 { width:78px;  height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc175 { width:91px;  height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc200 { width:104px; height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc225 { width:117px; height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc250 { width:130px; height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc275 { width:143px; height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
+.spc300 { width:156px; height: 0px; visibility:hidden; padding:0; border:0; margin:0; z-index: 1; }
 
 .keyboard-row {
     width: auto;
     white-space: nowrap;
+    height: 52px;
+    display: inline-flex;
+    flex-direction: row;
 }
 
 .keyboard-outline {
     /* stop displaying whitespace between keys */
     font-size: 0;
     padding: 20px 0 0 0;
+    display: inline-flex;
+    flex-direction: column;
 }
 
 .keyboard-pane {
@@ -156,3 +162,8 @@ textarea {
 }
 
 .center { text-align: center; }
+
+.height200 {
+    z-index: 5;
+    height: 80px;
+}
