@@ -452,7 +452,7 @@ Within each macro, the following commands can be used:
 e.g.:
 
     MACRO( D(LSHIFT), D(D), END )  // hold down LSHIFT and D - will print 'D'
-    MACRO( U(D), U(LSHIFT), END )  // release U and LSHIFT keys (an event.pressed == False counterpart for the one above)
+    MACRO( U(D), U(LSHIFT), END )  // release D and LSHIFT keys (an event.pressed == False counterpart for the one above)
     MACRO( I(255), T(H), T(E), T(L), T(L), W(255), T(O), END ) // slowly print out h-e-l-l---o
 
 #### 2.3.2 Examples
