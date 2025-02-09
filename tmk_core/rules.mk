@@ -116,6 +116,7 @@ CPPDEFS += $(OPT_DEFS)
 #  -O*:          optimization level
 #  -f...:        tuning, see GCC manual and avr-libc documentation
 #  -Wall...:     warning level
+#  -pipe:        avoid temporary files
 #  -Wa,...:      tell GCC to pass this to the assembler.
 #    -adhlns...: create assembler listing
 CFLAGS = -g$(DEBUG)
@@ -136,6 +137,7 @@ CFLAGS += -Wstrict-prototypes
 #CFLAGS += -Wundef
 #CFLAGS += -Wunreachable-code
 #CFLAGS += -Wsign-compare
+CFLAGS += -pipe
 CFLAGS += -Wa,-adhlns=$(@:%.o=%.lst)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 CFLAGS += $(CSTANDARD)
@@ -150,6 +152,7 @@ endif
 #  -O*:          optimization level
 #  -f...:        tuning, see GCC manual and avr-libc documentation
 #  -Wall...:     warning level
+#  -pipe:        avoid temporary files
 #  -Wa,...:      tell GCC to pass this to the assembler.
 #    -adhlns...: create assembler listing
 CPPFLAGS = -g$(DEBUG)
@@ -171,6 +174,7 @@ CPPFLAGS += -Wundef
 #CPPFLAGS += -Wstrict-prototypes
 #CPPFLAGS += -Wunreachable-code
 #CPPFLAGS += -Wsign-compare
+CPPFLAGS += -pipe
 CPPFLAGS += -Wa,-adhlns=$(@:%.o=%.lst)
 CPPFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 #CPPFLAGS += $(CSTANDARD)
@@ -181,6 +185,7 @@ endif
 
 
 #---------------- Assembler Options ----------------
+#  -pipe:     tell gcc to avoid temporary files
 #  -Wa,...:   tell GCC to pass this to the assembler.
 #  -adhlns:   create listing
 #  -gstabs:   have the assembler create line number information; note that
@@ -189,7 +194,7 @@ endif
 #             files -- see avr-libc docs [FIXME: not yet described there]
 #  -listing-cont-lines: Sets the maximum number of continuation lines of hex 
 #       dump that will be displayed for a given single line of source input.
-ASFLAGS = $(ADEFS) -Wa,-adhlns=$(@:%.o=%.lst),-gstabs,--listing-cont-lines=100
+ASFLAGS = $(ADEFS) -pipe -Wa,-adhlns=$(@:%.o=%.lst),-gstabs,--listing-cont-lines=100
 ASFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 ASFLAGS += -flto
 ifdef CONFIG_H
