@@ -41,7 +41,7 @@ $(function() {
     $("#layer_radio").buttonset();
 
     // layer change
-    $(".layer").click(function(ev, ui) {
+    $(".layer").on("click", function(ev, ui) {
         var layer = parseInt($(this).attr('id').match(/layer-(\d+)/)[1]);
         editing_layer = layer;
         load_keymap_on_keyboard(keymaps[layer]);
@@ -76,7 +76,7 @@ $(function() {
         $(this).attr({ title: act.desc });
     });
 
-    $(".action").click(function(ev,ui) {
+    $(".action").on("click", function(ev,ui) {
         // get code from code button id: code-[0x]CCCC where CCCC is dec or hex number
         var code = parseInt($(this).attr('id').match(/code-((0x){0,1}[0-9a-fA-F]+)/)[1]);
         action_editor_set_code(code);
@@ -171,7 +171,7 @@ $(function() {
                 .attr({ value: ids, title: command_ids[ids].desc })
                 .text(command_ids[ids].name));
     }
-    $(window).load(function() { action_editor_set_code(0); });
+    $(window).on("load", function() { action_editor_set_code(0); });
 
     // set code to editor
     var action_editor_set_code = function(code) {
@@ -269,7 +269,7 @@ $(function() {
     };
 
     // control display of dropdown elements
-    $("#kind_dropdown").change(function(ev) {
+    $("#kind_dropdown").on("change", function(ev) {
         $(".editor_dropdown").hide();
         $("#kind_dropdown").show();
         switch ($(this).val()) {
@@ -352,7 +352,7 @@ $(function() {
     });
 
     // apply button
-    $(".action-apply").click(function(ev) {
+    $(".action-apply").on("click", function(ev) {
         if (!editing_key) return;
         var action_code = action_editor_get_code();
         editing_key_set(action_code);
@@ -386,7 +386,7 @@ $(function() {
                 .attr({ value: prod, title: CONFIG.keymap[prod].desc })
                 .text(CONFIG.keymap[prod].desc));
     }
-    $("#firmware-dropdown").change(function() {
+    $("#firmware-dropdown").on("change", function() {
         let v = $(this).val();
         $("#firmware-download").prop("disabled", true);
         $("#keymap-load").prop("disabled", true);
@@ -413,7 +413,7 @@ $(function() {
     });
 
     // Base firmware - File chooser
-    $("#firmwareFile").change(function(ev) {
+    $("#firmwareFile").on("change", function(ev) {
         // called after choosing file
         var f = ev.target.files[0];
         if (!f) {
@@ -435,7 +435,7 @@ $(function() {
         fr.readAsText(f);
     });
 
-    $("#firmwareURL").change(function(ev) {
+    $("#firmwareURL").on("change", function(ev) {
         var firmware_url = $(this).val();
         if (!firmware_url) {
             $("#firmware-download").prop("disabled", true);
@@ -457,7 +457,7 @@ $(function() {
 
     // Load keymap from base firmware
     $("#keymap-load").prop("disabled", true);
-    $("#keymap-load").click(function(ev, ui) {
+    $("#keymap-load").on("click", function(ev, ui) {
         // load keymap from firmware
         keymaps = $.extend(true, [], firmware_keymaps); // copy
         while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
@@ -465,7 +465,7 @@ $(function() {
     });
 
     // Base firmeare - radio button
-    $(".base-firm").change(function() {
+    $(".base-firm").on("change", function() {
         console.log($(this).val());
         $("#firmware-download").prop("disabled", true);
         $("#keymap-load").prop("disabled", true);
@@ -500,7 +500,7 @@ $(function() {
      * Download firmware
      **********************************************************************/
     $("#firmware-download").prop("disabled", true);
-    $("#firmware-download").click(function(ev, ui) {
+    $("#firmware-download").on("click", function(ev, ui) {
         // TODO: support .bin format
         if ( $("#firmwareFile")[0].files[0] &&
                 $("#firmwareFile")[0].files[0].name.match(/\.hex/)) {
@@ -532,7 +532,7 @@ $(function() {
      **********************************************************************/
     // Share URL
     $("#share-url-display").hide();
-    $("#keymap-share").click(function(ev, ui) {
+    $("#keymap-share").on("click", function(ev, ui) {
         var hash = url_encode_keymap({ keymaps: keymaps });
         var editor_url = document.location.origin + document.location.pathname + document.location.search;
         $("#share-url-display").show();
@@ -540,7 +540,7 @@ $(function() {
     });
 
     // Shorten URL
-    $("#shorten-url").click(function(ev, ui) {
+    $("#shorten-url").on("click", function(ev, ui) {
         var hash = url_encode_keymap({ keymaps: keymaps });
         var editor_url = document.location.origin + document.location.pathname + document.location.search;
 
@@ -567,7 +567,7 @@ $(function() {
      * Output options for debug
      **********************************************************************/
     $("#debug-output").hide();
-    $("#debug-collapse").click(function() {
+    $("#debug-collapse").on("click", function() {
         if ($("#debug-output").css("display") == "none") {
             $("#debug-collapse").text("\u25b2");
         } else {
@@ -578,18 +578,18 @@ $(function() {
     //$("#keymap-output").resizable();  // resizable textarea
 
     // Hex output
-    $("#keymap-hex-generate").click(function(ev, ui) {
+    $("#keymap-hex-generate").on("click", function(ev, ui) {
         $("#keymap-output").text(hex_keymaps(KEYMAP_START_ADDRESS).join("\r\n"));
     });
 
     // C source output
-    $("#keymap-source-generate").click(function(ev, ui) {
+    $("#keymap-source-generate").on("click", function(ev, ui) {
         $("#keymap-output").text(source_output(keymaps));
     });
 
     // JSON output
     //$("#keymap-json-generate").css('display', 'none');  // hide
-    $("#keymap-json-generate").click(function(ev, ui) {
+    $("#keymap-json-generate").on("click", function(ev, ui) {
         var keymap_output;
         //keymap_output = JSON.stringify(keymaps, null, 4);
         keymap_output = JSON.stringify({ keymaps: keymaps });
@@ -597,13 +597,13 @@ $(function() {
     });
 
     // encode keymap
-    $("#keymap-encode").click(function(ev, ui) {
+    $("#keymap-encode").on("click", function(ev, ui) {
         var keymap_output = url_encode_keymap({ keymaps: keymaps });
         $("#keymap-output").text(keymap_output);
     });
 
     // decode  keymap
-    $("#keymap-decode").click(function(ev, ui) {
+    $("#keymap-decode").on("click", function(ev, ui) {
         var hash = $("#keymap-output").text();
         var keymap_output = url_decode_keymap(hash);
         $("#keymap-output").text(JSON.stringify(keymap_output));
@@ -611,8 +611,10 @@ $(function() {
 
 
     // prevent losing keymap under editing when leave the page
-    $(window).bind('beforeunload', function(){
-          return 'CAUTION: You will lost your change.';
+    $(window).on('beforeunload', function(e){
+        e.preventDefault();
+        e.returnValue = 'CAUTION: You will lost your change.';
+        return 'CAUTION: You will lost your change.';
     });
 
 
@@ -626,10 +628,10 @@ $(function() {
              * Keyboard(key buttons)
              **********************************************************************/
             // Select key button to edit
-            $(".key").focus(function(ev) {
+            $(".key").on("focus", function(ev) {
                 $(this).click();
             });
-            $(".key").click(function(ev) {
+            $(".key").on("click", function(ev) {
                 editing_key = $(this).attr('id');
 
                 // grey-out key to indicate being under editing
