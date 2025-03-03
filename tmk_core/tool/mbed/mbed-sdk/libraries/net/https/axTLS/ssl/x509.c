@@ -279,7 +279,8 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
     ctx->mod_offset = BIGINT_M_OFFSET;
 
     i = 10; /* start at the first possible non-padded byte */
-    while (block[i++] && i < sig_len);
+    // while (block[i++] && i < sig_len);
+    while (i < sig_len && block[i++]);
     size = sig_len - i;
 
     /* get only the bit we want */
