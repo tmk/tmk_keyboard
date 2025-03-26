@@ -1,6 +1,8 @@
 /*
  * TMK keymap editor - unimap/actionmap
  */
+import * as AtmelDFU from './AtmelDFU.js';
+
 $(function() {
     // Key button id under editing
     var editing_key;
@@ -388,15 +390,18 @@ $(function() {
     }
     $("#firmware-dropdown").on("change", function() {
         let v = $(this).val();
+        $("#firmware-flash").prop("disabled", true);
         $("#firmware-download").prop("disabled", true);
         $("#keymap-load").prop("disabled", true);
 
         if (!CONFIG.keymap[v]) { return; }
         $("#firmware-dropdown").prop("disabled", true);
         loadHexURL(CONFIG.keymap[v].firmware_url).done(function(s) {
+            $("#firmware-flash").prop("disabled", false);
             $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
         }).fail(function() {
+            $("#firmware-flash").prop("disabled", true);
             $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
         }).always(function() {
@@ -417,6 +422,7 @@ $(function() {
         // called after choosing file
         var f = ev.target.files[0];
         if (!f) {
+            $("#firmware-flash").prop("disabled", true);
             $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
             return;
@@ -429,6 +435,7 @@ $(function() {
             firmware_before = lines.before;
             firmware_after = lines.after;
             firmware_keymaps = lines.keymaps;
+            $("#firmware-flash").prop("disabled", false);
             $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
         };
@@ -438,6 +445,7 @@ $(function() {
     $("#firmwareURL").on("change", function(ev) {
         var firmware_url = $(this).val();
         if (!firmware_url) {
+            $("#firmware-flash").prop("disabled", true);
             $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
             return;
@@ -445,9 +453,11 @@ $(function() {
 
         $("#firmwareURL").prop("disabled", true);
         loadHexURL(firmware_url).done(function(s) {
+            $("#firmware-flash").prop("disabled", false);
             $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
         }).fail(function(d) {
+            $("#firmware-flash").prop("disabled", true);
             $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
         }).always(function() {
@@ -467,6 +477,7 @@ $(function() {
     // Base firmeare - radio button
     $(".base-firm").on("change", function() {
         console.log($(this).val());
+        $("#firmware-flash").prop("disabled", true);
         $("#firmware-download").prop("disabled", true);
         $("#keymap-load").prop("disabled", true);
         switch ($(this).val()) {
@@ -524,6 +535,98 @@ $(function() {
             // http://stackoverflow.com/questions/1694595/
             hex_link[0].click();
         }
+    });
+
+
+    /**********************************************************************
+     * Flash WebUSB
+     **********************************************************************/
+    $("#flash-console").hide();
+    let flash_console = function(msg) {
+        $("#flash-console").text($("#flash-console").text() + msg);
+    };
+    let target = null;
+    $("#firmware-flash").on("click", async function(ev, ui) {
+        console.log('firmware-flash: start');
+        try {
+            let result;
+
+            $("#flash-console").show();
+            $("#flash-console").text("");
+
+            // Select device
+            target = await AtmelDFU.getAtmelDevice();
+            if (target === null) {
+                flash_console("No device selected\n");
+                flash_console("NOTE: Firefox and Safari do not support this function(WebUSB). Use Chrome or Edge.");
+                return;
+            }
+            flash_console("Device: " + target.productName + "\n");
+            console.log(target.productName);
+            let d = AtmelDFU.deviceInfo.find((e) => e.productId === target.productId);
+            if (d === undefined) {
+                flash_console('Unsupported Device');
+                return;
+            }
+            flash_console("Flash/Boot Size: " + d.flashSize + "/" + d.bootSize + "\n");
+
+            // Erase Chip
+            flash_console('Erasing Flash...');
+            result = await AtmelDFU.chipErase(target);
+            flash_console('Erased\n');
+
+            // Blank check
+            flash_console('Checking Blank...');
+            result = await AtmelDFU.blankCheck(target, 0, d.flashSize - 1);
+            result = await AtmelDFU.getStatus(target);
+            let stat = AtmelDFU.parseStatus(result.data);
+            if (stat.bStatus == AtmelDFU.bStatus.OK) {
+                flash_console('Blank\n');
+            } else if (stat.bStatus === AtmelDFU.bStatus.errCHECK_ERASED) {
+                flash_console('Not Blank');
+                return;
+            } else {
+                flash_console('Unknown Error');
+                return;
+            }
+
+            // Load Firmware
+            flash_console('Loading Firmware...');
+            let hex_text = [].concat(firmware_before)
+                             .concat(hex_keymaps(KEYMAP_START_ADDRESS))
+                             .concat(firmware_after).join("\r\n").concat("\r\n");
+            let data = parseHex(hex_text);
+            flash_console('Data Length: ' + data.length + '\n');
+
+            // Write firmware
+            flash_console('Writing Firmware...');
+            result = await AtmelDFU.writeMemory(target, 0x0000, data.length - 1, data);
+            flash_console('OK\n');
+
+            // Verify
+            flash_console('Verifying Content...');
+            let mem = await AtmelDFU.readMemory(target, 0, data.length - 1);
+            for (let i = 0; i < mem.byteLength; i++) {
+                if (mem[i] !== data[i]) {
+                    flash_console('Failed at' + i.toString(16));
+                    return;
+                }
+            }
+            flash_console('OK\n');
+
+            // Start App
+            flash_console('Starting Keyboard...');
+            result = await AtmelDFU.launch(target);
+            flash_console(result.status);   // 'ok' or 'stall'
+
+            flash_console('\nFlashed firmware successfully.\n');
+        } catch(e) {
+            target = null;
+            flash_console('\nError...\n');
+            flash_console(e);
+            console.log(e);
+        }
+        console.log('firmware-flash: done');
     });
 
 
@@ -660,9 +763,11 @@ $(function() {
                 keymaps = $.extend(true, [], firmware_keymaps); // copy
                 while (keymaps.length < KEYMAP_LAYERS) keymaps.push(transparent_map());
             }
+            $("#firmware-flash").prop("disabled", false);
             $("#firmware-download").prop("disabled", false);
             $("#keymap-load").prop("disabled", false);
         }).fail(function(d) {
+            $("#firmware-flash").prop("disabled", true);
             $("#firmware-download").prop("disabled", true);
             $("#keymap-load").prop("disabled", true);
         }).always(function() {

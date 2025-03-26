@@ -13,7 +13,7 @@
     <script src="config.js"></script>
     <script src="action.js"></script>
     <script src="keymap.js"></script>
-    <script src="editor.js"></script>
+    <script src="editor.js" type="module"></script>
 </head>
 
 <body>
@@ -406,12 +406,17 @@ See TMK wiki for <a href="https://github.com/tmk/tmk_keyboard/wiki#keymap" targe
 <a href="https://github.com/tmk/tmk_keyboard/wiki/Keymap-Editor" target="_blank">Keymap Editor usage</a>.<br>
 </p>
 
-<h3>Firmware Hex File Download:</h3>
+<h3>Edited Firmware File:</h3>
 <button id="firmware-download" title="save file">Download</button>
 <a id="hex-download" style="display:none" ></a>
+<button id="firmware-flash" title="flash firmware">Flash on Web</button>
+
+<div>
+<textarea id="flash-console" rows="10" cols="40" value="" readonly></textarea>
+</div>
 
 <h3>Base Firmware File:</h3>
-You can select a product or supply your own firmware to edit its keymap. The firmware should be built with unimap enabled.
+You can select a product in the list or supply your own unimap firmware file.
 
 <div>
 <input type="radio" name="base-firm" class="base-firm" value="config" checked="checked" />

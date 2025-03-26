@@ -305,3 +305,87 @@ function url_decode_keymap(str) {
         return null;
     }
 };
+
+
+
+/**********************************************************************
+ * Parse Hex text
+ **********************************************************************/
+function parseHex(text) {
+    // https://en.wikipedia.org/wiki/Intel_HEX
+    let data = [];
+    let ext_addr = 0;
+    let processed = 0;
+    let lines = text.split(/\r?\n/);
+    for (let index = 0; index < lines.length; index++) {
+        //   DATA:  ':'   dlen    addr    '00'  data        chkSum
+        //    EOF:  ':'  '00'     '0000'  '01'              chkSum
+        //    EXT:  ':'  '02'     '0000'  '02'  address     chkSum
+        //   segm:  ':'  '04'     '0000'  '03'  CS+IP       chkSum
+        // hiaddr:  ':'  '02'     '0000'  '04'  address     chkSum
+        //   addr:  ':'  '04'     '0000'  '05'  address     chkSum
+        if (lines[index].length == 0) {
+            continue;
+        }
+
+        let line = lines[index].trim();
+        if (line.length < 11)   { throw new Error(`Invalid at line ${index + 1}`) }
+        if (line.at(0) !== ':') { throw new Error(`Invalid at line ${index + 1}`) }
+
+        let bytes = line.slice(1).match(/[0-9a-fA-F]{2}/g).map((h) => parseInt(h,16));
+
+        let checkSum = bytes.pop();
+        let sum = bytes.reduce((a, c) => a + c, 0);
+        if (checkSum !== (-sum & 0xff)) { throw new Error(`Checksum error at line ${index + 1}`) }
+
+        let dlen = bytes.shift();
+        let addr = bytes.shift() << 8 | bytes.shift();
+        let type = bytes.shift();
+
+        switch (type) {
+            case 0: // DATA
+                if (data.length < ext_addr + addr) {
+                    //console.log(`parseHex: skip from: ${data.length}, to: ${ext_addr + addr}`);
+                    for (let i = data.length; i < ext_addr + addr; i++) {
+                        data.push(0xff); // blank
+                    }
+                } else if (data.length > ext_addr + addr) {
+                    throw new Error(`Address error at line ${index + 1}`);
+                }
+                data.push(...bytes);
+                break;
+            case 1: // EOF
+                // should stop?
+                //console.log(`parseHex: EOF at line ${index + 1}`);
+                break;
+            case 2: // Extended Segment Address
+                if (2 !== bytes.length) throw new Error(`Invalid record at line ${index + 1}`);
+                ext_addr = ((bytes[0] << 8) | bytes[1]) * 16;
+                console.log(`parseHex: Extended Segment Address: ${ext_addr} at line ${index + 1}`);
+                break;
+            case 4: // Extended Linear Address
+                if (2 !== bytes.length) throw new Error(`Invalid record at line ${index + 1}`);
+                ext_addr = ((bytes[0] << 8) | bytes[1]) << 16;
+                console.log(`parseHex: Extended Segment Address: ${ext_addr} at line ${index + 1}`);
+                break;
+
+            case 3: // Start Segment Address
+            case 5: // Start Linear Address
+                console.log(`parseHex: Not supported record type ${type} at line ${index + 1}`);
+                break;
+
+            default:
+                throw new Error(`parseHex: Invalid record type ${type} at line ${index + 1}`);
+        }
+        processed++;
+    }
+    return data;
+}
+
+function hexStr(n, digit=2, toUpper=true) {
+    let s = n.toString(16).padStart(digit, '0');
+    if (toUpper)
+        return s.toUpperCase();
+    else
+        return s;
+}
