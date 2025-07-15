@@ -57,8 +57,8 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
       UNIMAP_KP_ENTER,  UNIMAP_KP_1,        UNIMAP_KP_2,        UNIMAP_KP_3,    UNIMAP_KP_4,        UNIMAP_KP_5,        UNIMAP_KP_6,    UNIMAP_KP_7         }, /* 58-5F */
     { UNIMAP_KP_8,      UNIMAP_KP_9,        UNIMAP_KP_0,        UNIMAP_KP_DOT,  UNIMAP_NONUS_BSLASH,UNIMAP_APPLICATION, UNIMAP_F24,     UNIMAP_KP_EQUAL,       /* 60-67 */
       UNIMAP_F13,       UNIMAP_F14,         UNIMAP_F15,         UNIMAP_F16,     UNIMAP_F17,         UNIMAP_F18,         UNIMAP_F19,     UNIMAP_F20          }, /* 68-6F */
-    { UNIMAP_F21,       UNIMAP_F22,         UNIMAP_F23,         UNIMAP_F24,     UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO,             /* 70-77 */
-      UNIMAP_NO,        UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_MUTE         }, /* 78-7F */
+    { UNIMAP_F21,       UNIMAP_F22,         UNIMAP_F23,         UNIMAP_F24,     UNIMAP_F19,         UNIMAP_F23,         UNIMAP_F15,     UNIMAP_F17,            /* 70-77 */
+      UNIMAP_F13,       UNIMAP_F14,         UNIMAP_F16,         UNIMAP_F22,     UNIMAP_F18,         UNIMAP_F20,         UNIMAP_F21,     UNIMAP_MUTE         }, /* 78-7F */
     { UNIMAP_VOLU,      UNIMAP_VOLD,        UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO,          UNIMAP_KP_COMMA,    UNIMAP_NO,      UNIMAP_RO,             /* 80-87 */
       UNIMAP_KANA,      UNIMAP_JYEN,        UNIMAP_HENK,        UNIMAP_MHEN,    UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO           }, /* 88-8F */
     { UNIMAP_HENK,      UNIMAP_MHEN,        UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO,          UNIMAP_NO,          UNIMAP_NO,      UNIMAP_NO,             /* 90-97 */
@@ -84,6 +84,21 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
  *  0x66 Power              UNIMAP_F24
  *  0x80 LANG1              UNIMAP_HENK         Korean Hangul/English
  *  0x81 LANG2              UNIMAP_MHEN         Korean Hanja conversion
+ *
+ *  0x78 Stop               UNIMAP_F13          Sun keyboard
+ *  0x79 Again              UNIMAP_F14          Sun keyboard
+ *  0x76 Menu               UNIMAP_F15          Sun keyboard Props
+ *  0x7A Undo               UNIMAP_F16          Sun keyboard
+ *  0x77 Select             UNIMAP_F17          Sun keyboard Front
+ *  0x7C Copy               UNIMAP_F18          Sun keyboard
+ *  0x74 Execute            UNIMAP_F19          Sun keyboard Open
+ *  0x7D Paste              UNIMAP_F20          Sun keyboard
+ *  0x7E Find               UNIMAP_F21          Sun keyboard
+ *  0x7B Cut                UNIMAP_F22          Sun keyboard
+ *  0x75 Help               UNIMAP_F23          Sun keyboard
+ *  ???? -----              UNIMAP_JYEN         Sun keyboard Blank(Unix layout) RO? RCTRL?
+ *
+ *  https://github.com/tmk/tmk_keyboard/wiki/Sun-Keyboard-Protocol#usb-hid-usages-for-sun
  */
 
 #endif
