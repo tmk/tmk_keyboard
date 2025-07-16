@@ -10,38 +10,38 @@
 /* Keymapping with 16bit action codes */
 extern const action_t actionmaps[][UNIMAP_ROWS][UNIMAP_COLS];
 
-// table translates matrix to universal keymap
+// table translates matrix to unimap position
 extern const uint8_t unimap_trans[MATRIX_ROWS][MATRIX_COLS];
 
 
 
-// translates raw matrix to universal map
-keypos_t unimap_translate(keypos_t key)
+// translates raw matrix to unimap position code
+uint8_t unimap_translate(keypos_t key)
 {
-    uint8_t unimap_pos = 
+    if (key.row >= MATRIX_ROWS || key.col >= MATRIX_COLS) {
+        return UNIMAP_NO;
+    }
+
 #if defined(__AVR__)
-        pgm_read_byte(&unimap_trans[key.row][key.col]);
+    return pgm_read_byte(&unimap_trans[key.row][key.col]);
 #else
-        unimap_trans[key.row][key.col];
+    return unimap_trans[key.row][key.col];
 #endif
-    return (keypos_t) {
-        .row = ((unimap_pos >> 4 ) & 0x07),
-        .col = (unimap_pos & 0x0F)
-    };
 }
 
 /* Converts key to action */
 __attribute__ ((weak))
 action_t action_for_key(uint8_t layer, keypos_t key)
 {
-    keypos_t uni = unimap_translate(key);
-    if ((uni.row << 4 | uni.col) > 0x7F) {
+    uint8_t ucode = unimap_translate(key);
+    if (ucode == UNIMAP_NO) {
         return (action_t)ACTION_NO;
     }
+
 #if defined(__AVR__)
-    return (action_t)pgm_read_word(&actionmaps[(layer)][(uni.row & 0x07)][(uni.col & 0x0F)]);
+    return (action_t)pgm_read_word(&actionmaps[(layer)][UNIMAP_ROW(ucode)][UNIMAP_COL(ucode)]);
 #else
-    return actionmaps[(layer)][(uni.row & 0x07)][(uni.col & 0x0F)];
+    return actionmaps[(layer)][UNIMAP_ROW(ucode)][UNIMAP_COL(ucode)];
 #endif
 }
 

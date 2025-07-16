@@ -14,6 +14,9 @@ Copyright 2016 Jun Wako <wakojun@gmail.com>
 // Universal map table: 8x16=128key
 #define UNIMAP_ROWS 8
 #define UNIMAP_COLS 16
+#define UNIMAP_ROW(ucode)       (((ucode) >> 4) & 0x7)
+#define UNIMAP_COL(ucode)       ((ucode) & 0xF)
+#define UNIMAP_CODE(row, col)   ((((row) & 0x7) << 4) | ((col) & 0xF))
 
 /* Universal 128-key keyboard layout(8x16)
         ,-----------------------------------------------.
