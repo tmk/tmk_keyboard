@@ -293,8 +293,8 @@ function Action(code) {
                 }
                 return $.extend({}, action_kinds.MODS_TAP_KEY,
                         {
-                            name: _mods_str.name + " \u296F" + keycodes[this.key_code].name,
-                            desc: _mods_str.desc + " and " + keycodes[this.key_code].desc + "(tap)"
+                            name: ((this.key_mods & 0x0f) ? _mods_str.name + " " : "") + "\u296F" + keycodes[this.key_code].name,
+                            desc: ((this.key_mods & 0x0f) ? _mods_str.desc + "(hold) and " : "") + keycodes[this.key_code].desc + "(tap)"
                         });
                 break;
             case ACT_TAP_LMODS:
