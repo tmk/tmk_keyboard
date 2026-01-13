@@ -63,11 +63,23 @@ CONFIG = {
             firmware_format: "ihex",
             layout: "layout-adb_usb.html",
         },
+        adb_usb_m0116: {
+            desc: "ADB-USB Converter rev.2(M0116)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/adb_usb/binary/adb_usb_rev2_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-adb_usb_m0116.html",
+        },
         adb_usb_rev1: {
             desc: "ADB-USB Converter rev.1",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/adb_usb/binary/adb_usb_rev1_unimap.hex",
             firmware_format: "ihex",
             layout: "layout-adb_usb.html",
+        },
+        adb_usb_rev1_m0116: {
+            desc: "ADB-USB Converter rev.1(M0116)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/adb_usb/binary/adb_usb_rev1_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-adb_usb_m0116.html",
         },
         /*
          * USB-USB
