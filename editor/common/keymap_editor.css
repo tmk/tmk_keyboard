@@ -167,3 +167,10 @@ textarea {
     z-index: 5;
     height: 80px;
 }
+
+/* backward L-shape return enter */
+.enterL {
+    z-index: 5;
+    padding-top: 58px;
+    top: -52px;
+}
