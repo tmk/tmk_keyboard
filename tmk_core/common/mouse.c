@@ -30,6 +30,16 @@ uint8_t mouse_scroll_button_timeout = MOUSE_SCROLL_BUTTON_TIMEOUT;
 #endif
 uint8_t mouse_scroll_div = MOUSE_SCROLL_DIV;
 
+// acceleration
+/*
+#if !defined(MOUSE_ACCEL)
+#   define MOUSE_ACCEL 2
+#endif
+*/
+#if !defined(MOUSE_ACCEL_THRESHOLD)
+#   define MOUSE_ACCEL_THRESHOLD 5
+#endif
+
 
 
 static report_mouse_t report = {};
@@ -44,6 +54,19 @@ void mouse_send(report_mouse_t *r)
     report = *r;
 
     //TODO: other features; middle button/third button emuation(evdev/libinput)
+
+#if MOUSE_ACCEL
+    // dumb acceleration
+    static const uint8_t accel = MOUSE_ACCEL;
+    static const uint8_t threshold = MOUSE_ACCEL_THRESHOLD;
+    uint8_t move = 0;
+    if (report.x < 0) move += -report.x; else move += report.x;
+    if (report.y < 0) move += -report.y; else move += report.y;
+    if (move > threshold) {
+        report.x *= accel;
+        report.y *= accel;
+    }
+#endif
 
 #if MOUSE_SCROLL_BUTTON
     static enum { STATE_NONE, STATE_BTN, STATE_SENT } scroll_state = STATE_NONE;
