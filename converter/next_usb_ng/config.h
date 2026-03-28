@@ -24,8 +24,11 @@ Copyright 2024 Jun Wako <wakojun@gmail.com>
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)) \
 )
 
+#define MOUSE_ACCEL 4
+#define MOUSE_ACCEL_THRESHOLD 0
+
 /* Mouse scroll by button(right) */
-#define MOUSE_SCROLL_BUTTON     MOUSE_BTN2
+//#define MOUSE_SCROLL_BUTTON     MOUSE_BTN2
 
 /* debug */
 #define NEXT_DEBUG  0
