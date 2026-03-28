@@ -482,5 +482,5 @@ void hook_main_loop(void)
     mouse_report.y = (mouse_report.y > -127 ? mouse_report.y : -127);
     mouse_send(&mouse_report);
 
-    xprintf("M:%03X%03X/X%d,Y%d,B%d ", data1, data2, mouse_report.x, mouse_report.y, mouse_report.buttons);
+    xprintf("M:%03X%03X/X%d,Y%d,B%d\n", data1, data2, mouse_report.x, mouse_report.y, mouse_report.buttons);
 }
