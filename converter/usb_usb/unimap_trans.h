@@ -85,21 +85,19 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
  *  0x90 LANG1              UNIMAP_HENK         Korean Hangul/English
  *  0x91 LANG2              UNIMAP_MHEN         Korean Hanja conversion
  *
- *  0x78 Stop               UNIMAP_F13          Sun keyboard
- *  0x79 Again              UNIMAP_F14          Sun keyboard
- *  0x76 Menu               UNIMAP_F15          Sun keyboard Props
- *  0x7A Undo               UNIMAP_F16          Sun keyboard
- *  0x77 Select             UNIMAP_F17          Sun keyboard Front
- *  0x7C Copy               UNIMAP_F18          Sun keyboard
- *  0x74 Execute            UNIMAP_F19          Sun keyboard Open
- *  0x7D Paste              UNIMAP_F20          Sun keyboard
- *  0x7E Find               UNIMAP_F21          Sun keyboard
- *  0x7B Cut                UNIMAP_F22          Sun keyboard
- *  0x75 Help               UNIMAP_F23          Sun keyboard
- *  ???? -----              UNIMAP_JYEN         Sun keyboard Blank(Unix layout) RO? RCTRL?
- *      https://github.com/tmk/tmk_keyboard/wiki/Sun-Keyboard-Protocol#usb-hid-usages-for-sun
- *  0x9E Return?                                Sun keyboard ???
- *      https://github.com/tmk/tmk_keyboard/wiki/Sun-Keyboard-Protocol#keyboard-return
+ *  0x78 Stop               UNIMAP_F13          Sun Stop
+ *  0x79 Again              UNIMAP_F14          Sun Again
+ *  0x76 Menu               UNIMAP_F15          Sun Props
+ *  0x7A Undo               UNIMAP_F16          Sun Undo
+ *  0x77 Select             UNIMAP_F17          Sun Front
+ *  0x7C Copy               UNIMAP_F18          Sun Copy
+ *  0x74 Execute            UNIMAP_F19          Sun Open
+ *  0x7D Paste              UNIMAP_F20          Sun Paste
+ *  0x7E Find               UNIMAP_F21          Sun Find
+ *  0x7B Cut                UNIMAP_F22          Sun Cut
+ *  0x75 Help               UNIMAP_F23          Sun Help
+ *  0x76 Menu               UNIMAP_F15          Sun Blank(UNIX layout)
+ *      https://github.com/tmk/tmk_keyboard/wiki/Sun-Keyboard-Protocol#blank-key
  *
  *  0x8C INTL6              UNIMAP_KP_COMMA     PC98 Keypad ,
  *      https://github.com/tmk/tmk_keyboard/wiki/USB:-HID-Usage-Table#note-21
