@@ -81,7 +81,7 @@ const uint8_t PROGMEM unimap_trans[MATRIX_ROWS][MATRIX_COLS] = {
  *
  *  HID Keyboard usage      Unimap code         Note
  *  -------------------------------------------------------------------------------
- *  0x66 Power              UNIMAP_F24
+ *  0x66 Power              UNIMAP_F24          Sun Sleep
  *  0x90 LANG1              UNIMAP_HENK         Korean Hangul/English
  *  0x91 LANG2              UNIMAP_MHEN         Korean Hanja conversion
  *
