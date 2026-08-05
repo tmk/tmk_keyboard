@@ -91,10 +91,16 @@ CONFIG = {
             layout: "layout-128key.html",
         },
         usb_usb_sun7: {
-            desc: "USB-USB Converter(Sun Type-6/7)",
+            desc: "USB-USB Converter(Sun Type-6/7 UNIX)",
             firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/usb_usb/binary/usb_usb_unimap.hex",
             firmware_format: "ihex",
             layout: "layout-sun_type7.html",
+        },
+        usb_usb_sun7pc: {
+            desc: "USB-USB Converter(Sun Type-6/7 PC)",
+            firmware_url: "https://raw.githubusercontent.com/tmk/tmk_keyboard/master/converter/usb_usb/binary/usb_usb_unimap.hex",
+            firmware_format: "ihex",
+            layout: "layout-sun_type7pc.html",
         },
         /*
          * NeXT-USB
